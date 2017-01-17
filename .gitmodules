@@ -1,0 +1,3 @@
+[submodule "libs/openxc-message-format"]
+	path = libs/openxc-message-format
+	url = git@github.com:openxc/openxc-message-format.git
