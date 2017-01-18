@@ -28,8 +28,10 @@
 #include <math.h>
 #include <fcntl.h>
 #include <systemd/sd-event.h>
+#include <errno.h>
 
 #include <json-c/json.h>
+#include <openxc.pb.h>
 
 #include <afb/afb-binding.h>
 #include <afb/afb-service-itf.h>
@@ -44,10 +46,16 @@
 /*****************************************************************************************/
 /*****************************************************************************************/
 
-/*
- * Interface between the daemon and the binding
- */
-static const struct afb_binding_interface *interface;
+/* max. number of CAN interfaces given on the cmdline */
+#define MAXSOCK 16
+
+/* buffer sizes for CAN frame string representations */
+#define CL_ID (sizeof("12345678##1"))
+#define CL_DATA sizeof(".AA")
+#define CL_BINDATA sizeof(".10101010")
+
+ /* CAN FD ASCII hex short representation with DATA_SEPERATORs */
+#define CL_CFSZ (2*CL_ID + 64*CL_DATA)
 
 /*
  * the type of position expected
@@ -64,27 +72,30 @@ enum type {
 #define type_size sizeof(enum type)-2
 
 /*
- * names of the types
+ * each generated event
  */
-static const char * const type_NAMES[type_size] = {
-	"OBDII",
-	"CAN"
+struct event {
+	struct event *next;	/* link for the same period */
+	const char *name;	/* name of the event */
+	struct afb_event event;	/* the event for the binder */
+	enum type type;		/* the type of data expected */
+	int id;			/* id of the event for unsubscribe */
 };
 
 struct can_handler {
 	int socket;
 	char *device;
-	char *send_msg;
-	char *read_msg;
 	struct sockaddr_can txAddress;
 };
 
-static struct can_handler can_handler = {
-	.socket = -1,
-	.device = "vcan0"
-};
-
-struct can_frame can_frame;
+static __u32 dropcnt[MAXSOCK];
+static __u32 last_dropcnt[MAXSOCK];
+char ctrlmsg[CMSG_SPACE(sizeof(struct timeval)) + CMSG_SPACE(sizeof(__u32))];
+struct timeval tv;
+struct iovec iov;
+struct msghdr msg;
+struct cmsghdr *cmsg;
+struct canfd_frame can_frame;
 
 /*****************************************************************************************/
 /*****************************************************************************************/
@@ -95,6 +106,10 @@ struct can_frame can_frame;
 /**											**/
 /*****************************************************************************************/
 /*****************************************************************************************/
+/*
+ * Interface between the daemon and the binding
+ */
+static const struct afb_binding_interface *interface;
 
 /*
  * @brief Retry a function 3 times
@@ -129,122 +144,30 @@ static int retry( int(*func)())
 /**											**/
 /*****************************************************************************************/
 /*****************************************************************************************/
+/*
+ * names of the types
+ */
+static const char * const type_NAMES[type_size] = {
+	"OBDII",
+	"CAN"
+};
 
-static int connect_to_event_loop();
+
+// Initialize default can_handler values
+static struct can_handler can_handler = {
+	.socket = -1,
+	.device = "vcan0"
+};
 
 /*
- * Parse the CAN frame data payload as a CANopen packet
- * TODO: define can_frame_t
+ * Parse the CAN frame data payload as a CAN packet
+ * TODO: parse as an OpenXC Can Message
  */
-int can_frame_parse(canopen_frame_t *canopen_frame, struct can_frame *can_frame)
+int can_frame_parse(openxc_CanMessage *can_message, struct can_frame *can_frame)
 {
-    int i;
 
-    if (canopen_frame == NULL || can_frame == NULL)
-    {
-        return -1;
-    }
-
-    bzero((void *)canopen_frame, sizeof(canopen_frame_t));
-
-    //
-    // Parse basic protocol fields
-    //
-
-    if (can_frame->can_id & CAN_EFF_FLAG)
-    {
-        canopen_frame->type = CANOPEN_FLAG_EXTENDED;
-        canopen_frame->id   = can_frame->can_id & CAN_EFF_MASK;
-    }
-    else
-    {
-        canopen_frame->type = CANOPEN_FLAG_STANDARD;
-        canopen_frame->function_code = (can_frame->can_id & 0x00000780U) >> 7;
-        canopen_frame->id            = (can_frame->can_id & 0x0000007FU);
-    }
-
-    canopen_frame->rtr = (can_frame->can_id & CAN_RTR_FLAG) ?
-                         CANOPEN_FLAG_RTR : CANOPEN_FLAG_NORMAL;
-
-    canopen_frame->data_len = can_frame->can_dlc;
-    for (i = 0; i < can_frame->can_dlc; i++)
-    {
-        canopen_frame->payload.data[i] = can_frame->data[i];
-    }
-
-    //
-    // Parse payload data
-    //
-
-    // NMT protocol
-    switch (canopen_frame->function_code)
-    {
-        // ---------------------------------------------------------------------
-        // Network ManagemenT frame: Module Control
-        //
-        case CANOPEN_FC_NMT_MC:
-
-            break;
-
-        // ---------------------------------------------------------------------
-        // Network ManagemenT frame: Node Guarding
-        //
-        case CANOPEN_FC_NMT_NG:
-
-
-            break;
-
-        //default:
-            // unhandled type...
-    }
-
-    return 0;
 }
 
-/*
- * Read on CAN bus
- */
-static int read_can()
-{
-	int byte_read;
-
-	byte_read = read(can_handler.socket, &can_frame, sizeof(struct can_frame));
-
-	if (byte_read < 0)
-	{
-		ERROR(interface, "Error reading CAN bus");
-		return -1;
-	}
-
-	if (byte_read < (int)sizeof(struct can_frame))
-	{
-		ERROR(interface, "CAN frame incomplete");
-		return -2;
-	}
-}
-
-/*
- * called on an event on the CAN bus
- */
-static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata)
-{
-	/* read available data */
-	if ((revents & EPOLLIN) != 0)
-	{
-		read_can();
-//		event_send();
-	}
-
-	/* check if error or hangup */
-	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
-	{
-		sd_event_source_unref(s);
-		close(fd);
-		connect_to_event_loop();
-	}
-
-	return 0;
-}
 
 /*
  * open the can socket
@@ -304,23 +227,6 @@ static int write_can()
 /*
  * TODO change old hvac write can frame to generic on_event
  */
-		can_frame.can_id = 0x30;
-		can_frame.can_dlc = 8;
-		can_frame.data[0] = 0;
-		can_frame.data[1] = 0;
-		can_frame.data[2] = 0;
-		can_frame.data[3] = 0xf0;
-		can_frame.data[4] = 0;
-		can_frame.data[5] = 1;
-		can_frame.data[6] = 0;
-		can_frame.data[7] = 0;
-
-		DEBUG(interface, "%s: %d %d [%02x %02x %02x %02x %02x %02x %02x %02x]\n",
-			can_handler.send_msg,
-			can_frame.can_id, can_frame.can_dlc,
-			can_frame.data[0], can_frame.data[1], can_frame.data[2], can_frame.data[3],
-			can_frame.data[4], can_frame.data[5], can_frame.data[6], can_frame.data[7]);
-
 		rc = sendto(can_handler.socket, &can_frame, sizeof(struct can_frame), 0,
 			    (struct sockaddr*)&can_handler.txAddress, sizeof(can_handler.txAddress));
 		if (rc < 0)
@@ -336,6 +242,69 @@ static int write_can()
 	return rc;
 }
 
+/*
+ * Read on CAN bus and return how much bytes has been read.
+ */
+static int read_can(openxc_CanMessage *can_message)
+{
+	int byte_read, maxdlen;
+	iov.iov_base = &can_frame;
+	msg.msg_name = &can_handler.txAddress;
+	msg.msg_iov = &iov;
+	msg.msg_iovlen = 1;
+	msg.msg_control = &ctrlmsg;
+
+	byte_read = recvmsg(can_handler.socket, &msg, 0);
+
+	if (byte_read < 0)
+	{
+		if (errno == ENETDOWN) {
+			ERROR(interface, "%s: interface down", can_handler.device);
+		}
+		ERROR(interface, "Error reading CAN bus");
+		return -1;
+	}
+
+	// CAN frame integrity check
+	if ((size_t)byte_read == CAN_MTU)
+		maxdlen = CAN_MAX_DLEN;
+	else if ((size_t)byte_read == CANFD_MTU)
+		maxdlen = CANFD_MAX_DLEN;
+	else
+	{
+		ERROR(interface, "CAN frame incomplete");
+		return -2;
+	}
+
+	for (	cmsg = CMSG_FIRSTHDR(&msg);
+		cmsg && (cmsg->cmsg_level == SOL_SOCKET);
+		cmsg = CMSG_NXTHDR(&msg,cmsg))
+	{
+		if (cmsg->cmsg_type == SO_TIMESTAMP)
+			tv = *(struct timeval *)CMSG_DATA(cmsg);
+			else if (cmsg->cmsg_type == SO_RXQ_OVFL)
+				dropcnt[can_handler.socket] = *(__u32 *)CMSG_DATA(cmsg);
+	}
+
+	// Check if there is a new CAN frame dropped.
+	if (dropcnt[can_handler.socket] != last_dropcnt[can_handler.socket])
+	{
+		__u32 frames = dropcnt[can_handler.socket] - last_dropcnt[can_handler.socket];
+		WARNING(interface, "DROPCOUNT: dropped %d CAN frame%s on '%s' socket (total drops %d)",
+			frames, (frames > 1)?"s":"", can_handler.device, dropcnt[can_handler.socket]);
+			if (log)
+				WARNING(interface, "DROPCOUNT: dropped %d CAN frame%s on '%s' socket (total drops %d)\n",
+					frames, (frames > 1)?"s":"", can_handler.device, dropcnt[can_handler.socket]);
+
+			last_dropcnt[can_handler.socket] = dropcnt[can_handler.socket];
+	}
+
+	can_message->has_id = true;
+	can_message->id = msg.id; // TODO make the parsing to extract id from data and only return left data into msg.msg_iov
+	can_message->has_data = true;
+	can_message->data = msg.msg_iov;
+}
+
 /***************************************************************************************/
 /***************************************************************************************/
 /**                                                                                   **/
@@ -345,6 +314,32 @@ static int write_can()
 /**                                                                                   **/
 /***************************************************************************************/
 /***************************************************************************************/
+static int connect_to_event_loop();
+
+/*
+ * called on an event on the CAN bus
+ */
+static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata)
+{
+	openxc_CanMessage can_message;
+
+	/* read available data */
+	if ((revents & EPOLLIN) != 0)
+	{
+		read_can(&can_message);
+//		event_send();
+	}
+
+	/* check if error or hangup */
+	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
+	{
+		sd_event_source_unref(s);
+		close(fd);
+		connect_to_event_loop();
+	}
+
+	return 0;
+}
 
 /*
  * get or create an event handler for the type
