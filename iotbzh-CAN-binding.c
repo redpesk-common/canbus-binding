@@ -25,6 +25,7 @@
 #include <net/if.h>
 #include <sys/time.h>
 #include <linux/can.h>
+#include <linux/can/raw.h>
 #include <math.h>
 #include <fcntl.h>
 #include <systemd/sd-event.h>
@@ -57,6 +58,8 @@
  /* CAN FD ASCII hex short representation with DATA_SEPERATORs */
 #define CL_CFSZ (2*CL_ID + 64*CL_DATA)
 
+#define CANID_DELIM '#'
+
 /*
  * the type of position expected
  *
@@ -82,20 +85,21 @@ struct event {
 	int id;			/* id of the event for unsubscribe */
 };
 
-struct can_handler {
-	int socket;
-	char *device;
-	struct sockaddr_can txAddress;
-};
+/* CAN variable initialization */
 
 static __u32 dropcnt[MAXSOCK];
 static __u32 last_dropcnt[MAXSOCK];
-char ctrlmsg[CMSG_SPACE(sizeof(struct timeval)) + CMSG_SPACE(sizeof(__u32))];
 struct timeval tv;
-struct iovec iov;
-struct msghdr msg;
-struct cmsghdr *cmsg;
-struct canfd_frame can_frame;
+struct canfd_frame canfd_frame;
+
+struct can_handler {
+	int socket;
+	char *device;
+	openxc_CanMessage *msg;
+	struct sockaddr_can txAddress;
+};
+
+
 
 /*****************************************************************************************/
 /*****************************************************************************************/
@@ -144,6 +148,25 @@ static int retry( int(*func)())
 /**											**/
 /*****************************************************************************************/
 /*****************************************************************************************/
+const char hex_asc_upper[] = "0123456789ABCDEF";
+
+#define hex_asc_upper_lo(x) hex_asc_upper[((x) & 0x0F)]
+#define hex_asc_upper_hi(x) hex_asc_upper[((x) & 0xF0) >> 4]
+
+static inline void _put_id(char *buf, int end_offset, canid_t id)
+{
+	/* build 3 (SFF) or 8 (EFF) digit CAN identifier */
+	while (end_offset >= 0) {
+		buf[end_offset--] = hex_asc_upper[id & 0xF];
+		id >>= 4;
+	}
+}
+
+#define put_sff_id(buf, id) _put_id(buf, 2, id)
+#define put_eff_id(buf, id) _put_id(buf, 7, id)
+
+static int canread_frame_parse(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen);
+
 /*
  * names of the types
  */
@@ -156,17 +179,8 @@ static const char * const type_NAMES[type_size] = {
 // Initialize default can_handler values
 static struct can_handler can_handler = {
 	.socket = -1,
-	.device = "vcan0"
+	.device = "vcan0",
 };
-
-/*
- * Parse the CAN frame data payload as a CAN packet
- * TODO: parse as an OpenXC Can Message
- */
-int can_frame_parse(openxc_CanMessage *can_message, struct can_frame *can_frame)
-{
-
-}
 
 
 /*
@@ -174,8 +188,10 @@ int can_frame_parse(openxc_CanMessage *can_message, struct can_frame *can_frame)
  */
 static int open_can_dev()
 {
+	const int canfd_on = 1;
 	struct ifreq ifr;
 	struct timeval timeout = {1,0};
+	openxc_CanMessage *can_msg;
 
 	DEBUG(interface, "open_can_dev: CAN Handler socket : %d", can_handler.socket);
 	close(can_handler.socket);
@@ -187,9 +203,19 @@ static int open_can_dev()
 	}
 	else
 	{
-		// Set timeout for read
+		/* Set timeout for read */
 		setsockopt(can_handler.socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
-		// Attempts to open a socket to CAN bus
+		/* try to switch the socket into CAN_FD mode */
+		can_msg->has_frame_format = true;
+		if (setsockopt(can_handler.socket, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
+		{
+			NOTICE(interface, "open_can_dev: Can not switch into CAN Extended frame format.");
+			can_msg->frame_format = openxc_CanMessage_FrameFormat_STANDARD;
+		} else {
+			can_msg->frame_format = openxc_CanMessage_FrameFormat_EXTENDED;
+		}
+
+		/* Attempts to open a socket to CAN bus */
 		strcpy(ifr.ifr_name, can_handler.device);
 		if(ioctl(can_handler.socket, SIOCGIFINDEX, &ifr) < 0)
 		{
@@ -200,7 +226,7 @@ static int open_can_dev()
 			can_handler.txAddress.can_family = AF_CAN;
 			can_handler.txAddress.can_ifindex = ifr.ifr_ifindex;
 
-			// And bind it to txAddress
+			/* And bind it to txAddress */
 			if (bind(can_handler.socket, (struct sockaddr *)&can_handler.txAddress, sizeof(can_handler.txAddress)) < 0)
 			{
 				ERROR(interface, "open_can_dev: bind failed");
@@ -208,6 +234,7 @@ static int open_can_dev()
 			else
 			{
 				fcntl(can_handler.socket, F_SETFL, O_NONBLOCK);
+				can_handler.msg = can_msg;
 				return 0;
 			}
 		}
@@ -227,7 +254,7 @@ static int write_can()
 /*
  * TODO change old hvac write can frame to generic on_event
  */
-		rc = sendto(can_handler.socket, &can_frame, sizeof(struct can_frame), 0,
+		rc = sendto(can_handler.socket, &canfd_frame, sizeof(struct canfd_frame), 0,
 			    (struct sockaddr*)&can_handler.txAddress, sizeof(can_handler.txAddress));
 		if (rc < 0)
 		{
@@ -245,18 +272,13 @@ static int write_can()
 /*
  * Read on CAN bus and return how much bytes has been read.
  */
-static int read_can(openxc_CanMessage *can_message)
+static int read_can()
 {
-	int byte_read, maxdlen;
-	iov.iov_base = &can_frame;
-	msg.msg_name = &can_handler.txAddress;
-	msg.msg_iov = &iov;
-	msg.msg_iovlen = 1;
-	msg.msg_control = &ctrlmsg;
+	int bytes_read, maxdlen;
 
-	byte_read = recvmsg(can_handler.socket, &msg, 0);
+	bytes_read = read(can_handler.socket, &canfd_frame, sizeof(struct canfd_frame));
 
-	if (byte_read < 0)
+	if (bytes_read < 0)
 	{
 		if (errno == ENETDOWN) {
 			ERROR(interface, "%s: interface down", can_handler.device);
@@ -265,10 +287,10 @@ static int read_can(openxc_CanMessage *can_message)
 		return -1;
 	}
 
-	// CAN frame integrity check
-	if ((size_t)byte_read == CAN_MTU)
+	/* CAN frame integrity check */
+	if ((size_t)bytes_read == CAN_MTU)
 		maxdlen = CAN_MAX_DLEN;
-	else if ((size_t)byte_read == CANFD_MTU)
+	else if ((size_t)bytes_read == CANFD_MTU)
 		maxdlen = CANFD_MAX_DLEN;
 	else
 	{
@@ -276,28 +298,59 @@ static int read_can(openxc_CanMessage *can_message)
 		return -2;
 	}
 
-	for (	cmsg = CMSG_FIRSTHDR(&msg);
-		cmsg && (cmsg->cmsg_level == SOL_SOCKET);
-		cmsg = CMSG_NXTHDR(&msg,cmsg))
-	{
-		if (cmsg->cmsg_type == SO_TIMESTAMP)
-			tv = *(struct timeval *)CMSG_DATA(cmsg);
-			else if (cmsg->cmsg_type == SO_RXQ_OVFL)
-				dropcnt[can_handler.socket] = *(__u32 *)CMSG_DATA(cmsg);
+	canread_frame_parse(can_message, &canfd_frame, maxdlen);
+}
+
+/*
+ * Parse the CAN frame data payload as a CAN packet
+ * TODO: parse as an OpenXC Can Message
+ */
+static int canread_frame_parse(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen)
+{
+	int i,offset;
+	int len = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
+
+	if (canfd_frame->can_id & CAN_ERR_FLAG) {
+		put_eff_id(buf, canfd_frame->can_id & (CAN_ERR_MASK|CAN_ERR_FLAG));
+		buf[8] = '#';
+		offset = 9;
+	} else if (canfd_frame->can_id & CAN_EFF_FLAG) {
+		put_eff_id(buf, canfd_frame->can_id & CAN_EFF_MASK);
+		buf[8] = '#';
+		offset = 9;
+	} else {
+		put_sff_id(buf, canfd_frame->can_id & CAN_SFF_MASK);
+		buf[3] = '#';
+		offset = 4;
 	}
 
-	// Check if there is a new CAN frame dropped.
-	if (dropcnt[can_handler.socket] != last_dropcnt[can_handler.socket])
-	{
-		__u32 frames = dropcnt[can_handler.socket] - last_dropcnt[can_handler.socket];
-		WARNING(interface, "DROPCOUNT: dropped %d CAN frame%s on '%s' socket (total drops %d)",
-			frames, (frames > 1)?"s":"", can_handler.device, dropcnt[can_handler.socket]);
-			if (log)
-				WARNING(interface, "DROPCOUNT: dropped %d CAN frame%s on '%s' socket (total drops %d)\n",
-					frames, (frames > 1)?"s":"", can_handler.device, dropcnt[can_handler.socket]);
+	/* standard CAN frames may have RTR enabled. There are no ERR frames with RTR */
+	if (maxdlen == CAN_MAX_DLEN && canfd_frame->can_id & CAN_RTR_FLAG) {
+		buf[offset++] = 'R';
+		/* print a given CAN 2.0B DLC if it's not zero */
+		if (canfd_frame->len && canfd_frame->len <= CAN_MAX_DLC)
+			buf[offset++] = hex_asc_upper[canfd_frame->len & 0xF];
 
-			last_dropcnt[can_handler.socket] = dropcnt[can_handler.socket];
+		buf[offset] = 0;
+		return;
 	}
+
+	if (maxdlen == CANFD_MAX_DLEN) {
+		/* add CAN FD specific escape char and flags */
+		buf[offset++] = '#';
+		buf[offset++] = hex_asc_upper[canfd_frame->flags & 0xF];
+		if (sep && len)
+			buf[offset++] = '.';
+	}
+
+	for (i = 0; i < len; i++) {
+		put_hex_byte(buf + offset, canfd_frame->data[i]);
+		offset += 2;
+		if (sep && (i+1 < len))
+			buf[offset++] = '.';
+	}
+
+buf[offset] = 0;
 
 	can_message->has_id = true;
 	can_message->id = msg.id; // TODO make the parsing to extract id from data and only return left data into msg.msg_iov
