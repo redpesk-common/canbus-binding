@@ -165,7 +165,7 @@ static inline void _put_id(char *buf, int end_offset, canid_t id)
 #define put_sff_id(buf, id) _put_id(buf, 2, id)
 #define put_eff_id(buf, id) _put_id(buf, 7, id)
 
-static int canread_frame_parse(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen);
+static void canread_frame_parse(struct canfd_frame *canfd_frame, int maxdlen);
 
 /*
  * names of the types
@@ -298,17 +298,18 @@ static int read_can()
 		return -2;
 	}
 
-	canread_frame_parse(can_message, &canfd_frame, maxdlen);
+	canread_frame_parse(&canfd_frame, maxdlen);
 }
 
 /*
  * Parse the CAN frame data payload as a CAN packet
  * TODO: parse as an OpenXC Can Message
  */
-static int canread_frame_parse(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen)
+static void canread_frame_parse(struct canfd_frame *canfd_frame, int maxdlen)
 {
 	int i,offset;
 	int len = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
+	char buf[CL_CFSZ];
 
 	if (canfd_frame->can_id & CAN_ERR_FLAG) {
 		put_eff_id(buf, canfd_frame->can_id & (CAN_ERR_MASK|CAN_ERR_FLAG));
@@ -332,22 +333,17 @@ static int canread_frame_parse(openxc_CanMessage *can_message, struct canfd_fram
 			buf[offset++] = hex_asc_upper[canfd_frame->len & 0xF];
 
 		buf[offset] = 0;
-		return;
 	}
 
 	if (maxdlen == CANFD_MAX_DLEN) {
 		/* add CAN FD specific escape char and flags */
 		buf[offset++] = '#';
 		buf[offset++] = hex_asc_upper[canfd_frame->flags & 0xF];
-		if (sep && len)
-			buf[offset++] = '.';
 	}
-
+/*
 	for (i = 0; i < len; i++) {
 		put_hex_byte(buf + offset, canfd_frame->data[i]);
 		offset += 2;
-		if (sep && (i+1 < len))
-			buf[offset++] = '.';
 	}
 
 buf[offset] = 0;
@@ -356,6 +352,7 @@ buf[offset] = 0;
 	can_message->id = msg.id; // TODO make the parsing to extract id from data and only return left data into msg.msg_iov
 	can_message->has_data = true;
 	can_message->data = msg.msg_iov;
+	*/
 }
 
 /***************************************************************************************/
