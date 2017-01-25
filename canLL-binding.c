@@ -278,7 +278,7 @@ static int write_can()
 /*
  * Read on CAN bus and return how much bytes has been read.
  */
-static int read_can()
+static int read_can(openxc_CanMessage *can_message)
 {
 	ssize_t nbytes;
 	int maxdlen;
@@ -295,9 +295,8 @@ static int read_can()
 	}
 	else
 	{
-	 	if (errno == ENETDOWN) {
+	 	if (errno == ENETDOWN)
 			ERROR(interface, "read_can: %s interface down", can_handler.device);
-		}
 		ERROR(interface, "read_can: Error reading CAN bus");
 		return -1;
 	}
@@ -318,7 +317,8 @@ static int read_can()
 
 /*
  * Parse the CAN frame data payload as a CAN packet
- * TODO: parse as an OpenXC Can Message
+ * TODO: parse as an OpenXC Can Message. Don't translate as ASCII and put bytes
+ * directly into openxc_CanMessage
  */
 static void canread_frame_parse(struct canfd_frame *canfd_frame, int maxdlen)
 {
@@ -326,11 +326,13 @@ static void canread_frame_parse(struct canfd_frame *canfd_frame, int maxdlen)
 	int len = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
 	char buf[CL_CFSZ];
 
-	if (canfd_frame->can_id & CAN_ERR_FLAG) {
+	if (canfd_frame->can_id & CAN_ERR_FLAG)
+	{
 		put_eff_id(buf, canfd_frame->can_id & (CAN_ERR_MASK|CAN_ERR_FLAG));
 		buf[8] = '#';
 		offset = 9;
-	} else if (canfd_frame->can_id & CAN_EFF_FLAG) {
+	} else if (canfd_frame->can_id & CAN_EFF_FLAG)
+	{
 		put_eff_id(buf, canfd_frame->can_id & CAN_EFF_MASK);
 		buf[8] = '#';
 		offset = 9;
@@ -341,27 +343,32 @@ static void canread_frame_parse(struct canfd_frame *canfd_frame, int maxdlen)
 	}
 
 	/* standard CAN frames may have RTR enabled. There are no ERR frames with RTR */
-	if (maxdlen == CAN_MAX_DLEN && canfd_frame->can_id & CAN_RTR_FLAG) {
+	if (maxdlen == CAN_MAX_DLEN && canfd_frame->can_id & CAN_RTR_FLAG)
+	{
 		buf[offset++] = 'R';
 		/* print a given CAN 2.0B DLC if it's not zero */
 		if (canfd_frame->len && canfd_frame->len <= CAN_MAX_DLC)
 			buf[offset++] = hex_asc_upper[canfd_frame->len & 0xF];
 
 		buf[offset] = 0;
+		return;
 	}
 
-	if (maxdlen == CANFD_MAX_DLEN) {
+	if (maxdlen == CANFD_MAX_DLEN)
+	{
 		/* add CAN FD specific escape char and flags */
 		buf[offset++] = '#';
 		buf[offset++] = hex_asc_upper[canfd_frame->flags & 0xF];
 	}
 
-	for (i = 0; i < len; i++) {
+	for (i = 0; i < len; i++)
+	{
 		put_hex_byte(buf + offset, canfd_frame->data[i]);
 		offset += 2;
 	}
 
-buf[offset] = 0;
+	buf[offset] = 0;
+	return;
 }
 
 /***************************************************************************************/
@@ -465,15 +472,15 @@ static void subscribe(struct afb_req req)
 {
 	enum type type;
 	const char *period;
-	struct event *event;
+	struct event *can_sig;
 	struct json_object *json;
 
 	if (get_type_for_req(req, &type))
 	{
-		event = afb_daemon_make_event(interface->daemon, type_NAMES[type]);
-		if (event == NULL)
+		can_sig->event = afb_daemon_make_event(interface->daemon, type_NAMES[type]);
+		if (can_sig == NULL)
 			afb_req_fail(req, "out-of-memory", NULL);
-		else if (afb_req_subscribe(req, event->event) != 0)
+		else if (afb_req_subscribe(req, can_sig->event) != 0)
 			afb_req_fail_f(req, "failed", "afb_req_subscribe returned an error: %m");
 		else
 		{
