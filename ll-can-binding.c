@@ -37,84 +37,24 @@
 #include <afb/afb-binding.h>
 #include <afb/afb-service-itf.h>
 
-/*****************************************************************************************/
-/*****************************************************************************************/
-/**											**/
-/**											**/
-/**	   SECTION: GLOBAL VARIABLES							**/
-/**											**/
-/**											**/
-/*****************************************************************************************/
-/*****************************************************************************************/
-/* max. number of CAN interfaces given on the cmdline */
-#define MAXSOCK 16
+#include "canLL-binding.h"
 
-/* buffer sizes for CAN frame string representations */
-#define CL_ID (sizeof("12345678##1"))
-#define CL_DATA sizeof(".AA")
-#define CL_BINDATA sizeof(".10101010")
-
- /* CAN FD ASCII hex short representation with DATA_SEPERATORs */
-#define CL_CFSZ (2*CL_ID + 64*CL_DATA)
-
-#define CANID_DELIM '#'
+/*************************************************************************/
+/*************************************************************************/
+/**									**/
+/**									**/
+/**	   SECTION: UTILITY FUNCTIONS					**/
+/**									**/
+/**									**/
+/*************************************************************************/
+/*************************************************************************/
 
 /*
- * Interface between the daemon and the binding
- */
-static const struct afb_binding_interface *interface;
-
-/*
- * the type of position expected
+ * Retry a function 3 times
  *
- * here, this type is the selection of protocol
- */
-enum type {
-	type_OBDII,
-	type_CAN,
-	type_DEFAULT = type_CAN,
-	type_INVALID = -1
-};
-
-#define type_size sizeof(enum type)-2
-
-/* CAN variable initialization */
-struct canfd_frame canfd_frame;
-
-struct can_handler {
-	int socket;
-	char *device;
-	openxc_CanMessage *msg;
-	struct sockaddr_can txAddress;
-};
-
-/*
- * each generated event
- */
-struct event {
-	struct event *next;	/* link for the same period */
-	const char *name;	/* name of the event */
-	struct afb_event event;	/* the event for the binder */
-	enum type type;		/* the type of data expected */
-	int id;			/* id of the event for unsubscribe */
-};
-
-/*****************************************************************************************/
-/*****************************************************************************************/
-/**											**/
-/**											**/
-/**	   SECTION: UTILITY FUNCTIONS							**/
-/**											**/
-/**											**/
-/*****************************************************************************************/
-/*****************************************************************************************/
-
-/*
- * @brief Retry a function 3 times
+ * param int function(): function that return an int wihtout any parameter
  *
- * @param int function(): function that return an int wihtout any parameter
- *
- * @ return : 0 if ok, -1 if failed
+ * return : 0 if ok, -1 if failed
  *
  */
 static int retry( int(*func)());
@@ -133,56 +73,72 @@ static int retry( int(*func)())
 	return -1;
 }
 
-/*****************************************************************************************/
-/*****************************************************************************************/
-/**											**/
-/**											**/
-/**	   SECTION: HANDLE CAN DEVICE							**/
-/**											**/
-/**											**/
-/*****************************************************************************************/
-/*****************************************************************************************/
-const char hex_asc_upper[] = "0123456789ABCDEF";
-
-#define hex_asc_upper_lo(x) hex_asc_upper[((x) & 0x0F)]
-#define hex_asc_upper_hi(x) hex_asc_upper[((x) & 0xF0) >> 4]
-
-static inline void put_hex_byte(char *buf, __u8 byte)
+/*
+ * Browse chained list and return the one with specified id
+ *
+ * param uint32_t id : can arbitration identifier
+ *
+ * return can_event
+ */
+static can_event *get_event_of_id(uint32_t id)
 {
-	buf[0] = hex_asc_upper_hi(byte);
-	buf[1] = hex_asc_upper_lo(byte);
-}
+	can_event *current;
 
-static inline void _put_id(char *buf, int end_offset, canid_t id)
-{
-	/* build 3 (SFF) or 8 (EFF) digit CAN identifier */
-	while (end_offset >= 0) {
-		buf[end_offset--] = hex_asc_upper[id & 0xF];
-		id >>= 4;
+	/* create and return if lists not exists */
+	if (!can_events_list)
+	{
+		can_events_list = (can_event*)calloc(1, sizeof(can_event));
+		can_events_list->id = id;
+		return can_events_list;
 	}
+
+	/* search for id */
+	current = can_events_list;
+	while(current)
+	{
+		if (current->id == id)
+			return current;
+		if (!current->next)
+		{
+			current->next = (can_event*)calloc(1, sizeof(can_event));
+			current->next->id = id;
+			return current->next;
+		}
+		current = current->next;
+	}
+
+	return NULL;
 }
-
-#define put_sff_id(buf, id) _put_id(buf, 2, id)
-#define put_eff_id(buf, id) _put_id(buf, 7, id)
-
-static void canread_frame_parse(struct canfd_frame *canfd_frame, int maxdlen);
 
 /*
- * names of the types
+ * Take an id and return it into a char array
  */
-static const char * const type_NAMES[type_size] = {
-	"OBDII",
-	"CAN"
-};
+char* create_name(uint32_t id)
+{
+	char name[32];
+	size_t nchar;
 
+	nchar = (size_t)sprintf(name, "can_%u", id);
+	if (nchar > 0)
+	{
+		char *result = (char*)malloc(nchar + 1);
+		memcpy(result, name, nchar);
+		result[nchar] = 0;
+		return result;
+	}
 
-// Initialize default can_handler values
-static struct can_handler can_handler = {
-	.socket = -1,
-	.device = "vcan0",
-};
+	return NULL;
+}
 
-
+/*************************************************************************/
+/*************************************************************************/
+/**									**/
+/**									**/
+/**	   SECTION: HANDLE CAN DEVICE					**/
+/**									**/
+/**									**/
+/*************************************************************************/
+/*************************************************************************/
 /*
  * open the can socket
  */
@@ -191,15 +147,10 @@ static int open_can_dev()
 	const int canfd_on = 1;
 	struct ifreq ifr;
 	struct timeval timeout = {1,0};
-	openxc_CanMessage can_msg = {
-		.has_bus = false,
-		.has_id = false,
-		.has_data = false,
-		.has_frame_format = false,
-	};
 
 	DEBUG(interface, "open_can_dev: CAN Handler socket : %d", can_handler.socket);
-	close(can_handler.socket);
+	if (can_handler.socket >= 0)
+		close(can_handler.socket);
 
 	can_handler.socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
 	if (can_handler.socket < 0)
@@ -211,21 +162,18 @@ static int open_can_dev()
 		/* Set timeout for read */
 		setsockopt(can_handler.socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 		/* try to switch the socket into CAN_FD mode */
-		can_msg.has_frame_format = true;
 		if (setsockopt(can_handler.socket, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{
 			NOTICE(interface, "open_can_dev: Can not switch into CAN Extended frame format.");
-			can_msg.frame_format = openxc_CanMessage_FrameFormat_STANDARD;
+			can_handler.is_fdmode_on = false;
 		} else {
-			can_msg.frame_format = openxc_CanMessage_FrameFormat_EXTENDED;
+			can_handler.is_fdmode_on = true;
 		}
 
 		/* Attempts to open a socket to CAN bus */
 		strcpy(ifr.ifr_name, can_handler.device);
 		if(ioctl(can_handler.socket, SIOCGIFINDEX, &ifr) < 0)
-		{
 			ERROR(interface, "open_can_dev: ioctl failed");
-		}
 		else
 		{
 			can_handler.txAddress.can_family = AF_CAN;
@@ -239,7 +187,6 @@ static int open_can_dev()
 			else
 			{
 				fcntl(can_handler.socket, F_SETFL, O_NONBLOCK);
-				can_handler.msg = &can_msg;
 				return 0;
 			}
 		}
@@ -249,6 +196,9 @@ static int open_can_dev()
 	return -1;
 }
 
+/*
+ * TODO : test that socket is really opened
+ */
 static int write_can()
 {
 	ssize_t nbytes;
@@ -277,6 +227,7 @@ static int write_can()
 
 /*
  * Read on CAN bus and return how much bytes has been read.
+ * TODO : test that socket is really opened
  */
 static int read_can(openxc_CanMessage *can_message)
 {
@@ -312,7 +263,7 @@ static int read_can(openxc_CanMessage *can_message)
 		return -2;
 	}
 
-	canread_frame_parse(&canfd_frame, maxdlen);
+	parse_can_frame(can_message, &canfd_frame, maxdlen);
 }
 
 /*
@@ -320,7 +271,7 @@ static int read_can(openxc_CanMessage *can_message)
  * TODO: parse as an OpenXC Can Message. Don't translate as ASCII and put bytes
  * directly into openxc_CanMessage
  */
-static void canread_frame_parse(struct canfd_frame *canfd_frame, int maxdlen)
+static void parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen)
 {
 	int i,offset;
 	int len = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
@@ -328,6 +279,8 @@ static void canread_frame_parse(struct canfd_frame *canfd_frame, int maxdlen)
 
 	if (canfd_frame->can_id & CAN_ERR_FLAG)
 	{
+		can_message->has_id = true;
+		can_message->id = canfd_frame->can_id;
 		put_eff_id(buf, canfd_frame->can_id & (CAN_ERR_MASK|CAN_ERR_FLAG));
 		buf[8] = '#';
 		offset = 9;
@@ -371,17 +324,15 @@ static void canread_frame_parse(struct canfd_frame *canfd_frame, int maxdlen)
 	return;
 }
 
-/***************************************************************************************/
-/***************************************************************************************/
-/**                                                                                   **/
-/**                                                                                   **/
-/**       SECTION: MANAGING EVENTS                                                    **/
-/**                                                                                   **/
-/**                                                                                   **/
-/***************************************************************************************/
-/***************************************************************************************/
-static int connect_to_event_loop();
-
+/*************************************************************************/
+/*************************************************************************/
+/**									**/
+/**									**/
+/**       SECTION: MANAGING EVENTS					**/
+/**									**/
+/**									**/
+/*************************************************************************/
+/*************************************************************************/
 /*
  * called on an event on the CAN bus
  */
@@ -393,7 +344,7 @@ static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata
 	if ((revents & EPOLLIN) != 0)
 	{
 		read_can(&can_message);
-//		event_send();
+		send_event();
 	}
 
 	/* check if error or hangup */
@@ -410,27 +361,82 @@ static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata
 /*
  * get or create an event handler for the type
  * TODO: implement function and handle retrieve or create an event as needed
+ */
+static event *get_event(uint32_t id, enum type type)
+{
+	event *event;
+	can_event *list;
+
+	/* find the can list by id */
+	list = get_event_of_id(id);
+
+	/* make the new event */
+	event = (can_event*)calloc(1, sizeof(can_event));
+	event->next = event;
+	list->events = event;
+	event->name = create_name(id);
+	event->afb_event = afb_daemon_make_event(interface->daemon, event->name);
+
+	return event;
+}
+
+/*
+ * Send an event
+ */
+static void send_event()
+{
+	can_event *current;
+
+	/* search for id */
+	current = can_events_list;
+	while(current)
+	{
+		afb_event_push(current->afb_event, object);
+		current = current->next;
+	}
+}
+
+/*
+ * Get the event loop running.
+ * Will trigger on_event function on EPOLLIN event on socket
  *
-static struct event *event_get(enum type type)
+ * Return 0 or positive value on success. Else negative value for failure.
+ */
+static int connect_to_event_loop()
 {
+	sd_event *event_loop;
+	sd_event_source *source;
+	int rc;
 
+	if (can_handler.socket < 0)
+	{
+		return can_handler.socket;
+	}
+
+	event_loop = afb_daemon_get_event_loop(interface->daemon);
+	rc = sd_event_add_io(event_loop, &source, can_handler.socket, EPOLLIN, on_event, NULL);
+	if (rc < 0)
+	{
+		close(can_handler.socket);
+		ERROR(interface, "Can't connect CAN bus %s to the event loop", can_handler.device);
+	} else
+	{
+		NOTICE(interface, "Connected CAN bus %s to the event loop", can_handler.device);
+	}
+
+	return rc;
 }
-*/
 
-static struct event *event_of_id(int id)
-{
 
-}
-
-/*****************************************************************************************/
-/*****************************************************************************************/
-/**											**/
-/**											**/
-/**	   SECTION: BINDING VERBS IMPLEMENTATION					**/
-/**											**/
-/**											**/
-/*****************************************************************************************/
-/*****************************************************************************************/
+/*************************************************************************/
+/*************************************************************************/
+/**									**/
+/**									**/
+/**	   SECTION: BINDING VERBS IMPLEMENTATION			**/
+/**									**/
+/**									**/
+/*************************************************************************/
+/*************************************************************************/
 /*
  * Returns the type corresponding to the given name
  */
@@ -439,7 +445,7 @@ static enum type type_of_name(const char *name)
 	enum type result;
 	if (name == NULL)
 		return type_DEFAULT;
-	for (result = 0 ; result < type_size; result++)
+	for (result = 0 ; (size_t)result < type_size; result++)
 		if (strcmp(type_NAMES[result], name) == 0)
 			return result;
 	return type_INVALID;
@@ -472,21 +478,23 @@ static void subscribe(struct afb_req req)
 {
 	enum type type;
 	const char *period;
-	struct event *can_sig;
+	event *event;
+	uint32_t id;
 	struct json_object *json;
 
 	if (get_type_for_req(req, &type))
 	{
-		can_sig->event = afb_daemon_make_event(interface->daemon, type_NAMES[type]);
-		if (can_sig == NULL)
+		id = (uint32_t)atoi(afb_req_value(req, "id"));
+		event = get_event(id, type);
+		if (event == NULL)
 			afb_req_fail(req, "out-of-memory", NULL);
-		else if (afb_req_subscribe(req, can_sig->event) != 0)
+		else if (afb_req_subscribe(req, event->afb_event) != 0)
 			afb_req_fail_f(req, "failed", "afb_req_subscribe returned an error: %m");
 		else
 		{
+			/* TODO : build json openXC message to send. I guess */
 			json = json_object_new_object();
 			json_object_object_add(json, "name", json_object_new_string(event->name));
-			json_object_object_add(json, "id", json_object_new_int(event->id));
 			afb_req_success(req, json, NULL);
 		}
 	}
@@ -502,14 +510,14 @@ static void subscribe(struct afb_req req)
 static void unsubscribe(struct afb_req req)
 {
 	const char *id;
-	struct event *event;
+	event *event;
 
 	id = afb_req_value(req, "id");
 	if (id == NULL)
 		afb_req_fail(req, "missing-id", NULL);
 	else
 	{
-		event = event_of_id(atoi(id));
+		event = get_event_of_id(atoi(id));
 		if (event == NULL)
 			afb_req_fail(req, "bad-id", NULL);
 		else
@@ -519,32 +527,6 @@ static void unsubscribe(struct afb_req req)
 		}
 	}
 }
-
-static int connect_to_event_loop()
-{
-	sd_event_source *source;
-	int rc;
-
-	retry(open_can_dev);
-
-	if (can_handler.socket < 0)
-	{
-		return can_handler.socket;
-	}
-
-	rc = sd_event_add_io(afb_daemon_get_event_loop(interface->daemon), &source, can_handler.socket, EPOLLIN, on_event, NULL);
-	if (rc < 0)
-	{
-		close(can_handler.socket);
-		ERROR(interface, "Can't connect CAN bus %s to the event loop", can_handler.device);
-	} else
-	{
-		NOTICE(interface, "Connected CAN bus %s to the event loop", can_handler.device);
-	}
-
-	return rc;
-}
-
 
 // TODO: Have to change session management flag to AFB_SESSION_CHECK to use token auth
 static const struct afb_verb_desc_v1 verbs[]=
@@ -572,5 +554,7 @@ const struct afb_binding *afbBindingV1Register (const struct afb_binding_interfa
 
 int afbBindingV1ServiceInit(struct afb_service service)
 {
+	/* Open CAN socket */
+	retry(open_can_dev);
 	return connect_to_event_loop();
 }
