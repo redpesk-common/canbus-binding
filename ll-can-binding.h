@@ -15,19 +15,6 @@
  * limitations under the License.
  */
 
-/* max. number of CAN interfaces given on the cmdline */
-#define MAXSOCK 16
-
-/* buffer sizes for CAN frame string representations */
-#define CL_ID (sizeof("12345678##1"))
-#define CL_DATA sizeof(".AA")
-#define CL_BINDATA sizeof(".10101010")
-
- /* CAN FD ASCII hex short representation with DATA_SEPERATORs */
-#define CL_CFSZ (2*CL_ID + 64*CL_DATA)
-
-#define CANID_DELIM '#'
-
 /*
  * Interface between the daemon and the binding
  */
@@ -92,32 +79,6 @@ can_event *can_events_list;
 /* TODO : Add help comments :p */
 static int connect_to_event_loop();
 
-const char hex_asc_upper[] = "0123456789ABCDEF";
-
-#define hex_asc_upper_lo(x) hex_asc_upper[((x) & 0x0F)]
-#define hex_asc_upper_hi(x) hex_asc_upper[((x) & 0xF0) >> 4]
-
-static inline void put_hex_byte(char *buf, __u8 byte)
-{
-	buf[0] = hex_asc_upper_hi(byte);
-	buf[1] = hex_asc_upper_lo(byte);
-}
-
-static inline void _put_id(char *buf, int end_offset, canid_t id)
-{
-	/* build 3 (SFF) or 8 (EFF) digit CAN identifier */
-	while (end_offset >= 0) {
-		buf[end_offset--] = hex_asc_upper[id & 0xF];
-		id >>= 4;
-	}
-}
-
-#define put_sff_id(buf, id) _put_id(buf, 2, id)
-#define put_eff_id(buf, id) _put_id(buf, 7, id)
-
-static void parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen);
-
-
 // Initialize default can_handler values
 static struct can_handler can_handler = {
 	.socket = -1,
@@ -126,3 +87,7 @@ static struct can_handler can_handler = {
 };
 
 static void send_event();
+
+static int retry( int(*func)());
+
+static void parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen);

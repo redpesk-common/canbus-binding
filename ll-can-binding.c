@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #define _GNU_SOURCE
 
 #include <string.h>
@@ -37,7 +38,7 @@
 #include <afb/afb-binding.h>
 #include <afb/afb-service-itf.h>
 
-#include "canLL-binding.h"
+#include "ll-can-binding.h"
 
 /*************************************************************************/
 /*************************************************************************/
@@ -57,7 +58,6 @@
  * return : 0 if ok, -1 if failed
  *
  */
-static int retry( int(*func)());
 static int retry( int(*func)())
 {
 	int i;
@@ -71,6 +71,23 @@ static int retry( int(*func)())
 		usleep(100000);
 	}
 	return -1;
+}
+
+/*
+ * Test that socket is really opened
+ *
+ * param
+ *
+ * return : 0 or positive int if ok, negative value if failed
+ *
+ */
+static int socket_test()
+{
+	if (can_handler.socket < 0)
+	{
+		return -1;
+	}
+	return 0;
 }
 
 /*
@@ -113,7 +130,7 @@ static can_event *get_event_of_id(uint32_t id)
 /*
  * Take an id and return it into a char array
  */
-char* create_name(uint32_t id)
+static char* create_name(uint32_t id)
 {
 	char name[32];
 	size_t nchar;
@@ -128,6 +145,33 @@ char* create_name(uint32_t id)
 	}
 
 	return NULL;
+}
+
+/*
+ * Create json object that will be pushed through event_loop to any subscriber
+ *
+ *  param : openxc_CanMessage structure complete with data to put into json
+ *  object.
+ *
+ *  return : json object
+ *
+ *
+ */
+static json_object* create_json_from_openxc_CanMessage(event *event)
+{
+	struct json_object *json;
+	openxc_CanMessage can_message;
+
+	/*
+	 * TODO: process the openxc_CanMessage struct. Should be a call to a
+	 * decoder function relative to that msg
+	 */
+	can_message = event->can_message;
+
+	json = json_object_new_object();
+	json_object_object_add(json, "name", json_object_new_string(event->name));
+
+	return json;
 }
 
 /*************************************************************************/
@@ -227,12 +271,21 @@ static int write_can()
 
 /*
  * Read on CAN bus and return how much bytes has been read.
- * TODO : test that socket is really opened
  */
 static int read_can(openxc_CanMessage *can_message)
 {
 	ssize_t nbytes;
 	int maxdlen;
+
+	/* Test that socket is really opened */
+	if ( socket_test < 0)
+	{
+		if (retry(open_can_dev) < 0)
+		{
+			ERROR(interface, "read_can: Socket unavailable");
+			return -1;
+		}
+	}
 
 	nbytes = read(can_handler.socket, &canfd_frame, CANFD_MTU);
 
@@ -249,7 +302,7 @@ static int read_can(openxc_CanMessage *can_message)
 	 	if (errno == ENETDOWN)
 			ERROR(interface, "read_can: %s interface down", can_handler.device);
 		ERROR(interface, "read_can: Error reading CAN bus");
-		return -1;
+		return -2;
 	}
 
 	/* CAN frame integrity check */
@@ -260,7 +313,7 @@ static int read_can(openxc_CanMessage *can_message)
 	else
 	{
 		ERROR(interface, "read_can: CAN frame incomplete");
-		return -2;
+		return -3;
 	}
 
 	parse_can_frame(can_message, &canfd_frame, maxdlen);
@@ -275,52 +328,49 @@ static void parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *
 {
 	int i,offset;
 	int len = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
-	char buf[CL_CFSZ];
 
+	can_message->has_id = true;
 	if (canfd_frame->can_id & CAN_ERR_FLAG)
+		can_message->id = canfd_frame->can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
+	else if (canfd_frame->can_id & CAN_EFF_FLAG)
 	{
-		can_message->has_id = true;
-		can_message->id = canfd_frame->can_id;
-		put_eff_id(buf, canfd_frame->can_id & (CAN_ERR_MASK|CAN_ERR_FLAG));
-		buf[8] = '#';
-		offset = 9;
-	} else if (canfd_frame->can_id & CAN_EFF_FLAG)
+		can_message->has_frame_format = true;
+		can_message->frame_format = openxc_CanMessage_FrameFormat_EXTENDED;
+		can_message->id = canfd_frame->can_id & CAN_EFF_MASK;
+	} else
 	{
-		put_eff_id(buf, canfd_frame->can_id & CAN_EFF_MASK);
-		buf[8] = '#';
-		offset = 9;
-	} else {
-		put_sff_id(buf, canfd_frame->can_id & CAN_SFF_MASK);
-		buf[3] = '#';
-		offset = 4;
+		can_message->has_frame_format = true;
+		can_message->frame_format = openxc_CanMessage_FrameFormat_STANDARD;
+		can_message->id = canfd_frame->can_id & CAN_SFF_MASK;
 	}
 
 	/* standard CAN frames may have RTR enabled. There are no ERR frames with RTR */
 	if (maxdlen == CAN_MAX_DLEN && canfd_frame->can_id & CAN_RTR_FLAG)
 	{
-		buf[offset++] = 'R';
-		/* print a given CAN 2.0B DLC if it's not zero */
+		/* Don't know what to do with that for now as we haven't 
+		 * len fields in openxc_CanMessage struct
+		 *
+		 * print a given CAN 2.0B DLC if it's not zero
 		if (canfd_frame->len && canfd_frame->len <= CAN_MAX_DLC)
 			buf[offset++] = hex_asc_upper[canfd_frame->len & 0xF];
 
-		buf[offset] = 0;
+		buf[offset] = 0;*/
 		return;
 	}
 
 	if (maxdlen == CANFD_MAX_DLEN)
 	{
 		/* add CAN FD specific escape char and flags */
-		buf[offset++] = '#';
-		buf[offset++] = hex_asc_upper[canfd_frame->flags & 0xF];
+		canfd_frame->flags & 0xF;
 	}
 
 	for (i = 0; i < len; i++)
 	{
-		put_hex_byte(buf + offset, canfd_frame->data[i]);
-		offset += 2;
+		//put_hex_byte(buf + offset, canfd_frame->data[i]);
+		//offset += 2;
 	}
 
-	buf[offset] = 0;
+//	buf[offset] = 0;
 	return;
 }
 
@@ -381,17 +431,26 @@ static event *get_event(uint32_t id, enum type type)
 }
 
 /*
- * Send an event
+ * Send all events
  */
 static void send_event()
 {
 	can_event *current;
+	event *events;
+	json_object *object;
 
-	/* search for id */
+	/* Browse can_events */
 	current = can_events_list;
 	while(current)
 	{
-		afb_event_push(current->afb_event, object);
+		/* Browse event for each can_events no matter what the id */
+		events = current->events;
+		while(events)
+		{
+			object = create_json_from_openxc_CanMessage(events);
+			afb_event_push(events->afb_event, object);
+			events = events->next;
+		}
 		current = current->next;
 	}
 }
@@ -426,7 +485,6 @@ static int connect_to_event_loop()
 
 	return rc;
 }
-
 
 /*************************************************************************/
 /*************************************************************************/
@@ -522,7 +580,7 @@ static void unsubscribe(struct afb_req req)
 			afb_req_fail(req, "bad-id", NULL);
 		else
 		{
-			afb_req_unsubscribe(req, event->event);
+			afb_req_unsubscribe(req, event->afb_event);
 			afb_req_success(req, NULL, NULL);
 		}
 	}
