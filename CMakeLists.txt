@@ -17,7 +17,7 @@
 # limitations under the License.
 ###########################################################################
 
-project(canLL)
+project(ll-can)
 
 cmake_minimum_required(VERSION 3.3)
 
