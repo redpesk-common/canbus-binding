@@ -154,8 +154,6 @@ static char* create_name(uint32_t id)
  *  object.
  *
  *  return : json object
- *
- *
  */
 static json_object* create_json_from_openxc_CanMessage(event *event)
 {
@@ -271,63 +269,6 @@ static int write_can()
 }
 
 /*
- * Read on CAN bus and return how much bytes has been read.
- */
-static int read_can(openxc_CanMessage *can_message)
-{
-	ssize_t nbytes;
-	int maxdlen;
-
-	/* Test that socket is really opened */
-	if ( socket_test() < 0)
-	{
-		if (retry(open_can_dev) < 0)
-		{
-			ERROR(interface, "read_can: Socket unavailable");
-			return -1;
-		}
-	}
-
-	nbytes = read(can_handler.socket, &canfd_frame, CANFD_MTU);
-
-	if (nbytes == CANFD_MTU)
-	{
-		DEBUG(interface, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
-	}
-	else if (nbytes == CAN_MTU)
-	{
-		DEBUG(interface, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
-	}
-	else
-	{
-	 	if (errno == ENETDOWN)
-			ERROR(interface, "read_can: %s interface down", can_handler.device);
-		ERROR(interface, "read_can: Error reading CAN bus");
-		return -2;
-	}
-
-	/* CAN frame integrity check */
-	if ((size_t)nbytes == CAN_MTU)
-		maxdlen = CAN_MAX_DLEN;
-	else if ((size_t)nbytes == CANFD_MTU)
-		maxdlen = CANFD_MAX_DLEN;
-	else
-	{
-		ERROR(interface, "read_can: CAN frame incomplete");
-		return -3;
-	}
-
-	if (parse_can_frame(can_message, &canfd_frame, maxdlen))
-	{
-		ERROR(interface, "read_can: Can't parse the can frame. ID: %i, DLC: %i, DATA: %s", 
-		      canfd_frame.can_id, canfd_frame.len, canfd_frame.data);
-		return -4;
-	}
-
-	return 0;
-}
-
-/*
  * Parse the CAN frame data payload as a CAN packet
  * TODO: parse as an OpenXC Can Message. Don't translate as ASCII and put bytes
  * directly into openxc_CanMessage
@@ -399,6 +340,63 @@ static int parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *c
 	return -3;
 }
 
+
+/*
+ * Read on CAN bus and return how much bytes has been read.
+ */
+static int read_can(openxc_CanMessage *can_message)
+{
+	ssize_t nbytes;
+	int maxdlen;
+
+	/* Test that socket is really opened */
+	if ( socket_test() < 0)
+	{
+		if (retry(open_can_dev) < 0)
+		{
+			ERROR(interface, "read_can: Socket unavailable");
+			return -1;
+		}
+	}
+
+	nbytes = read(can_handler.socket, &canfd_frame, CANFD_MTU);
+
+	if (nbytes == CANFD_MTU)
+	{
+		DEBUG(interface, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
+	}
+	else if (nbytes == CAN_MTU)
+	{
+		DEBUG(interface, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
+	}
+	else
+	{
+	 	if (errno == ENETDOWN)
+			ERROR(interface, "read_can: %s interface down", can_handler.device);
+		ERROR(interface, "read_can: Error reading CAN bus");
+		return -2;
+	}
+
+	/* CAN frame integrity check */
+	if ((size_t)nbytes == CAN_MTU)
+		maxdlen = CAN_MAX_DLEN;
+	else if ((size_t)nbytes == CANFD_MTU)
+		maxdlen = CANFD_MAX_DLEN;
+	else
+	{
+		ERROR(interface, "read_can: CAN frame incomplete");
+		return -3;
+	}
+
+	if (parse_can_frame(can_message, &canfd_frame, maxdlen))
+	{
+		ERROR(interface, "read_can: Can't parse the can frame. ID: %i, DLC: %i, DATA: %s", 
+		      canfd_frame.can_id, canfd_frame.len, canfd_frame.data);
+		return -4;
+	}
+
+	return 0;
+}
 /*************************************************************************/
 /*************************************************************************/
 /**									**/
@@ -408,6 +406,63 @@ static int parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *c
 /**									**/
 /*************************************************************************/
 /*************************************************************************/
+static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata);
+
+/*
+ * Get the event loop running.
+ * Will trigger on_event function on EPOLLIN event on socket
+ *
+ * Return 0 or positive value on success. Else negative value for failure.
+ */
+static int connect_to_event_loop()
+{
+	sd_event *event_loop;
+	sd_event_source *source;
+	int rc;
+
+	if (can_handler.socket < 0)
+	{
+		return can_handler.socket;
+	}
+
+	event_loop = afb_daemon_get_event_loop(interface->daemon);
+	rc = sd_event_add_io(event_loop, &source, can_handler.socket, EPOLLIN, on_event, NULL);
+	if (rc < 0)
+	{
+		close(can_handler.socket);
+		ERROR(interface, "Can't connect CAN bus %s to the event loop", can_handler.device);
+	} else
+	{
+		NOTICE(interface, "Connected CAN bus %s to the event loop", can_handler.device);
+	}
+
+	return rc;
+}
+/*
+ * Send all events
+ */
+static void send_event()
+{
+	can_event *current;
+	event *events;
+	json_object *object;
+
+	/* Browse can_events */
+	current = can_events_list;
+	while(current)
+	{
+		/* Browse event for each can_events no matter what the id */
+		events = current->events;
+		while(events)
+		{
+			object = create_json_from_openxc_CanMessage(events);
+			afb_event_push(events->afb_event, object);
+			events = events->next;
+		}
+		current = current->next;
+	}
+}
+
 /*
  * called on an event on the CAN bus
  */
@@ -454,62 +509,6 @@ static event *get_event(uint32_t id, enum type type)
 	event_elt->afb_event = afb_daemon_make_event(interface->daemon, event_elt->name);
 
 	return event_elt;
-}
-
-/*
- * Send all events
- */
-static void send_event()
-{
-	can_event *current;
-	event *events;
-	json_object *object;
-
-	/* Browse can_events */
-	current = can_events_list;
-	while(current)
-	{
-		/* Browse event for each can_events no matter what the id */
-		events = current->events;
-		while(events)
-		{
-			object = create_json_from_openxc_CanMessage(events);
-			afb_event_push(events->afb_event, object);
-			events = events->next;
-		}
-		current = current->next;
-	}
-}
-
-/*
- * Get the event loop running.
- * Will trigger on_event function on EPOLLIN event on socket
- *
- * Return 0 or positive value on success. Else negative value for failure.
- */
-static int connect_to_event_loop()
-{
-	sd_event *event_loop;
-	sd_event_source *source;
-	int rc;
-
-	if (can_handler.socket < 0)
-	{
-		return can_handler.socket;
-	}
-
-	event_loop = afb_daemon_get_event_loop(interface->daemon);
-	rc = sd_event_add_io(event_loop, &source, can_handler.socket, EPOLLIN, on_event, NULL);
-	if (rc < 0)
-	{
-		close(can_handler.socket);
-		ERROR(interface, "Can't connect CAN bus %s to the event loop", can_handler.device);
-	} else
-	{
-		NOTICE(interface, "Connected CAN bus %s to the event loop", can_handler.device);
-	}
-
-	return rc;
 }
 
 /*************************************************************************/
@@ -617,7 +616,6 @@ static void unsubscribe(struct afb_req req)
 	}
 }
 
-// TODO: Have to change session management flag to AFB_SESSION_CHECK to use token auth
 static const struct afb_verb_desc_v1 verbs[]=
 {
   { .name= "subscribe",    .session= AFB_SESSION_NONE, .callback= subscribe,    .info= "subscribe to notification of CAN bus messages." },

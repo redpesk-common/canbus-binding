@@ -76,9 +76,6 @@ struct _can_event {
 
 can_event *can_events_list;
 
-/* TODO : Add help comments :p */
-static int connect_to_event_loop();
-
 // Initialize default can_handler values
 static struct can_handler can_handler = {
 	.socket = -1,
@@ -86,12 +83,7 @@ static struct can_handler can_handler = {
 	.is_fdmode_on = false,
 };
 
-static void send_event();
-
-static int retry( int(*func)());
-
-static int parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen);
-
+/* Redefining openxc_CanMessage_init_default for C */
 #ifdef openxc_CanMessage_init_default
 #undef openxc_CanMessage_init_default
 #endif
