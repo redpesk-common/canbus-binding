@@ -97,7 +97,7 @@ static int socket_test()
  *
  * return can_event
  */
-static can_event *get_event_of_id(uint32_t id)
+static can_event *get_event_list_of_id(uint32_t id)
 {
 	can_event *current;
 
@@ -160,13 +160,14 @@ static char* create_name(uint32_t id)
 static json_object* create_json_from_openxc_CanMessage(event *event)
 {
 	struct json_object *json;
-	openxc_CanMessage can_message;
 
 	/*
 	 * TODO: process the openxc_CanMessage struct. Should be a call to a
 	 * decoder function relative to that msg
-	 */
+
+	openxc_CanMessage can_message;
 	can_message = event->can_message;
+	 */
 
 	json = json_object_new_object();
 	json_object_object_add(json, "name", json_object_new_string(event->name));
@@ -278,7 +279,7 @@ static int read_can(openxc_CanMessage *can_message)
 	int maxdlen;
 
 	/* Test that socket is really opened */
-	if ( socket_test < 0)
+	if ( socket_test() < 0)
 	{
 		if (retry(open_can_dev) < 0)
 		{
@@ -318,7 +319,7 @@ static int read_can(openxc_CanMessage *can_message)
 
 	if (parse_can_frame(can_message, &canfd_frame, maxdlen))
 	{
-		ERROR(interface, "read_can: Can't parse the can frame. ID: %i, DLC: %i, DATA: %X", 
+		ERROR(interface, "read_can: Can't parse the can frame. ID: %i, DLC: %i, DATA: %s", 
 		      canfd_frame.can_id, canfd_frame.len, canfd_frame.data);
 		return -4;
 	}
@@ -359,7 +360,7 @@ static int parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *c
 	 * standard CAN frames may have RTR enabled. There are no ERR frames with RTR
 	if (maxdlen == CAN_MAX_DLEN && canfd_frame->can_id & CAN_RTR_FLAG)
 	{
-		/* print a given CAN 2.0B DLC if it's not zero
+		// print a given CAN 2.0B DLC if it's not zero
 		if (canfd_frame->len && canfd_frame->len <= CAN_MAX_DLC)
 			buf[offset++] = hex_asc_upper[canfd_frame->len & 0xF];
 
@@ -371,7 +372,7 @@ static int parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *c
 	/* Doesn't handle real canfd_frame for now
 	if (maxdlen == CANFD_MAX_DLEN)
 	{
-		/* add CAN FD specific escape char and flags
+		// add CAN FD specific escape char and flags
 		canfd_frame->flags & 0xF;
 	} */
 
@@ -394,7 +395,8 @@ static int parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *c
 		return -2;
 	}
 
-	return NULL;
+	/* You should not reach this return statement */
+	return -3;
 }
 
 /*************************************************************************/
@@ -438,20 +440,20 @@ static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata
  */
 static event *get_event(uint32_t id, enum type type)
 {
-	event *event;
+	event *event_elt;
 	can_event *list;
 
 	/* find the can list by id */
-	list = get_event_of_id(id);
+	list = get_event_list_of_id(id);
 
 	/* make the new event */
-	event = (can_event*)calloc(1, sizeof(can_event));
-	event->next = event;
-	list->events = event;
-	event->name = create_name(id);
-	event->afb_event = afb_daemon_make_event(interface->daemon, event->name);
+	event_elt = (event*)calloc(1, sizeof(event));
+	event_elt->next = event_elt;
+	list->events = event_elt;
+	event_elt->name = create_name(id);
+	event_elt->afb_event = afb_daemon_make_event(interface->daemon, event_elt->name);
 
-	return event;
+	return event_elt;
 }
 
 /*
@@ -591,6 +593,7 @@ static void subscribe(struct afb_req req)
 static void unsubscribe(struct afb_req req)
 {
 	const char *id;
+	can_event *events_list;
 	event *event;
 
 	id = afb_req_value(req, "id");
@@ -598,13 +601,18 @@ static void unsubscribe(struct afb_req req)
 		afb_req_fail(req, "missing-id", NULL);
 	else
 	{
-		event = get_event_of_id(atoi(id));
-		if (event == NULL)
-			afb_req_fail(req, "bad-id", NULL);
-		else
+		events_list = get_event_list_of_id((uint32_t)atoi(id));
+		event = events_list->events;
+		while(event)
 		{
-			afb_req_unsubscribe(req, event->afb_event);
-			afb_req_success(req, NULL, NULL);
+			if (event == NULL)
+				afb_req_fail(req, "bad-id", NULL);
+			else
+			{
+				afb_req_unsubscribe(req, event->afb_event);
+				afb_req_success(req, NULL, NULL);
+			}
+			event = event->next;
 		}
 	}
 }
