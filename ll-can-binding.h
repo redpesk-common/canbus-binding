@@ -90,4 +90,9 @@ static void send_event();
 
 static int retry( int(*func)());
 
-static void parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen);
+static int parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen);
+
+#ifdef openxc_CanMessage_init_default
+#undef openxc_CanMessage_init_default
+#endif
+openxc_CanMessage openxc_CanMessage_init_default = {.has_bus = false, .bus = 0, .has_id = false, .id = 0, .has_data = false, .data = {0, {0}}, .has_frame_format = false, .frame_format = (openxc_CanMessage_FrameFormat)0};

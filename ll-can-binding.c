@@ -316,7 +316,14 @@ static int read_can(openxc_CanMessage *can_message)
 		return -3;
 	}
 
-	parse_can_frame(can_message, &canfd_frame, maxdlen);
+	if (parse_can_frame(can_message, &canfd_frame, maxdlen))
+	{
+		ERROR(interface, "read_can: Can't parse the can frame. ID: %i, DLC: %i, DATA: %X", 
+		      canfd_frame.can_id, canfd_frame.len, canfd_frame.data);
+		return -4;
+	}
+
+	return 0;
 }
 
 /*
@@ -324,10 +331,12 @@ static int read_can(openxc_CanMessage *can_message)
  * TODO: parse as an OpenXC Can Message. Don't translate as ASCII and put bytes
  * directly into openxc_CanMessage
  */
-static void parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen)
+static int parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *canfd_frame, int maxdlen)
 {
-	int i,offset;
-	int len = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
+	int i, len;
+	//size_t n_msg;
+
+	len = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
 
 	can_message->has_id = true;
 	if (canfd_frame->can_id & CAN_ERR_FLAG)
@@ -344,34 +353,48 @@ static void parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *
 		can_message->id = canfd_frame->can_id & CAN_SFF_MASK;
 	}
 
-	/* standard CAN frames may have RTR enabled. There are no ERR frames with RTR */
+	/* Don't know what to do with that for now as we haven't
+	 * len fields in openxc_CanMessage struct
+
+	 * standard CAN frames may have RTR enabled. There are no ERR frames with RTR
 	if (maxdlen == CAN_MAX_DLEN && canfd_frame->can_id & CAN_RTR_FLAG)
 	{
-		/* Don't know what to do with that for now as we haven't 
-		 * len fields in openxc_CanMessage struct
-		 *
-		 * print a given CAN 2.0B DLC if it's not zero
+		/* print a given CAN 2.0B DLC if it's not zero
 		if (canfd_frame->len && canfd_frame->len <= CAN_MAX_DLC)
 			buf[offset++] = hex_asc_upper[canfd_frame->len & 0xF];
 
-		buf[offset] = 0;*/
-		return;
+		buf[offset] = 0;
+		return NULL;
 	}
+	*/
 
+	/* Doesn't handle real canfd_frame for now
 	if (maxdlen == CANFD_MAX_DLEN)
 	{
-		/* add CAN FD specific escape char and flags */
+		/* add CAN FD specific escape char and flags
 		canfd_frame->flags & 0xF;
-	}
+	} */
 
-	for (i = 0; i < len; i++)
+	if (sizeof(canfd_frame->data) <= sizeof(can_message->data.bytes))
 	{
-		//put_hex_byte(buf + offset, canfd_frame->data[i]);
-		//offset += 2;
+		for (i = 0; i < len; i++)
+			can_message->data.bytes[i] = canfd_frame->data[i];
+		return 0;
+	} else if (sizeof(canfd_frame->data) <= CAN_MAX_DLEN)
+	{
+		ERROR(interface, "parse_can_frame: can_frame data too long to be stored into openxc_CanMessage data field");
+		return -1;
+		/* TODO create as many as needed openxc_CanMessage into an array to store all data from canfd_frame
+		n_msg = CAN_MAX_DLEN / sizeof(canfd_frame->data.bytes);
+		for (i = 0; i < len; i++)
+			can_message->data.bytes[i] = canfd_frame->data[i]; */
+	} else
+	{
+		ERROR(interface, "parse_can_frame: can_frame is really too long here. Size of data greater than canfd maximum 64bytes size. Is it a CAN message ?");
+		return -2;
 	}
 
-//	buf[offset] = 0;
-	return;
+	return NULL;
 }
 
 /*************************************************************************/
@@ -389,6 +412,8 @@ static void parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *
 static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata)
 {
 	openxc_CanMessage can_message;
+
+	can_message = openxc_CanMessage_init_default;
 
 	/* read available data */
 	if ((revents & EPOLLIN) != 0)
@@ -410,7 +435,6 @@ static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata
 
 /*
  * get or create an event handler for the type
- * TODO: implement function and handle retrieve or create an event as needed
  */
 static event *get_event(uint32_t id, enum type type)
 {
@@ -535,7 +559,6 @@ static int get_type_for_req(struct afb_req req, enum type *type)
 static void subscribe(struct afb_req req)
 {
 	enum type type;
-	const char *period;
 	event *event;
 	uint32_t id;
 	struct json_object *json;
