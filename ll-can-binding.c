@@ -39,6 +39,7 @@
 #include <afb/afb-service-itf.h>
 
 #include "ll-can-binding.h"
+#include "obd2.h"
 
 /*************************************************************************/
 /*************************************************************************/
@@ -545,75 +546,87 @@ static int get_type_for_req(struct afb_req req, enum type *type)
 	return 0;
 }
 
-/*
- * subscribe to notification of new CAN messages
- *
- * parameters of the subscription are:
- *
- *    TODO type: string:  choose between CAN and OBDII messages formats.
- *
- * returns an object with 2 fields:
- *
- *    name:   string:  the name of the event without its prefix
- *    id:     integer: a numeric identifier of the event to be used for unsubscribing
- */
-static void subscribe(struct afb_req req)
+static int subscribe_unsubscribe_sig(struct afb_req request, int subscribe, struct signal *sig)
 {
-	enum type type;
-	event *event;
-	uint32_t id;
-	struct json_object *json;
-
-	if (get_type_for_req(req, &type))
-	{
-		id = (uint32_t)atoi(afb_req_value(req, "id"));
-		event = get_event(id, type);
-		if (event == NULL)
-			afb_req_fail(req, "out-of-memory", NULL);
-		else if (afb_req_subscribe(req, event->afb_event) != 0)
-			afb_req_fail_f(req, "failed", "afb_req_subscribe returned an error: %m");
-		else
-		{
-			/* TODO : build json openXC message to send. I guess */
-			json = json_object_new_object();
-			json_object_object_add(json, "name", json_object_new_string(event->name));
-			afb_req_success(req, json, NULL);
+	if (!afb_event_is_valid(sig->event)) {
+		if (!subscribe)
+			return 1;
+		sig->event = afb_daemon_make_event(afbitf->daemon, sig->name);
+		if (!afb_event_is_valid(sig->event)) {
+			return 0;
 		}
 	}
+
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, sig->event)) < 0) {
+		return 0;
+	}
+
+	return 1;
 }
 
-/*
- * unsubscribe a previous subscription
- *
- * parameters of the unsubscription are:
- *
- *    id:   integer: the numeric identifier of the event as returned when subscribing
- */
-static void unsubscribe(struct afb_req req)
+static int subscribe_unsubscribe_all(struct afb_req request, int subscribe)
 {
-	const char *id;
-	can_event *events_list;
-	event *event;
+	int i, n, e;
 
-	id = afb_req_value(req, "id");
-	if (id == NULL)
-		afb_req_fail(req, "missing-id", NULL);
-	else
-	{
-		events_list = get_event_list_of_id((uint32_t)atoi(id));
-		event = events_list->events;
-		while(event)
-		{
-			if (event == NULL)
-				afb_req_fail(req, "bad-id", NULL);
-			else
-			{
-				afb_req_unsubscribe(req, event->afb_event);
-				afb_req_success(req, NULL, NULL);
-			}
-			event = event->next;
-		}
+	n = sizeof OBD2_PIDS / sizeof * OBD2_PIDS;
+	e = 0;
+	for (i = 0 ; i < n ; i++)
+		e += !subscribe_unsubscribe_sig(request, subscribe, &OBD2_PIDS[i]);
+	return e == 0;
+}
+
+static int subscribe_unsubscribe_name(struct afb_req request, int subscribe, const char *name)
+{
+	struct signal *sig;
+
+	if (0 == strcmp(name, "*"))
+		return subscribe_unsubscribe_all(request, subscribe);
+
+	sig = getsig(name);
+	if (sig == NULL) {
+		return 0;
 	}
+
+	return subscribe_unsubscribe_sig(request, subscribe, sig);
+}
+
+static void subscribe_unsubscribe(struct afb_req request, int subscribe)
+{
+	int ok, i, n;
+	struct json_object *args, *a, *x;
+
+	/* makes the subscription/unsubscription */
+	args = afb_req_json(request);
+	if (args == NULL || !json_object_object_get_ex(args, "event", &a)) {
+		ok = subscribe_unsubscribe_all(request, subscribe);
+	} else if (json_object_get_type(a) != json_type_array) {
+		ok = subscribe_unsubscribe_name(request, subscribe, json_object_get_string(a));
+	} else {
+		n = json_object_array_length(a);
+		ok = 0;
+		for (i = 0 ; i < n ; i++) {
+			x = json_object_array_get_idx(a, i);
+			if (subscribe_unsubscribe_name(request, subscribe, json_object_get_string(x)))
+				ok++;
+		}
+		ok = (ok == n);
+	}
+
+	/* send the report */
+	if (ok)
+		afb_req_success(request, NULL, NULL);
+	else
+		afb_req_fail(request, "error", NULL);
+}
+
+static void subscribe(struct afb_req request)
+{
+	subscribe_unsubscribe(request, 1);
+}
+
+static void unsubscribe(struct afb_req request)
+{
+	subscribe_unsubscribe(request, 0);
 }
 
 static const struct afb_verb_desc_v1 verbs[]=
