@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <string>
 #include "timer.h"
 #include "openxc.pb.h"
 
@@ -84,6 +85,21 @@ typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal* signal,
  */
 typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
         openxc_DynamicField* value, bool* send);
+
+/* CanBus represent a can device definition get from configuraiton file */
+class CanBus {
+	private:
+		/* Got from conf file */
+		std::string deviceName;
+
+		int socket;
+		bool is_fdmode_on;
+		struct sockaddr_can txAddress;
+
+	public:
+		int open();
+		int close();
+};
 
 /* Public: The ID format for a CAN message.
  *

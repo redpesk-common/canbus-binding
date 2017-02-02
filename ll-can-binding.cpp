@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 
-#define _GNU_SOURCE
-
-#include <string.h>
-#include <stdbool.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
-#include <sys/time.h>
 #include <linux/can.h>
 #include <linux/can/raw.h>
-#include <math.h>
 #include <fcntl.h>
 #include <systemd/sd-event.h>
 #include <errno.h>
+#include <vector>
+#include <map>
+#include <queue>
+#include <string>
+#include <functional>
+#include <memory>
 
 #include <json-c/json.h>
 #include <openxc.pb.h>
@@ -50,46 +50,6 @@
 /**									**/
 /*************************************************************************/
 /*************************************************************************/
-
-/*
- * Retry a function 3 times
- *
- * param int function(): function that return an int wihtout any parameter
- *
- * return : 0 if ok, -1 if failed
- *
- */
-static int retry( int(*func)())
-{
-	int i;
-
-	for (i=0;i<4;i++)
-	{
-		if ( (*func)() >= 0)
-		{
-			return 0;
-		}
-		usleep(100000);
-	}
-	return -1;
-}
-
-/*
- * Test that socket is really opened
- *
- * param
- *
- * return : 0 or positive int if ok, negative value if failed
- *
- */
-static int socket_test()
-{
-	if (can_handler.socket < 0)
-	{
-		return -1;
-	}
-	return 0;
-}
 
 /*
  * Browse chained list and return the one with specified id
@@ -125,7 +85,7 @@ static can_event *get_event_list_of_id(uint32_t id)
 		current = current->next;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -145,7 +105,7 @@ static char* create_name(uint32_t id)
 		return result;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*
@@ -183,59 +143,60 @@ static json_object* create_json_from_openxc_CanMessage(event *event)
 /**									**/
 /*************************************************************************/
 /*************************************************************************/
+
 /*
  * open the can socket
  */
-static int open_can_dev()
+int CanBus::open()
 {
 	const int canfd_on = 1;
 	struct ifreq ifr;
-	struct timeval timeout = {1,0};
+	struct timeval timeout = {1, 0};
 
-	DEBUG(interface, "open_can_dev: CAN Handler socket : %d", can_handler.socket);
-	if (can_handler.socket >= 0)
-		close(can_handler.socket);
+	DEBUG(interface, "open_can_dev: CAN Handler socket : %d", socket);
+	if (socket >= 0)
+		close(socket);
 
-	can_handler.socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-	if (can_handler.socket < 0)
+	socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+	if (socket < 0)
 	{
 		ERROR(interface, "open_can_dev: socket could not be created");
 	}
 	else
 	{
 		/* Set timeout for read */
-		setsockopt(can_handler.socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+		setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 		/* try to switch the socket into CAN_FD mode */
-		if (setsockopt(can_handler.socket, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
+		if (setsockopt(socket, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{
 			NOTICE(interface, "open_can_dev: Can not switch into CAN Extended frame format.");
-			can_handler.is_fdmode_on = false;
+			is_fdmode_on = false;
 		} else {
-			can_handler.is_fdmode_on = true;
+			is_fdmode_on = true;
 		}
 
 		/* Attempts to open a socket to CAN bus */
-		strcpy(ifr.ifr_name, can_handler.device);
-		if(ioctl(can_handler.socket, SIOCGIFINDEX, &ifr) < 0)
+		strcpy(ifr.ifr_name, device);
+		if(ioctl(socket, SIOCGIFINDEX, &ifr) < 0)
 			ERROR(interface, "open_can_dev: ioctl failed");
 		else
 		{
-			can_handler.txAddress.can_family = AF_CAN;
-			can_handler.txAddress.can_ifindex = ifr.ifr_ifindex;
+			txAddress.can_family = AF_CAN;
+			txAddress.can_ifindex = ifr.ifr_ifindex;
 
 			/* And bind it to txAddress */
-			if (bind(can_handler.socket, (struct sockaddr *)&can_handler.txAddress, sizeof(can_handler.txAddress)) < 0)
+			if (bind(socket, (struct sockaddr *)&txAddress, sizeof(txAddress)) < 0)
 			{
 				ERROR(interface, "open_can_dev: bind failed");
 			}
 			else
 			{
-				fcntl(can_handler.socket, F_SETFL, O_NONBLOCK);
+				fcntl(socket, F_SETFL, O_NONBLOCK);
 				return 0;
 			}
 		}
-		close(can_handler.socket);
-		can_handler.socket = -1;
+		close(socket);
+		socket = -1;
 	}
 	return -1;
 }
@@ -248,14 +209,14 @@ static int write_can()
 	ssize_t nbytes;
 	int rc;
 
-	rc = can_handler.socket;
+	rc = socket;
 	if (rc >= 0)
 	{
 /*
  * TODO change old hvac write can frame to generic on_event
  */
-		nbytes = sendto(can_handler.socket, &canfd_frame, sizeof(struct canfd_frame), 0,
-			    (struct sockaddr*)&can_handler.txAddress, sizeof(can_handler.txAddress));
+		nbytes = sendto(socket, &canfd_frame, sizeof(struct canfd_frame), 0,
+			    (struct sockaddr*)&txAddress, sizeof(txAddress));
 		if (nbytes < 0)
 		{
 			ERROR(interface, "write_can: Sending CAN frame failed.");
@@ -264,7 +225,7 @@ static int write_can()
 	else
 	{
 		ERROR(interface, "write_can: socket not initialized. Attempt to reopen can device socket.");
-		retry(open_can_dev);
+		open_can_dev();
 	}
 	return rc;
 }
@@ -307,7 +268,7 @@ static int parse_can_frame(openxc_CanMessage *can_message, struct canfd_frame *c
 			buf[offset++] = hex_asc_upper[canfd_frame->len & 0xF];
 
 		buf[offset] = 0;
-		return NULL;
+		return nullptr;
 	}
 	*/
 
@@ -353,14 +314,14 @@ static int read_can(openxc_CanMessage *can_message)
 	/* Test that socket is really opened */
 	if ( socket_test() < 0)
 	{
-		if (retry(open_can_dev) < 0)
+		if (open_can_dev() < 0)
 		{
 			ERROR(interface, "read_can: Socket unavailable");
 			return -1;
 		}
 	}
 
-	nbytes = read(can_handler.socket, &canfd_frame, CANFD_MTU);
+	nbytes = read(socket, &canfd_frame, CANFD_MTU);
 
 	if (nbytes == CANFD_MTU)
 	{
@@ -373,7 +334,7 @@ static int read_can(openxc_CanMessage *can_message)
 	else
 	{
 	 	if (errno == ENETDOWN)
-			ERROR(interface, "read_can: %s interface down", can_handler.device);
+			ERROR(interface, "read_can: %s interface down", device);
 		ERROR(interface, "read_can: Error reading CAN bus");
 		return -2;
 	}
@@ -415,26 +376,26 @@ static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata
  *
  * Return 0 or positive value on success. Else negative value for failure.
  */
-static int connect_to_event_loop()
+static int connect_to_event_loop(CanBus &CanBus_handler)
 {
 	sd_event *event_loop;
 	sd_event_source *source;
 	int rc;
 
-	if (can_handler.socket < 0)
+	if (CanBus_handler.socket < 0)
 	{
-		return can_handler.socket;
+		return CanBus_handler.socket;
 	}
 
 	event_loop = afb_daemon_get_event_loop(interface->daemon);
-	rc = sd_event_add_io(event_loop, &source, can_handler.socket, EPOLLIN, on_event, NULL);
+	rc = sd_event_add_io(event_loop, &source, CanBus_handler.socket, EPOLLIN, on_event, NULL);
 	if (rc < 0)
 	{
-		close(can_handler.socket);
-		ERROR(interface, "Can't connect CAN bus %s to the event loop", can_handler.device);
+		CanBus_handler.close();
+		ERROR(interface, "Can't connect CAN bus %s to the event loop", CanBus_handler.device);
 	} else
 	{
-		NOTICE(interface, "Connected CAN bus %s to the event loop", can_handler.device);
+		NOTICE(interface, "Connected CAN bus %s to the event loop", CanBus_handler.device);
 	}
 
 	return rc;
@@ -654,7 +615,10 @@ const struct afb_binding *afbBindingV1Register (const struct afb_binding_interfa
 
 int afbBindingV1ServiceInit(struct afb_service service)
 {
+	/* Open JSON conf file */
+
 	/* Open CAN socket */
-	retry(open_can_dev);
-	return connect_to_event_loop();
+	CanBus_handler.open();
+
+	return connect_to_event_loop(CanBus_handler);
 }

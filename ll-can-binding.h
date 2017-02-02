@@ -45,7 +45,7 @@ static const char * const type_NAMES[type_size] = {
 /* CAN variable initialization */
 struct canfd_frame canfd_frame;
 
-struct can_handler {
+class can_handle {
 	int socket;
 	char *device;
 	bool is_fdmode_on;
