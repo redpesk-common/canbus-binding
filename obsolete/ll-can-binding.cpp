@@ -18,6 +18,7 @@
 
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
@@ -32,6 +33,7 @@
 #include <string>
 #include <functional>
 #include <memory>
+
 
 #include <json-c/json.h>
 #include <openxc.pb.h>
@@ -616,7 +618,27 @@ const struct afb_binding *afbBindingV1Register (const struct afb_binding_interfa
 
 int afbBindingV1ServiceInit(struct afb_service service)
 {
+	std::ifstream fd_conf;
+	std::string fd_conf_content;
+	json_object jo_canbus;
+
 	/* Open JSON conf file */
+	/* TODO: can't use this method in c++ for now. Need to reimplement it ? */
+	jo_canbus = json_object_new_object();
+	fd_conf = afb_daemon_rootdir_open_locale(interface->daemon, "canbus.json", O_RDONLY, NULL);
+	if (fd_conf)
+	{
+		fd_conf.seekg(0, std::ios::end);
+		fd_conf_content.resize(fd_conf.tellg());
+		fd_conf.seekg(0, std::ios::beg);
+		fd_conf.read(&fd_conf_content[0], fd_conf_content.size());
+		fd_conf.close();
+	}
+
+	jo_canbus = json_tokener_parse(&fd_conf_content);
+
+	CanBus CanBus_handler;
+	CanBus_handler.deviceName = json_object_get_string("deviceName")
 
 	/* Open CAN socket */
 	CanBus_handler.open();
