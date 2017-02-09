@@ -96,9 +96,15 @@ class CanBus {
 		bool is_fdmode_on;
 		struct sockaddr_can txAddress;
 
+        std::thread th_reading;
+        std::thread th_decoding;
+        std::thread th_pushing;
+
 	public:
 		int open();
 		int close();
+
+        void start_threads();
 };
 
 /* Public: The ID format for a CAN message.
