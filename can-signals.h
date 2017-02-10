@@ -43,8 +43,8 @@ int getCanBusCount();
 CanMessageDefinition* getMessages();
 
 /* Public: Return an array of all CAN signals to be processed in the active
- *  * configuration.
- *   */
+ * configuration.
+ */
 CanSignal* getSignals();
 
 /* Public: Return an array of all OpenXC CAN commands enabled in the active
@@ -82,4 +82,3 @@ CanBus* getCanBuses();
  *           * message - The received CAN message.
  *            */
 void decodeCanMessage(openxc::pipeline::Pipeline* pipeline, CanBus* bus, CanMessage* message);
-
