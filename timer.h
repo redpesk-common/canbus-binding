@@ -17,16 +17,23 @@
 
 #pragma once
 
-typedef unsigned long (*TimeFunction)();
+//typedef unsigned long (*TimeFunction)();
 
 /* Public: A frequency counting clock.
- *  *
- *   * frequency - the clock freuquency in Hz.
- *    * lastTime - the last time (in milliseconds since startup) that the clock
- *     *      ticked.
- *      */
+ *
+ * frequency - the clock frequency in Hz.
+ * last_time - the last time (in milliseconds since startup) that the clock
+ *  ticked.
+ * time_function - a function returning current time in ms
 typedef struct {
 	    float frequency;
 	        unsigned long lastTick;
 		    TimeFunction timeFunction;
 } FrequencyClock;
+ */
+
+class FrequencyClock {
+	private:
+		float frequency;
+		unsigned long last_tick;
+}
