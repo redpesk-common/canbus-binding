@@ -48,81 +48,6 @@
  */
 static const struct afb_binding_interface *interface;
 
-/********************************************************************************
-*
-*		CanBus method implementation
-*
-*********************************************************************************/
-
-int CanBus::open()
-{
-	const int canfd_on = 1;
-	struct ifreq ifr;
-	struct timeval timeout = {1, 0};
-
-	DEBUG(interface, "open_can_dev: CAN Handler socket : %d", socket);
-	if (socket >= 0)
-		close(socket);
-
-	socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-	if (socket < 0)
-	{
-		ERROR(interface, "open_can_dev: socket could not be created");
-	}
-	else
-	{
-		/* Set timeout for read */
-		setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
-		/* try to switch the socket into CAN_FD mode */
-		if (setsockopt(socket, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
-		{
-			NOTICE(interface, "open_can_dev: Can not switch into CAN Extended frame format.");
-			is_fdmode_on = false;
-		} else {
-			is_fdmode_on = true;
-		}
-
-		/* Attempts to open a socket to CAN bus */
-		strcpy(ifr.ifr_name, device);
-		if(ioctl(socket, SIOCGIFINDEX, &ifr) < 0)
-			ERROR(interface, "open_can_dev: ioctl failed");
-		else
-		{
-			txAddress.can_family = AF_CAN;
-			txAddress.can_ifindex = ifr.ifr_ifindex;
-
-			/* And bind it to txAddress */
-			if (bind(socket, (struct sockaddr *)&txAddress, sizeof(txAddress)) < 0)
-			{
-				ERROR(interface, "open_can_dev: bind failed");
-			}
-			else
-			{
-				fcntl(socket, F_SETFL, O_NONBLOCK);
-				return 0;
-			}
-		}
-		close(socket);
-		socket = -1;
-	}
-	return -1;
-}
-
-int CanBus::close()
-{
-	close(socket);
-	socket = -1;
-}
-
-void CanBus::start_threads()
-{
-    std::queue <canfd_frame> canfd_frame_queue;
-    std::queue <openxc_can_message_type> can_message_queue;
-
-    th_reading = std::thread(can_reader, interface, socket, canfd_frame_queue);
-    th_decoding = std::thread(can_decoder, interface, canfd_frame_queue, can_message_queue);
-    th_pushing = std::thread(can_event_push, interface, can_message_queue);
-}
 
 /********************************************************************************
 *
@@ -305,7 +230,7 @@ int afbBindingV1ServiceInit(struct afb_service service)
 	/* Open JSON conf file */
 
 	/* Open CAN socket */
-	CanBus CanBus_handler;
+	CanBus_t CanBus_handler;
 	CanBus_handler.open();
     CanBus_handler.start_threads();
 

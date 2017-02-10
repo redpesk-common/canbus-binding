@@ -1,0 +1,175 @@
+/*
+ * Copyright (C) 2015, 2016 "IoT.bzh"
+ * Author "Romain Forlot" <romain.forlot@iot.bzh>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#pragma once
+
+/********************************************************************************
+*
+*		CanBus method implementation
+*
+*********************************************************************************/
+
+int CanBus_c::open()
+{
+	const int canfd_on = 1;
+	struct ifreq ifr;
+	struct timeval timeout = {1, 0};
+
+	DEBUG(interface, "open_can_dev: CAN Handler socket : %d", socket);
+	if (socket >= 0)
+		close(socket);
+
+	socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+	if (socket < 0)
+	{
+		ERROR(interface, "open_can_dev: socket could not be created");
+	}
+	else
+	{
+		/* Set timeout for read */
+		setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+		/* try to switch the socket into CAN_FD mode */
+		if (setsockopt(socket, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
+		{
+			NOTICE(interface, "open_can_dev: Can not switch into CAN Extended frame format.");
+			is_fdmode_on = false;
+		} else {
+			is_fdmode_on = true;
+		}
+
+		/* Attempts to open a socket to CAN bus */
+		strcpy(ifr.ifr_name, device);
+		if(ioctl(socket, SIOCGIFINDEX, &ifr) < 0)
+			ERROR(interface, "open_can_dev: ioctl failed");
+		else
+		{
+			txAddress.can_family = AF_CAN;
+			txAddress.can_ifindex = ifr.ifr_ifindex;
+
+			/* And bind it to txAddress */
+			if (bind(socket, (struct sockaddr *)&txAddress, sizeof(txAddress)) < 0)
+			{
+				ERROR(interface, "open_can_dev: bind failed");
+			}
+			else
+			{
+				fcntl(socket, F_SETFL, O_NONBLOCK);
+				return 0;
+			}
+		}
+		close(socket);
+		socket = -1;
+	}
+	return -1;
+}
+
+int CanBus_c::close()
+{
+	close(socket);
+	socket = -1;
+}
+
+void CanBus_c::start_threads()
+{
+    std::queue <canfd_frame> canfd_frame_queue;
+    std::queue <openxc_can_message_type> can_message_queue;
+
+    th_reading = std::thread(can_reader, interface, socket, canfd_frame_queue);
+    th_decoding = std::thread(can_decoder, interface, canfd_frame_queue, can_message_queue);
+    th_pushing = std::thread(can_event_push, interface, can_message_queue);
+}
+
+/********************************************************************************
+*
+*		CanMessage method implementation
+*
+*********************************************************************************/
+
+uint32_t CanMessage_c::get_id()
+{
+    return id;
+}
+
+int CanMessage_c::get_format()
+{
+    return format;
+}
+
+uint8_t CanMessage_c::get_data()
+{
+    return data;
+}
+uint8_t CanMessage_c::get_lenght()
+{
+    return lenght;
+}
+
+void CanMessage_c::set_id(uint32_t new_id)
+{
+    switch(format):
+        case SIMPLE:
+            id = new_id & CAN_SFF_MASK;
+        case EXTENDED:
+            id = new_id & CAN_EFF_MASK;
+        default:
+            ERROR(interface, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
+}
+
+void CanMessage_c::set_format(CanMessageFormat new_format)
+{
+    if(new_format == SIMPLE || new_format == EXTENDED)
+        format = new_format;
+    else
+        ERROR(interface, "ERROR: Can set format, wrong format chosen");
+}
+
+void CanMessage_c::set_data(uint8_t new_data)
+{
+    data = new_data;
+}
+
+void CanMessage_c::set_lenght(uint8_t new_length)
+{
+    lenght = new_lenght;
+}
+
+void CanMessage_c::convert_canfd_frame_to_CanMessage(canfd_frame *frame)
+{
+    
+	lenght = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
+
+	switch (canfd_frame->can_id): 
+        case (canfd_frame->can_id & CAN_ERR_FLAG):
+		    id = canfd_frame->can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
+            break;
+        case (canfd_frame->can_id & CAN_EFF_FLAG):
+		    id = canfd_frame->can_id & CAN_EFF_MASK;
+    		format = EXTENDED;
+        default:
+		    format = STANDARD;
+		    id = canfd_frame->can_id & CAN_SFF_MASK;
+
+	if (sizeof(canfd_frame->data) <= sizeof(data))
+	{
+		for (i = 0; i < lenght; i++)
+			can_message->data.bytes[i] = canfd_frame->data[i];
+		return 0;
+	} else if (sizeof(canfd_frame->data) >= CAN_MAX_DLEN)
+	{
+		ERROR(interface, "parse_can_frame: can_frame data too long to be stored into openxc_CanMessage data field");
+    }
+}

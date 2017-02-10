@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2015, 2016 "IoT.bzh"
  * Author "Romain Forlot" <romain.forlot@iot.bzh>
@@ -84,7 +83,7 @@ typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
         openxc_DynamicField* value, bool* send);
 
 /* CanBus represent a can device definition gotten from configuraiton file */
-class CanBus {
+class CanBus_c {
 	private:
 		/* Got from conf file */
 		std::string deviceName;
@@ -109,11 +108,11 @@ class CanBus {
  * STANDARD - standard 11-bit CAN arbitration ID.
  * EXTENDED - an extended frame, with a 29-bit arbitration ID.
  */
-enum CanMessageFormat {
+enum CanMessageFormat_c {
     STANDARD,
     EXTENDED,
 };
-typedef enum CanMessageFormat CanMessageFormat;
+typedef enum CanMessageFormat_c CanMessageFormat;
 
 /* Public: A state encoded (SED) signal's mapping from numerical values to
  * OpenXC state names.
@@ -126,11 +125,11 @@ struct CanSignalState {
 };
 typedef struct CanSignalState CanSignalState;
  */
- class CanSignalState {
+ class CanSignalState_c {
      private:
         const int value;
         const char *name;
- }
+};
 
 /* Public: A CAN signal to decode from the bus and output over USB.
  *
@@ -188,8 +187,9 @@ struct CanSignal {
 typedef struct CanSignal CanSignal;
  */
 
-class CanSignal {
+class CanSignal_c {
     private:
+        CanMessageDefinition *message;
         const char *generic_name;
         uint8_t bit_position;
         uint8_t bit_size;
@@ -197,7 +197,7 @@ class CanSignal {
         float offset;
         float min_value;
         float max_value;
-        FrequencyClock clock;
+        FrequencyClock_t clock;
         bool send_same;
         bool force_send_changed;
         const CanSignalState *states;
@@ -207,7 +207,7 @@ class CanSignal {
         SignalEncoder encoder;
         bool received;
         float last_value;
-}
+};
 
 /* Public: The definition of a CAN message. This includes a lot of metadata, so
  * to save memory this struct should not be used for storing incoming and
@@ -234,15 +234,15 @@ struct CanMessageDefinition {
 };
 typedef struct CanMessageDefinition CanMessageDefinition;
  */
- class CanMessageDefinition {
+ class CanMessageDefinition_c {
     private:
         CanBus *bus
         uint32_t id;
         CanMessageFormat format;
-        FrequencyClock clock;
+        FrequencyClock_t clock;
         bool force_send_changed;
         uint8_t last_value[CAN_MESSAGE_SIZE];
- }
+ };
 
 /* A compact representation of a single CAN message, meant to be used in in/out
  * buffers.
@@ -259,15 +259,28 @@ struct CanMessage {
 };
 typedef struct CanMessage CanMessage;
 */
-class CanMessage {
+class CanMessage_c {
     private:
         uint32_t id;
         CanMessageFormat format;
         uint8_t data[CAN_MESSAGE_SIZE];
         uint8_t length;
-}
 
-QUEUE_DECLARE(CanMessage, 8);
+    public:
+        uint32_t get_id();
+        int get_format();
+        uint8_t get_data();
+        uint8_t get_lenght();
+
+        void set_id(uint32_t id);
+        void set_format(CanMessageFormat format);
+        void set_data(uint8_t data);
+        void set_lenght(uint8_t length);
+
+        void convert_canfd_frame_to_CanMessage(canfd_frame frame);
+};
+
+QUEUE_DECLARE(CanMessage_c, 8);
 
 /* Private: An entry in the list of acceptance filters for each CanBus.
  *
@@ -316,7 +329,7 @@ typedef struct {
     unsigned short commandCount;
 } CanMessageSet;
  */
-class CanMessageSet {
+class CanMessageSet_c {
     private:
         uint8_t index;
         const char * name;
@@ -324,7 +337,7 @@ class CanMessageSet {
         unsigned short messageCount;
         unsigned short signalCount;
         unsigned short commandCount;
-}
+};
 
 /* Public: The type signature for a function to handle a custom OpenXC command.
  *
@@ -361,11 +374,11 @@ typedef struct {
 } CanCommand;
  */
 
-class CanCommand {
+class CanCommand_c {
     private:
         const char* genericName;
         CommandHandler handler;
-}
+};
 
 /* Pre initialize actions made before CAN bus initialization
  *

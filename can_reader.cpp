@@ -21,10 +21,11 @@
 
 #include <afb/afb-binding.h>
 
-void can_reader(afb_binding_interface *interface, int socket, std::queue <canfd_frame>& canfd_frame_queue)
+void can_reader(afb_binding_interface *interface, int socket, std::queue <CanMessage_t>& can_message_q)
 {
     ssize_t nbytes;
 	int maxdlen;
+    CanMessage_t can_message;
 
 	/* Test that socket is really opened */
 	if ( socket < 0)
@@ -39,7 +40,7 @@ void can_reader(afb_binding_interface *interface, int socket, std::queue <canfd_
 
         switch(nbytes)
         {
-            case CANFD_MTU:s
+            case CANFD_MTU:
                 DEBUG(interface, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
                 maxdlen = CANFD_MAX_DLEN;
                 break;
@@ -64,6 +65,10 @@ void can_reader(afb_binding_interface *interface, int socket, std::queue <canfd_
             return -4;
         }
         */
-        canfd_frame_queue.push(canfd_frame);
+
+        can_message.convert_canfd_frame_to_CanMessage(canfd_frame);
+
+
+        can_message_q.push(can_message);
     }
 }

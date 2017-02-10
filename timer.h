@@ -32,7 +32,7 @@ typedef struct {
 } FrequencyClock;
  */
 
-class FrequencyClock {
+class FrequencyClock_c {
 	private:
 		float frequency;
 		unsigned long last_tick;
