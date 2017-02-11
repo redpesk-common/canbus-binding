@@ -4,3 +4,6 @@
 [submodule "libs/nanopb"]
 	path = libs/nanopb
 	url = git@github.com:nanopb/nanopb.git
+[submodule "uds-c"]
+	path = libs/uds-c
+	url = git@github.com:openxc/uds-c.git
