@@ -22,7 +22,10 @@
 
 #include <afb/afb-binding.h>
 
-void decode_can_message(afb_binding_interface *interface, std::queue <canfd_frame>& canfd_frame_queue, std::queue <openxc_can_message_type>& can_message_queue)
+#include "can-utils.h"
+#include "openxc.pb.h"
+
+void decode_can_message(afb_binding_interface *interface, std::queue <CanMessage_t>& can_message_q, std::queue <openxc_VehicleMessage>& VehicleMessage_q)
 {
     canfd_frame canfd_frame;
 

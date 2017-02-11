@@ -21,6 +21,8 @@
 
 #include <afb/afb-binding.h>
 
+#include "can-utils.h"
+
 void can_reader(afb_binding_interface *interface, int socket, std::queue <CanMessage_t>& can_message_q)
 {
     ssize_t nbytes;
@@ -55,16 +57,6 @@ void can_reader(afb_binding_interface *interface, int socket, std::queue <CanMes
                 ERROR(interface, "read_can: Error reading CAN bus");
                 return -2;
         }
-
-        /* 
-         * TODO: thread handle
-        if (parse_can_frame(can_message, &canfd_frame, maxdlen))
-        {
-            ERROR(interface, "read_can: Can't parse the can frame. ID: %i, DLC: %i, DATA: %s", 
-            canfd_frame.can_id, canfd_frame.len, canfd_frame.data);
-            return -4;
-        }
-        */
 
         can_message.convert_canfd_frame_to_CanMessage(canfd_frame);
 

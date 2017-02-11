@@ -22,14 +22,17 @@
 
 #include <afb/afb-binding.h>
 
-void can_event_push(afb_binding_interface *interface, std::queue <openxc_can_message_type>& can_message_queue)
+#include "can-utils.h"
+#include "openxc.pb.h"
+
+void can_event_push(afb_binding_interface *interface, std::queue <openxc_VehicleMessage>& vehicle_message_q)
 {
     while(true)
     {
-        if(! can_message_queue.empty())
+        if(! vehicle_message_q.empty())
         {
-            can_message = can_message_queue.front();
-            can_message_queue.pop();
+            vehicle_message = vehicle_message_q.front();
+            vehicle_message_q.pop();
         }
     }
 }

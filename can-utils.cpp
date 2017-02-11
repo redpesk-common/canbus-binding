@@ -85,11 +85,10 @@ int CanBus_c::close()
 
 void CanBus_c::start_threads()
 {
-    std::queue <canfd_frame> canfd_frame_queue;
-    std::queue <openxc_can_message_type> can_message_queue;
+	std::queue <CanMessage_t> can_message_q;
 
-    th_reading = std::thread(can_reader, interface, socket, canfd_frame_queue);
-    th_decoding = std::thread(can_decoder, interface, canfd_frame_queue, can_message_queue);
+    th_reading = std::thread(can_reader, interface, socket, can_message_q);
+    th_decoding = std::thread(can_decoder, interface, can_message_q, can_message_queue);
     th_pushing = std::thread(can_event_push, interface, can_message_queue);
 }
 
@@ -147,6 +146,12 @@ void CanMessage_c::set_lenght(uint8_t new_length)
     lenght = new_lenght;
 }
 
+/*
+ * This is the prefered way to initialize a CanMessage object 
+ * from a read canfd_frame message.
+ * 
+ * params: canfd_frame pointer
+ */
 void CanMessage_c::convert_canfd_frame_to_CanMessage(canfd_frame *frame)
 {
     
@@ -159,9 +164,11 @@ void CanMessage_c::convert_canfd_frame_to_CanMessage(canfd_frame *frame)
         case (canfd_frame->can_id & CAN_EFF_FLAG):
 		    id = canfd_frame->can_id & CAN_EFF_MASK;
     		format = EXTENDED;
-        default:
-		    format = STANDARD;
-		    id = canfd_frame->can_id & CAN_SFF_MASK;
+			break;
+		default:
+			format = STANDARD;
+			id = canfd_frame->can_id & CAN_SFF_MASK;
+			break;
 
 	if (sizeof(canfd_frame->data) <= sizeof(data))
 	{
@@ -169,7 +176,5 @@ void CanMessage_c::convert_canfd_frame_to_CanMessage(canfd_frame *frame)
 			can_message->data.bytes[i] = canfd_frame->data[i];
 		return 0;
 	} else if (sizeof(canfd_frame->data) >= CAN_MAX_DLEN)
-	{
-		ERROR(interface, "parse_can_frame: can_frame data too long to be stored into openxc_CanMessage data field");
-    }
+		ERROR(interface, "CanMessage_c: canfd_frame data too long to be stored into CanMessage object");
 }

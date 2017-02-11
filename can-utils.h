@@ -82,7 +82,9 @@ typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal* signal,
 typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
         openxc_DynamicField* value, bool* send);
 
-/* CanBus represent a can device definition gotten from configuraiton file */
+/* 
+ * CanBus represent a can device definition gotten from configuraiton file 
+ */
 class CanBus_c {
 	private:
 		/* Got from conf file */
