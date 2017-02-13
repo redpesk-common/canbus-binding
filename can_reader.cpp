@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,44 +23,44 @@
 
 #include "can-utils.h"
 
-void can_reader(afb_binding_interface *interface, int socket, std::queue <CanMessage_t>& can_message_q)
+void can_reader(CanBus_c *can_bus))
 {
-    ssize_t nbytes;
+	ssize_t nbytes;
 	int maxdlen;
-    CanMessage_t can_message;
+	CanMessage_c can_message;
+	canfd_frame canfd_frame;
 
 	/* Test that socket is really opened */
-	if ( socket < 0)
+	if ( can_bus->socket < 0)
 	{
 		ERROR(interface, "read_can: Socket unavailable");
 		return -1;
 	}
 
-    while(true)
-    {
-    	nbytes = read(socket, &canfd_frame, CANFD_MTU);
+	while(true)
+	{
+		nbytes = read(can_bus->socket, &canfd_frame, CANFD_MTU);
 
-        switch(nbytes)
-        {
-            case CANFD_MTU:
-                DEBUG(interface, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
-                maxdlen = CANFD_MAX_DLEN;
-                break;
-            case CAN_MTU:
-                DEBUG(interface, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
-                maxdlen = CAN_MAX_DLEN;
-                break;
-            default:
-                if (errno == ENETDOWN)
-                    ERROR(interface, "read_can: %s interface down", device);
-                
-                ERROR(interface, "read_can: Error reading CAN bus");
-                return -2;
-        }
+		switch(nbytes)
+		{
+			case CANFD_MTU:
+				DEBUG(interface, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
+				maxdlen = CANFD_MAX_DLEN;
+				break;
+			case CAN_MTU:
+				DEBUG(interface, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
+				maxdlen = CAN_MAX_DLEN;
+				break;
+			default:
+				if (errno == ENETDOWN)
+					ERROR(interface, "read_can: %s interface down", device);
+				
+				ERROR(interface, "read_can: Error reading CAN bus");
+				return -2;
+		}
 
-        can_message.convert_canfd_frame_to_CanMessage(canfd_frame);
+		can_message.convert_from_canfd_frame(canfd_frame);
 
-
-        can_message_q.push(can_message);
-    }
+		can_message_q.push(can_message);
+	}
 }

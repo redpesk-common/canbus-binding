@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,14 +25,14 @@
 #include "can-utils.h"
 #include "openxc.pb.h"
 
-void can_event_push(afb_binding_interface *interface, std::queue <openxc_VehicleMessage>& vehicle_message_q)
+void can_event_push(CanBus_c *can_bus)
 {
-    while(true)
-    {
-        if(! vehicle_message_q.empty())
-        {
-            vehicle_message = vehicle_message_q.front();
-            vehicle_message_q.pop();
-        }
-    }
+	while(true)
+	{
+		if(! can_bus->vehicle_message_q.empty())
+		{
+			vehicle_message = can_bus->vehicle_message_q.front();
+			can_bus->vehicle_message_q.pop();
+		}
+	}
 }

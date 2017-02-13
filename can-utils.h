@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,9 +34,9 @@
 static const int queue_##type##_max_length = max_length; \
 static const int queue_##type##_max_internal_length = max_length + 1; \
 typedef struct queue_##type##_s { \
-    int head; \
-    int tail; \
-    type elements[max_length + 1]; \
+	int head; \
+	int tail; \
+	type elements[max_length + 1]; \
 } queue_##type; \
 \
 bool queue_##type##_push(queue_##type* queue, type value); \
@@ -60,14 +60,14 @@ void queue_##type##_snapshot(queue_##type* queue, type* snapshot, int max);
  * signals - The list of all signals.
  * signalCount - The length of the signals array.
  * value - The CAN signal parsed from the message as a raw floating point
- *      value.
+ *		value.
  * send - An output parameter. If the decoding failed or the CAN signal should
- *      not send for some other reason, this should be flipped to false.
+ *		not send for some other reason, this should be flipped to false.
  *
  * Returns a decoded value in an openxc_DynamicField struct.
  */
 typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal* signal,
-        CanSignal* signals, int signalCount, float value, bool* send);
+		CanSignal* signals, int signalCount, float value, bool* send);
 
 /* Public: The type signature for a CAN signal encoder.
  *
@@ -80,13 +80,15 @@ typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal* signal,
  * not be encoded for some other reason, this will be flipped to false.
  */
 typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
-        openxc_DynamicField* value, bool* send);
+		openxc_DynamicField* value, bool* send);
 
 /* 
  * CanBus represent a can device definition gotten from configuraiton file 
  */
 class CanBus_c {
 	private:
+		afb_binding_interface *interface;
+
 		/* Got from conf file */
 		std::string deviceName;
 
@@ -94,157 +96,19 @@ class CanBus_c {
 		bool is_fdmode_on;
 		struct sockaddr_can txAddress;
 
-        std::thread th_reading;
-        std::thread th_decoding;
-        std::thread th_pushing;
+		std::thread th_reading;
+		std::thread th_decoding;
+		std::thread th_pushing;
+		std::queue <CanMessage_c> can_message_q;
+		std::queue <openxc_VehicleMessage> VehicleMessage_q;
 
 	public:
 		int open();
 		int close();
 
-        void start_threads();
+		void start_threads();
+		int send_can_message(CanMessage_c can_msg);
 };
-
-/* Public: The ID format for a CAN message.
- *
- * STANDARD - standard 11-bit CAN arbitration ID.
- * EXTENDED - an extended frame, with a 29-bit arbitration ID.
- */
-enum CanMessageFormat_c {
-    STANDARD,
-    EXTENDED,
-};
-typedef enum CanMessageFormat_c CanMessageFormat;
-
-/* Public: A state encoded (SED) signal's mapping from numerical values to
- * OpenXC state names.
- *
- * value - The integer value of the state on the CAN bus.
- * name  - The corresponding string name for the state in OpenXC.
-struct CanSignalState {
-    const int value;
-    const char* name;
-};
-typedef struct CanSignalState CanSignalState;
- */
- class CanSignalState_c {
-     private:
-        const int value;
-        const char *name;
-};
-
-/* Public: A CAN signal to decode from the bus and output over USB.
- *
- * message     - The message this signal is a part of.
- * genericName - The name of the signal to be output over USB.
- * bitPosition - The starting bit of the signal in its CAN message (assuming
- *               non-inverted bit numbering, i.e. the most significant bit of
- *               each byte is 0)
- * bitSize     - The width of the bit field in the CAN message.
- * factor      - The final value will be multiplied by this factor. Use 1 if you
- *               don't need a factor.
- * offset      - The final value will be added to this offset. Use 0 if you
- *               don't need an offset.
- * minValue    - The minimum value for the processed signal.
- * maxValue    - The maximum value for the processed signal.
- * frequencyClock - A FrequencyClock struct to control the maximum frequency to
- *              process and send this signal. To process every value, set the
- *              clock's frequency to 0.
- * sendSame    - If true, will re-send even if the value hasn't changed.
- * forceSendChanged - If true, regardless of the frequency, it will send the
- *              value if it has changed.
- * states      - An array of CanSignalState describing the mapping
- *               between numerical and string values for valid states.
- * stateCount  - The length of the states array.
- * writable    - True if the signal is allowed to be written from the USB host
- *               back to CAN. Defaults to false.
- * decoder     - An optional function to decode a signal from the bus to a human
- *      readable value. If NULL, the default numerical decoder is used.
- * encoder     - An optional function to encode a signal value to be written to
- *                CAN into a byte array. If NULL, the default numerical encoder
- *                is used.
- * received    - True if this signal has ever been received.
- * lastValue   - The last received value of the signal. If 'received' is false,
- *      this value is undefined.
-struct CanSignal {
-    struct CanMessageDefinition* message;
-    const char* genericName;
-    uint8_t bitPosition;
-    uint8_t bitSize;
-    float factor;
-    float offset;
-    float minValue;
-    float maxValue;
-    FrequencyClock frequencyClock;
-    bool sendSame;
-    bool forceSendChanged;
-    const CanSignalState* states;
-    uint8_t stateCount;
-    bool writable;
-    SignalDecoder decoder;
-    SignalEncoder encoder;
-    bool received;
-    float lastValue;
-};
-typedef struct CanSignal CanSignal;
- */
-
-class CanSignal_c {
-    private:
-        CanMessageDefinition *message;
-        const char *generic_name;
-        uint8_t bit_position;
-        uint8_t bit_size;
-        float factor;
-        float offset;
-        float min_value;
-        float max_value;
-        FrequencyClock_t clock;
-        bool send_same;
-        bool force_send_changed;
-        const CanSignalState *states;
-        uint8_t state_count;
-        bool writable;
-        SignalDecoder decoder;
-        SignalEncoder encoder;
-        bool received;
-        float last_value;
-};
-
-/* Public: The definition of a CAN message. This includes a lot of metadata, so
- * to save memory this struct should not be used for storing incoming and
- * outgoing CAN messages.
- *
- * bus - A pointer to the bus this message is on.
- * id - The ID of the message.
- * format - the format of the message's ID.
- * clock - an optional frequency clock to control the output of this
- *      message, if sent raw, or simply to mark the max frequency for custom
- *      handlers to retrieve.
- * forceSendChanged - If true, regardless of the frequency, it will send CAN
- *      message if it has changed when using raw passthrough.
- * lastValue - The last received value of the message. Defaults to undefined.
- *      This is required for the forceSendChanged functionality, as the stack
- *      needs to compare an incoming CAN message with the previous frame.
-struct CanMessageDefinition {
-    struct CanBus* bus;
-    uint32_t id;
-    CanMessageFormat format;
-    FrequencyClock frequencyClock;
-    bool forceSendChanged;
-    uint8_t lastValue[CAN_MESSAGE_SIZE];
-};
-typedef struct CanMessageDefinition CanMessageDefinition;
- */
- class CanMessageDefinition_c {
-    private:
-        CanBus *bus
-        uint32_t id;
-        CanMessageFormat format;
-        FrequencyClock_t clock;
-        bool force_send_changed;
-        uint8_t last_value[CAN_MESSAGE_SIZE];
- };
 
 /* A compact representation of a single CAN message, meant to be used in in/out
  * buffers.
@@ -254,35 +118,148 @@ typedef struct CanMessageDefinition CanMessageDefinition;
  * data  - The message's data field.
  * length - the length of the data array (max 8).
 struct CanMessage {
-    uint32_t id;
-    CanMessageFormat format;
-    uint8_t data[CAN_MESSAGE_SIZE];
-    uint8_t length;
+	uint32_t id;
+	CanMessageFormat format;
+	uint8_t data[CAN_MESSAGE_SIZE];
+	uint8_t length;
 };
 typedef struct CanMessage CanMessage;
 */
 class CanMessage_c {
-    private:
-        uint32_t id;
-        CanMessageFormat format;
-        uint8_t data[CAN_MESSAGE_SIZE];
-        uint8_t length;
+	private:
+		uint32_t id;
+		CanMessageFormat format;
+		uint8_t data[CAN_MESSAGE_SIZE];
+		uint8_t length;
 
-    public:
-        uint32_t get_id();
-        int get_format();
-        uint8_t get_data();
-        uint8_t get_lenght();
+	public:
+		uint32_t get_id();
+		int get_format();
+		uint8_t get_data();
+		uint8_t get_lenght();
 
-        void set_id(uint32_t id);
-        void set_format(CanMessageFormat format);
-        void set_data(uint8_t data);
-        void set_lenght(uint8_t length);
+		void set_id(uint32_t id);
+		void set_format(CanMessageFormat format);
+		void set_data(uint8_t data);
+		void set_lenght(uint8_t length);
 
-        void convert_canfd_frame_to_CanMessage(canfd_frame frame);
+		void convert_from_canfd_frame(canfd_frame frame);
+		canfd_frame convert_to_canfd_frame();
 };
 
 QUEUE_DECLARE(CanMessage_c, 8);
+
+/* Public: The ID format for a CAN message.
+ *
+ * STANDARD - standard 11-bit CAN arbitration ID.
+ * EXTENDED - an extended frame, with a 29-bit arbitration ID.
+ */
+enum CanMessageFormat {
+	STANDARD,
+	EXTENDED,
+};
+typedef enum CanMessageFormat CanMessageFormat;
+
+/* Public: A state encoded (SED) signal's mapping from numerical values to
+ * OpenXC state names.
+ *
+ * value - The integer value of the state on the CAN bus.
+ * name  - The corresponding string name for the state in OpenXC.
+struct CanSignalState {
+	const int value;
+	const char* name;
+};
+typedef struct CanSignalState CanSignalState;
+ */
+ class CanSignalState_c {
+	 private:
+		const int value;
+		const char *name;
+};
+
+/* Public: A CAN signal to decode from the bus and output over USB.
+ *
+ * message	   - The message this signal is a part of.
+ * genericName - The name of the signal to be output over USB.
+ * bitPosition - The starting bit of the signal in its CAN message (assuming
+ *				 non-inverted bit numbering, i.e. the most significant bit of
+ *				 each byte is 0)
+ * bitSize	   - The width of the bit field in the CAN message.
+ * factor	   - The final value will be multiplied by this factor. Use 1 if you
+ *				 don't need a factor.
+ * offset	   - The final value will be added to this offset. Use 0 if you
+ *				 don't need an offset.
+ * minValue    - The minimum value for the processed signal.
+ * maxValue    - The maximum value for the processed signal.
+ * frequencyClock - A FrequencyClock struct to control the maximum frequency to
+ *				process and send this signal. To process every value, set the
+ *				clock's frequency to 0.
+ * sendSame    - If true, will re-send even if the value hasn't changed.
+ * forceSendChanged - If true, regardless of the frequency, it will send the
+ *				value if it has changed.
+ * states	   - An array of CanSignalState describing the mapping
+ *				 between numerical and string values for valid states.
+ * stateCount  - The length of the states array.
+ * writable    - True if the signal is allowed to be written from the USB host
+ *				 back to CAN. Defaults to false.
+ * decoder	   - An optional function to decode a signal from the bus to a human
+ *		readable value. If NULL, the default numerical decoder is used.
+ * encoder	   - An optional function to encode a signal value to be written to
+ *				  CAN into a byte array. If NULL, the default numerical encoder
+ *				  is used.
+ * received    - True if this signal has ever been received.
+ * lastValue   - The last received value of the signal. If 'received' is false,
+ *		this value is undefined.
+ */
+struct CanSignal {
+	struct CanMessageDefinition* message;
+	const char* genericName;
+	uint8_t bitPosition;
+	uint8_t bitSize;
+	float factor;
+	float offset;
+	float minValue;
+	float maxValue;
+	FrequencyClock frequencyClock;
+	bool sendSame;
+	bool forceSendChanged;
+	const CanSignalState* states;
+	uint8_t stateCount;
+	bool writable;
+	SignalDecoder decoder;
+	SignalEncoder encoder;
+	bool received;
+	float lastValue;
+
+	struct afb_event event;
+};
+typedef struct CanSignal CanSignal;
+
+/* Public: The definition of a CAN message. This includes a lot of metadata, so
+ * to save memory this struct should not be used for storing incoming and
+ * outgoing CAN messages.
+ *
+ * bus - A pointer to the bus this message is on.
+ * id - The ID of the message.
+ * format - the format of the message's ID.
+ * clock - an optional frequency clock to control the output of this
+ *		message, if sent raw, or simply to mark the max frequency for custom
+ *		handlers to retrieve.
+ * forceSendChanged - If true, regardless of the frequency, it will send CAN
+ *		message if it has changed when using raw passthrough.
+ * lastValue - The last received value of the message. Defaults to undefined.
+ *		This is required for the forceSendChanged functionality, as the stack
+ *		needs to compare an incoming CAN message with the previous frame.
+ */
+struct CanMessageDefinition {
+	struct CanBus* bus;
+	uint32_t id;
+	CanMessageFormat format;
+	FrequencyClock frequencyClock;
+	bool forceSendChanged;
+	uint8_t lastValue[CAN_MESSAGE_SIZE];
+};
+typedef struct CanMessageDefinition CanMessageDefinition;
 
 /* Private: An entry in the list of acceptance filters for each CanBus.
  *
@@ -290,13 +267,13 @@ QUEUE_DECLARE(CanMessage_c, 8);
  *
  * filter - the value for the CAN acceptance filter.
  * activeUserCount - The number of active consumers of this filter's messages.
- *      When 0, this filter can be removed.
+ *		When 0, this filter can be removed.
  * format - the format of the ID for the filter.
 struct AcceptanceFilterListEntry {
-    uint32_t filter;
-    uint8_t activeUserCount;
-    CanMessageFormat format;
-    LIST_ENTRY(AcceptanceFilterListEntry) entries;
+	uint32_t filter;
+	uint8_t activeUserCount;
+	CanMessageFormat format;
+	LIST_ENTRY(AcceptanceFilterListEntry) entries;
 };
  */
 
@@ -304,55 +281,55 @@ struct AcceptanceFilterListEntry {
 LIST_HEAD(AcceptanceFilterList, AcceptanceFilterListEntry);
 
 struct CanMessageDefinitionListEntry {
-    CanMessageDefinition definition;
-    LIST_ENTRY(CanMessageDefinitionListEntry) entries;
+	CanMessageDefinition definition;
+	LIST_ENTRY(CanMessageDefinitionListEntry) entries;
 };
 LIST_HEAD(CanMessageDefinitionList, CanMessageDefinitionListEntry);
  */
 
 /** Public: A parent wrapper for a particular set of CAN messages and associated
- *  CAN buses(e.g. a vehicle or program).
+ *	CAN buses(e.g. a vehicle or program).
  *
- *  index - A numerical ID for the message set, ideally the index in an array
- *      for fast lookup
- *  name - The name of the message set.
- *  busCount - The number of CAN buses defined for this message set.
- *  messageCount - The number of CAN messages (across all buses) defined for
- *      this message set.
- *  signalCount - The number of CAN signals (across all messages) defined for
- *      this message set.
- *  commandCount - The number of CanCommmands defined for this message set.
+ *	index - A numerical ID for the message set, ideally the index in an array
+ *		for fast lookup
+ *	name - The name of the message set.
+ *	busCount - The number of CAN buses defined for this message set.
+ *	messageCount - The number of CAN messages (across all buses) defined for
+ *		this message set.
+ *	signalCount - The number of CAN signals (across all messages) defined for
+ *		this message set.
+ *	commandCount - The number of CanCommmands defined for this message set.
 typedef struct {
-    uint8_t index;
-    const char* name;
-    uint8_t busCount;
-    unsigned short messageCount;
-    unsigned short signalCount;
-    unsigned short commandCount;
+	uint8_t index;
+	const char* name;
+	uint8_t busCount;
+	unsigned short messageCount;
+	unsigned short signalCount;
+	unsigned short commandCount;
 } CanMessageSet;
  */
 class CanMessageSet_c {
-    private:
-        uint8_t index;
-        const char * name;
-        uint8_t busCount;
-        unsigned short messageCount;
-        unsigned short signalCount;
-        unsigned short commandCount;
+	private:
+		uint8_t index;
+		const char * name;
+		uint8_t busCount;
+		unsigned short messageCount;
+		unsigned short signalCount;
+		unsigned short commandCount;
 };
 
 /* Public: The type signature for a function to handle a custom OpenXC command.
  *
  * name - the name of the received command.
  * value - the value of the received command, in a DynamicField. The actual type
- *      may be a number, string or bool.
+ *		may be a number, string or bool.
  * event - an optional event from the received command, in a DynamicField. The
- *      actual type may be a number, string or bool.
+ *		actual type may be a number, string or bool.
  * signals - The list of all signals.
  * signalCount - The length of the signals array.
  */
 typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
-        openxc_DynamicField* event, CanSignal* signals, int signalCount);
+		openxc_DynamicField* event, CanSignal* signals, int signalCount);
 
 /* Public: The structure to represent a supported custom OpenXC command.
  *
@@ -369,24 +346,24 @@ typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
  *
  * genericName - The name of the command.
  * handler - An function to process the received command's data and perform some
- *      action.
+ *		action.
 typedef struct {
-    const char* genericName;
-    CommandHandler handler;
+	const char* genericName;
+	CommandHandler handler;
 } CanCommand;
  */
 
 class CanCommand_c {
-    private:
-        const char* genericName;
-        CommandHandler handler;
+	private:
+		const char* genericName;
+		CommandHandler handler;
 };
 
 /* Pre initialize actions made before CAN bus initialization
  *
  * bus - A CanBus struct defining the bus's metadata
  * writable - configure the controller in a writable mode. If false, it will be
- *      configured as "listen only" and will not allow writes or even CAN ACKs.
+ *		configured as "listen only" and will not allow writes or even CAN ACKs.
  * buses - An array of all CAN buses.
  * busCount - The length of the buses array.
  */
@@ -397,7 +374,7 @@ void pre_initialize(CanBus* bus, bool writable, CanBus* buses, const int busCoun
  *
  * bus - A CanBus struct defining the bus's metadata
  * writable - configure the controller in a writable mode. If false, it will be
- *      configured as "listen only" and will not allow writes or even CAN ACKs.
+ *		configured as "listen only" and will not allow writes or even CAN ACKs.
  * buses - An array of all CAN buses.
  * busCount - The length of the buses array.
  */
