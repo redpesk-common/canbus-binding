@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,24 +15,45 @@
  * limitations under the License.
  */
 
-/*
- *  A representation of an OBD-II PID.
- *
- * pid - The 1 byte PID.
- * name - A human readable name to use for this PID when published.
- * frequency - The frequency to request this PID if supported by the vehicle
- *      when automatic, recurring OBD-II requests are enabled.
- */
+
+void shims_logger(afb_binding_interface *itf)
+{
+	//DEBUG(itf, "dd");
+}
+
+void shims_timer()
+{
+}
 
 /*
  * Will scan for supported Obd2 pids
  */
-Obd2Handler::Obd2Handler() {
+Obd2Handler::Obd2Handler(afb_binding_interface *itf, CanBus_c cb)
+{
+	CanBus_c can_bus = cb;
+	DiagnosticShims shims = diagnostic_init_shims(shims_logger, can_bus.send_can_message, NULL);
 
+	int n_pids, i;
+
+	n_pids = size(Obd2Pid);
+	for(i=0; i<=n_pids; i++)
+	{
+	}
 }
 
-Obd2Handler::isObd2Request(DiagnosticRequest* request) {
-    return request->mode == 0x1 && request->has_pid && request->pid < 0xff;
+Obd2Handler::add_request(int pid)
+{
+	DiagnosticRequest request = {
+	arbitration_id: OBD2_FUNCTIONAL_BROADCAST_ID,
+	mode: 0x1, has_pid: true, pid: pid};
 }
 
-Obd2Handler::decodeObd2Response(obd2response responce)
+Obd2Handler::is_obd2_request(DiagnosticRequest* request)
+{
+	return request->mode == 0x1 && request->has_pid && request->pid < 0xff;
+}
+
+Obd2Handler::decode_obd2_response(DiagnosticResponse* responce)
+{
+	return diagnostic_decode_obd2_pid(response);
+}
