@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *	 http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,7 +44,7 @@
 #include "obd2.h"
 
 /*
- *   Interface between the daemon and the binding
+ *	 Interface between the daemon and the binding
  */
 static const struct afb_binding_interface *interface;
 
@@ -84,11 +84,12 @@ static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata
 }
 
 /*
+ * USELESS SINCE THREADS SEPARATION
+ *
  * Get the event loop running.
  * Will trigger on_event function on EPOLLIN event on socket
  *
  * Return 0 or positive value on success. Else negative value for failure.
- */
 static int connect_to_event_loop(CanBus &CanBus_handler)
 {
 	sd_event *event_loop;
@@ -113,6 +114,7 @@ static int connect_to_event_loop(CanBus &CanBus_handler)
 
 	return rc;
 }
+ */
 
 /********************************************************************************
 *
@@ -156,7 +158,7 @@ static int subscribe_unsubscribe_name(struct afb_req request, int subscribe, con
 	if (0 == strcmp(name, "*"))
 		return subscribe_unsubscribe_all(request, subscribe);
 
-	sig = getsig(name);
+	sig = getSignal(name);
 	if (sig == NULL) {
 		return 0;
 	}
@@ -204,8 +206,8 @@ static void unsubscribe(struct afb_req request)
 }
 static const struct afb_verb_desc_v1 verbs[]=
 {
-  { .name= "subscribe",    .session= AFB_SESSION_NONE, .callback= subscribe,    .info= "subscribe to notification of CAN bus messages." },
-  { .name= "unsubscribe",  .session= AFB_SESSION_NONE, .callback= unsubscribe,  .info= "unsubscribe a previous subscription." },
+  { .name= "subscribe",    .session= AFB_SESSION_NONE, .callback= subscribe,	.info= "subscribe to notification of CAN bus messages." },
+  { .name= "unsubscribe",  .session= AFB_SESSION_NONE, .callback= unsubscribe,	.info= "unsubscribe a previous subscription." },
 	{NULL}
 };
 
@@ -230,9 +232,7 @@ int afbBindingV1ServiceInit(struct afb_service service)
 	/* Open JSON conf file */
 
 	/* Open CAN socket */
-	CanBus_t CanBus_handler;
+	CanBus_c CanBus_handler(interface);
 	CanBus_handler.open();
-    CanBus_handler.start_threads();
-
-	return connect_to_event_loop(CanBus_handler);
+	CanBus_handler.start_threads();
 }
