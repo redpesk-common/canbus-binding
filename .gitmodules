@@ -7,3 +7,7 @@
 [submodule "libs/uds-c"]
 	path = libs/uds-c
 	url = git@github.com:openxc/uds-c.git
+	url = git@github.com:nanopb/nanopb.git
+[submodule "libs/bitfield-c"]
+	path = libs/bitfield-c
+	url = git@github.com:openxc/bitfield-c.git
