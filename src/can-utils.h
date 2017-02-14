@@ -99,8 +99,9 @@ class CanBus_c {
 		std::thread th_reading;
 		std::thread th_decoding;
 		std::thread th_pushing;
+
 		std::queue <CanMessage_c> can_message_q;
-		std::queue <openxc_VehicleMessage> VehicleMessage_q;
+		std::queue <openxc_VehicleMessage> vehicle_message_q;
 
 	public:
 		int open();
@@ -108,6 +109,9 @@ class CanBus_c {
 
 		void start_threads();
 		int send_can_message(CanMessage_c can_msg);
+
+		CanMessage_c* next_can_message();
+		void insert_new_can_message(CanMessage_c *can_msg);
 };
 
 /* A compact representation of a single CAN message, meant to be used in in/out
@@ -165,17 +169,12 @@ typedef enum CanMessageFormat CanMessageFormat;
  *
  * value - The integer value of the state on the CAN bus.
  * name  - The corresponding string name for the state in OpenXC.
+ */
 struct CanSignalState {
 	const int value;
 	const char* name;
 };
 typedef struct CanSignalState CanSignalState;
- */
- class CanSignalState_c {
-	 private:
-		const int value;
-		const char *name;
-};
 
 /* Public: A CAN signal to decode from the bus and output over USB.
  *
@@ -299,7 +298,8 @@ LIST_HEAD(CanMessageDefinitionList, CanMessageDefinitionListEntry);
  *	signalCount - The number of CAN signals (across all messages) defined for
  *		this message set.
  *	commandCount - The number of CanCommmands defined for this message set.
-typedef struct {
+ */
+ typedef struct {
 	uint8_t index;
 	const char* name;
 	uint8_t busCount;
@@ -307,16 +307,6 @@ typedef struct {
 	unsigned short signalCount;
 	unsigned short commandCount;
 } CanMessageSet;
- */
-class CanMessageSet_c {
-	private:
-		uint8_t index;
-		const char * name;
-		uint8_t busCount;
-		unsigned short messageCount;
-		unsigned short signalCount;
-		unsigned short commandCount;
-};
 
 /* Public: The type signature for a function to handle a custom OpenXC command.
  *

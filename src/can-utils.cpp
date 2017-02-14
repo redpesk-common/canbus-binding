@@ -128,6 +128,29 @@ int CanBus_c::send_can_message(CanMessage_c can_msg)
 	return 0;
 }
 
+/*
+ * Get a CanMessage from can_message_q and return it
+ * then point to the next CanMessage in queue.
+ * 
+ * Return the next queue element or NULL if queue is empty.
+ */
+CanMessage_c* CanBus_c::next_can_message()
+{
+	if(! can_message_q.empty())
+	{
+		CanMessage_c can_msg = can_message_q.front();
+		can_message_q.pop()
+		return &can_msg;
+	}
+
+	return NULL;
+}
+
+void CanBus_c::insert_new_can_message(CanMessage_c *can_msg)
+{
+	can_message_q.push(can_msg);
+}
+
 /********************************************************************************
 *
 *		CanMessage method implementation
