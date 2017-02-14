@@ -48,7 +48,6 @@
  */
 static const struct afb_binding_interface *interface;
 
-
 /********************************************************************************
 *
 *		Event management
@@ -229,10 +228,26 @@ const struct afb_binding *afbBindingV1Register (const struct afb_binding_interfa
 
 int afbBindingV1ServiceInit(struct afb_service service)
 {
+	std::ifstream fd_conf;
+	std::string fd_conf_content;
+	json_object jo_canbus;
+
 	/* Open JSON conf file */
+	jo_canbus = json_object_new_object();
+	fd_conf = afb_daemon_rootdir_open_locale(interface->daemon, "canbus.json", O_RDONLY, NULL);
+	if (fd_conf)
+	{
+		fd_conf.seekg(0, std::ios::end);
+		fd_conf_content.resize(fd_conf.tellg());
+		fd_conf.seekg(0, std::ios::beg);
+		fd_conf.read(&fd_conf_content[0], fd_conf_content.size());
+		fd_conf.close();
+	}
+
+	jo_canbus = json_tokener_parse(&fd_conf_content);
 
 	/* Open CAN socket */
-	CanBus_c CanBus_handler(interface);
+	CanBus_c CanBus_handler(interface, json_object_get_string(json_object_object_get(jo_canbus, "deviceName"));
 	CanBus_handler.open();
 	CanBus_handler.start_threads();
 }

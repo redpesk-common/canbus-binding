@@ -23,9 +23,10 @@
 *
 *********************************************************************************/
 
-CanBus_c::CanBus_c(afb_binding_interface *itf)
+CanBus_c::CanBus_c(afb_binding_interface *itf, const std:string& dev_name)
 {
 	interface = itf;
+	deviceName = dev_name;
 }
 
 int CanBus_c::open()
