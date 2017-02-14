@@ -23,18 +23,54 @@
 #include <afb/afb-binding.h>
 
 #include "can-utils.h"
+#include "can-decoder.h"
 #include "openxc.pb.h"
 
 void can_decode_message(CanBus_c *can_bus)
 {
-	CanMessage_c can_message;
+	CanMessage_c *can_message;
+	int i;
+	std:vector <CanSignal> *signals;
+	CanSignal sig;
+	openxc_VehicleMessage vehicle_message;
+	openxc_SimpleMessage s_message;
+	openxc_DynamicField key, ret;
+	Decoder_c decoder();
+
+	vehicle_message = {.has_type = true,
+					  .type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE,
+					  .has_simple_message = true };
 
 	while(true)
 	{
-		if(! can_bus->can_message_q.empty())
+		if(can_message = can_bus->next_can_message())
 		{
-			can_message = can_bus->can_message_q.front();
-			can_bus->can_message_q.pop();
+			/* First we have to found which CanSignal is */
+			key = { .has_type = true,
+					.type = openxc_DynamicField_Type::openxc_DynamicField_Type_NUM,
+					.has_numeric_value = true,
+					.numeric_value = (double)can_message.get_id() };
+			signals = GetSignals(key);
+
+			/* Decoding the message ! Don't kill the messenger ! */
+			if(signals.size() > 0)
+			{
+				for(i=0; i< signals.size(); i++)
+				{
+					sig = signals.back();
+					ret = decoder.decodeSignal(&sig, can_message, SIGNALS, SIGNALS.size(), true);
+
+					s_message = {.has_name = true,
+										.name = sig->genericName,
+										.has_value = true,
+										.value = ret
+									};
+					vehicle_message.simple_message = s_message;
+					vehicle_message_q.push(vehicle_message);
+					
+					signals.pop_back();
+				}
+			}
 		}
 	}
 }
