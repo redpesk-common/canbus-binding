@@ -143,7 +143,7 @@ CanMessage_c* CanBus_c::next_can_message()
 		return &can_msg;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CanBus_c::insert_new_can_message(CanMessage_c *can_msg)
@@ -151,6 +151,28 @@ void CanBus_c::insert_new_can_message(CanMessage_c *can_msg)
 	can_message_q.push(can_msg);
 }
 
+/*
+ * Get a VehicleMessage from vehicle_message_q and return it
+ * then point to the next VehicleMessage in queue.
+ * 
+ * Return the next queue element or NULL if queue is empty.
+ */
+openxc_VehicleMessage* CanBus_c::next_vehicle_message()
+{
+	if(! vehicle_message_q.empty())
+	{
+		openxc_VehicleMessage v_msg = vehicle_message_q.front();
+		vehicle_message_q.pop()
+		return &v_msg;
+	}
+
+	return nullptr;
+}
+
+void CanBus_c::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
+{
+	vehicle_message_q.push(v_msg);
+}
 /********************************************************************************
 *
 *		CanMessage method implementation

@@ -112,6 +112,9 @@ class CanBus_c {
 
 		CanMessage_c* next_can_message();
 		void insert_new_can_message(CanMessage_c *can_msg);
+
+		openxc_VehicleMessage* next_vehicle_message();
+		void insert_new_vehicle_message(openxc_VehicleMessage *v_msg);
 };
 
 /* A compact representation of a single CAN message, meant to be used in in/out
