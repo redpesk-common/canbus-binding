@@ -1,12 +1,12 @@
-[submodule "libs/openxc-message-format"]
-	path = libs/openxc-message-format
+[submodule "src/libs/openxc-message-format"]
+	path = src/libs/openxc-message-format
 	url = git@github.com:openxc/openxc-message-format.git
-[submodule "libs/nanopb"]
-	path = libs/nanopb
+[submodule "src/libs/nanopb"]
+	path = src/libs/nanopb
 	url = git@github.com:nanopb/nanopb.git
-[submodule "libs/uds-c"]
-	path = libs/uds-c
+[submodule "src/libs/uds-c"]
+	path = src/libs/uds-c
 	url = git@github.com:openxc/uds-c.git
-[submodule "libs/bitfield-c"]
-	path = libs/bitfield-c
+[submodule "src/libs/bitfield-c"]
+	path = src/libs/bitfield-c
 	url = git@github.com:openxc/bitfield-c.git

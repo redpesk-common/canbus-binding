@@ -25,7 +25,7 @@
 #include "can-utils.h"
 #include "openxc.pb.h"
 
-void decode_can_message(CanBus_c *can_bus)
+void can_decode_message(CanBus_c *can_bus)
 {
 	CanMessage_c can_message;
 
