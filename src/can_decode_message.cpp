@@ -50,26 +50,27 @@ void can_decode_message(CanBus_c *can_bus)
 					.type = openxc_DynamicField_Type::openxc_DynamicField_Type_NUM,
 					.has_numeric_value = true,
 					.numeric_value = (double)can_message.get_id() };
+
 			signals = GetSignals(key);
 
 			/* Decoding the message ! Don't kill the messenger ! */
-			if(signals.size() > 0)
+			for(i=0; i< signals.size(); i++)
 			{
-				for(i=0; i< signals.size(); i++)
+				sig = signals.back();
+				if(afb_event_is_valid(sig->event))
 				{
-					sig = signals.back();
 					ret = decoder.decodeSignal(&sig, can_message, SIGNALS, SIGNALS.size(), true);
 
 					s_message = {.has_name = true,
-										.name = sig->genericName,
-										.has_value = true,
-										.value = ret
-									};
+									.name = sig->genericName,
+									.has_value = true,
+									.value = ret
+								};
+						
 					vehicle_message.simple_message = s_message;
 					vehicle_message_q.push(vehicle_message);
-					
-					signals.pop_back();
 				}
+					signals.pop_back();
 			}
 		}
 	}
