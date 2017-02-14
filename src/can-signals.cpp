@@ -16,6 +16,7 @@
  */
 
 #include <string>
+#include <vector>
 #include "can-signals.h"
 
 bool match(const std::string &first, const std::string &second)
@@ -23,18 +24,34 @@ bool match(const std::string &first, const std::string &second)
 
 }
 
-CanSignal* getSignals(std::string name)
+CanSignal* getSignals(openxc_DynamicField *key)
 {
 	int n_signals, i;
-	CanSignal ret_signals[];
+	std::vector <CanSignal> ret_signals;
 
-	n_signals = size(SIGNALS);
+	n_signals = SIGNALS.size();
 
-	for(i=0; i<=n_signals; i++)
+	switch(key->type):
 	{
-		if(SIGNALS[i].generic_name == name)
-			return &SIGNALS[i];
-		i++;
+		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
+			for(i=0; i<=n_signals; i++)
+			{
+				if(match((std::string*)key->string_value, (std::string*)SIGNALS[i]->genericName))
+					ret_signals.insert(&SIGNALS[i]);
+			}
+			break;
+		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
+			for(i=0; i<=n_signals; i++)
+			{
+				CanMessageDefinition *msg_def = SIGNALS[i]->message;
+				if(msg_def->id == key->numeric_value)
+					ret_signals.insert(&SIGNALS[i])
+			}
+			break;
+		default:
+			return NULL;
+			break;
 	}
-	return 0;
+
+	return &ret_signals;
 }
