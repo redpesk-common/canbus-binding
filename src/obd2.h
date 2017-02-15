@@ -118,6 +118,8 @@ float handleObd2Pid(const DiagnosticResponse* response, float parsedPayload);
  */
 class Obd2Handler_c {
 	private:
+
+		public:
 		/*
 		* Pre-defined OBD-II PIDs to query for if supported by the vehicle.
 		*/
@@ -143,7 +145,6 @@ class Obd2Handler_c {
 			{ pid: 0x63, name: "obd2.engine.torque", min: 0, max: 65535, unit: NM, frequency: 1, supported: false },
 		};
 
-		public:
 			Obd2Handler_c();
 			
 			bool isObd2Request(request);
