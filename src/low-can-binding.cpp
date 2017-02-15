@@ -121,22 +121,42 @@ static int connect_to_event_loop(CanBus &CanBus_handler)
 *
 *********************************************************************************/
 
-static int subscribe_unsubscribe_sig(struct afb_req request, int subscribe, struct signal *sig)
-{
-	if (!afb_event_is_valid(sig->event)) {
+static int subscribe_unsubscribe_signal(struct afb_req request, int subscribe, std::map<CanSignal, struct afb_event>::iterator *s_sig)
+ {
+	if (!afb_event_is_valid(s_sig->second)) {
 		if (!subscribe)
 			return 1;
-		sig->event = afb_daemon_make_event(afbitf->daemon, sig->name);
-		if (!afb_event_is_valid(sig->event)) {
+		sig->event = afb_daemon_make_event(afbitf->daemon, s_sig->first->genericName);
+		if (!afb_event_is_valid(s_sig->second)) {
 			return 0;
 		}
 	}
 
-	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, sig->event)) < 0) {
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s_sig->second)) < 0) {
 		return 0;
 	}
 
 	return 1;
+ }
+
+static int subscribe_unsubscribe_signals(struct afb_req request, int subscribe, std:vector<CanSignal> *signals)
+{
+	std::vector<CanSignal>::iterator signal_i;
+	std::map <CanSignal, struct afb_event>::iterator s_signal_i;
+	
+	for(signal_i=signals.begin(); signal_i != signals.end(); signal_i++)
+	{
+		s_signal_i = subscribed_signals.find(signal_i);
+		if(s_signal_i != subscribed_signals.end())
+			subscribe_unsubscribe_signal(request, subscribe, s_signal_i);
+		else
+		{
+			std::map <CanSignal, struct afb_event>::iterator it = subscribed_signals.begin();
+			it = subscribed_signals.insert(it, std::pair<CanSignal, struct afb_event>(signal_i, NULL);
+			subscribe_unsubscribe_signal(request, subscribe, it);
+		}
+		return 0;
+	}
 }
 
 static int subscribe_unsubscribe_all(struct afb_req request, int subscribe)
@@ -152,12 +172,12 @@ static int subscribe_unsubscribe_all(struct afb_req request, int subscribe)
 
 static int subscribe_unsubscribe_name(struct afb_req request, int subscribe, const char *name)
 {
-	struct signal *sig;
+	 std::vector <CanSignal> *sig;
 
 	if (0 == strcmp(name, "*"))
 		return subscribe_unsubscribe_all(request, subscribe);
 
-	sig = getSignal(name);
+	find_signals(name, sig);
 	if (sig == NULL) {
 		return 0;
 	}

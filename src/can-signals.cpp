@@ -17,27 +17,31 @@
 
 #include <string>
 #include <vector>
+#include <fnmatch.h>
 #include "can-signals.h"
 
-bool match(const std::string &first, const std::string &second)
-{
+/* Can signal event map making access to afb_event
+ * external to openxc existing structure.
+ */
+std::map <CanSignal, struct afb_event> subscribed_signals;
+std::map <CanSignal, struct afb_event>::iterator subscribed_signals_i;
 
-}
-
-CanSignal* getSignals(openxc_DynamicField *key)
+/* Find one or many signals based on its name or id
+* passed through openxc_DynamicField.
+*/
+void find_signals(openxc_DynamicField *key, std:vector <CanSignal> *signals)
 {
 	int n_signals, i;
-	std::vector <CanSignal> ret_signals;
 
-	n_signals = SIGNALS.size();
+	n_signals = getSignalCount();
 
 	switch(key->type):
 	{
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
 			for(i=0; i<=n_signals; i++)
 			{
-				if(match((std::string*)key->string_value, (std::string*)SIGNALS[i]->genericName))
-					ret_signals.insert(&SIGNALS[i]);
+				if(fnmatch(key->string_value, SIGNALS[i]->genericName) == 0)
+					signals.insert(&SIGNALS[i]);
 			}
 			break;
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
@@ -45,13 +49,22 @@ CanSignal* getSignals(openxc_DynamicField *key)
 			{
 				CanMessageDefinition *msg_def = SIGNALS[i]->message;
 				if(msg_def->id == key->numeric_value)
-					ret_signals.insert(&SIGNALS[i])
+					signals.insert(&SIGNALS[i])
 			}
 			break;
 		default:
+			ERROR(interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 			return NULL;
 			break;
 	}
+}
 
-	return &ret_signals;
+CanSignal* getSignals()
+{
+	return &SIGNALS;
+}
+
+int getSignalCount()
+{
+	return SIGNALS.size();
 }
