@@ -232,8 +232,6 @@ struct CanSignal {
 	SignalEncoder encoder;
 	bool received;
 	float lastValue;
-
-	struct afb_event event;
 };
 typedef struct CanSignal CanSignal;
 
