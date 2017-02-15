@@ -19,6 +19,7 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include <queue>
+#include <sys/timeb.h>
 
 #include <afb/afb-binding.h>
 
@@ -26,52 +27,121 @@
 #include "can-decoder.h"
 #include "openxc.pb.h"
 
+union DynamicField
+{
+	std::char string[100];
+	std::double numeric_value;
+	std::bool boolean_value;
+};
+
 void can_decode_message(CanBus_c *can_bus)
 {
 	CanMessage_c *can_message;
-	int i;
 	std:vector <CanSignal> *signals;
-	CanSignal sig;
+	std:vector <CanSignal>::iterator signals_i;
 	openxc_VehicleMessage vehicle_message;
-	openxc_SimpleMessage s_message;
-	openxc_DynamicField key, ret;
+	openxc_DynamicField search_key, ret;
+	
 	Decoder_c decoder();
 
-	vehicle_message = {.has_type = true,
-					  .type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE,
-					  .has_simple_message = true };
 
 	while(true)
 	{
 		if(can_message = can_bus->next_can_message())
 		{
 			/* First we have to found which CanSignal is */
-			key = { .has_type = true,
-					.type = openxc_DynamicField_Type::openxc_DynamicField_Type_NUM,
-					.has_numeric_value = true,
-					.numeric_value = (double)can_message.get_id() };
+			DynamicField signal_id = (double)can_message.get_id();
+			search_key = build_DynamicField(openxc_DynamicField_Type_NUM, signal_id)
 
-			signals = GetSignals(key);
-
+			signals = find_signals(search_key);
+			
 			/* Decoding the message ! Don't kill the messenger ! */
-			for(i=0; i< signals.size(); i++)
+			for(signals_i=signals.begin(); signal_i != signals.end(); signals_i++)
 			{
-				sig = signals.back();
-				if(afb_event_is_valid(sig->event))
+				subscribed_signals_i = subscribed_signals.find(signals_i);
+				
+				if(subscribed_signals_i != subscribed_signals.end() &&
+					afb_event_is_valid(subscribed_signals_i->second))
 				{
 					ret = decoder.decodeSignal(&sig, can_message, SIGNALS, SIGNALS.size(), true);
 
-					s_message = {.has_name = true,
-									.name = sig->genericName,
-									.has_value = true,
-									.value = ret
-								};
+					s_message = build_SimpleMessage(subscribed_signals_i->first->genericName, ret);
 						
-					vehicle_message.simple_message = s_message;
+					vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
 					vehicle_message_q.push(vehicle_message);
 				}
-					signals.pop_back();
 			}
 		}
 	}
+}
+
+/*
+ * Build a specific VehicleMessage containing a SimpleMessage.
+ */
+openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type,
+															  openxc_SimpleMessage message)
+{
+	struct timeb t_msec;
+	long long int timestamp_msec;
+	if(!ftime(&t_msec))
+	{
+		timestamp_msec = ((long long int) t_msec.time) * 1000ll + 
+                        (long long int) t_msec.millitm;
+
+	return openxc_VehicleMessage v = {.has_type = true,
+					  .type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE,
+					  .has_simple_message = true,
+					  .simple_message =  message,
+					  .has_timestamp = true,
+					  .timestamp = timestamp_msec};
+	}
+
+	return openxc_VehicleMessage v = {.has_type = true,
+					  .type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE,
+					  .has_simple_message = true,
+					  .simple_message =  message};
+}
+
+/*
+ * Build an openxc_SimpleMessage associating a name to an openxc_DynamicField
+ */
+openxc_SimpleMessage build_SimpleMessage(std:string name, openxc_DynamicField value)
+{
+	return openxc_SimpleMessage s = {.has_name = true,
+									 .name = name,
+									 .has_value = true,
+									 .value = value};
+}
+
+
+}
+
+/* 
+ * Build an openxc_DynamicField using its type and an union.
+ * Why do not use of union in first place anyway...
+ */
+openxc_DynamicField build_DynamicField(openxc_DynamicField_Type type, DynamicField field)
+{
+	openxc_DynamicField d = {.has_type = true,
+									.type = type};
+	
+	switch(type)
+	{
+		case openxc_DynamicField_Type_BOOL:
+			d.has_boolean_value = true;
+			d.boolean_value = field;
+			break;
+		case openxc_DynamicField_Type_NUM:
+			d.has_numeric_value = true;
+			d.numeric_value = field;
+			break;
+		case openxc_DynamicField_Type_STRING:
+			d.has_string_value = true;
+			strcpy(d.string_value, field);
+			break;
+		default:
+			return nullptr;
+	}
+
+	return d;
 }
