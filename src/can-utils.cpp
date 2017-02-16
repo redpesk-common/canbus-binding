@@ -24,9 +24,8 @@
 *********************************************************************************/
 
 CanBus_c::CanBus_c(afb_binding_interface *itf, const std:string& dev_name)
+    : interface{itf}, deviceName{dev_name}
 {
-	interface = itf;
-	deviceName = dev_name;
 }
 
 int CanBus_c::open()
@@ -36,10 +35,10 @@ int CanBus_c::open()
 	struct timeval timeout = {1, 0};
 
 	DEBUG(interface, "open_can_dev: CAN Handler socket : %d", socket);
-	if (socket >= 0)
-		close(socket);
+	if (can_socket_ >= 0)
+		return 0;
 
-	socket = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+	can_socket_ = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
 	if (socket < 0)
 	{
 		ERROR(interface, "open_can_dev: socket could not be created");
@@ -47,9 +46,9 @@ int CanBus_c::open()
 	else
 	{
 		/* Set timeout for read */
-		setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+		::setsockopt(can_socket_, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 		/* try to switch the socket into CAN_FD mode */
-		if (setsockopt(socket, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
+		if (::setsockopt(can_socket_, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{
 			NOTICE(interface, "open_can_dev: Can not switch into CAN Extended frame format.");
 			is_fdmode_on = false;
@@ -58,8 +57,8 @@ int CanBus_c::open()
 		}
 
 		/* Attempts to open a socket to CAN bus */
-		strcpy(ifr.ifr_name, device);
-		if(ioctl(socket, SIOCGIFINDEX, &ifr) < 0)
+		::strcpy(ifr.ifr_name, device);
+		if(ioctl(can_socket_, SIOCGIFINDEX, &ifr) < 0)
 			ERROR(interface, "open_can_dev: ioctl failed");
 		else
 		{
@@ -67,35 +66,32 @@ int CanBus_c::open()
 			txAddress.can_ifindex = ifr.ifr_ifindex;
 
 			/* And bind it to txAddress */
-			if (bind(socket, (struct sockaddr *)&txAddress, sizeof(txAddress)) < 0)
+			if (::bind(can_socket_, (struct sockaddr *)&txAddress, sizeof(txAddress)) < 0)
 			{
 				ERROR(interface, "open_can_dev: bind failed");
 			}
 			else
 			{
-				fcntl(socket, F_SETFL, O_NONBLOCK);
+				::fcntl(can_socket_, F_SETFL, O_NONBLOCK);
 				return 0;
 			}
 		}
-		close(socket);
-		socket = -1;
+		close();
 	}
 	return -1;
 }
 
 int CanBus_c::close()
 {
-	close(socket);
-	socket = -1;
+	::close(can_socket_);
+	can_socket_ = -1;
 }
 
 void CanBus_c::start_threads()
 {
-	std::queue <CanMessage_c> can_message_q;
-
-	th_reading = std::thread(can_reader, interface, socket, can_message_q);
-	th_decoding = std::thread(can_decoder, interface, can_message_q, can_message_q);
-	th_pushing = std::thread(can_event_push, interface, can_message_q);
+	th_reading_ = std::thread(can_reader, interface, socket, can_message_q_);
+	th_decoding_ = std::thread(can_decoder, interface, can_message_q, can_message_q_);
+	th_pushing_ = std::thread(can_event_push, interface, can_message_q_);
 }
 
 /*
@@ -108,22 +104,22 @@ int CanBus_c::send_can_message(CanMessage_c can_msg)
 
 	f = can_msg.convert_to_canfd_frame();
 
-	if(socket >= 0)
+	if(can_socket_ >= 0)
 	{
-		nbytes = sendto(socket, &f, sizeof(struct canfd_frame), 0,
+		nbytes = ::sendto(can_socket_, &f, sizeof(struct canfd_frame), 0,
 				(struct sockaddr*)&txAddress, sizeof(txAddress));
 				
 		if (nbytes == -1)
 		{
-			ERROR(interface, "send_can_message: Sending CAN frame failed.");
+			ERROR(interface_, "send_can_message: Sending CAN frame failed.");
 			return -1;
 		}
 		return nbytes;
 	}
 	else
 	{
-		ERROR(interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
-		open_can_dev();
+		ERROR(interface_, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
+		open();
 	}
 	return 0;
 }
@@ -136,10 +132,10 @@ int CanBus_c::send_can_message(CanMessage_c can_msg)
  */
 CanMessage_c* CanBus_c::next_can_message()
 {
-	if(! can_message_q.empty())
+	if(! can_message_q_.empty())
 	{
-		CanMessage_c can_msg = can_message_q.front();
-		can_message_q.pop()
+		CanMessage_c can_msg = can_message_q_.front();
+		can_message_q_.pop()
 		return &can_msg;
 	}
 
@@ -148,7 +144,7 @@ CanMessage_c* CanBus_c::next_can_message()
 
 void CanBus_c::insert_new_can_message(CanMessage_c *can_msg)
 {
-	can_message_q.push(can_msg);
+	can_message_q_.push(can_msg);
 }
 
 /*
@@ -159,10 +155,10 @@ void CanBus_c::insert_new_can_message(CanMessage_c *can_msg)
  */
 openxc_VehicleMessage* CanBus_c::next_vehicle_message()
 {
-	if(! vehicle_message_q.empty())
+	if(! vehicle_message_q_.empty())
 	{
-		openxc_VehicleMessage v_msg = vehicle_message_q.front();
-		vehicle_message_q.pop()
+		openxc_VehicleMessage v_msg = vehicle_message_q_.front();
+		vehicle_message_q_.pop();
 		return &v_msg;
 	}
 
@@ -171,7 +167,7 @@ openxc_VehicleMessage* CanBus_c::next_vehicle_message()
 
 void CanBus_c::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
 {
-	vehicle_message_q.push(v_msg);
+	vehicle_message_q_.push(v_msg);
 }
 /********************************************************************************
 *
@@ -179,21 +175,21 @@ void CanBus_c::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
 *
 *********************************************************************************/
 
-uint32_t CanMessage_c::get_id()
+uint32_t CanMessage_c::get_id() const
 {
 	return id;
 }
 
-int CanMessage_c::get_format()
+int CanMessage_c::get_format() const
 {
 	return format;
 }
 
-uint8_t CanMessage_c::get_data()
+uint8_t CanMessage_c::get_data() const
 {
 	return data;
 }
-uint8_t CanMessage_c::get_lenght()
+uint8_t CanMessage_c::get_lenght() const
 {
 	return lenght;
 }

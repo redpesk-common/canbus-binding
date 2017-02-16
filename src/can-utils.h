@@ -87,21 +87,21 @@ typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
  */
 class CanBus_c {
 	private:
-		afb_binding_interface *interface;
+		afb_binding_interface *interface_;
 
 		/* Got from conf file */
-		std::string deviceName;
+		std::string device_name;
 
-		int socket;
-		bool is_fdmode_on;
+		int can_socket_;
+		bool is_fdmode_on_;
 		struct sockaddr_can txAddress;
 
-		std::thread th_reading;
-		std::thread th_decoding;
-		std::thread th_pushing;
+		std::thread th_reading_;
+		std::thread th_decoding_;
+		std::thread th_pushing_;
 
-		std::queue <CanMessage_c> can_message_q;
-		std::queue <openxc_VehicleMessage> vehicle_message_q;
+		std::queue <CanMessage_c> can_message_q_;
+		std::queue <openxc_VehicleMessage> vehicle_message_q_;
 
 	public:
 		int open();
@@ -140,10 +140,10 @@ class CanMessage_c {
 		uint8_t length;
 
 	public:
-		uint32_t get_id();
-		int get_format();
-		uint8_t get_data();
-		uint8_t get_lenght();
+		uint32_t get_id() const;
+		int get_format() const;
+		uint8_t get_data() const;
+		uint8_t get_lenght() const;
 
 		void set_id(uint32_t id);
 		void set_format(CanMessageFormat format);
