@@ -17,7 +17,7 @@
 # limitations under the License.
 ###########################################################################
 
-project(ll-can)
+project(low-can)
 
 cmake_minimum_required(VERSION 3.3)
 
@@ -65,7 +65,7 @@ link_libraries(${EXTRAS_LIBRARIES})
 
 message(STATUS "Creation of ${PROJECT_NAME} binding for AFB-DAEMON")
 ###########################################################################
-add_library(${PROJECT_NAME}-binding MODULE ${PROJECT_NAME}-binding.c)
+add_library(${PROJECT_NAME}-binding MODULE ${PROJECT_NAME}-binding.cpp)
 
 set_target_properties(${PROJECT_NAME}-binding PROPERTIES
 	PREFIX ""
