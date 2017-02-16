@@ -28,9 +28,9 @@ void shims_timer()
 /*
  * Will scan for supported Obd2 pids
  */
-obd2_handler_c::obd2_handler_c(afb_binding_interface *itf, CanBus_c cb)
+obd2_handler_c::obd2_handler_c(afb_binding_interface *itf, can_bus_t cb)
 {
-	CanBus_c can_bus = cb;
+	can_bus_t can_bus = cb;
 	DiagnosticShims shims = diagnostic_init_shims(shims_logger, can_bus.send_can_message, NULL);
 
 	int n_pids, i;

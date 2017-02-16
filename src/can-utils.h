@@ -85,7 +85,7 @@ typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
 /* 
  * CanBus represent a can device definition gotten from configuraiton file 
  */
-class CanBus_c {
+class can_bus_t {
 	private:
 		afb_binding_interface *interface_;
 
@@ -101,7 +101,7 @@ class CanBus_c {
 		std::thread th_decoding_;
 		std::thread th_pushing_;
 
-		std::queue <CanMessage_c> can_message_q_;
+		std::queue <can_message_t> can_message_q_;
 		std::queue <openxc_VehicleMessage> vehicle_message_q_;
 
 	public:
@@ -111,10 +111,10 @@ class CanBus_c {
 		void start_threads();
 		bool is_running();
 
-		int send_can_message(CanMessage_c can_msg);
+		int send_can_message(can_message_t can_msg);
 
-		CanMessage_c* next_can_message();
-		void insert_new_can_message(CanMessage_c &can_msg);
+		can_message_t* next_can_message();
+		void insert_new_can_message(can_message_t &can_msg);
 
 		openxc_VehicleMessage* next_vehicle_message();
 		void insert_new_vehicle_message(openxc_VehicleMessage *v_msg);
@@ -135,7 +135,7 @@ struct CanMessage {
 };
 typedef struct CanMessage CanMessage;
 */
-class CanMessage_c {
+class can_message_t {
 	private:
 		uint32_t id;
 		CanMessageFormat format;
@@ -157,7 +157,7 @@ class CanMessage_c {
 		canfd_frame convert_to_canfd_frame();
 };
 
-QUEUE_DECLARE(CanMessage_c, 8);
+QUEUE_DECLARE(can_message_t, 8);
 
 /* Public: The ID format for a CAN message.
  *

@@ -26,7 +26,7 @@
 #include "openxc.pb.h"
 #include "json-c/json.h"
 
-void can_event_push(CanBus_c *can_bus)
+void can_event_push(can_bus_t *can_bus)
 {
 	openxc_VehicleMessage *v_message;
 	openxc_SimpleMessage *s_message;

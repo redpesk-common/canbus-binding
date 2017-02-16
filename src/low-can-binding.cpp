@@ -276,7 +276,7 @@ int afbBindingV1ServiceInit(struct afb_service service)
 	jo_canbus = json_tokener_parse(&fd_conf_content);
 
 	/* Open CAN socket */
-	CanBus_c CanBus_handler(interface, json_object_get_string(json_object_object_get(jo_canbus, "deviceName"));
+	can_bus_t CanBus_handler(interface, json_object_get_string(json_object_object_get(jo_canbus, "deviceName"));
 	CanBus_handler.open();
 	CanBus_handler.start_threads();
 }

@@ -23,12 +23,12 @@
 *
 *********************************************************************************/
 
-CanBus_t::CanBus_t(afb_binding_interface *itf, const std:string& dev_name)
+can_bus_t::can_bus_t(afb_binding_interface *itf, const std:string& dev_name)
     : interface{itf}, deviceName{dev_name}
 {
 }
 
-int CanBus_t::open()
+int can_bus_t::open()
 {
 	const int canfd_on = 1;
 	struct ifreq ifr;
@@ -81,14 +81,14 @@ int CanBus_t::open()
 	return -1;
 }
 
-int CanBus_t::close()
+int can_bus_t::close()
 {
 	::close(can_socket_);
 	can_socket_ = -1;
 }
 
 
-canfd_frame CanBus_t::can_read()
+canfd_frame can_bus_t::can_read()
 {
 	ssize_t nbytes;
 	int maxdlen;
@@ -124,7 +124,7 @@ canfd_frame CanBus_t::can_read()
 	return canfd_frame;
 }
 
-void CanBus_t::start_threads()
+void can_bus_t::start_threads()
 {
 	th_reading_ = std::thread(can_reader, interface, socket, can_message_q_);
 	is_running_ = true;
@@ -136,15 +136,15 @@ void CanBus_t::start_threads()
 /*
  * Return is_running_ bool
  */
-bool CanBus_t::is_running()
+bool can_bus_t::is_running()
 {
 	return is_running_;
 }
 
 /*
- * Send a can message from a CanMessage_c object.
+ * Send a can message from a can_message_t object.
  */
-int CanBus_t::send_can_message(CanMessage_c &can_msg)
+int can_bus_t::send_can_message(can_message_t &can_msg)
 {
 	int nbytes;
 	canfd_frame *f;
@@ -177,11 +177,11 @@ int CanBus_t::send_can_message(CanMessage_c &can_msg)
  * 
  * Return the next queue element or NULL if queue is empty.
  */
-CanMessage_c* CanBus_t::next_can_message()
+can_message_t* can_bus_t::next_can_message()
 {
 	if(! can_message_q_.empty())
 	{
-		CanMessage_c can_msg = can_message_q_.front();
+		can_message_t can_msg = can_message_q_.front();
 		can_message_q_.pop()
 		return &can_msg;
 	}
@@ -189,7 +189,7 @@ CanMessage_c* CanBus_t::next_can_message()
 	return nullptr;
 }
 
-void CanBus_t::insert_new_can_message(CanMessage_c &can_msg)
+void can_bus_t::insert_new_can_message(can_message_t &can_msg)
 {
 	can_message_q_.push(can_msg);
 }
@@ -200,7 +200,7 @@ void CanBus_t::insert_new_can_message(CanMessage_c &can_msg)
  * 
  * Return the next queue element or NULL if queue is empty.
  */
-openxc_VehicleMessage* CanBus_t::next_vehicle_message()
+openxc_VehicleMessage* can_bus_t::next_vehicle_message()
 {
 	if(! vehicle_message_q_.empty())
 	{
@@ -212,7 +212,7 @@ openxc_VehicleMessage* CanBus_t::next_vehicle_message()
 	return nullptr;
 }
 
-void CanBus_t::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
+void can_bus_t::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
 {
 	vehicle_message_q_.push(v_msg);
 }
@@ -222,26 +222,26 @@ void CanBus_t::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
 *
 *********************************************************************************/
 
-uint32_t CanMessage_c::get_id() const
+uint32_t can_message_t::get_id() const
 {
 	return id;
 }
 
-int CanMessage_c::get_format() const
+int can_message_t::get_format() const
 {
 	return format;
 }
 
-uint8_t CanMessage_c::get_data() const
+uint8_t can_message_t::get_data() const
 {
 	return data;
 }
-uint8_t CanMessage_c::get_lenght() const
+uint8_t can_message_t::get_lenght() const
 {
 	return lenght;
 }
 
-void CanMessage_c::set_id(uint32_t new_id)
+void can_message_t::set_id(uint32_t new_id)
 {
 	switch(format):
 		case CanMessageFormat::SIMPLE:
@@ -252,7 +252,7 @@ void CanMessage_c::set_id(uint32_t new_id)
 			ERROR(interface, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
 }
 
-void CanMessage_c::set_format(CanMessageFormat new_format)
+void can_message_t::set_format(CanMessageFormat new_format)
 {
 	if(new_format == CanMessageFormat::SIMPLE || new_format == CanMessageFormat::EXTENDED)
 		format = new_format;
@@ -260,12 +260,12 @@ void CanMessage_c::set_format(CanMessageFormat new_format)
 		ERROR(interface, "ERROR: Can set format, wrong format chosen");
 }
 
-void CanMessage_c::set_data(uint8_t new_data)
+void can_message_t::set_data(uint8_t new_data)
 {
 	data = new_data;
 }
 
-void CanMessage_c::set_lenght(uint8_t new_length)
+void can_message_t::set_lenght(uint8_t new_length)
 {
 	lenght = new_lenght;
 }
@@ -276,7 +276,7 @@ void CanMessage_c::set_lenght(uint8_t new_length)
  * 
  * params: canfd_frame pointer
  */
-void CanMessage_c::convert_from_canfd_frame(canfd_frame *frame)
+void can_message_t::convert_from_canfd_frame(canfd_frame *frame)
 {
 	
 	lenght = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
@@ -299,7 +299,7 @@ void CanMessage_c::convert_from_canfd_frame(canfd_frame *frame)
 		memcpy(data, canfd_frame->data, lenght);
 		return 0;
 	} else if (sizeof(canfd_frame->data) >= CAN_MAX_DLEN)
-		ERROR(interface, "CanMessage_c: canfd_frame data too long to be stored into CanMessage object");
+		ERROR(interface, "can_message_t: canfd_frame data too long to be stored into CanMessage object");
 }
 
 canfd_frame* convert_to_canfd_frame()

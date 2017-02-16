@@ -34,9 +34,9 @@ union DynamicField
 	std::bool boolean_value;
 };
 
-void can_decode_message(CanBus_c *can_bus)
+void can_decode_message(can_bus_t *can_bus)
 {
-	CanMessage_c *can_message;
+	can_message_t *can_message;
 	std:vector <CanSignal> *signals;
 	std:vector <CanSignal>::iterator signals_i;
 	openxc_VehicleMessage vehicle_message;

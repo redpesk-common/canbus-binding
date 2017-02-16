@@ -23,9 +23,9 @@
 
 #include "can-utils.h"
 
-void can_reader(CanBus_t &can_bus)
+void can_reader(can_bus_t &can_bus)
 {
-	CanMessage_c can_message;
+	can_message_t can_message;
 
 	while(can_bus.is_running())
 	{
