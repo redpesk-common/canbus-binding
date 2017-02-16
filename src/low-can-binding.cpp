@@ -40,7 +40,6 @@
 #include <afb/afb-binding.h>
 #include <afb/afb-service-itf.h>
 
-#include "ll-can-binding.h"
 #include "obd2.h"
 
 /*
@@ -177,7 +176,10 @@ static int subscribe_unsubscribe_name(struct afb_req request, int subscribe, con
 	if (0 == strcmp(name, "*"))
 		return subscribe_unsubscribe_all(request, subscribe);
 
-	find_signals(name, sig);
+	if(obd2_handler_c.is_obd2_signal(name))
+
+	else
+		find_can_signals(name, sig);
 	if (sig == NULL) {
 		return 0;
 	}
@@ -246,6 +248,13 @@ const struct afb_binding *afbBindingV1Register (const struct afb_binding_interfa
 	return &binding_desc;
 }
 
+/**
+ * @brief Initialize the binding.
+ * 
+ * @param[in] service Structure which represent the Application Framework Binder.
+ * 
+ * @return Exit code, zero if success.
+ */
 int afbBindingV1ServiceInit(struct afb_service service)
 {
 	std::ifstream fd_conf;

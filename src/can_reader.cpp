@@ -23,44 +23,13 @@
 
 #include "can-utils.h"
 
-void can_reader(CanBus_c *can_bus))
+void can_reader(CanBus_t &can_bus)
 {
-	ssize_t nbytes;
-	int maxdlen;
 	CanMessage_c can_message;
-	canfd_frame canfd_frame;
 
-	/* Test that socket is really opened */
-	if ( can_bus->socket < 0)
+	while(can_bus.is_running())
 	{
-		ERROR(interface, "read_can: Socket unavailable");
-		return -1;
-	}
-
-	while(true)
-	{
-		nbytes = read(can_bus->socket, &canfd_frame, CANFD_MTU);
-
-		switch(nbytes)
-		{
-			case CANFD_MTU:
-				DEBUG(interface, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
-				maxdlen = CANFD_MAX_DLEN;
-				break;
-			case CAN_MTU:
-				DEBUG(interface, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
-				maxdlen = CAN_MAX_DLEN;
-				break;
-			default:
-				if (errno == ENETDOWN)
-					ERROR(interface, "read_can: %s interface down", device);
-				
-				ERROR(interface, "read_can: Error reading CAN bus");
-				return -2;
-		}
-
-		can_message.convert_from_canfd_frame(canfd_frame);
-
-		can_message_q.push(can_message);
+		can_message.convert_from_canfd_frame(canbus.read());
+		can_bus.insert_new_can_message(can_message);
 	}
 }

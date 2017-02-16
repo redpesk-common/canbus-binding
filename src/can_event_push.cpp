@@ -52,7 +52,7 @@ void jsonify_DynamicField(openxc_DynamicField *field, json_object *value)
 	else if(field->has_string_value)
 		json_object_object_add(value, "value", json_object_new_string(field->string_value));
 
-return value;
+	return value;
 }
 
 /* Extract the simple message value from an openxc_VehicleMessage

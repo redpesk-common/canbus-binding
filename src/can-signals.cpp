@@ -29,7 +29,7 @@ std::map <CanSignal, struct afb_event>::iterator subscribed_signals_i;
 /* Find one or many signals based on its name or id
 * passed through openxc_DynamicField.
 */
-void find_signals(openxc_DynamicField *key, std:vector <CanSignal> *signals)
+void find_can_signals(openxc_DynamicField *key, std:vector <CanSignal> *signals)
 {
 	int n_signals, i;
 

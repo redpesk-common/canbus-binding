@@ -50,7 +50,6 @@ const char *UNIT_NAMES[10] = {
 	"NM"
 };
 
-
 /*
  *	A representation of an OBD-II PID.
  *
@@ -63,7 +62,6 @@ const char *UNIT_NAMES[10] = {
  *		when automatic, recurring OBD-II requests are enabled.
  *	supported - is it supported by the vehicle. Initialized after scan
  * event - application framework event handler.
- * 
  */
 typedef struct _Obd2Pid {
 	uint8_t pid;
@@ -116,7 +114,7 @@ float handleObd2Pid(const DiagnosticResponse* response, float parsedPayload);
  * Object to handle obd2 session with pre-scan of supported pid
  * then request them regularly
  */
-class Obd2Handler_c {
+class obd2_handler_c {
 	private:
 
 		public:
@@ -145,7 +143,31 @@ class Obd2Handler_c {
 			{ pid: 0x63, name: "obd2.engine.torque", min: 0, max: 65535, unit: NM, frequency: 1, supported: false },
 		};
 
-			Obd2Handler_c();
 			
-			bool isObd2Request(request);
+			/* Public: Check if a request is an OBD-II PID request.
+ 			 *
+ 			 * Returns true if the request is a mode 1  request and it has a 1 byte PID.
+ 			 */
+			void find_obd2_pid(const char *name, std::Vector<Obd2Pid> *pids);
+
+			/* Public: Check if a request is an OBD-II PID request.
+ 			 *
+ 			 * Returns true if the request is a mode 1  request and it has a 1 byte PID.
+ 			 */
+			bool is_obd2_request(DiagnosticRequest *request);
+
+			/*
+			 * Public: Check if requested signal name is an obd2 pid
+			 * 
+			 * Returns true if name began with ob2.* else false.
+			 */
+			bool is_obd2_signal(const char *name);
+
+			/*
+			 * Public: pass response to UDS-C library function 
+			 * diagnostic_decode_obd2_pid()
+			 *
+			 * Return: float number representing the requested value.
+			 */
+			bool decode_obd2_response(DiagnosticResponse* responce);
 }
