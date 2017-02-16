@@ -23,25 +23,25 @@
 *
 *********************************************************************************/
 
-CanBus_c::CanBus_c(afb_binding_interface *itf, const std:string& dev_name)
+CanBus_t::CanBus_t(afb_binding_interface *itf, const std:string& dev_name)
     : interface{itf}, deviceName{dev_name}
 {
 }
 
-int CanBus_c::open()
+int CanBus_t::open()
 {
 	const int canfd_on = 1;
 	struct ifreq ifr;
 	struct timeval timeout = {1, 0};
 
-	DEBUG(interface, "open_can_dev: CAN Handler socket : %d", socket);
+	DEBUG(interface_, "open_can_dev: CAN Handler socket : %d", can_socket_);
 	if (can_socket_ >= 0)
 		return 0;
 
 	can_socket_ = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
 	if (socket < 0)
 	{
-		ERROR(interface, "open_can_dev: socket could not be created");
+		ERROR(interface_, "open_can_dev: socket could not be created");
 	}
 	else
 	{
@@ -50,25 +50,25 @@ int CanBus_c::open()
 		/* try to switch the socket into CAN_FD mode */
 		if (::setsockopt(can_socket_, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{
-			NOTICE(interface, "open_can_dev: Can not switch into CAN Extended frame format.");
-			is_fdmode_on = false;
+			NOTICE(interface_, "open_can_dev: Can not switch into CAN Extended frame format.");
+			is_fdmode_on_ = false;
 		} else {
-			is_fdmode_on = true;
+			is_fdmode_on_ = true;
 		}
 
 		/* Attempts to open a socket to CAN bus */
 		::strcpy(ifr.ifr_name, device);
 		if(ioctl(can_socket_, SIOCGIFINDEX, &ifr) < 0)
-			ERROR(interface, "open_can_dev: ioctl failed");
+			ERROR(interface_, "open_can_dev: ioctl failed");
 		else
 		{
 			txAddress.can_family = AF_CAN;
 			txAddress.can_ifindex = ifr.ifr_ifindex;
 
 			/* And bind it to txAddress */
-			if (::bind(can_socket_, (struct sockaddr *)&txAddress, sizeof(txAddress)) < 0)
+			if (::bind(can_socket_, (struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
 			{
-				ERROR(interface, "open_can_dev: bind failed");
+				ERROR(interface_, "open_can_dev: bind failed");
 			}
 			else
 			{
@@ -81,23 +81,70 @@ int CanBus_c::open()
 	return -1;
 }
 
-int CanBus_c::close()
+int CanBus_t::close()
 {
 	::close(can_socket_);
 	can_socket_ = -1;
 }
 
-void CanBus_c::start_threads()
+
+canfd_frame CanBus_t::can_read()
+{
+	ssize_t nbytes;
+	int maxdlen;
+	canfd_frame canfd_frame;
+
+	/* Test that socket is really opened */
+	if (can_socket_ < 0)
+	{
+		ERROR(interface_, "read_can: Socket unavailable. Closing thread.");
+		is_running_ = false;
+	}
+
+	nbytes = ::read(can_socket_, &canfd_frame, CANFD_MTU);
+
+	switch(nbytes)
+	{
+		case CANFD_MTU:
+			DEBUG(interface_, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
+			maxdlen = CANFD_MAX_DLEN;
+			break;
+		case CAN_MTU:
+			DEBUG(interface_, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
+			maxdlen = CAN_MAX_DLEN;
+			break;
+		default:
+			if (errno == ENETDOWN)
+					ERROR(interface_, "read_can: %s interface down", device);
+			ERROR(interface_, "read_can: Error reading CAN bus");
+			::memset(&canfd_frame, 0, sizeof(canfd_frame));
+			break;
+	}
+	
+	return canfd_frame;
+}
+
+void CanBus_t::start_threads()
 {
 	th_reading_ = std::thread(can_reader, interface, socket, can_message_q_);
+	is_running_ = true;
+
 	th_decoding_ = std::thread(can_decoder, interface, can_message_q, can_message_q_);
 	th_pushing_ = std::thread(can_event_push, interface, can_message_q_);
 }
 
 /*
+ * Return is_running_ bool
+ */
+bool CanBus_t::is_running()
+{
+	return is_running_;
+}
+
+/*
  * Send a can message from a CanMessage_c object.
  */
-int CanBus_c::send_can_message(CanMessage_c can_msg)
+int CanBus_t::send_can_message(CanMessage_c &can_msg)
 {
 	int nbytes;
 	canfd_frame *f;
@@ -130,7 +177,7 @@ int CanBus_c::send_can_message(CanMessage_c can_msg)
  * 
  * Return the next queue element or NULL if queue is empty.
  */
-CanMessage_c* CanBus_c::next_can_message()
+CanMessage_c* CanBus_t::next_can_message()
 {
 	if(! can_message_q_.empty())
 	{
@@ -142,7 +189,7 @@ CanMessage_c* CanBus_c::next_can_message()
 	return nullptr;
 }
 
-void CanBus_c::insert_new_can_message(CanMessage_c *can_msg)
+void CanBus_t::insert_new_can_message(CanMessage_c &can_msg)
 {
 	can_message_q_.push(can_msg);
 }
@@ -153,7 +200,7 @@ void CanBus_c::insert_new_can_message(CanMessage_c *can_msg)
  * 
  * Return the next queue element or NULL if queue is empty.
  */
-openxc_VehicleMessage* CanBus_c::next_vehicle_message()
+openxc_VehicleMessage* CanBus_t::next_vehicle_message()
 {
 	if(! vehicle_message_q_.empty())
 	{
@@ -165,7 +212,7 @@ openxc_VehicleMessage* CanBus_c::next_vehicle_message()
 	return nullptr;
 }
 
-void CanBus_c::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
+void CanBus_t::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
 {
 	vehicle_message_q_.push(v_msg);
 }

@@ -94,9 +94,10 @@ class CanBus_c {
 
 		int can_socket_;
 		bool is_fdmode_on_;
-		struct sockaddr_can txAddress;
+		struct sockaddr_can txAddress_;
 
 		std::thread th_reading_;
+		bool is_running_;
 		std::thread th_decoding_;
 		std::thread th_pushing_;
 
@@ -108,10 +109,12 @@ class CanBus_c {
 		int close();
 
 		void start_threads();
+		bool is_running();
+
 		int send_can_message(CanMessage_c can_msg);
 
 		CanMessage_c* next_can_message();
-		void insert_new_can_message(CanMessage_c *can_msg);
+		void insert_new_can_message(CanMessage_c &can_msg);
 
 		openxc_VehicleMessage* next_vehicle_message();
 		void insert_new_vehicle_message(openxc_VehicleMessage *v_msg);
