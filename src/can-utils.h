@@ -137,10 +137,11 @@ typedef struct CanMessage CanMessage;
 */
 class can_message_t {
 	private:
-		uint32_t id;
-		CanMessageFormat format;
-		uint8_t data[CAN_MESSAGE_SIZE];
-		uint8_t length;
+		afb_binding_interface interface_;
+		uint32_t id_;
+		CanMessageFormat format_;
+		uint8_t data_[CAN_MESSAGE_SIZE];
+		uint8_t length_;
 
 	public:
 		uint32_t get_id() const;

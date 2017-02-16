@@ -23,7 +23,7 @@
 *
 *********************************************************************************/
 
-can_bus_t::can_bus_t(afb_binding_interface *itf, const std:string& dev_name)
+can_bus_t::can_bus_t(afb_binding_interface *itf, const std:string &dev_name)
     : interface{itf}, deviceName{dev_name}
 {
 }
@@ -91,7 +91,7 @@ int can_bus_t::close()
 canfd_frame can_bus_t::can_read()
 {
 	ssize_t nbytes;
-	int maxdlen;
+	//int maxdlen;
 	canfd_frame canfd_frame;
 
 	/* Test that socket is really opened */
@@ -107,11 +107,11 @@ canfd_frame can_bus_t::can_read()
 	{
 		case CANFD_MTU:
 			DEBUG(interface_, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
-			maxdlen = CANFD_MAX_DLEN;
+			//maxdlen = CANFD_MAX_DLEN;
 			break;
 		case CAN_MTU:
 			DEBUG(interface_, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
-			maxdlen = CAN_MAX_DLEN;
+			//maxdlen = CAN_MAX_DLEN;
 			break;
 		default:
 			if (errno == ENETDOWN)
@@ -222,26 +222,30 @@ void can_bus_t::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
 *
 *********************************************************************************/
 
+can_message_t::can_message_t(afb_binding_interface *itf)
+	: interface_{itf}
+{}
+
 uint32_t can_message_t::get_id() const
 {
-	return id;
+	(id_ != 0) ? return id_ : return 0;
 }
 
 int can_message_t::get_format() const
 {
-	return format;
+	(format_ != CanMessageFormat::SIMPLE || format_ != CanMessageFormat::EXTENDED) return -1 : return format_;
 }
 
 uint8_t can_message_t::get_data() const
 {
-	return data;
+	return data_;
 }
 uint8_t can_message_t::get_lenght() const
 {
-	return lenght;
+	return lenght_;
 }
 
-void can_message_t::set_id(uint32_t new_id)
+void can_message_t::set_id(uint32_t &new_id)
 {
 	switch(format):
 		case CanMessageFormat::SIMPLE:
@@ -249,25 +253,21 @@ void can_message_t::set_id(uint32_t new_id)
 		case CanMessageFormat::EXTENDED:
 			id = new_id & CAN_EFF_MASK;
 		default:
-			ERROR(interface, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
+			ERROR(interface_, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
 }
 
-void can_message_t::set_format(CanMessageFormat new_format)
+void can_message_t::set_format(CanMessageFormat &new_format)
 {
 	if(new_format == CanMessageFormat::SIMPLE || new_format == CanMessageFormat::EXTENDED)
 		format = new_format;
 	else
-		ERROR(interface, "ERROR: Can set format, wrong format chosen");
+		ERROR(interface_, "ERROR: Can set format, wrong format chosen");
 }
 
-void can_message_t::set_data(uint8_t new_data)
+void can_message_t::set_data(uint8_t &new_data)
 {
-	data = new_data;
-}
-
-void can_message_t::set_lenght(uint8_t new_length)
-{
-	lenght = new_lenght;
+	::memcpy(data_, new_data, new_data.size());
+	lenght_ = new_data(size);
 }
 
 /*
@@ -276,39 +276,39 @@ void can_message_t::set_lenght(uint8_t new_length)
  * 
  * params: canfd_frame pointer
  */
-void can_message_t::convert_from_canfd_frame(canfd_frame *frame)
+void can_message_t::convert_from_canfd_frame(canfd_frame &frame)
 {
-	
-	lenght = (canfd_frame->len > maxdlen) ? maxdlen : canfd_frame->len;
+	lenght_ = (frame.len > CAN_MAX_DLEN) ? CAN_MAX_DLEN : frame.len;
+	lenght_ = (frame.len > CANFD_MAX_DLEN) ? CANFD_MAX_DLEN : frame.len;
 
-	switch (canfd_frame->can_id): 
-		case (canfd_frame->can_id & CAN_ERR_FLAG):
-			id = canfd_frame->can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
+	switch (frame.can_id): 
+		case (frame.can_id & CAN_ERR_FLAG):
+			id_ = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
 			break;
-		case (canfd_frame->can_id & CAN_EFF_FLAG):
-			id = canfd_frame->can_id & CAN_EFF_MASK;
-			format = CanMessageFormat::EXTENDED;
+		case (frame.can_id & CAN_EFF_FLAG):
+			id_ = frame.can_id & CAN_EFF_MASK;
+			format_ = CanMessageFormat::EXTENDED;
 			break;
 		default:
-			format = CanMessageFormat::STANDARD;
-			id = canfd_frame->can_id & CAN_SFF_MASK;
+			format_ = CanMessageFormat::STANDARD;
+			id_ = frame.can_id & CAN_SFF_MASK;
 			break;
 
-	if (sizeof(canfd_frame->data) <= sizeof(data))
+	if (sizeof(frame.data) <= data_.size())
 	{
-		memcpy(data, canfd_frame->data, lenght);
+		::memcpy(data_, canfd_frame.data, lenght_);
 		return 0;
-	} else if (sizeof(canfd_frame->data) >= CAN_MAX_DLEN)
-		ERROR(interface, "can_message_t: canfd_frame data too long to be stored into CanMessage object");
+	} else if (sizeof(frame.data) >= CAN_MAX_DLEN)
+		ERROR(interface_, "can_message_t: canfd_frame data too long to be stored into CanMessage object");
 }
 
-canfd_frame* convert_to_canfd_frame()
+canfd_frame convert_to_canfd_frame()
 {
 	canfd_frame frame;
 
-	frame.id = can_msg.get_id();
-	frame.len = can_msg.get_lenght();
-	frame.data = can_msg.get_data();
+	frame.can_id = get_id();
+	frame.len = get_lenght();
+	::memcpy(frame.data, get_data(), lenght_);
 
-	return &frame;
+	return frame;
 }
