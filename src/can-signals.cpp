@@ -29,8 +29,9 @@ std::map <CanSignal, struct afb_event>::iterator subscribed_signals_i;
 /* Find one or many signals based on its name or id
 * passed through openxc_DynamicField.
 */
-void find_can_signals(openxc_DynamicField *key, std:vector <CanSignal> *signals)
+std:vector <CanSignal> find_can_signals(openxc_DynamicField *key)
 {
+	std:vector <CanSignal> signals;
 	int n_signals, i;
 
 	n_signals = getSignalCount();
@@ -41,7 +42,7 @@ void find_can_signals(openxc_DynamicField *key, std:vector <CanSignal> *signals)
 			for(i=0; i<=n_signals; i++)
 			{
 				if(fnmatch(key->string_value, SIGNALS[i]->genericName) == 0)
-					signals.insert(&SIGNALS[i]);
+					signals.push_back(&SIGNALS[i]);
 			}
 			break;
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
@@ -49,7 +50,7 @@ void find_can_signals(openxc_DynamicField *key, std:vector <CanSignal> *signals)
 			{
 				CanMessageDefinition *msg_def = SIGNALS[i]->message;
 				if(msg_def->id == key->numeric_value)
-					signals.insert(&SIGNALS[i])
+					signals.push_back(&SIGNALS[i])
 			}
 			break;
 		default:
