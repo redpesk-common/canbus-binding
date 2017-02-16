@@ -29,25 +29,25 @@
 
 union DynamicField
 {
-	std::char string[100];
-	std::double numeric_value;
-	std::bool boolean_value;
+	char string[100];
+	double numeric_value;
+	bool boolean_value;
 };
 
-void can_decode_message(can_bus_t *can_bus)
+void can_decode_message(can_bus_t &can_bus)
 {
 	can_message_t *can_message;
-	std:vector <CanSignal> *signals;
+	std:vector <CanSignal> signals;
 	std:vector <CanSignal>::iterator signals_i;
 	openxc_VehicleMessage vehicle_message;
 	openxc_DynamicField search_key, ret;
 	
-	Decoder_c decoder();
+	decoder_t decoder();
 
 
 	while(true)
 	{
-		if(can_message = can_bus->next_can_message())
+		if(can_message = can_bus.next_can_message())
 		{
 			/* First we have to found which CanSignal is */
 			DynamicField signal_id = (double)can_message.get_id();

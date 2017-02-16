@@ -18,7 +18,7 @@
 #pragma once
 
 
-class Decoder_c
+class decoder_t
 {
 	private:
 		openxc_DynamicField decoded_value;
