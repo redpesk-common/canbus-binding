@@ -115,9 +115,11 @@ class can_bus_t {
 
 		can_message_t* next_can_message();
 		void insert_new_can_message(can_message_t &can_msg);
+		bool has_can_message_;
 
 		openxc_VehicleMessage* next_vehicle_message();
 		void insert_new_vehicle_message(openxc_VehicleMessage *v_msg);
+		bool has_vehicle_message_;
 };
 
 /* A compact representation of a single CAN message, meant to be used in in/out

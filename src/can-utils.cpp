@@ -185,8 +185,15 @@ can_message_t* can_bus_t::next_can_message()
 		can_message_q_.pop()
 		return &can_msg;
 	}
+	has_can_message_ = false;
+}
 
-	return nullptr;
+/**
+ * @return has_can_message_ bool
+ */
+bool can_bus_t::has_can_message() const
+{
+	return has_can_message_;
 }
 
 void can_bus_t::insert_new_can_message(can_message_t &can_msg)
@@ -209,13 +216,23 @@ openxc_VehicleMessage* can_bus_t::next_vehicle_message()
 		return &v_msg;
 	}
 
-	return nullptr;
+	has_vehicle_message_ = false;
 }
 
 void can_bus_t::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
 {
 	vehicle_message_q_.push(v_msg);
+	has_vehicle_message_ = true;
 }
+
+/*
+ * Return has_can_message_ bool
+ */
+bool can_bus_t::has_vehicle_message() const
+{
+	return has_vehicle_message_;
+}
+
 /********************************************************************************
 *
 *		CanMessage method implementation
