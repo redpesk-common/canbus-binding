@@ -15,14 +15,7 @@
  * limitations under the License.
  */
 
-/*
- *	A representation of an OBD-II PID.
- *
- * pid - The 1 byte PID.
- * name - A human readable name to use for this PID when published.
- * frequency - The frequency to request this PID if supported by the vehicle
- *		when automatic, recurring OBD-II requests are enabled.
- */
+#include "uds/uds.h"
 
 enum UNIT {
 	POURCENT,

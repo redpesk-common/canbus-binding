@@ -57,7 +57,7 @@ include(FindPkgConfig)
 
 pkg_check_modules(EXTRAS REQUIRED json-c afb-daemon)
 add_compile_options(${EXTRAS_CFLAGS})
-include_directories(${EXTRAS_INCLUDE_DIRS} ${PROJECT_LIBDIR}/openxc-message-format/gen/cpp ${PROJECT_LIBDIR}/nanopb/)
+include_directories(${EXTRAS_INCLUDE_DIRS} ${PROJECT_LIBDIR}/openxc-message-format/gen/cpp ${PROJECT_LIBDIR}/nanopb/  ${PROJECT_LIBDIR}/uds-c/src  ${PROJECT_LIBDIR}/bitfield-c/src ${PROJECT_LIBDIR}/isotp-c/src)
 link_libraries(${EXTRAS_LIBRARIES})
 
 ###########################################################################
