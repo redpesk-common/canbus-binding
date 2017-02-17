@@ -10,3 +10,6 @@
 [submodule "src/libs/bitfield-c"]
 	path = src/libs/bitfield-c
 	url = git@github.com:openxc/bitfield-c.git
+[submodule "src/libs/isotp-c"]
+	path = src/libs/isotp-c
+	url = git@github.com:openxc/isotp-c.git
