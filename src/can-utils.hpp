@@ -62,67 +62,16 @@ typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal* signal,
 typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
 		openxc_DynamicField* value, bool* send);
 
-/** 
- * @brief Object representing a can device. Handle opening, closing and reading on the
- * socket. This is the low level object to be use by can_bus_t.
+/* Public: The ID format for a CAN message.
  *
- * @params[*interface_] - afb_binding_interface to the binder. Used to log messages
- * @params[device_name_] - name of the linux device handling the can bus. Generally vcan0, can0, etc.
- *
+ * STANDARD - standard 11-bit CAN arbitration ID.
+ * EXTENDED - an extended frame, with a 29-bit arbitration ID.
  */
-class can_bus_dev_t {
-	private:
-		std::string device_name_;
-		int can_socket_;
-		bool is_fdmode_on_;
-		struct sockaddr_can txAddress_;
-
-		bool has_can_message_;
-		std::queue <can_message_t> can_message_q_;
-
-		std::thread th_reading_;
-		bool is_running_;
-
-	public:
-		int open();
-		int close();
-		bool is_running();
-		
-		can_message_t* next_can_message();
-		void push_new_can_message(const can_message_t& can_msg);		
-		bool has_can_message() const;
-}
-
-
-/** 
- * @brief Object used to handle decoding and manage event queue to be pushed.
- *
- * @params[*interface_] - afb_binding_interface to the binder. Used to log messages
- * @params[conf_file_ifstream_] - stream of configuration file used to initialize 
- * can_bus_dev_t objects.
- */
-class can_bus_t {
-	private:
-		afb_binding_interface *interface_;
-		
-		std::thread th_decoding_;
-		std::thread th_pushing_;
-
-		bool has_vehicle_message_;
-		std::queue <openxc_VehicleMessage> vehicle_message_q_;
-
-	public:
-		void start_threads();
-		
-		void init_can_dev(std::ifstream& conf_file);
-		std::vector<std::string> read_conf()
-
-		int send_can_message(can_message_t can_msg);
-
-		openxc_VehicleMessage& next_vehicle_message();
-		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
-		bool has_vehicle_message() const;
+enum CanMessageFormat {
+	STANDARD,
+	EXTENDED,
 };
+typedef enum CanMessageFormat CanMessageFormat;
 
 /* A compact representation of a single CAN message, meant to be used in in/out
  * buffers.
@@ -162,18 +111,66 @@ class can_message_t {
 		canfd_frame convert_to_canfd_frame();
 };
 
-QUEUE_DECLARE(can_message_t, 8);
-
-/* Public: The ID format for a CAN message.
+/** 
+ * @brief Object representing a can device. Handle opening, closing and reading on the
+ * socket. This is the low level object to be use by can_bus_t.
  *
- * STANDARD - standard 11-bit CAN arbitration ID.
- * EXTENDED - an extended frame, with a 29-bit arbitration ID.
+ * @params[*interface_] - afb_binding_interface to the binder. Used to log messages
+ * @params[device_name_] - name of the linux device handling the can bus. Generally vcan0, can0, etc.
+ *
  */
-enum CanMessageFormat {
-	STANDARD,
-	EXTENDED,
+class can_bus_dev_t {
+	private:
+		std::string device_name_;
+		int can_socket_;
+		bool is_fdmode_on_;
+		struct sockaddr_can txAddress_;
+
+		bool has_can_message_;
+		std::queue <can_message_t> can_message_q_;
+
+		std::thread th_reading_;
+		bool is_running_;
+
+	public:
+		int open();
+		int close();
+		bool is_running();
+		
+		can_message_t* next_can_message();
+		void push_new_can_message(const can_message_t& can_msg);		
+		bool has_can_message() const;
 };
-typedef enum CanMessageFormat CanMessageFormat;
+
+/** 
+ * @brief Object used to handle decoding and manage event queue to be pushed.
+ *
+ * @params[*interface_] - afb_binding_interface to the binder. Used to log messages
+ * @params[conf_file_ifstream_] - stream of configuration file used to initialize 
+ * can_bus_dev_t objects.
+ */
+class can_bus_t {
+	private:
+		afb_binding_interface *interface_;
+		
+		std::thread th_decoding_;
+		std::thread th_pushing_;
+
+		bool has_vehicle_message_;
+		std::queue <openxc_VehicleMessage> vehicle_message_q_;
+
+	public:
+		int init_can_dev();
+		std::vector<std::string> read_conf();
+		
+		void start_threads();
+		
+		int send_can_message(can_message_t can_msg);
+
+		openxc_VehicleMessage& next_vehicle_message();
+		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
+		bool has_vehicle_message() const;
+};
 
 /* Public: A state encoded (SED) signal's mapping from numerical values to
  * OpenXC state names.
@@ -346,17 +343,11 @@ typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
  * genericName - The name of the command.
  * handler - An function to process the received command's data and perform some
  *		action.
+ */
 typedef struct {
 	const char* genericName;
 	CommandHandler handler;
 } CanCommand;
- */
-
-class CanCommand_c {
-	private:
-		const char* genericName;
-		CommandHandler handler;
-};
 
 /* Pre initialize actions made before CAN bus initialization
  *

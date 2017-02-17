@@ -28,7 +28,7 @@ void shims_timer()
 /*
  * Will scan for supported Obd2 pids
  */
-obd2_handler_c::obd2_handler_c(afb_binding_interface *itf, can_bus_t cb)
+obd2_handler_t::obd2_handler_t(afb_binding_interface *itf, can_bus_t cb)
 {
 	can_bus_t can_bus = cb;
 	DiagnosticShims shims = diagnostic_init_shims(shims_logger, can_bus.send_can_message, NULL);
@@ -41,26 +41,26 @@ obd2_handler_c::obd2_handler_c(afb_binding_interface *itf, can_bus_t cb)
 	}
 }
 
-void obd2_handler_c::add_request(int pid)
+void obd2_handler_t::add_request(int pid)
 {
 	DiagnosticRequest request = {
 	arbitration_id: OBD2_FUNCTIONAL_BROADCAST_ID,
 	mode: 0x1, has_pid: true, pid: pid};
 }
 
-bool obd2_handler_c::is_obd2_request(DiagnosticRequest* request)
+bool obd2_handler_t::is_obd2_request(DiagnosticRequest* request)
 {
 	return request->mode == 0x1 && request->has_pid && request->pid < 0xff;
 }
 
-bool obd2_handler_c::is_obd2_signal(const char *name)
+bool obd2_handler_t::is_obd2_signal(const char *name)
 {
 	if(fnmatch("obd2.*", name, NULL) == 0)
 		return true;
 	return false;
 }
 
-bool obd2_handler_c::decode_obd2_response(DiagnosticResponse* responce)
+bool obd2_handler_t::decode_obd2_response(DiagnosticResponse* responce)
 {
 	return diagnostic_decode_obd2_pid(response);
 }

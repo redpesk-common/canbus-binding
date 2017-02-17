@@ -33,6 +33,7 @@
 #include <functional>
 #include <memory>
 #include <thread>
+#include <fstream>
 
 #include <json-c/json.h>
 #include <openxc.pb.h>
@@ -40,82 +41,21 @@
 #include <afb/afb-binding.h>
 #include <afb/afb-service-itf.h>
 
-//#include "obd2.hpp"
+#include "obd2.hpp"
 #include "can-utils.hpp"
 #include "can-signals.hpp"
 
 /*
- *	 Interface between the daemon and the binding
+ *	Interface between the daemon and the binding
  */
 static const struct afb_binding_interface *interface;
+static obd2_handler_t obd2_handler();
 
 /********************************************************************************
 *
 *		Event management
 *
 *********************************************************************************/
-
-/*
- * TBF TBF TBF
- * called on an event on the CAN bus
- static int on_event(sd_event_source *s, int fd, uint32_t revents, void *userdata)
-{
-	openxc_CanMessage can_message;
-
-	can_message = openxc_CanMessage_init_default;
-
-	/* read available data */
-	/*
-	if ((revents & EPOLLIN) != 0)
-	{
-		read_can(&can_message);
-		send_event();
-	}
-*/
-	/* check if error or hangup */
-/*
-	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
-	{
-		sd_event_source_unref(s);
-		close(fd);
-		connect_to_event_loop();
-	}
-
-	return 0;
-}
-*/
-/*
- * USELESS SINCE THREADS SEPARATION
- *
- * Get the event loop running.
- * Will trigger on_event function on EPOLLIN event on socket
- *
- * Return 0 or positive value on success. Else negative value for failure.
-static int connect_to_event_loop(CanBus &CanBus_handler)
-{
-	sd_event *event_loop;
-	sd_event_source *source;
-	int rc;
-
-	if (CanBus_handler.socket < 0)
-	{
-		return CanBus_handler.socket;
-	}
-
-	event_loop = afb_daemon_get_event_loop(interface->daemon);
-	rc = sd_event_add_io(event_loop, &source, CanBus_handler.socket, EPOLLIN, on_event, NULL);
-	if (rc < 0)
-	{
-		CanBus_handler.close();
-		ERROR(interface, "Can't connect CAN bus %s to the event loop", CanBus_handler.device);
-	} else
-	{
-		NOTICE(interface, "Connected CAN bus %s to the event loop", CanBus_handler.device);
-	}
-
-	return rc;
-}
- */
 
 /********************************************************************************
 *
@@ -124,84 +64,83 @@ static int connect_to_event_loop(CanBus &CanBus_handler)
 *********************************************************************************/
 
 static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, std::vector<CanSignal>::const_iterator& sig_i)
- {
-  int ret;
-  
-  const auto& ss_i = subscribed_signals.find(sig_i);
-  if (ss_i != subscribed_signals.end())
-  {
-    if(!afb_event_is_valid(ss_i->second))
-    {
-      if(!subscribe)
-      {
-        NOTICE(interface, "Event isn't valid, it can't be unsubscribed.");
-        ret = 1;
-      }
-      else
-      {
-        ss_i->second = afb_daemon_make_event(afbitf->daemon, ss_i->first.genericName);
-        if (!afb_event_is_valid(ss_i->second)) 
-        {
-          ERROR(interface, "Can't create an event, something goes wrong.");
-          ret = 0;
-        }
-      }
-    }
-  }
-  else
-  {
-    subscribed_signals[sig_i] = afb_daemon_make_event(afbitf->daemon, sig_i.genericName);
-    if (!afb_event_is_valid(ss_i->second)) 
-    {
-      ERROR(interface, "Can't create an event, something goes wrong.");
-      ret = 0;
-    }
- }
-          
+{
+	int ret;
+
+	const auto& ss_i = subscribed_signals.find(sig_i);
+	if (ss_i != subscribed_signals.end())
+	{
+		if(!afb_event_is_valid(ss_i->second))
+		{
+			if(!subscribe)
+			{
+				NOTICE(interface, "Event isn't valid, it can't be unsubscribed.");
+				ret = 1;
+			}
+			else
+			{
+				ss_i->second = afb_daemon_make_event(interface->daemon, ss_i->first.genericName);
+				if (!afb_event_is_valid(ss_i->second)) 
+				{
+					ERROR(interface, "Can't create an event, something goes wrong.");
+					ret = 0;
+				}
+			}
+		}
+	}
+	else
+	{
+		subscribed_signals[sig_i] = afb_daemon_make_event(interface->daemon, sig_i->genericName);
+		if (!afb_event_is_valid(ss_i->second)) 
+		{
+			ERROR(interface, "Can't create an event, something goes wrong.");
+			ret = 0;
+		}
+	}
+
 	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, subscribed_signals[sig_i])) < 0)
 	{
-	  ERROR(interface, "Operation goes wrong for signal: %s", sig_i.genericName);
-	  ret = 0;
+		ERROR(interface, "Operation goes wrong for signal: %s", sig_i->genericName);
+		ret = 0;
 	}
-  else
-	  ret = 1;
+	else
+		ret = 1;
 	
 	return ret;
- }
+}
 
-static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std:vector<CanSignal>& signals)
+static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<CanSignal>& signals)
 {
-	std::vector<CanSignal>::iterator signal_i;
-	std::map <CanSignal, struct afb_event>::iterator s_signal_i;
-  int ret;
+	int ret;
 
 	// TODO: lock the subscribed_signals when insert/remove
 	for(const auto& signal_i : signals)
 	{
-	  ret = subscribe_unsubscribe_signal(request, subscribe, signal_i);
-	  if(ret == 0)
-	    return ret;
+		ret = subscribe_unsubscribe_signal(request, subscribe, signal_i);
+		if(ret == 0)
+			return ret;
 	}
 }
 
 static int subscribe_unsubscribe_all(struct afb_req request, bool subscribe)
 {
-	int i, n, e;
+	int n, e;
 
-	n = sizeof OBD2_PIDS / sizeof * OBD2_PIDS;
+	n = obd2_handler.OBD2_PIDS.size();
 	e = 0;
-	for (i = 0 ; i < n ; i++)
-		e += !subscribe_unsubscribe_sig(request, subscribe, &OBD2_PIDS[i]);
+	for (const auto& pid : obd2_handler.OBD2_PIDS)
+		e += !subscribe_unsubscribe_signals(request, subscribe, pid);
+	
 	return e == 0;
 }
 
 static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, const char *name)
 {
-	 std::vector<CanSignal> sig;
-	 int ret = 0;
+	std::vector<CanSignal> sig;
+	int ret = 0;
 
-	if (!strcmp(name, "*"))
-	  ret = subscribe_unsubscribe_all(request, subscribe);
+	if (!::strcmp(name, "*"))
+		ret = subscribe_unsubscribe_all(request, subscribe);
 	else
 	{
 		//if(obd2_handler_c.is_obd2_signal(name))
@@ -211,12 +150,12 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 		}
 		else
 		{
-		sig = find_can_signals(name);
-		if (sig.empty())
-			ret = 0;
-  	}
-  	ret = subscribe_unsubscribe_signals(request, subscribe, sig);
-  }
+			sig = find_can_signals(name);
+			if (sig.empty())
+				ret = 0;
+		}
+		ret = subscribe_unsubscribe_signals(request, subscribe, sig);
+	}
 	return ret;
 }
 
@@ -258,11 +197,11 @@ static void unsubscribe(struct afb_req request)
 {
 	subscribe_unsubscribe(request, false);
 }
+
 static const struct afb_verb_desc_v1 verbs[]=
 {
-  { .name= "subscribe",    .session= AFB_SESSION_NONE, .callback= subscribe,	.info= "subscribe to notification of CAN bus messages." },
-  { .name= "unsubscribe",  .session= AFB_SESSION_NONE, .callback= unsubscribe,	.info= "unsubscribe a previous subscription." },
-	{NULL}
+	{ .name= "subscribe",    .session= AFB_SESSION_NONE, .callback= subscribe,	.info= "subscribe to notification of CAN bus messages." },
+	{ .name= "unsubscribe",  .session= AFB_SESSION_NONE, .callback= unsubscribe,	.info= "unsubscribe a previous subscription." }
 };
 
 static const struct afb_binding binding_desc = {
@@ -294,7 +233,12 @@ int afbBindingV1ServiceInit(struct afb_service service)
 	fd_conf = afb_daemon_rootdir_open_locale(interface->daemon, "can_bus.json", O_RDONLY, NULL);
 
 	/* Open CAN socket */
-	can_bus_t can_bus_handler(interface, ));
-	CanBus_handler.open();
-	CanBus_handler.start_threads();
+	can_bus_t can_bus_handler(interface, fd_conf);
+	if(can_bus_handler.init_can_dev() == 0)
+	{
+		can_bus_handler.start_threads();
+		return 0;
+	}
+
+	return 1;
 }

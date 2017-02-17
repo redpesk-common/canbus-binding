@@ -87,7 +87,7 @@ float handleObd2Pid(const DiagnosticResponse* response, float parsedPayload);
  * Object to handle obd2 session with pre-scan of supported pid
  * then request them regularly
  */
-class obd2_handler_c {
+class obd2_handler_t {
 	private:
 
 	public:
@@ -144,4 +144,4 @@ class obd2_handler_c {
 		* @return float number representing the requested value.
 		*/
 		bool decode_obd2_response(DiagnosticResponse* responce);
-}
+};

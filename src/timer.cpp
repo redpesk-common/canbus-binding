@@ -14,23 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#pragma once
-
-#include <sys/timeb.h>
-
-typedef unsigned long (*TimeFunction)();
-
-/**
- * @brief: A frequency counting clock.
- *
- * frequency - the clock frequency in Hz.
- * last_time - the last time (in milliseconds since startup) that the clock
- *	ticked.
- * time_function - a function returning current time
- */
-typedef struct {
-		float frequency;
-		unsigned long lastTick;
-		TimeFunction timeFunction;
-} FrequencyClock;
+ 
+inline unsigned long systemTimeMs()
+{
+	struct timeb t_msec;
+	unsigned long int timestamp_msec;
+	
+	if(!::ftime(&t_msec))
+	{
+		timestamp_msec = ((unsigned long int) t_msec.time) * 1000ll + 
+			(unsigned long int) t_msec.millitm;
+	}
+	return timestamp_msec;
+}

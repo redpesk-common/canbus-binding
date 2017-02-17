@@ -69,16 +69,14 @@ int getMessageCount();
  *	 */
 CanBus* getCanBuses();
 
-/* Public: Decode CAN signals from raw CAN messages, translate from engineering
- *	* units to something more human readable, and send the resulting value over USB
- *	 * as an OpenXC-style JSON message.
- *	  *
- *	   * This is the main workhorse function of the VI. Every time a new
- *		* CAN message is received that matches one of the signals in the list returend
- *		 * by getSignals(), this function is called with the message ID and 64-bit data
- *		  * field.
- *		   *
- *			* bus - The CAN bus this message was received on.
- *			 * message - The received CAN message.
- *			  */
-void decodeCanMessage(openxc::pipeline::Pipeline* pipeline, CanBus* bus, CanMessage* message);
+
+/**
+ * @brief Find one or many signals based on its name or id
+ * passed through openxc_DynamicField.
+ *
+ * params[openxc_DynamicField&] - a const reference with the key to search into signal.
+ * Key is either a signal name or its CAN arbitration id.
+ *
+ * return[std::vector<CanSignal>] return found CanSignal array.
+ */
+std::vector <CanSignal> find_can_signals(const openxc_DynamicField &key)
