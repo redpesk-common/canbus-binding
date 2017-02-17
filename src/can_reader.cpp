@@ -30,6 +30,6 @@ void can_reader(can_bus_t &can_bus)
 	while(can_bus.is_running())
 	{
 		can_message.convert_from_canfd_frame(canbus.read());
-		can_bus.insert_new_can_message(can_message);
+		can_bus.push_new_can_message(can_message);
 	}
 }

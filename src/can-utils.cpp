@@ -23,12 +23,12 @@
 *
 *********************************************************************************/
 
-can_bus_t::can_bus_t(afb_binding_interface *itf, const std:string &dev_name)
-    : interface{itf}, deviceName{dev_name}
+can_bus_dev_t::can_bus_dev_t(afb_binding_interface *itf, const std:string &dev_name)
+	: interface{itf}, deviceName{dev_name}
 {
 }
 
-int can_bus_t::open()
+int can_bus_dev_t::open()
 {
 	const int canfd_on = 1;
 	struct ifreq ifr;
@@ -81,14 +81,14 @@ int can_bus_t::open()
 	return -1;
 }
 
-int can_bus_t::close()
+int can_bus_dev_t::close()
 {
 	::close(can_socket_);
 	can_socket_ = -1;
 }
 
 
-canfd_frame can_bus_t::can_read()
+canfd_frame can_bus_dev_t::read()
 {
 	ssize_t nbytes;
 	//int maxdlen;
@@ -124,6 +124,19 @@ canfd_frame can_bus_t::can_read()
 	return canfd_frame;
 }
 
+/*
+ * Return is_running_ bool
+ */
+bool can_bus_dev_t::is_running()
+{
+	return is_running_;
+}
+
+can_bus_t::can_bus_t(afb_binding_interface *itf, const std:string &dev_name)
+	: interface{itf}
+{
+}
+
 void can_bus_t::start_threads()
 {
 	th_reading_ = std::thread(can_reader, interface, socket, can_message_q_);
@@ -134,11 +147,33 @@ void can_bus_t::start_threads()
 }
 
 /*
- * Return is_running_ bool
+ * Get a CanMessage from can_message_q and return it
+ * then point to the next CanMessage in queue.
+ * 
+ * Return the next queue element or NULL if queue is empty.
  */
-bool can_bus_t::is_running()
+can_message_t can_bus_dev_t::next_can_message()
 {
-	return is_running_;
+	if(! can_message_q_.empty())
+	{
+		can_message_t can_msg = can_message_q_.front();
+		can_message_q_.pop()
+		return &can_msg;
+	}
+	has_can_message_ = false;
+}
+
+/**
+ * @return has_can_message_ bool
+ */
+bool can_bus_dev_t::has_can_message() const
+{
+	return has_can_message_;
+}
+
+void can_bus_dev_t::push_new_can_message(const can_message_t& can_msg)
+{
+	can_message_q_.push(can_msg);
 }
 
 /*
@@ -172,36 +207,6 @@ int can_bus_t::send_can_message(can_message_t &can_msg)
 }
 
 /*
- * Get a CanMessage from can_message_q and return it
- * then point to the next CanMessage in queue.
- * 
- * Return the next queue element or NULL if queue is empty.
- */
-can_message_t* can_bus_t::next_can_message()
-{
-	if(! can_message_q_.empty())
-	{
-		can_message_t can_msg = can_message_q_.front();
-		can_message_q_.pop()
-		return &can_msg;
-	}
-	has_can_message_ = false;
-}
-
-/**
- * @return has_can_message_ bool
- */
-bool can_bus_t::has_can_message() const
-{
-	return has_can_message_;
-}
-
-void can_bus_t::insert_new_can_message(can_message_t &can_msg)
-{
-	can_message_q_.push(can_msg);
-}
-
-/*
  * Get a VehicleMessage from vehicle_message_q and return it
  * then point to the next VehicleMessage in queue.
  * 
@@ -219,7 +224,7 @@ openxc_VehicleMessage* can_bus_t::next_vehicle_message()
 	has_vehicle_message_ = false;
 }
 
-void can_bus_t::insert_new_vehicle_message(openxc_VehicleMessage *v_msg)
+void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 {
 	vehicle_message_q_.push(v_msg);
 	has_vehicle_message_ = true;

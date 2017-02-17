@@ -34,7 +34,7 @@ class decoder_t
 		* Returns the raw value of the signal parsed as a bitfield from the given byte
 		* array.
 		*/
-		float parseSignalBitfield(CanSignal* signal, const CanMessage* message);
+		float parseSignalBitfield(const CanSignal& signal, const CanMessage& message);
 
 		/* Public: Find and return the corresponding string state for a CAN signal's
 		* raw integer value.
@@ -53,8 +53,8 @@ class decoder_t
 		* the signal. If an equivalent isn't found, send is sent to false and the
 		* return value is undefined.
 		*/
-		openxc_DynamicField stateDecoder(CanSignal* signal, CanSignal* signals,
-				int signalCount, float value, bool* send);
+		openxc_DynamicField stateDecoder(const CanSignal& signal, const CanSignal& signals,
+				float value, bool* send);
 
 		/* Public: Coerces a numerical value to a boolean.
 		*
@@ -72,8 +72,8 @@ class decoder_t
 		* is 0.0, otherwise true. The 'send' argument will not be modified as this
 		* decoder always succeeds.
 		*/
-		openxc_DynamicField booleanDecoder(CanSignal* signal, CanSignal* signals,
-				int signalCount, float value, bool* send);
+		openxc_DynamicField booleanDecoder(const CanSignal& signal, const CanSignal& signals,
+				float value, bool* send);
 
 		/* Public: Update the metadata for a signal and the newly received value.
 		*
@@ -91,8 +91,8 @@ class decoder_t
 		*
 		* The return value is undefined.
 		*/
-		openxc_DynamicField ignoreDecoder(CanSignal* signal, CanSignal* signals,
-				int signalCount, float value, bool* send);
+		openxc_DynamicField ignoreDecoder(const CanSignal& signal, const CanSignal& signals,
+				float value, bool* send);
 
 		/* Public: Wrap a raw CAN signal value in a DynamicField without modification.
 		*
@@ -110,8 +110,8 @@ class decoder_t
 		* its numeric value. The 'send' argument will not be modified as this decoder
 		* always succeeds.
 		*/
-		openxc_DynamicField noopDecoder(CanSignal* signal, CanSignal* signals,
-				int signalCount, float value, bool* send);
+		openxc_DynamicField noopDecoder(const CanSignal& signal, const CanSignal& signals,
+				float value, bool* send);
 
 		/* Public: Parse a signal from a CAN message and apply any required
 		* transforations to get a human readable value.
@@ -129,18 +129,18 @@ class decoder_t
 		* The decoder returns an openxc_DynamicField, which may contain a number,
 		* string or boolean. If 'send' is false, the return value is undefined.
 		*/
-		openxc_DynamicField decodeSignal(CanSignal* signal,
-				const CanMessage* message, CanSignal* signals, int signalCount,
+		openxc_DynamicField decodeSignal(const CanSignal& signal,
+				const CanMessage& message, const CanSignal& signals,
 				bool* send);
 
 		/* Public: Decode a transformed, human readable value from an raw CAN signal
 		* already parsed from a CAN message.
 		*
-		* This is the same as decodeSignal(CanSignal*, CanMessage*, CanSignal*, int,
+		* This is the same as decodeSignal(const CanSignal&, CanMessage*, const CanSignal&, int,
 		* bool*) but you must parse the bitfield value of the signal from the CAN
 		* message yourself. This is useful if you need that raw value for something
 		* else.
 		*/
-		openxc_DynamicField decodeSignal(CanSignal* signal, float value,
-		CanSignal* signals, int signalCount, bool* send);
+		openxc_DynamicField decodeSignal(const CanSignal& signal, float value,
+		const CanSignal& signals, bool* send);
 }

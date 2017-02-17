@@ -40,7 +40,7 @@
 #include <afb/afb-binding.h>
 #include <afb/afb-service-itf.h>
 
-#include "obd2.h"
+#include "obd2.hpp"
 
 /*
  *	 Interface between the daemon and the binding

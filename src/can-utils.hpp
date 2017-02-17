@@ -30,27 +30,6 @@
 
 #define CAN_ACTIVE_TIMEOUT_S 30
 
-#define QUEUE_DECLARE(type, max_length) \
-static const int queue_##type##_max_length = max_length; \
-static const int queue_##type##_max_internal_length = max_length + 1; \
-typedef struct queue_##type##_s { \
-	int head; \
-	int tail; \
-	type elements[max_length + 1]; \
-} queue_##type; \
-\
-bool queue_##type##_push(queue_##type* queue, type value); \
-\
-type queue_##type##_pop(queue_##type* queue); \
-\
-type queue_##type##_peek(queue_##type* queue); \
-void queue_##type##_init(queue_##type* queue); \
-int queue_##type##_length(queue_##type* queue); \
-int queue_##type##_available(queue_##type* queue); \
-bool queue_##type##_full(queue_##type* queue); \
-bool queue_##type##_empty(queue_##type* queue); \
-void queue_##type##_snapshot(queue_##type* queue, type* snapshot, int max);
-
 /* Public: The type signature for a CAN signal decoder.
  *
  * A SignalDecoder transforms a raw floating point CAN signal into a number,
@@ -69,57 +48,79 @@ void queue_##type##_snapshot(queue_##type* queue, type* snapshot, int max);
 typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal* signal,
 		CanSignal* signals, int signalCount, float value, bool* send);
 
-/* Public: The type signature for a CAN signal encoder.
+/**
+ * @brief: The type signature for a CAN signal encoder.
  *
  * A SignalEncoder transforms a number, string or boolean into a raw floating
  * point value that fits in the CAN signal.
  *
- * signal - The CAN signal to encode. 
- * value - The dynamic field to encode.
- * send - An output parameter. If the encoding failed or the CAN signal should
+ * @params[signal] - The CAN signal to encode. 
+ * @params[value] - The dynamic field to encode.
+ * @params[send] - An output parameter. If the encoding failed or the CAN signal should
  * not be encoded for some other reason, this will be flipped to false.
  */
 typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
 		openxc_DynamicField* value, bool* send);
 
-/* 
- * CanBus represent a can device definition gotten from configuraiton file 
+/** 
+ * @brief Object representing a can device. Handle opening, closing and reading on the
+ * socket. This is the low level object to be use by can_bus_t.
+ *
+ * @params[*interface_] - afb_binding_interface to the binder. Used to log messages
+ * @params[device_name_] - name of the linux device handling the can bus. Generally vcan0, can0, etc.
+ *
  */
-class can_bus_t {
+class can_bus_dev_t {
 	private:
-		afb_binding_interface *interface_;
-
-		/* Got from conf file */
-		std::string device_name;
+		std::string device_name_;
+		int can_socket_;
 
 		int can_socket_;
 		bool is_fdmode_on_;
 		struct sockaddr_can txAddress_;
 
+		bool has_can_message_;
+		std::queue <can_message_t> can_message_q_;
+
 		std::thread th_reading_;
 		bool is_running_;
-		std::thread th_decoding_;
-		std::thread th_pushing_;
-
-		std::queue <can_message_t> can_message_q_;
-		std::queue <openxc_VehicleMessage> vehicle_message_q_;
 
 	public:
 		int open();
 		int close();
-
-		void start_threads();
 		bool is_running();
+		
+		can_message_t* next_can_message();
+		void push_new_can_message(const can_message_t& can_msg);		
+}
+
+
+/** 
+ * @brief Object used to handle decoding and manage event queue to be pushed.
+ *
+ * @params[*interface_] - afb_binding_interface to the binder. Used to log messages
+ * @params[conf_file_ifstream_] - stream of configuration file used to initialize 
+ * can_bus_dev_t objects.
+ */
+class can_bus_t {
+	private:
+		afb_binding_interface *interface_;
+
+		std::vector<can_bus_dev_t> devices;
+
+		std::thread th_decoding_;
+		std::thread th_pushing_;
+
+		bool has_vehicle_message_;
+		std::queue <openxc_VehicleMessage> vehicle_message_q_;
+
+	public:
+		void start_threads();
 
 		int send_can_message(can_message_t can_msg);
 
-		can_message_t* next_can_message();
-		void insert_new_can_message(can_message_t &can_msg);
-		bool has_can_message_;
-
-		openxc_VehicleMessage* next_vehicle_message();
-		void insert_new_vehicle_message(openxc_VehicleMessage *v_msg);
-		bool has_vehicle_message_;
+		openxc_VehicleMessage& next_vehicle_message();
+		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
 };
 
 /* A compact representation of a single CAN message, meant to be used in in/out
