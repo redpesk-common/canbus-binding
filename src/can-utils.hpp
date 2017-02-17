@@ -18,7 +18,7 @@
 #pragma once
 
 #include <string>
-#include "timer.h"
+#include "timer.hpp"
 #include "openxc.pb.h"
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
@@ -74,8 +74,6 @@ class can_bus_dev_t {
 	private:
 		std::string device_name_;
 		int can_socket_;
-
-		int can_socket_;
 		bool is_fdmode_on_;
 		struct sockaddr_can txAddress_;
 
@@ -92,6 +90,7 @@ class can_bus_dev_t {
 		
 		can_message_t* next_can_message();
 		void push_new_can_message(const can_message_t& can_msg);		
+		bool has_can_message() const;
 }
 
 
@@ -105,9 +104,7 @@ class can_bus_dev_t {
 class can_bus_t {
 	private:
 		afb_binding_interface *interface_;
-
-		std::vector<can_bus_dev_t> devices;
-
+		
 		std::thread th_decoding_;
 		std::thread th_pushing_;
 
@@ -116,11 +113,15 @@ class can_bus_t {
 
 	public:
 		void start_threads();
+		
+		void init_can_dev(std::ifstream& conf_file);
+		std::vector<std::string> read_conf()
 
 		int send_can_message(can_message_t can_msg);
 
 		openxc_VehicleMessage& next_vehicle_message();
 		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
+		bool has_vehicle_message() const;
 };
 
 /* A compact representation of a single CAN message, meant to be used in in/out
