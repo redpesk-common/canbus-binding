@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "can-utils.h"
+#include "can-utils.hpp"
 #include <string>
 
 /** Public: Return the currently active CAN configuration. */

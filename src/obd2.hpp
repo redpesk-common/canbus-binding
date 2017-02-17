@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <vector>
 #include "uds/uds.h"
 
 enum UNIT {
@@ -67,27 +68,6 @@ typedef struct _Obd2Pid {
 	struct afb_event event;
 } Obd2Pid;
 
-/*
-	{ pid: 0x4, name: "engine.load", frequency: 5 },
-	{ pid: 0x5, name: "engine.coolant.temperature", frequency: 1 },
-	{ pid: 0xa, name: "fuel.pressure", frequency: 1 },
-	{ pid: 0xb, name: "intake.manifold.pressure", frequency: 1 },
-	{ pid: 0xc, name: "engine.speed", frequency: 5 },
-	{ pid: 0xd, name: "vehicle.speed", frequency: 5 },
-	{ pid: 0xf, name: "intake.air.temperature", frequency: 1 },
-	{ pid: 0x10, name: "mass.airflow", frequency: 5 },
-	{ pid: 0x11, name: "throttle.position", frequency: 5 },
-	{ pid: 0x1f, name: "running.time", frequency: 1 },
-	{ pid: 0x27, name: "fuel.level", frequency: 1 },
-	{ pid: 0x33, name: "barometric.pressure", frequency: 1 },
-	{ pid: 0x4c, name: "commanded.throttle.position", frequency: 1 },
-	{ pid: 0x52, name: "ethanol.fuel.percentage", frequency: 1 },
-	{ pid: 0x5a, name: "accelerator.pedal.position", frequency: 5 },
-	{ pid: 0x5c, name: "engine.oil.temperature", frequency: 1 },
-	{ pid: 0x63, name: "engine.torque", frequency: 1 },
-};
- */
-
 /* Public: Check if a request is an OBD-II PID request.
  *
  * Returns true if the request is a mode 1	request and it has a 1 byte PID.
@@ -110,57 +90,58 @@ float handleObd2Pid(const DiagnosticResponse* response, float parsedPayload);
 class obd2_handler_c {
 	private:
 
-		public:
-		/*
-		* Pre-defined OBD-II PIDs to query for if supported by the vehicle.
+	public:
+	/*
+	* Pre-defined OBD-II PIDs to query for if supported by the vehicle.
+	*/
+	const Obd2Pid OBD2_PIDS[] = {
+		{ pid: 0x04, name: "obd2.engine.load", min:0, max: 100, unit: POURCENT, frequency: 5, supported: false, event: nullptr },
+		{ pid: 0x05, name: "obd2.engine.coolant.temperature", min: -40, max: 215, unit: DEGREES_CELSIUS, frequency: 1, supported: false, event: nullptr},
+		{ pid: 0x0a, name: "obd2.fuel.pressure", min: 0, max: 765, unit: KPA, frequency: 1, supported: false, event: nullptr },
+		{ pid: 0x0b, name: "obd2.intake.manifold.pressure", min: 0, max: 255, unit: KPA, frequency: 1, supported: false, event: nullptr },
+		{ pid: 0x0c, name: "obd2.engine.speed", min: 0, max: 16383, unit: RPM, frequency: 5, supported: false, event: nullptr },
+		{ pid: 0x0d, name: "obd2.vehicle.speed", min: 0, max: 255, unit: KM_H, frequency: 5, supported: false, event: nullptr },
+		{ pid: 0x0f, name: "obd2.intake.air.temperature", min: -40, max:215, unit: DEGREES_CELSIUS, frequency: 1, supported: false, event: nullptr },
+		{ pid: 0x10, name: "obd2.mass.airflow", min: 0, max: 655, unit: GRAMS_SEC, frequency: 5, supported: false, event: nullptr },
+		{ pid: 0x11, name: "obd2.throttle.position", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false, event: nullptr },
+		{ pid: 0x1f, name: "obd2.running.time", min: 0, max: 65535, unit: SECONDS, frequency: 1, supported: false, event: nullptr },
+		{ pid: 0x2d, name: "obd2.EGR.error", min: -100, max: 99, unit: POURCENT, frequency: 0, supported: false, event: nullptr },
+		{ pid: 0x2f, name: "obd2.fuel.level", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false, event: nullptr },
+		{ pid: 0x33, name: "obd2.barometric.pressure", min: 0, max: 255, unit: KPA, frequency: 1, supported: false, event: nullptr },
+		{ pid: 0x4c, name: "obd2.commanded.throttle.position", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false, event: nullptr },
+		{ pid: 0x52, name: "obd2.ethanol.fuel.percentage", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false, event: nullptr },
+		{ pid: 0x5a, name: "obd2.accelerator.pedal.position", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false, event: nullptr },
+		{ pid: 0x5b, name: "obd2.hybrid.battery-pack.remaining.life", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false, event: nullptr },
+		{ pid: 0x5c, name: "obd2.engine.oil.temperature",min: -40, max: 210, unit: DEGREES_CELSIUS, frequency: 1, supported: false, event: nullptr },
+		{ pid: 0x63, name: "obd2.engine.torque", min: 0, max: 65535, unit: NM, frequency: 1, supported: false, event: nullptr }
+	};
+		
+		/**
+		 * @brief:
+		 *
+		 * Returns
+		 */
+		void find_obd2_pid(const char *name, std::vector<Obd2Pid> *pids);
+
+		/**
+		 * @brief Check if a request is an OBD-II PID request.
+		 *
+		 * @return true if the request is a mode 1  request and it has a 1 byte PID.
+		 */
+		bool is_obd2_request(DiagnosticRequest *request);
+
+		/**
+		* @brief Check if requested signal name is an obd2 pid
+		* 
+		* @return true if name began with ob2.* else false.
 		*/
-		const Obd2Pid OBD2_PIDS[] = {
-			{ pid: 0x04, name: "obd2.engine.load", min:0, max: 100, unit: POURCENT, frequency: 5, supported: false },
-			{ pid: 0x05, name: "obd2.engine.coolant.temperature", min: -40, max: 215, unit: DEGREES_CELSIUS, frequency: 1, supported: false },
-			{ pid: 0x0a, name: "obd2.fuel.pressure", min: 0, max: 765, unit: KPA, frequency: 1, supported: false },
-			{ pid: 0x0b, name: "obd2.intake.manifold.pressure", min: 0, max: 255, unit: KPA, frequency: 1, supported: false },
-			{ pid: 0x0c, name: "obd2.engine.speed", min: 0, max: 16383, unit: RPM, frequency: 5, supported: false },
-			{ pid: 0x0d, name: "obd2.vehicle.speed", min: 0, max: 255, unit: KM_H, frequency: 5, supported: false },
-			{ pid: 0x0f, name: "obd2.intake.air.temperature", min: -40, max:215, unit: DEGREES_CELSIUS, frequency: 1, supported: false },
-			{ pid: 0x10, name: "obd2.mass.airflow", min: 0, max: 655, unit: GRAMS_SEC, frequency: 5, supported: false },
-			{ pid: 0x11, name: "obd2.throttle.position", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false },
-			{ pid: 0x1f, name: "obd2.running.time", min: 0, max: 65535, unit: SECONDS, frequency: 1, supported: false },
-			{ pid: 0x2d, name: "obd2.EGR.error", min: -100, max: 99, unit: POURCENT, frequency: 0, supported: false },
-			{ pid: 0x2f, name: "obd2.fuel.level", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false },
-			{ pid: 0x33, name: "obd2.barometric.pressure", min: 0, max: 255, unit: KPA, frequency: 1, supported: false },
-			{ pid: 0x4c, name: "obd2.commanded.throttle.position", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false },
-			{ pid: 0x52, name: "obd2.ethanol.fuel.percentage", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false },
-			{ pid: 0x5a, name: "obd2.accelerator.pedal.position", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false },
-			{ pid: 0x5b, name: "obd2.hybrid.battery-pack.remaining.life", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false },
-			{ pid: 0x5c, name: "obd2.engine.oil.temperature",min: -40, max: 210, unit: DEGREES_CELSIUS, frequency: 1, supported: false },
-			{ pid: 0x63, name: "obd2.engine.torque", min: 0, max: 65535, unit: NM, frequency: 1, supported: false },
-		};
+		bool is_obd2_signal(const char *name);
 
-			
-			/* Public: Check if a request is an OBD-II PID request.
- 			 *
- 			 * Returns true if the request is a mode 1  request and it has a 1 byte PID.
- 			 */
-			void find_obd2_pid(const char *name, std::Vector<Obd2Pid> *pids);
-
-			/* Public: Check if a request is an OBD-II PID request.
- 			 *
- 			 * Returns true if the request is a mode 1  request and it has a 1 byte PID.
- 			 */
-			bool is_obd2_request(DiagnosticRequest *request);
-
-			/*
-			 * Public: Check if requested signal name is an obd2 pid
-			 * 
-			 * Returns true if name began with ob2.* else false.
-			 */
-			bool is_obd2_signal(const char *name);
-
-			/*
-			 * Public: pass response to UDS-C library function 
-			 * diagnostic_decode_obd2_pid()
-			 *
-			 * Return: float number representing the requested value.
-			 */
-			bool decode_obd2_response(DiagnosticResponse* responce);
+		/*
+		* @brief pass response to UDS-C library function 
+		* diagnostic_decode_obd2_pid()
+		*
+		* @return float number representing the requested value.
+		*/
+		bool decode_obd2_response(DiagnosticResponse* responce);
 }

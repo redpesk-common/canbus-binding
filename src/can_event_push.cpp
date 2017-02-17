@@ -26,10 +26,10 @@
 #include "openxc.pb.h"
 #include "json-c/json.h"
 
-void can_event_push(can_bus_t *can_bus)
+void can_event_push(can_bus_t& can_bus)
 {
-	openxc_VehicleMessage *v_message;
-	openxc_SimpleMessage *s_message;
+	openxc_VehicleMessage v_message;
+	openxc_SimpleMessage s_message;
 	iterator it_event;
 
 	while(true)
@@ -37,20 +37,21 @@ void can_event_push(can_bus_t *can_bus)
 		if(v_message = can_bus->next_vehicle_message())
 		{
 			s_message = get_simple_message(v_msg);
-			it_event = event_map.find(s_msg->name);
-			afb_event_push(it_event->second, jsonify_simple(s_msg));
+			const auto& it_event = subscribed_signals.find(s_msg.name);
+			if(! it_event->end() && afb_event_is_valid(it_event->second))
+				afb_event_push(it_event->second, jsonify_simple(s_msg));
 		}
 	}
 }
 
-void jsonify_DynamicField(openxc_DynamicField *field, json_object *value)
+void jsonify_DynamicField(const openxc_DynamicField& field, const json_object& value)
 {
-	if(field->has_numeric_value)
-		json_object_object_add(value, "value", json_object_new_double(field->numeric_value));
-	else if(field->has_boolean_value)
-		json_object_object_add(value, "value", json_object_new_boolean(field->boolean_value));
-	else if(field->has_string_value)
-		json_object_object_add(value, "value", json_object_new_string(field->string_value));
+	if(field.has_numeric_value)
+		json_object_object_add(value, "value", json_object_new_double(field.numeric_value));
+	else if(field.has_boolean_value)
+		json_object_object_add(value, "value", json_object_new_boolean(field.boolean_value));
+	else if(field.has_string_value)
+		json_object_object_add(value, "value", json_object_new_string(field.string_value));
 
 	return value;
 }
@@ -58,24 +59,21 @@ void jsonify_DynamicField(openxc_DynamicField *field, json_object *value)
 /* Extract the simple message value from an openxc_VehicleMessage
  * and return it, or null if there isn't.
  */
-openxc_SimpleMessage* get_simple_message(openxc_VehicleMessage *v_msg)
+openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg)
 {
-	if(v_msg->has_simple_message)
-		return v_msg->simple_message;
-	
-	return nullptr;
+	return v_msg.has_simple_message ? v_msg.simple_message : {0};
 }
 
-json_object* jsonify_simple(openxc_SimpleMessage *s_msg)
+json_object jsonify_simple(const openxc_SimpleMessage& s_msg)
 {
 	json_object *json;
-	json = json_object_new_object();
+	json = nullptr;
 
-	if(!s_msg->has_name)
-		return nullptr;
-
-	json_object_object_add(json, "name", json_object_new_string(s_msg->name));
-	jsonify_DynamicField(&s_msg->value, json);
-
+	if(s_msg->has_name)
+	{
+	  json = json_object_new_object();
+  	json_object_object_add(json, "name", json_object_new_string(s_msg->name));
+  	jsonify_DynamicField(&s_msg->value, json);
+  }
 	return json;
 }
