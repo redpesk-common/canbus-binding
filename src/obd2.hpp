@@ -17,6 +17,10 @@
 
 #include <vector>
 #include "uds/uds.h"
+extern "C"
+{
+	#include <afb/afb-binding.h>
+}
 
 enum UNIT {
 	POURCENT,

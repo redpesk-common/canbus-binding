@@ -16,17 +16,7 @@
  * limitations under the License.
  */
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
-#include <queue>
-#include <sys/timeb.h>
-
-#include <afb/afb-binding.h>
-
-#include "can-utils.hpp"
-#include "can-decoder.hpp"
-#include "openxc.pb.h"
-#include "openxc-utils.hpp"
+#include "low-can-binding.hpp"
 
 void can_decode_message(can_bus_t &can_bus)
 {

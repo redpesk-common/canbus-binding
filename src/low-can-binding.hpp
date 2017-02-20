@@ -18,7 +18,23 @@
  
 #pragma once
 
+#include <queue>
+#include <sys/timeb.h>
+#include <linux/can.h>
+#include <json-c/json.h>
+#include <linux/can/raw.h>
+
+#include "obd2.hpp"
+#include "openxc.pb.h"
+#include "can-utils.hpp"
 #include "can-signals.hpp"
+#include "can-decoder.hpp"
+#include "openxc-utils.hpp"
+
+/*
+ *	Interface between the daemon and the binding
+ */
+static const struct afb_binding_interface *interface;
 
 extern "C"
 {
@@ -55,9 +71,4 @@ extern "C"
 	* @return Exit code, zero if success.
 	*/
 	int afbBindingV1ServiceInit(struct afb_service service);
-}
-
-/*
- *	Interface between the daemon and the binding
- */
-static const struct afb_binding_interface *interface;
+};

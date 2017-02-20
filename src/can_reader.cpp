@@ -16,12 +16,7 @@
  * limitations under the License.
  */
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
-
-#include <afb/afb-binding.h>
-
-#include "can-utils.h"
+#include "low-can-binding.hpp"
 
 void can_reader(can_bus_t &can_bus)
 {

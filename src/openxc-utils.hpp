@@ -18,34 +18,36 @@
 
 #pragma once
 
-/*
- * Build a specific VehicleMessage containing a SimpleMessage.
- */
-openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type,
-	const openxc_SimpleMessage& message);
+#include "openxc.pb.h"
 
-/*
- * Build an openxc_SimpleMessage associating a name to an openxc_DynamicField
+/**
+ * @brief Build a specific VehicleMessage containing a SimpleMessage.
+ */
+openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type, const openxc_SimpleMessage& message);
+
+/**
+ * @brief Build an openxc_SimpleMessage associating a name to an openxc_DynamicField
  */
 openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_DynamicField& value);
-/* 
- * Build an openxc_DynamicField depending what we pass as argument
+/**
+ * @brief Build an openxc_DynamicField depending what we pass as argument
  */
 openxc_DynamicField build_DynamicField(const std::string& value);
 
-/* 
- * Build an openxc_DynamicField depending what we pass as argument
+/**
+ * @brief Build an openxc_DynamicField depending what we pass as argument
  */
 openxc_DynamicField build_DynamicField(double value);
 
-/* 
- * Build an openxc_DynamicField depending what we pass as argument
+/**
+ * @brief Build an openxc_DynamicField depending what we pass as argument
  */
 openxc_DynamicField build_DynamicField(bool value);
 
 void jsonify_DynamicField(const openxc_DynamicField& field, const json_object& value);
 
-/* Extract the simple message value from an openxc_VehicleMessage
+/**
+ * @brief Extract the simple message value from an openxc_VehicleMessage
  * and return it, or null if there isn't.
  */
 openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg);

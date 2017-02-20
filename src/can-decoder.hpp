@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "can-utils.hpp"
 
 class decoder_t
 {
@@ -34,7 +35,7 @@ class decoder_t
 		* Returns the raw value of the signal parsed as a bitfield from the given byte
 		* array.
 		*/
-		float parseSignalBitfield(const CanSignal& signal, const CanMessage& message);
+		float parseSignalBitfield(const CanSignal& signal, const can_message_t& message);
 
 		/* Public: Find and return the corresponding string state for a CAN signal's
 		* raw integer value.
@@ -130,7 +131,7 @@ class decoder_t
 		* string or boolean. If 'send' is false, the return value is undefined.
 		*/
 		openxc_DynamicField decodeSignal(const CanSignal& signal,
-				const CanMessage& message, const CanSignal& signals,
+				const can_message_t& message, const CanSignal& signals,
 				bool* send);
 
 		/* Public: Decode a transformed, human readable value from an raw CAN signal

@@ -27,8 +27,6 @@
 
 #include "timer.hpp"
 #include "openxc.pb.h"
-#include <afb/afb-binding.h>
-#include <afb/afb-service-itf.h>
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
 #define MAX_ACCEPTANCE_FILTERS 24

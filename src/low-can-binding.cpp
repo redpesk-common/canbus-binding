@@ -38,10 +38,6 @@
 #include <openxc.pb.h>
 
 #include "low-can-binding.hpp"
-#include "openxc-utils.hpp"
-#include "obd2.hpp"
-#include "can-utils.hpp"
-#include "can-signals.hpp"
 
 /********************************************************************************
 *
@@ -236,4 +232,4 @@ extern "C"
 
 		return 1;
 	}
-}
+};

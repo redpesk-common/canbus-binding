@@ -16,16 +16,7 @@
  * limitations under the License.
  */
 
-#include <linux/can.h>
-#include <linux/can/raw.h>
-#include <queue>
-
-#include <afb/afb-binding.h>
-
-#include "can-utils.h"
-#include "openxc-utils.hpp"
-#include "openxc.pb.h"
-#include "json-c/json.h"
+#include "low-can-binding.hpp"
 
 void can_event_push(can_bus_t& can_bus)
 {
