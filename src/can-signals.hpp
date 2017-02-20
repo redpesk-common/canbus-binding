@@ -26,6 +26,11 @@
 #include "can-utils.hpp"
 #include "low-can-binding.hpp"
 
+extern "C"
+{
+	#include <afb/afb-event-itf.h>
+}
+
 #define MESSAGE_SET_ID 0
 
 /** Can signal event map making access to afb_event

@@ -28,20 +28,20 @@ can_bus_dev_t::can_bus_dev_t(const std::string &dev_name)
 {
 }
 
-int can_bus_dev_t::open()
+int can_bus_dev_t::open(const struct afb_binding_interface* interface)
 {
 	const int canfd_on = 1;
 	struct ifreq ifr;
 	struct timeval timeout = {1, 0};
 
-	DEBUG(interface_, "open_can_dev: CAN Handler socket : %d", can_socket_);
+	DEBUG(interface, "open_can_dev: CAN Handler socket : %d", can_socket_);
 	if (can_socket_ >= 0)
 		return 0;
 
 	can_socket_ = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
-	if (socket < 0)
+	if (can_socket_ < 0)
 	{
-		ERROR(interface_, "open_can_dev: socket could not be created");
+		ERROR(interface, "open_can_dev: socket could not be created");
 	}
 	else
 	{
@@ -50,25 +50,25 @@ int can_bus_dev_t::open()
 		/* try to switch the socket into CAN_FD mode */
 		if (::setsockopt(can_socket_, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{
-			NOTICE(interface_, "open_can_dev: Can not switch into CAN Extended frame format.");
+			NOTICE(interface, "open_can_dev: Can not switch into CAN Extended frame format.");
 			is_fdmode_on_ = false;
 		} else {
 			is_fdmode_on_ = true;
 		}
 
 		/* Attempts to open a socket to CAN bus */
-		::strcpy(ifr.ifr_name, device);
+		::strcpy(ifr.ifr_name, device_name_.c_str());
 		if(::ioctl(can_socket_, SIOCGIFINDEX, &ifr) < 0)
-			ERROR(interface_, "open_can_dev: ioctl failed");
+			ERROR(interface, "open_can_dev: ioctl failed");
 		else
 		{
-			txAddress.can_family = AF_CAN;
-			txAddress.can_ifindex = ifr.ifr_ifindex;
+			txAddress_.can_family = AF_CAN;
+			txAddress_.can_ifindex = ifr.ifr_ifindex;
 
 			/* And bind it to txAddress */
 			if (::bind(can_socket_, (struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
 			{
-				ERROR(interface_, "open_can_dev: bind failed");
+				ERROR(interface, "open_can_dev: bind failed");
 			}
 			else
 			{
@@ -87,8 +87,7 @@ int can_bus_dev_t::close()
 	can_socket_ = -1;
 }
 
-
-canfd_frame can_bus_dev_t::read()
+canfd_frame can_bus_dev_t::read(const struct afb_binding_interface* interface)
 {
 	ssize_t nbytes;
 	//int maxdlen;
@@ -97,7 +96,7 @@ canfd_frame can_bus_dev_t::read()
 	/* Test that socket is really opened */
 	if (can_socket_ < 0)
 	{
-		ERROR(interface_, "read_can: Socket unavailable. Closing thread.");
+		ERROR(interface, "read_can: Socket unavailable. Closing thread.");
 		is_running_ = false;
 	}
 
@@ -106,17 +105,17 @@ canfd_frame can_bus_dev_t::read()
 	switch(nbytes)
 	{
 		case CANFD_MTU:
-			DEBUG(interface_, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
+			DEBUG(interface, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
 			//maxdlen = CANFD_MAX_DLEN;
 			break;
 		case CAN_MTU:
-			DEBUG(interface_, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
+			DEBUG(interface, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
 			//maxdlen = CAN_MAX_DLEN;
 			break;
 		default:
 			if (errno == ENETDOWN)
-					ERROR(interface_, "read_can: %s interface down", device);
-			ERROR(interface_, "read_can: Error reading CAN bus");
+					ERROR(interface, "read_can: %s interface down", device_name_);
+			ERROR(interface, "read_can: Error reading CAN bus");
 			::memset(&canfd_frame, 0, sizeof(canfd_frame));
 			is_running_ = false;
 			break;
@@ -225,7 +224,9 @@ int init_can_dev()
 
 		for(const auto& device : devices_name)
 		{
-			can_bus_dev_t(device);
+			can_bus_dev_t can_bus_device_handler(device);
+			can_bus_device_handler.open(interface_);
+			can_bus_device_handler.start_reading(interface_);
 			i++;
 		}
 

@@ -144,4 +144,4 @@ class decoder_t
 		*/
 		openxc_DynamicField decodeSignal(const CanSignal& signal, float value,
 		const CanSignal& signals, bool* send);
-}
+};

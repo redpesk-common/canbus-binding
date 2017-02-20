@@ -18,13 +18,13 @@
 
 #include "low-can-binding.hpp"
 
-void can_reader(can_bus_t &can_bus)
+void can_reader(can_bus__dev_t &can_bus)
 {
 	can_message_t can_message;
 
 	while(can_bus.is_running())
 	{
-		can_message.convert_from_canfd_frame(canbus.read());
+		can_message.convert_from_canfd_frame(can_bus.read(interface));
 		can_bus.push_new_can_message(can_message);
 	}
 }

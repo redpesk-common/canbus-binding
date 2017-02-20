@@ -18,13 +18,29 @@
  
 #pragma once
 
+#include <map>
 #include <queue>
-#include <sys/timeb.h>
+#include <vector>
+#include <string>
+#include <memory>
+#include <thread>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <net/if.h>
+#include <functional>
+#include <sys/ioctl.h>
 #include <linux/can.h>
+#include <openxc.pb.h>
+#include <sys/timeb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <json-c/json.h>
 #include <linux/can/raw.h>
+#include <systemd/sd-event.h>
 
 #include "obd2.hpp"
+#include "timer.hpp"
 #include "openxc.pb.h"
 #include "can-utils.hpp"
 #include "can-signals.hpp"

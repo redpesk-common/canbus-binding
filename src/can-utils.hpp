@@ -23,10 +23,22 @@
 #include <cstdio>
 #include <string>
 #include <thread>
+#include <fcntl.h>
+#include <unistd.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
 #include <linux/can.h>
+#include <sys/socket.h>
+#include <linux/can/raw.h>
 
 #include "timer.hpp"
 #include "openxc.pb.h"
+
+extern "C"
+{
+	#include <afb/afb-binding.h>
+	#include <afb/afb-service-itf.h>
+}
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
 #define MAX_ACCEPTANCE_FILTERS 24
@@ -36,6 +48,13 @@
 #define CAN_MESSAGE_SIZE 8
 
 #define CAN_ACTIVE_TIMEOUT_S 30
+
+/**
+ * @brief Function representing thread activated by can bus objects
+ */
+void can_reader(can_bus_dev_t& can_bus);
+void can_decode_message(can_bus_t& can_bus);
+void can_event_push(can_bus_t& can_bus);
 
 /**
  * @brief The type signature for a CAN signal decoder.
@@ -146,11 +165,13 @@ class can_bus_dev_t {
 	public:
 		can_bus_dev_t(const std::string& dev_name);
 
-		int open();
+		int open(const struct afb_binding_interface* interface);
 		int close();
 		bool is_running();
+		void start_reading();
+		canfd_frame read(const struct afb_binding_interface *interface);
 		
-		can_message_t* next_can_message();
+		can_message_t next_can_message();
 		void push_new_can_message(const can_message_t& can_msg);		
 		bool has_can_message() const;
 };
