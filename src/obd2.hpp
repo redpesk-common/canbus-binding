@@ -48,8 +48,8 @@ const char *UNIT_NAMES[10] = {
 	"NM"
 };
 
-/*
- *	A representation of an OBD-II PID.
+/**
+ *	@brief A representation of an OBD-II PID.
  *
  * pid - The 1 byte PID.
  * name - A human readable name to use for this PID when published.
@@ -73,8 +73,8 @@ typedef struct _Obd2Pid {
 } Obd2Pid;
 
 /*
-	* Pre-defined OBD-II PIDs to query for if supported by the vehicle.
-	*/
+* Pre-defined OBD-II PIDs to query for if supported by the vehicle.
+*/
 const std::vector<Obd2Pid> OBD2_PIDS {
 	{ pid: 0x04, name: "obd2.engine.load", min:0, max: 100, unit: POURCENT, frequency: 5, supported: false, event: {nullptr, nullptr} },
 	{ pid: 0x05, name: "obd2.engine.coolant.temperature", min: -40, max: 215, unit: DEGREES_CELSIUS, frequency: 1, supported: false, event: {nullptr, nullptr} },
@@ -96,21 +96,6 @@ const std::vector<Obd2Pid> OBD2_PIDS {
 	{ pid: 0x5c, name: "obd2.engine.oil.temperature",min: -40, max: 210, unit: DEGREES_CELSIUS, frequency: 1, supported: false, event: {nullptr, nullptr} },
 	{ pid: 0x63, name: "obd2.engine.torque", min: 0, max: 65535, unit: NM, frequency: 1, supported: false, event: {nullptr, nullptr} }
 };
-
-/* Public: Check if a request is an OBD-II PID request.
- *
- * Returns true if the request is a mode 1	request and it has a 1 byte PID.
- */
-bool isObd2Request(DiagnosticRequest* request);
-
-/* Public: Decode the payload of an OBD-II PID.
- *
- * This function matches the type signature for a DiagnosticResponseDecoder, so
- * it can be used as the decoder for a DiagnosticRequest. It returns the decoded
- * value of the PID, using the standard formulas (see
- * http://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_01).
- */
-float handleObd2Pid(const DiagnosticResponse* response, float parsedPayload);
 
 /**
  * @brief - Object to handle obd2 session with pre-scan of supported pid
@@ -141,11 +126,18 @@ class obd2_handler_t {
 		*/
 		bool is_obd2_signal(const char *name);
 
-		/*
-		* @brief pass response to UDS-C library function 
-		* diagnostic_decode_obd2_pid()
+		/**
+		* @brief Decode the payload of an OBD-II PID.
 		*
-		* @return float number representing the requested value.
+		* This function matches the type signature for a DiagnosticResponseDecoder, so
+		* it can be used as the decoder for a DiagnosticRequest. It returns the decoded
+		* value of the PID, using the standard formulas (see
+		* http://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_01).
+		*
+		* @param[in] DiagnosticResponse response - the received DiagnosticResponse (the data is in response.payload,
+		*      a byte array). This is most often used when the byte order is
+		*      signiticant, i.e. with many OBD-II PID formulas.
+		* @param[in] float parsed_payload - the entire payload of the response parsed as an int.
 		*/
-		bool decode_obd2_response(DiagnosticResponse* responce);
+		float handle_obd2_pid(const DiagnosticResponse* response, float parsedPayload);
 };

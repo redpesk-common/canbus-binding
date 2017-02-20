@@ -16,8 +16,7 @@
  * limitations under the License.
  */
 
-openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type,
-	const openxc_SimpleMessage& message)
+openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type, const openxc_SimpleMessage& message)
 {
 	struct timeb t_msec;
 	long long int timestamp_msec;

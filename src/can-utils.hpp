@@ -283,32 +283,6 @@ struct CanMessageDefinition {
 };
 typedef struct CanMessageDefinition CanMessageDefinition;
 
-/* Private: An entry in the list of acceptance filters for each CanBus.
- *
- * This struct is meant to be used with a LIST type from <sys/queue.h>.
- *
- * filter - the value for the CAN acceptance filter.
- * activeUserCount - The number of active consumers of this filter's messages.
- *		When 0, this filter can be removed.
- * format - the format of the ID for the filter.
-struct AcceptanceFilterListEntry {
-	uint32_t filter;
-	uint8_t activeUserCount;
-	CanMessageFormat format;
-	LIST_ENTRY(AcceptanceFilterListEntry) entries;
-};
- */
-
-/* Private: A type of list containing CAN acceptance filters.
-LIST_HEAD(AcceptanceFilterList, AcceptanceFilterListEntry);
-
-struct CanMessageDefinitionListEntry {
-	CanMessageDefinition definition;
-	LIST_ENTRY(CanMessageDefinitionListEntry) entries;
-};
-LIST_HEAD(CanMessageDefinitionList, CanMessageDefinitionListEntry);
- */
-
 /**
  * @brief A parent wrapper for a particular set of CAN messages and associated
  *	CAN buses(e.g. a vehicle or program).
@@ -377,7 +351,7 @@ typedef struct {
  * @param[in] buses - An array of all CAN buses.
  * @param[in] int busCount - The length of the buses array.
  */
-void pre_initialize(can_bus_dev_t* bus, bool writable, CanBus* buses, const int busCount);
+void pre_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
 
 /* Post-initialize actions made after CAN bus initialization and before the
  * event loop connection.
@@ -388,7 +362,7 @@ void pre_initialize(can_bus_dev_t* bus, bool writable, CanBus* buses, const int 
  * buses - An array of all CAN buses.
  * busCount - The length of the buses array.
  */
-void post_initialize(can_bus_dev_t* bus, bool writable, CanBus* buses, const int busCount);
+void post_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
 
 /* Public: Check if the device is connected to an active CAN bus, i.e. it's
  * received a message in the recent past.
@@ -403,4 +377,4 @@ bool isBusActive(can_bus_dev_t* bus);
  * buses - an array of active CAN buses.
  * busCount - the length of the buses array.
  */
-void logBusStatistics(CanBus* buses, const int busCount);
+void logBusStatistics(can_bus_dev_t* buses, const int busCount);
