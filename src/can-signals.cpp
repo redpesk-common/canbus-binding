@@ -15,57 +15,65 @@
  * limitations under the License.
  */
 
-#include <string>
-#include <vector>
-#include <fnmatch.h>
-#include "can-signals.h"
+#include "can-signals.hpp"
 
-/* Can signal event map making access to afb_event
- * external to openxc existing structure.
- */
-std::map <CanSignal, struct afb_event> subscribed_signals;
-std::map <CanSignal, struct afb_event>::iterator subscribed_signals_i;
-
-#define MESSAGE_SET_ID 0
-std::vector <CanSignal> find_can_signals(openxc_DynamicField &key)
-{
-    std::vector <CanSignal> signals;
-	int n_signals, i;
-
-	n_signals = getSignalCount();
-
-	switch(key->type):
-	{
-		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-			for(const CanSignal& s : SIGNALS[MESSAGE_SET_ID])
-			{
-				if(fnmatch(key->string_value, s.genericName) == 0)
-					signals.push_back(s);
-			}
-			break;
-		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-			for(const CanSignal& s : SIGNALS[MESSAGE_SET_ID])
-			{
-				CanMessageDefinition *msg_def = s.message;
-				if(msg_def->id == key->numeric_value)
-					signals.push_back(s)
-			}
-			break;
-		default:
-			ERROR(interface, "find_can_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
-			return NULL;
-			break;
-	}
-
-	return signals;
-}
-
-std::vector<CanSignal>& getSignals()
+const std::vector<CanSignal> getSignals()
 {
 	return SIGNALS[MESSAGE_SET_ID];
 }
 
-int getSignalCount()
+size_t getSignalCount()
 {
 	return SIGNALS[MESSAGE_SET_ID].size();
 }
+
+std::vector<CanSignal> find_can_signals(openxc_DynamicField& key)
+{
+	std::vector<CanSignal> signals;
+
+	switch(key.type)
+	{
+		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
+			for(const CanSignal& s : getSignals())
+			{
+				if(fnmatch(key.string_value, s.genericName, FNM_CASEFOLD) == 0)
+					signals.push_back(s);
+			}
+			break;
+		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
+			for(const CanSignal& s : getSignals())
+			{
+				CanMessageDefinition *msg_def = s.message;
+				if(msg_def->id == key.numeric_value)
+					signals.push_back(s);
+			}
+			break;
+		default:
+			ERROR(interface, "find_can_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
+			CanSignal cs;
+			::memset(&cs, 0, sizeof(CanSignal));
+			signals.push_back(cs);
+			return signals;
+			break;
+	}
+	return signals;
+}
+
+	struct CanMessageDefinition* message;
+	const char* genericName;
+	uint8_t bitPosition;
+	uint8_t bitSize;
+	float factor;
+	float offset;
+	float minValue;
+	float maxValue;
+	FrequencyClock frequencyClock;
+	bool sendSame;
+	bool forceSendChanged;
+	const CanSignalState* states;
+	uint8_t stateCount;
+	bool writable;
+	SignalDecoder decoder;
+	SignalEncoder encoder;
+	bool received;
+	float lastValue;

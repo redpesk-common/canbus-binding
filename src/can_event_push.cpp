@@ -23,6 +23,7 @@
 #include <afb/afb-binding.h>
 
 #include "can-utils.h"
+#include "openxc-utils.hpp"
 #include "openxc.pb.h"
 #include "json-c/json.h"
 
@@ -37,43 +38,9 @@ void can_event_push(can_bus_t& can_bus)
 		if(v_message = can_bus->next_vehicle_message())
 		{
 			s_message = get_simple_message(v_msg);
-			const auto& it_event = subscribed_signals.find(s_msg.name);
+			const auto& it_event = subscribed_signals.find(s_message.name);
 			if(! it_event->end() && afb_event_is_valid(it_event->second))
-				afb_event_push(it_event->second, jsonify_simple(s_msg));
+				afb_event_push(it_event->second, jsonify_simple(s_message));
 		}
 	}
-}
-
-void jsonify_DynamicField(const openxc_DynamicField& field, const json_object& value)
-{
-	if(field.has_numeric_value)
-		json_object_object_add(value, "value", json_object_new_double(field.numeric_value));
-	else if(field.has_boolean_value)
-		json_object_object_add(value, "value", json_object_new_boolean(field.boolean_value));
-	else if(field.has_string_value)
-		json_object_object_add(value, "value", json_object_new_string(field.string_value));
-
-	return value;
-}
-
-/* Extract the simple message value from an openxc_VehicleMessage
- * and return it, or null if there isn't.
- */
-openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg)
-{
-	return v_msg.has_simple_message ? v_msg.simple_message : {0};
-}
-
-json_object jsonify_simple(const openxc_SimpleMessage& s_msg)
-{
-	json_object *json;
-	json = nullptr;
-
-	if(s_msg->has_name)
-	{
-	  json = json_object_new_object();
-  	json_object_object_add(json, "name", json_object_new_string(s_msg->name));
-  	jsonify_DynamicField(&s_msg->value, json);
-  }
-	return json;
 }

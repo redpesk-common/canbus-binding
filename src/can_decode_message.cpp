@@ -26,13 +26,7 @@
 #include "can-utils.hpp"
 #include "can-decoder.hpp"
 #include "openxc.pb.h"
-
-union DynamicField
-{
-	char string[100];
-	double numeric_value;
-	bool boolean_value;
-};
+#include "openxc-utils.hpp"
 
 void can_decode_message(can_bus_t &can_bus)
 {
@@ -57,7 +51,7 @@ void can_decode_message(can_bus_t &can_bus)
 			/* Decoding the message ! Don't kill the messenger ! */
 			for(const auto& sig : signals)
 			{	
-			  subscribed_signals_i = subscribed_signals.find(sig);
+				subscribed_signals_i = subscribed_signals.find(sig.genericName);
 				
 				if(subscribed_signals_i != subscribed_signals.end() &&
 					afb_event_is_valid(subscribed_signals_i->second))
@@ -72,99 +66,4 @@ void can_decode_message(can_bus_t &can_bus)
 			}
 		}
 	}
-}
-
-/*
- * Build a specific VehicleMessage containing a SimpleMessage.
- */
-openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type,
-	const openxc_SimpleMessage& message)
-{
-	struct timeb t_msec;
-	long long int timestamp_msec;
-	
-	openxc_VehicleMessage v = {0};
-	
-	if(!ftime(&t_msec))
-	{
-		timestamp_msec = ((long long int) t_msec.time) * 1000ll + 
-                        (long long int) t_msec.millitm;
-
-	  v.has_type = true:
-		v.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE;
-		v.has_simple_message = true;
-		v.simple_message =  message;
-		v.has_timestamp = true;
-		v.timestamp = timestamp_msec;
-		
-	  return v;
-	}
-
-	v.has_type = true,
-	v.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE;
-	v.has_simple_message = true;
-	v.simple_message =  message;
-					  
-  return v;
-}
-
-/*
- * Build an openxc_SimpleMessage associating a name to an openxc_DynamicField
- */
-openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_DynamicField& value)
-{
-  
-  openxc_SimpleMessage s = {0};
-  
-  s.has_name = true;
-  ::strncpy(s.name, name.c_str(), 100);
-	s.has_value = true;
-  s.value = value;
-  
-	return s;
-}
-
-/* 
- * Build an openxc_DynamicField depending what we pass as argument
- */
-openxc_DynamicField build_DynamicField(const std::string& value)
-{
-  openxc_DynamicField d = {0}
-	d.has_type = true;
-	d.type = openxc_DynamicField_Type_STRING;
-	
-	d.has_string_value = true;
-	::strncpy(d.string_value, value.c_tr(), 100);
-	
-	return d;
-}
-
-/* 
- * Build an openxc_DynamicField depending what we pass as argument
- */
-openxc_DynamicField build_DynamicField(double value)
-{
-  openxc_DynamicField d = {0}
-	d.has_type = true;
-	d.type = openxc_DynamicField_Type_NUM;
-	
-	d.has_numeric_value = true;
-	d.numeric_value = field;
-	
-	return d;
-}
-
-/* 
- * Build an openxc_DynamicField depending what we pass as argument
- */
-openxc_DynamicField build_DynamicField(bool value)
-{
-  openxc_DynamicField d = {0}
-	d.has_type = true;
-	d.type = openxc_DynamicField_Type_BOOL;
-	
-	d.has_boolean_value = true;
-	d.boolean_value = field;
-	
-	return d;
 }

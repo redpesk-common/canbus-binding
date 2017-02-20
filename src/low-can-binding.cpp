@@ -33,23 +33,15 @@
 #include <functional>
 #include <memory>
 #include <thread>
-#include <fstream>
 
 #include <json-c/json.h>
 #include <openxc.pb.h>
 
-#include <afb/afb-binding.h>
-#include <afb/afb-service-itf.h>
-
+#include "low-can-binding.hpp"
+#include "openxc-utils.hpp"
 #include "obd2.hpp"
 #include "can-utils.hpp"
 #include "can-signals.hpp"
-
-/*
- *	Interface between the daemon and the binding
- */
-static const struct afb_binding_interface *interface;
-static obd2_handler_t obd2_handler();
 
 /********************************************************************************
 *
@@ -63,11 +55,11 @@ static obd2_handler_t obd2_handler();
 *
 *********************************************************************************/
 
-static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, std::vector<CanSignal>::const_iterator& sig_i)
+static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, const CanSignal& sig)
 {
 	int ret;
 
-	const auto& ss_i = subscribed_signals.find(sig_i);
+	const auto& ss_i = subscribed_signals.find(sig.genericName);
 	if (ss_i != subscribed_signals.end())
 	{
 		if(!afb_event_is_valid(ss_i->second))
@@ -79,7 +71,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 			}
 			else
 			{
-				ss_i->second = afb_daemon_make_event(interface->daemon, ss_i->first.genericName);
+				ss_i->second = afb_daemon_make_event(interface->daemon, ss_i->first.c_str());
 				if (!afb_event_is_valid(ss_i->second)) 
 				{
 					ERROR(interface, "Can't create an event, something goes wrong.");
@@ -90,7 +82,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	}
 	else
 	{
-		subscribed_signals[sig_i] = afb_daemon_make_event(interface->daemon, sig_i->genericName);
+		subscribed_signals[sig.genericName] = afb_daemon_make_event(interface->daemon, sig.genericName);
 		if (!afb_event_is_valid(ss_i->second)) 
 		{
 			ERROR(interface, "Can't create an event, something goes wrong.");
@@ -98,9 +90,9 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 		}
 	}
 
-	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, subscribed_signals[sig_i])) < 0)
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, subscribed_signals[sig.genericName])) < 0)
 	{
-		ERROR(interface, "Operation goes wrong for signal: %s", sig_i->genericName);
+		ERROR(interface, "Operation goes wrong for signal: %s", sig.genericName);
 		ret = 0;
 	}
 	else
@@ -124,12 +116,11 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 
 static int subscribe_unsubscribe_all(struct afb_req request, bool subscribe)
 {
-	int n, e;
+	int e = 0;
 
-	n = obd2_handler.OBD2_PIDS.size();
-	e = 0;
-	for (const auto& pid : obd2_handler.OBD2_PIDS)
-		e += !subscribe_unsubscribe_signals(request, subscribe, pid);
+	//for (const auto& sig : SIGNALS)
+	//	e += !subscribe_unsubscribe_signals(request, subscribe, sig);
+	e += !subscribe_unsubscribe_signals(request, subscribe, SIGNALS[MESSAGE_SET_ID]);
 	
 	return e == 0;
 }
@@ -150,7 +141,8 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 		}
 		else
 		{
-			sig = find_can_signals(name);
+			openxc_DynamicField search_key = build_DynamicField(name);
+			sig = find_can_signals(search_key);
 			if (sig.empty())
 				ret = 0;
 		}
@@ -188,57 +180,60 @@ static void subscribe_unsubscribe(struct afb_req request, bool subscribe)
 		afb_req_fail(request, "error", NULL);
 }
 
-static void subscribe(struct afb_req request)
-{
-	subscribe_unsubscribe(request, true);
-}
-
-static void unsubscribe(struct afb_req request)
-{
-	subscribe_unsubscribe(request, false);
-}
-
 static const struct afb_verb_desc_v1 verbs[]=
 {
-	{ .name= "subscribe",    .session= AFB_SESSION_NONE, .callback= subscribe,	.info= "subscribe to notification of CAN bus messages." },
-	{ .name= "unsubscribe",  .session= AFB_SESSION_NONE, .callback= unsubscribe,	.info= "unsubscribe a previous subscription." }
+	{ .name= "subscribe",	.session= AFB_SESSION_NONE, .callback= subscribe,	.info= "subscribe to notification of CAN bus messages." },
+	{ .name= "unsubscribe",	.session= AFB_SESSION_NONE, .callback= unsubscribe,	.info= "unsubscribe a previous subscription." }
 };
 
-static const struct afb_binding binding_desc = {
-	.type = AFB_BINDING_VERSION_1,
-	.v1 = {
-		.info = "CAN bus service",
-		.prefix = "can",
-		.verbs = verbs
-	}
-};
-
-const struct afb_binding *afbBindingV1Register (const struct afb_binding_interface *itf)
-{
-	interface = itf;
-
-	return &binding_desc;
-}
-
-/**
- * @brief Initialize the binding.
- * 
- * @param[in] service Structure which represent the Application Framework Binder.
- * 
- * @return Exit code, zero if success.
- */
-int afbBindingV1ServiceInit(struct afb_service service)
-{
-	std::ifstream fd_conf;
-	fd_conf = afb_daemon_rootdir_open_locale(interface->daemon, "can_bus.json", O_RDONLY, NULL);
-
-	/* Open CAN socket */
-	can_bus_t can_bus_handler(interface, fd_conf);
-	if(can_bus_handler.init_can_dev() == 0)
+static const struct afb_binding binding_desc {
+	AFB_BINDING_VERSION_1,
 	{
-		can_bus_handler.start_threads();
-		return 0;
+		"CAN bus service",
+		"can",
+		verbs
+	}
+};
+
+extern "C"
+{
+	static void subscribe(struct afb_req request)
+	{
+		subscribe_unsubscribe(request, true);
 	}
 
-	return 1;
+	static void unsubscribe(struct afb_req request)
+	{
+		subscribe_unsubscribe(request, false);
+	}
+
+	const struct afb_binding *afbBindingV1Register (const struct afb_binding_interface *itf)
+	{
+		interface = itf;
+
+		return &binding_desc;
+	}
+
+	/**
+	* @brief Initialize the binding.
+	* 
+	* @param[in] service Structure which represent the Application Framework Binder.
+	* 
+	* @return Exit code, zero if success.
+	*/
+	int afbBindingV1ServiceInit(struct afb_service service)
+	{
+		int fd_conf;
+		fd_conf = afb_daemon_rootdir_open_locale(interface->daemon, "can_bus.json", O_RDONLY, NULL);
+
+		/* Open CAN socket */
+		can_bus_t can_bus_handler(interface, fd_conf);
+		if(can_bus_handler.init_can_dev() == 0)
+		{
+			can_bus_handler.start_threads();
+			return 0;
+		}
+
+		return 1;
+	}
 }

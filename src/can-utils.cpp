@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "can-utils.hpp"
 
 /********************************************************************************
 *
@@ -23,8 +23,7 @@
 *
 *********************************************************************************/
 
-
-can_bus_dev_t::can_bus_dev_t(afb_binding_interface *itf, const std:string &dev_name)
+can_bus_dev_t::can_bus_dev_t(const std::string &dev_name)
 	: device_name_{dev_name}
 {
 }
@@ -59,7 +58,7 @@ int can_bus_dev_t::open()
 
 		/* Attempts to open a socket to CAN bus */
 		::strcpy(ifr.ifr_name, device);
-		if(ioctl(can_socket_, SIOCGIFINDEX, &ifr) < 0)
+		if(::ioctl(can_socket_, SIOCGIFINDEX, &ifr) < 0)
 			ERROR(interface_, "open_can_dev: ioctl failed");
 		else
 		{
@@ -119,6 +118,7 @@ canfd_frame can_bus_dev_t::read()
 					ERROR(interface_, "read_can: %s interface down", device);
 			ERROR(interface_, "read_can: Error reading CAN bus");
 			::memset(&canfd_frame, 0, sizeof(canfd_frame));
+			is_running_ = false;
 			break;
 	}
 	
@@ -189,8 +189,8 @@ bool can_bus_dev_t::has_can_message() const
 *
 *********************************************************************************/
 
-can_bus_t::can_bus_t(afb_binding_interface *itf, std::ifstream& conf_file)
-	: interface{itf}, conf_file_{conf_file}
+can_bus_t::can_bus_t(const afb_binding_interface *itf, int& conf_file)
+	: interface_{itf}, conf_file_{conf_file}
 {
 }
 
@@ -204,7 +204,6 @@ void can_bus_t::start_threads()
 	th_decoding_ = std::thread(can_decoder, this);
 	th_pushing_ = std::thread(can_event_push, this);
 }
-
 
 /**
  * @brief Initialize as many as can_bus_dev_t objects with their respective reading thread
@@ -245,18 +244,17 @@ int init_can_dev()
 std::vector<std::string> read_conf()
 {
 	std::vector<std::string> ret;
-	std::string fd_conf_content;
 	json_object jo, canbus;
 	int n, i, ok;
 
-	/* Open JSON conf file */
 	if (conf_file_)
 	{
-		conf_file_.seekg(0, std::ios::end);
-		conf_file_.resize(conf_file_.tellg());
-		conf_file_.seekg(0, std::ios::beg);
-		conf_file_.read(&fd_conf_content[0], fd_conf_content.size());
-		conf_file_.close();
+		std::string fd_conf_content;
+		std::fseek(conf_file_, 0, SEEK_END);
+		fd_conf_content.resize(std::ftell(conf_file_));
+		std::rewind(fp);
+		std::fread(&fd_conf_content[0], 1, fd_conf_content.size(), conf_file_);
+		std::fclose(conf_file_);
 
 		jo = json_tokener_parse(&fd_conf_content);
 
@@ -441,7 +439,7 @@ void can_message_t::convert_from_canfd_frame(canfd_frame &frame)
 		ERROR(interface_, "can_message_t: canfd_frame data too long to be stored into CanMessage object");
 }
 
-canfd_frame convert_to_canfd_frame()
+canfd_frame can_message_t::convert_to_canfd_frame()
 {
 	canfd_frame frame;
 

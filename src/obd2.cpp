@@ -55,7 +55,7 @@ bool obd2_handler_t::is_obd2_request(DiagnosticRequest* request)
 
 bool obd2_handler_t::is_obd2_signal(const char *name)
 {
-	if(fnmatch("obd2.*", name, NULL) == 0)
+	if(fnmatch("obd2.*", name, FNM_CASEFOLD) == 0)
 		return true;
 	return false;
 }

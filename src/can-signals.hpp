@@ -17,30 +17,53 @@
 
 #pragma once
 
-#include "can-utils.hpp"
+#include <queue>
 #include <string>
+#include <vector>
+#include <fnmatch.h>
+#include <linux/can.h>
+
+#include "can-utils.hpp"
+#include "low-can-binding.hpp"
+
+#define MESSAGE_SET_ID 0
+
+/** Can signal event map making access to afb_event
+ * external to openxc existing structure.
+ */
+static std::map<std::string, struct afb_event> subscribed_signals;
+static std::map<std::string, struct afb_event>::iterator subscribed_signals_i;
+
+/**
+ * @brief Dumb SIGNALS array. It is composed by CanMessageSet
+ * SIGNALS[MESSAGE_SET_ID][CanSignal]
+ */
+std::vector<std::vector<CanSignal>> SIGNALS {
+	{ // message set: example
+	}
+};
 
 /** Public: Return the currently active CAN configuration. */
 CanMessageSet* getActiveMessageSet();
 
 /** Public: Retrive a list of all possible CAN configurations.
- *	*
- *	 * Returns a pointer to an array of all configurations.
- *	  */
+ *
+ * Returns a pointer to an array of all configurations.
+ */
 CanMessageSet* getMessageSets();
 
 /** Public: Return the length of the array returned by getMessageSets() */
 int getMessageSetCount();
 
 /* Public: Return the number of CAN buses configured in the active
- *	* configuration. This is limited to 2, as the hardware controller only has 2
- *	 * CAN channels.
- *	  */
+ * configuration. This is limited to 2, as the hardware controller only has 2
+ * CAN channels.
+ */
 int getCanBusCount();
 
 /* Public: Return an array of all CAN messages to be processed in the active
- *	* configuration.
- *	 */
+ * configuration.
+ */
 CanMessageDefinition* getMessages();
 
 /* Public: Return signals from an signals array filtered on name.
@@ -48,10 +71,10 @@ CanMessageDefinition* getMessages();
 CanSignal* getSignals(std::string name);
 
 /* Public: Return an array of all OpenXC CAN commands enabled in the active
- *	* configuration that can write back to CAN with a custom handler.
- *	 *
- *	  * Commands not defined here are handled using a 1-1 mapping from the signals
- *	   * list.
+ * configuration that can write back to CAN with a custom handler.
+ *
+ * * Commands not defined here are handled using a 1-1 mapping from the signals
+ * list.
  *		*/
 CanCommand* getCommands();
 
@@ -59,16 +82,16 @@ CanCommand* getCommands();
 int getCommandCount();
 
 /* Public: Return the length of the array returned by getSignals(). */
-int getSignalCount();
+size_t getSignalCount();
 
 /* Public: Return the length of the array returned by getMessages(). */
 int getMessageCount();
 
-/* Public: Return an array of the metadata for the 2 CAN buses you want to
- *	* monitor. The size of this array is fixed at 2.
- *	 */
+/**
+ * @brief Return an array of the metadata for the 2 CAN buses you want to
+ * monitor. The size of this array is fixed at 2.
+ */
 CanBus* getCanBuses();
-
 
 /**
  * @brief Find one or many signals based on its name or id
@@ -77,6 +100,11 @@ CanBus* getCanBuses();
  * params[openxc_DynamicField&] - a const reference with the key to search into signal.
  * Key is either a signal name or its CAN arbitration id.
  *
- * return[std::vector<CanSignal>] return found CanSignal array.
+ * return[std::vector<std::string>] return found CanSignal generic name vector.
  */
-std::vector <CanSignal> find_can_signals(const openxc_DynamicField &key)
+std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key);
+
+uint32_t get_CanSignal_id(const CanSignal& sig)
+{
+	return sig.message->id;
+}
