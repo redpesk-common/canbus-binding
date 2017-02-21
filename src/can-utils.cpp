@@ -17,6 +17,103 @@
 
 #include "can-utils.hpp"
 
+
+/********************************************************************************
+*
+*		CanMessage method implementation
+*
+*********************************************************************************/
+
+can_message_t::can_message_t(const struct afb_binding_interface* interface)
+	: interface_{interface}
+{}
+
+uint32_t can_message_t::get_id() const
+{
+	(id_ != 0) ? return id_ : return 0;
+}
+
+int can_message_t::get_format() const
+{
+	(format_ != CanMessageFormat::SIMPLE || format_ != CanMessageFormat::EXTENDED) return -1 : return format_;
+}
+
+uint8_t can_message_t::get_data() const
+{
+	return data_;
+}
+uint8_t can_message_t::get_lenght() const
+{
+	return lenght_;
+}
+
+void can_message_t::set_id(uint32_t &new_id)
+{
+	switch(format):
+		case CanMessageFormat::SIMPLE:
+			id = new_id & CAN_SFF_MASK;
+		case CanMessageFormat::EXTENDED:
+			id = new_id & CAN_EFF_MASK;
+		default:
+			ERROR(interface_, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
+}
+
+void can_message_t::set_format(CanMessageFormat &new_format)
+{
+	if(new_format == CanMessageFormat::SIMPLE || new_format == CanMessageFormat::EXTENDED)
+		format = new_format;
+	else
+		ERROR(interface_, "ERROR: Can set format, wrong format chosen");
+}
+
+void can_message_t::set_data(uint8_t &new_data)
+{
+	::memcpy(data_, new_data, new_data.size());
+	lenght_ = new_data(size);
+}
+
+/*
+ * This is the preferred way to initialize a CanMessage object 
+ * from a read canfd_frame message.
+ * 
+ * params: canfd_frame pointer
+ */
+void can_message_t::convert_from_canfd_frame(canfd_frame &frame)
+{
+	lenght_ = (frame.len > CAN_MAX_DLEN) ? CAN_MAX_DLEN : frame.len;
+	lenght_ = (frame.len > CANFD_MAX_DLEN) ? CANFD_MAX_DLEN : frame.len;
+
+	switch (frame.can_id): 
+		case (frame.can_id & CAN_ERR_FLAG):
+			id_ = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
+			break;
+		case (frame.can_id & CAN_EFF_FLAG):
+			id_ = frame.can_id & CAN_EFF_MASK;
+			format_ = CanMessageFormat::EXTENDED;
+			break;
+		default:
+			format_ = CanMessageFormat::STANDARD;
+			id_ = frame.can_id & CAN_SFF_MASK;
+			break;
+
+	if (sizeof(frame.data) <= data_.size())
+	{
+		::memcpy(data_, canfd_frame.data, lenght_);
+		return 0;
+	} else if (sizeof(frame.data) >= CAN_MAX_DLEN)
+		ERROR(interface_, "can_message_t: canfd_frame data too long to be stored into CanMessage object");
+}
+
+canfd_frame can_message_t::convert_to_canfd_frame()
+{
+	canfd_frame frame;
+
+	frame.can_id = get_id();
+	frame.len = get_lenght();
+	::memcpy(frame.data, get_data(), lenght_);
+
+	return frame;
+}
 /********************************************************************************
 *
 *		can_bus_dev_t method implementation
@@ -182,6 +279,38 @@ bool can_bus_dev_t::has_can_message() const
 	return has_can_message_;
 }
 
+/**
+ * @brief Send a can message from a can_message_t object.
+ * 
+ * params[const can_message_t& can_msg] the can message object to send
+ * 
+ */
+int can_bus_dev_t::send_can_message(can_message_t& can_msg, const struct afb_binding_interface* interface)
+{
+	size_t nbytes;
+	canfd_frame f;
+
+	f = can_msg.convert_to_canfd_frame();
+
+	if(can_socket_ >= 0)
+	{
+		nbytes = ::sendto(can_socket_, &f, sizeof(struct canfd_frame), 0,
+				(struct sockaddr*)&txAddress_, sizeof(txAddress_));
+				
+		if (nbytes == -1)
+		{
+			ERROR(interface, "send_can_message: Sending CAN frame failed.");
+			return -1;
+		}
+		return (int)nbytes;
+	}
+	else
+	{
+		ERROR(interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
+		open(interface);
+	}
+	return 0;
+}
 /********************************************************************************
 *
 *		can_bus_t method implementation
@@ -213,7 +342,7 @@ void can_bus_t::start_threads()
 int can_bus_t::init_can_dev()
 {
 	std::vector<std::string> devices_name;
-	int i, ret;
+	int i;
 	size_t t;
 
 	devices_name = read_conf();
@@ -227,7 +356,7 @@ int can_bus_t::init_can_dev()
 		{
 			can_bus_dev_t can_bus_device_handler(device);
 			can_bus_device_handler.open(interface_);
-			can_bus_device_handler.start_reading(interface_);
+			can_bus_device_handler.start_reading();
 			i++;
 		}
 
@@ -246,72 +375,40 @@ int can_bus_t::init_can_dev()
 std::vector<std::string> can_bus_t::read_conf()
 {
 	std::vector<std::string> ret;
-	json_object jo, canbus;
+	json_object *jo, *canbus;
 	int n, i, ok;
 
-	if (conf_file_)
+	FILE *fd = fdopen(conf_file_, "r");
+	if (fd)
 	{
 		std::string fd_conf_content;
-		std::fseek(conf_file_, 0, SEEK_END);
-		fd_conf_content.resize(std::ftell(conf_file_));
-		std::rewind(fp);
-		std::fread(&fd_conf_content[0], 1, fd_conf_content.size(), conf_file_);
-		std::fclose(conf_file_);
+		std::fseek(fd, 0, SEEK_END);
+		fd_conf_content.resize(std::ftell(fd));
+		std::rewind(fd);
+		std::fread(&fd_conf_content[0], 1, fd_conf_content.size(), fd);
+		std::fclose(fd);
 
-		jo = json_tokener_parse(&fd_conf_content);
+		jo = json_tokener_parse(fd_conf_content.c_str());
 
-		if (jo == NULL || !json_object_object_get_ex(&jo, "canbus", &&canbus))
+		if (jo == NULL || !json_object_object_get_ex(jo, "canbus", &canbus))
 		{
 			ERROR(interface_, "Can't find canbus node in the configuration file. Please review it.");
 			ret.clear();
 		}
 		else if (json_object_get_type(canbus) != json_type_array)
-			ret.push_back(json_object_get_string(a));
+			ret.push_back(json_object_get_string(canbus));
 		else
 		{
-			n = json_object_array_length(a);
+			n = json_object_array_length(canbus);
 			ok = 0;
 			for (i = 0 ; i < n ; i++)
-			ret.push_back(json_object_get_string(json_object_array_get_idx(a, i)));
+			ret.push_back(json_object_get_string(json_object_array_get_idx(canbus, i)));
 		}
 		return ret;
 	}
 	ERROR(interface_, "Problem at reading the conf file");
-	return ret.clear();
-}
-
-/**
- * @brief Send a can message from a can_message_t object.
- * TODO: specify which can_dev to use as we can use many
- * 
- * params[const can_message_t& can_msg] the can message object to send
- * 
- */
-int can_bus_t::send_can_message(const can_message_t &can_msg)
-{
-	int nbytes;
-	canfd_frame *f;
-
-	f = can_msg.convert_to_canfd_frame();
-
-	if(can_socket_ >= 0)
-	{
-		nbytes = ::sendto(can_socket_, &f, sizeof(struct canfd_frame), 0,
-				(struct sockaddr*)&txAddress, sizeof(txAddress));
-				
-		if (nbytes == -1)
-		{
-			ERROR(interface_, "send_can_message: Sending CAN frame failed.");
-			return -1;
-		}
-		return nbytes;
-	}
-	else
-	{
-		ERROR(interface_, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
-		open();
-	}
-	return 0;
+	ret.clear();
+	return ret;
 }
 
 /**
@@ -320,13 +417,13 @@ int can_bus_t::send_can_message(const can_message_t &can_msg)
  * 
  * @return the next queue element or NULL if queue is empty.
  */
-openxc_VehicleMessage* can_bus_t::next_vehicle_message()
+openxc_VehicleMessage can_bus_t::next_vehicle_message()
 {
 	if(! vehicle_message_q_.empty())
 	{
 		openxc_VehicleMessage v_msg = vehicle_message_q_.front();
 		vehicle_message_q_.pop();
-		return &v_msg;
+		return v_msg;
 	}
 
 	has_vehicle_message_ = false;
@@ -353,101 +450,4 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 bool can_bus_t::has_vehicle_message() const
 {
 	return has_vehicle_message_;
-}
-
-/********************************************************************************
-*
-*		CanMessage method implementation
-*
-*********************************************************************************/
-
-can_message_t::can_message_t(afb_binding_interface *itf)
-	: interface_{itf}
-{}
-
-uint32_t can_message_t::get_id() const
-{
-	(id_ != 0) ? return id_ : return 0;
-}
-
-int can_message_t::get_format() const
-{
-	(format_ != CanMessageFormat::SIMPLE || format_ != CanMessageFormat::EXTENDED) return -1 : return format_;
-}
-
-uint8_t can_message_t::get_data() const
-{
-	return data_;
-}
-uint8_t can_message_t::get_lenght() const
-{
-	return lenght_;
-}
-
-void can_message_t::set_id(uint32_t &new_id)
-{
-	switch(format):
-		case CanMessageFormat::SIMPLE:
-			id = new_id & CAN_SFF_MASK;
-		case CanMessageFormat::EXTENDED:
-			id = new_id & CAN_EFF_MASK;
-		default:
-			ERROR(interface_, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
-}
-
-void can_message_t::set_format(CanMessageFormat &new_format)
-{
-	if(new_format == CanMessageFormat::SIMPLE || new_format == CanMessageFormat::EXTENDED)
-		format = new_format;
-	else
-		ERROR(interface_, "ERROR: Can set format, wrong format chosen");
-}
-
-void can_message_t::set_data(uint8_t &new_data)
-{
-	::memcpy(data_, new_data, new_data.size());
-	lenght_ = new_data(size);
-}
-
-/*
- * This is the preferred way to initialize a CanMessage object 
- * from a read canfd_frame message.
- * 
- * params: canfd_frame pointer
- */
-void can_message_t::convert_from_canfd_frame(canfd_frame &frame)
-{
-	lenght_ = (frame.len > CAN_MAX_DLEN) ? CAN_MAX_DLEN : frame.len;
-	lenght_ = (frame.len > CANFD_MAX_DLEN) ? CANFD_MAX_DLEN : frame.len;
-
-	switch (frame.can_id): 
-		case (frame.can_id & CAN_ERR_FLAG):
-			id_ = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
-			break;
-		case (frame.can_id & CAN_EFF_FLAG):
-			id_ = frame.can_id & CAN_EFF_MASK;
-			format_ = CanMessageFormat::EXTENDED;
-			break;
-		default:
-			format_ = CanMessageFormat::STANDARD;
-			id_ = frame.can_id & CAN_SFF_MASK;
-			break;
-
-	if (sizeof(frame.data) <= data_.size())
-	{
-		::memcpy(data_, canfd_frame.data, lenght_);
-		return 0;
-	} else if (sizeof(frame.data) >= CAN_MAX_DLEN)
-		ERROR(interface_, "can_message_t: canfd_frame data too long to be stored into CanMessage object");
-}
-
-canfd_frame can_message_t::convert_to_canfd_frame()
-{
-	canfd_frame frame;
-
-	frame.can_id = get_id();
-	frame.len = get_lenght();
-	::memcpy(frame.data, get_data(), lenght_);
-
-	return frame;
 }

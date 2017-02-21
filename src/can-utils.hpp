@@ -29,6 +29,7 @@
 #include <sys/ioctl.h>
 #include <linux/can.h>
 #include <sys/socket.h>
+#include <json-c/json.h>
 #include <linux/can/raw.h>
 
 #include "timer.hpp"
@@ -115,13 +116,15 @@ typedef struct CanMessage CanMessage;
 */
 class can_message_t {
 	private:
-		const struct afb_binding_interface *interface_;
+		const struct afb_binding_interface* interface_;
 		uint32_t id_;
 		CanMessageFormat format_;
 		uint8_t data_[CAN_MESSAGE_SIZE];
 		uint8_t length_;
 
 	public:
+		can_message_t(const struct afb_binding_interface* interface);
+
 		uint32_t get_id() const;
 		int get_format() const;
 		uint8_t get_data() const;
@@ -167,6 +170,8 @@ class can_bus_dev_t {
 		can_message_t next_can_message();
 		void push_new_can_message(const can_message_t& can_msg);		
 		bool has_can_message() const;
+
+		int send_can_message(can_message_t& can_msg, const struct afb_binding_interface* interface);
 };
 
 /** 
@@ -193,9 +198,7 @@ class can_bus_t {
 		
 		void start_threads();
 		
-		int send_can_message(can_message_t can_msg);
-
-		openxc_VehicleMessage& next_vehicle_message();
+		openxc_VehicleMessage next_vehicle_message();
 		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
 		bool has_vehicle_message() const;
 };
