@@ -17,7 +17,6 @@
 
 #include "can-utils.hpp"
 
-
 /********************************************************************************
 *
 *		CanMessage method implementation
@@ -235,7 +234,7 @@ canfd_frame can_bus_dev_t::read(const struct afb_binding_interface* interface)
  */
 void can_bus_dev_t::start_reading()
 {
-	th_reading_ = std::thread(can_reader, this);
+	th_reading_ = std::thread(can_reader, *this);
 	is_running_ = true;
 }
 
@@ -300,7 +299,7 @@ bool can_bus_dev_t::has_can_message() const
  */
 int can_bus_dev_t::send_can_message(can_message_t& can_msg, const struct afb_binding_interface* interface)
 {
-	size_t nbytes;
+	ssize_t nbytes;
 	canfd_frame f;
 
 	f = can_msg.convert_to_canfd_frame();
@@ -340,8 +339,8 @@ can_bus_t::can_bus_t(const afb_binding_interface *itf, int& conf_file)
  */
 void can_bus_t::start_threads()
 {
-	th_decoding_ = std::thread(can_decoder, this);
-	th_pushing_ = std::thread(can_event_push, this);
+	th_decoding_ = std::thread(can_decode_message, *this);
+	th_pushing_ = std::thread(can_event_push, *this);
 }
 
 /**
@@ -387,7 +386,7 @@ std::vector<std::string> can_bus_t::read_conf()
 {
 	std::vector<std::string> ret;
 	json_object *jo, *canbus;
-	int n, i, ok;
+	int n, i;
 
 	FILE *fd = fdopen(conf_file_, "r");
 	if (fd)
@@ -411,9 +410,8 @@ std::vector<std::string> can_bus_t::read_conf()
 		else
 		{
 			n = json_object_array_length(canbus);
-			ok = 0;
 			for (i = 0 ; i < n ; i++)
-			ret.push_back(json_object_get_string(json_object_array_get_idx(canbus, i)));
+				ret.push_back(json_object_get_string(json_object_array_get_idx(canbus, i)));
 		}
 		return ret;
 	}

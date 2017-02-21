@@ -34,6 +34,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 {
 	int ret;
 
+	// TODO: lock the subscribed_signals when insert/remove
 	const auto& ss_i = subscribed_signals.find(sig.genericName);
 	if (ss_i != subscribed_signals.end())
 	{
@@ -78,15 +79,15 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<CanSignal>& signals)
 {
-	int ret;
+	int ret = 0;
 
-	// TODO: lock the subscribed_signals when insert/remove
 	for(const auto& signal_i : signals)
 	{
 		ret = subscribe_unsubscribe_signal(request, subscribe, signal_i);
 		if(ret == 0)
 			return ret;
 	}
+	return ret;
 }
 
 static int subscribe_unsubscribe_all(struct afb_req request, bool subscribe)
