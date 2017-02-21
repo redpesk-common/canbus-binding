@@ -58,22 +58,3 @@ std::vector<CanSignal> find_can_signals(openxc_DynamicField& key)
 	}
 	return signals;
 }
-
-	struct CanMessageDefinition* message;
-	const char* genericName;
-	uint8_t bitPosition;
-	uint8_t bitSize;
-	float factor;
-	float offset;
-	float minValue;
-	float maxValue;
-	FrequencyClock frequencyClock;
-	bool sendSame;
-	bool forceSendChanged;
-	const CanSignalState* states;
-	uint8_t stateCount;
-	bool writable;
-	SignalDecoder decoder;
-	SignalEncoder encoder;
-	bool received;
-	float lastValue;

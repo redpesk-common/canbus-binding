@@ -234,8 +234,8 @@ canfd_frame can_bus_dev_t::read(const struct afb_binding_interface* interface)
  */
 void can_bus_dev_t::start_reading()
 {
-	th_reading_ = std::thread(can_reader, *this);
-	is_running_ = true;
+	th_reading_ = std::thread(can_reader, std::ref(*this));
+	is_running_ = true;	is_running_ = true;
 }
 
 /*
@@ -339,8 +339,8 @@ can_bus_t::can_bus_t(const afb_binding_interface *itf, int& conf_file)
  */
 void can_bus_t::start_threads()
 {
-	th_decoding_ = std::thread(can_decode_message, *this);
-	th_pushing_ = std::thread(can_event_push, *this);
+	th_decoding_ = std::thread(can_decode_message, std::ref(*this));
+	th_pushing_ = std::thread(can_event_push, std::ref(*this));
 }
 
 /**

@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
+#include "obd2.hpp"
 
-void shims_logger(afb_binding_interface *itf)
+void shims_logger(const char* m, const struct afb_binding_interface *interface)
 {
-	//DEBUG(itf, "dd");
+	DEBUG(interface, "%s", m);
 }
 
 void shims_timer()
@@ -28,15 +29,16 @@ void shims_timer()
 /*
  * Will scan for supported Obd2 pids
  */
-obd2_handler_t::obd2_handler_t(afb_binding_interface *itf, can_bus_t cb)
+obd2_handler_t::obd2_handler_t(const struct afb_binding_interface *interface, can_bus_t can_bus)
+	: can_bus_{can_bus}
 {
-	can_bus_t can_bus = cb;
-	DiagnosticShims shims = diagnostic_init_shims(shims_logger, can_bus.send_can_message, NULL);
+	can_bus_t can_bus_ = can_bus;
+	DiagnosticShims shims_ = diagnostic_init_shims(shims_logger, can_bus.send_can_message, NULL);
 
-	int n_pids, i;
+	int n_pids_, i_;
 
-	n_pids = size(Obd2Pid);
-	for(i=0; i<=n_pids; i++)
+	n_pids_ = size(Obd2Pid);
+	for(i_=0; i_<=n_pids_; i_++)
 	{
 	}
 }

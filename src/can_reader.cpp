@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "low-can-binding.hpp"
+#include "can_reader.hpp"
 
 void can_reader(can_bus_dev_t &can_bus)
 {

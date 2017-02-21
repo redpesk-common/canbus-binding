@@ -15,8 +15,12 @@
  * limitations under the License.
  */
 
+ #pragma once
+
 #include <vector>
 #include "uds/uds.h"
+#include "can-utils.hpp"
+
 extern "C"
 {
 	#include <afb/afb-binding.h>

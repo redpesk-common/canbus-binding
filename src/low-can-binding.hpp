@@ -39,13 +39,14 @@
 #include <linux/can/raw.h>
 #include <systemd/sd-event.h>
 
-#include "obd2.hpp"
 #include "timer.hpp"
 #include "openxc.pb.h"
 #include "can-utils.hpp"
 #include "can-signals.hpp"
 #include "can-decoder.hpp"
 #include "openxc-utils.hpp"
+
+#define MESSAGE_SET_ID 0
 
 /*
  *	Interface between the daemon and the binding
@@ -88,3 +89,9 @@ extern "C"
 	*/
 	int afbBindingV1ServiceInit(struct afb_service service);
 };
+
+/** Can signal event map making access to afb_event
+ * external to openxc existing structure.
+ */
+static std::map<std::string, struct afb_event> subscribed_signals;
+static std::map<std::string, struct afb_event>::iterator subscribed_signals_i;

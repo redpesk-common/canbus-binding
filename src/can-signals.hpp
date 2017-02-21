@@ -31,21 +31,12 @@ extern "C"
 	#include <afb/afb-event-itf.h>
 }
 
-#define MESSAGE_SET_ID 0
-
-/** Can signal event map making access to afb_event
- * external to openxc existing structure.
- */
-static std::map<std::string, struct afb_event> subscribed_signals;
-static std::map<std::string, struct afb_event>::iterator subscribed_signals_i;
-
 /**
  * @brief Dumb SIGNALS array. It is composed by CanMessageSet
  * SIGNALS[MESSAGE_SET_ID][CanSignal]
  */
 std::vector<std::vector<CanSignal>> SIGNALS {
-	{ // message set: example
-	}
+	{}// message set: example
 };
 
 /** Public: Return the currently active CAN configuration. */
