@@ -50,13 +50,6 @@ extern "C"
 #define CAN_ACTIVE_TIMEOUT_S 30
 
 /**
- * @brief Function representing thread activated by can bus objects
- */
-void can_reader(can_bus_dev_t& can_bus);
-void can_decode_message(can_bus_t& can_bus);
-void can_event_push(can_bus_t& can_bus);
-
-/**
  * @brief The type signature for a CAN signal decoder.
  *
  * @desc A SignalDecoder transforms a raw floating point CAN signal into a number,
@@ -399,3 +392,10 @@ bool isBusActive(can_bus_dev_t* bus);
  * busCount - the length of the buses array.
  */
 void logBusStatistics(can_bus_dev_t* buses, const int busCount);
+
+/**
+ * @brief Function representing thread activated by can bus objects
+ */
+void can_reader(can_bus_dev_t& can_bus);
+void can_decode_message(can_bus_t& can_bus);
+void can_event_push(can_bus_t& can_bus);

@@ -153,8 +153,8 @@ can_message_t can_bus_dev_t::next_can_message()
 	if(! can_message_q_.empty())
 	{
 		can_message_t can_msg = can_message_q_.front();
-		can_message_q_.pop()
-		return &can_msg;
+		can_message_q_.pop();
+		return can_msg;
 	}
 	
 	has_can_message_ = false;
@@ -210,17 +210,18 @@ void can_bus_t::start_threads()
  * params[std::ifstream& conf_file] conf_file ifstream to the JSON configuration 
  * file located at the rootdir of the binding
  */
-int init_can_dev()
+int can_bus_t::init_can_dev()
 {
 	std::vector<std::string> devices_name;
-	int i, t, ret;
+	int i, ret;
+	size_t t;
 
-	devices_name = read_conf(conf_file_);
+	devices_name = read_conf();
 
-	if (devices_name)
+	if (! devices_name.empty())
 	{
 		t = devices_name.size();
-		i=0
+		i=0;
 
 		for(const auto& device : devices_name)
 		{
@@ -242,7 +243,7 @@ int init_can_dev()
  * 
  * @return[std:vector<std::string>] return a vector of device name
  */
-std::vector<std::string> read_conf()
+std::vector<std::string> can_bus_t::read_conf()
 {
 	std::vector<std::string> ret;
 	json_object jo, canbus;
@@ -262,7 +263,7 @@ std::vector<std::string> read_conf()
 		if (jo == NULL || !json_object_object_get_ex(&jo, "canbus", &&canbus))
 		{
 			ERROR(interface_, "Can't find canbus node in the configuration file. Please review it.");
-			ret = nullptr;
+			ret.clear();
 		}
 		else if (json_object_get_type(canbus) != json_type_array)
 			ret.push_back(json_object_get_string(a));
@@ -273,10 +274,10 @@ std::vector<std::string> read_conf()
 			for (i = 0 ; i < n ; i++)
 			ret.push_back(json_object_get_string(json_object_array_get_idx(a, i)));
 		}
-	return ret;
+		return ret;
 	}
 	ERROR(interface_, "Problem at reading the conf file");
-	return nullptr;
+	return ret.clear();
 }
 
 /**
