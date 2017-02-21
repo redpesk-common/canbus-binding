@@ -119,7 +119,7 @@ class can_message_t {
 		const struct afb_binding_interface* interface_;
 		uint32_t id_;
 		CanMessageFormat format_;
-		uint8_t data_[CAN_MESSAGE_SIZE];
+		uint8_t data_;
 		uint8_t length_;
 
 	public:
@@ -127,15 +127,15 @@ class can_message_t {
 
 		uint32_t get_id() const;
 		int get_format() const;
-		uint8_t get_data() const;
-		uint8_t get_lenght() const;
+		const uint8_t* get_data() const;
+		uint8_t get_length() const;
 
-		void set_id(uint32_t id);
-		void set_format(CanMessageFormat format);
-		void set_data(uint8_t data);
-		void set_lenght(uint8_t length);
+		void set_id(const uint32_t new_id);
+		void set_format(const CanMessageFormat format);
+		void set_data(const uint8_t new_data);
+		void set_length(const uint8_t new_length);
 
-		void convert_from_canfd_frame(canfd_frame frame);
+		void convert_from_canfd_frame(const canfd_frame& frame);
 		canfd_frame convert_to_canfd_frame();
 };
 
@@ -167,7 +167,7 @@ class can_bus_dev_t {
 		void start_reading();
 		canfd_frame read(const struct afb_binding_interface *interface);
 		
-		can_message_t next_can_message();
+		can_message_t next_can_message(const struct afb_binding_interface* interface);
 		void push_new_can_message(const can_message_t& can_msg);		
 		bool has_can_message() const;
 
@@ -283,7 +283,7 @@ typedef struct CanSignal CanSignal;
  * @param[in] format - the format of the message's ID.
  * @param[in] clock - an optional frequency clock to control the output of this
  *		message, if sent raw, or simply to mark the max frequency for custom
- *		handlers to retrieve.
+ *		handlers to retriec++ if ? syntaxve.
  * @param[in] forceSendChanged - If true, regardless of the frequency, it will send CAN
  *		message if it has changed when using raw passthrough.
  * @param[in] lastValue - The last received value of the message. Defaults to undefined.

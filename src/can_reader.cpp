@@ -18,9 +18,9 @@
 
 #include "low-can-binding.hpp"
 
-void can_reader(can_bus__dev_t &can_bus)
+void can_reader(can_bus_dev_t &can_bus)
 {
-	can_message_t can_message;
+	can_message_t can_message(interface);
 
 	while(can_bus.is_running())
 	{

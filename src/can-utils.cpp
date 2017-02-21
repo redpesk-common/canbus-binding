@@ -30,77 +30,84 @@ can_message_t::can_message_t(const struct afb_binding_interface* interface)
 
 uint32_t can_message_t::get_id() const
 {
-	(id_ != 0) ? return id_ : return 0;
+	if (id_ != 0)
+		return id_;
+	return 0;
 }
 
 int can_message_t::get_format() const
 {
-	(format_ != CanMessageFormat::SIMPLE || format_ != CanMessageFormat::EXTENDED) return -1 : return format_;
+	if (format_ != CanMessageFormat::STANDARD || format_ != CanMessageFormat::EXTENDED)
+		return -1;
+	return format_;
 }
 
-uint8_t can_message_t::get_data() const
+const uint8_t* can_message_t::get_data() const
 {
-	return data_;
+	return &data_;
 }
-uint8_t can_message_t::get_lenght() const
+uint8_t can_message_t::get_length() const
 {
-	return lenght_;
+	return length_;
 }
 
-void can_message_t::set_id(uint32_t &new_id)
+void can_message_t::set_id(const uint32_t new_id)
 {
-	switch(format):
-		case CanMessageFormat::SIMPLE:
-			id = new_id & CAN_SFF_MASK;
+	switch(format_)
+	{
+		case CanMessageFormat::STANDARD:
+			id_ = new_id & CAN_SFF_MASK;
+			break;
 		case CanMessageFormat::EXTENDED:
-			id = new_id & CAN_EFF_MASK;
+			id_ = new_id & CAN_EFF_MASK;
+			break;
 		default:
 			ERROR(interface_, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
+			break;
+	}
 }
 
-void can_message_t::set_format(CanMessageFormat &new_format)
+void can_message_t::set_format(const CanMessageFormat new_format)
 {
-	if(new_format == CanMessageFormat::SIMPLE || new_format == CanMessageFormat::EXTENDED)
-		format = new_format;
+	if(new_format == CanMessageFormat::STANDARD || new_format == CanMessageFormat::EXTENDED)
+		format_ = new_format;
 	else
 		ERROR(interface_, "ERROR: Can set format, wrong format chosen");
 }
 
-void can_message_t::set_data(uint8_t &new_data)
+void can_message_t::set_data(const uint8_t new_data)
 {
-	::memcpy(data_, new_data, new_data.size());
-	lenght_ = new_data(size);
+	::memcpy(&data_, &new_data, sizeof(new_data));
+	length_ = sizeof(new_data);
 }
 
 /*
- * This is the preferred way to initialize a CanMessage object 
+ * @brief This is the preferred way to initialize a CanMessage object 
  * from a read canfd_frame message.
  * 
- * params: canfd_frame pointer
+ * @param: canfd_frame pointer
  */
-void can_message_t::convert_from_canfd_frame(canfd_frame &frame)
+void can_message_t::convert_from_canfd_frame(const canfd_frame& frame)
 {
-	lenght_ = (frame.len > CAN_MAX_DLEN) ? CAN_MAX_DLEN : frame.len;
-	lenght_ = (frame.len > CANFD_MAX_DLEN) ? CANFD_MAX_DLEN : frame.len;
+	length_ = (frame.len > CAN_MAX_DLEN) ? (uint8_t)CAN_MAX_DLEN : frame.len;
+	length_ = (frame.len > CANFD_MAX_DLEN) ? (uint8_t)CANFD_MAX_DLEN : frame.len;
 
-	switch (frame.can_id): 
-		case (frame.can_id & CAN_ERR_FLAG):
-			id_ = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
-			break;
-		case (frame.can_id & CAN_EFF_FLAG):
-			id_ = frame.can_id & CAN_EFF_MASK;
-			format_ = CanMessageFormat::EXTENDED;
-			break;
-		default:
-			format_ = CanMessageFormat::STANDARD;
-			id_ = frame.can_id & CAN_SFF_MASK;
-			break;
-
-	if (sizeof(frame.data) <= data_.size())
+	if (frame.can_id & CAN_ERR_FLAG)
+		id_ = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
+	else if (frame.can_id & CAN_EFF_FLAG)
 	{
-		::memcpy(data_, canfd_frame.data, lenght_);
-		return 0;
-	} else if (sizeof(frame.data) >= CAN_MAX_DLEN)
+		id_ = frame.can_id & CAN_EFF_MASK;
+		format_ = CanMessageFormat::EXTENDED;
+	}
+	else
+	{
+		id_ = frame.can_id & CAN_SFF_MASK;
+		format_ = CanMessageFormat::STANDARD;
+	}
+
+	if (sizeof(frame.data) <= sizeof(data_))
+		::memcpy(&data_, frame.data, length_);
+	else if (sizeof(frame.data) >= CAN_MAX_DLEN)
 		ERROR(interface_, "can_message_t: canfd_frame data too long to be stored into CanMessage object");
 }
 
@@ -109,8 +116,8 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 	canfd_frame frame;
 
 	frame.can_id = get_id();
-	frame.len = get_lenght();
-	::memcpy(frame.data, get_data(), lenght_);
+	frame.len = get_length();
+	::memcpy(frame.data, get_data(), length_);
 
 	return frame;
 }
@@ -182,6 +189,7 @@ int can_bus_dev_t::close()
 {
 	::close(can_socket_);
 	can_socket_ = -1;
+	return can_socket_;
 }
 
 canfd_frame can_bus_dev_t::read(const struct afb_binding_interface* interface)
@@ -245,16 +253,21 @@ bool can_bus_dev_t::is_running()
  * 
  * @return the next queue element or NULL if queue is empty.
  */
-can_message_t can_bus_dev_t::next_can_message()
+can_message_t can_bus_dev_t::next_can_message(const struct afb_binding_interface* interface)
 {
-	if(! can_message_q_.empty())
+	can_message_t can_msg(interface);
+
+	if(!can_message_q_.empty())
 	{
-		can_message_t can_msg = can_message_q_.front();
+		can_msg = can_message_q_.front();
 		can_message_q_.pop();
+		DEBUG(interface, "next_can_message: Here is the next can message : id %d, length %d", can_msg.get_id(), can_msg.get_length());
 		return can_msg;
 	}
 	
+	NOTICE(interface, "next_can_message: End of can message queue");
 	has_can_message_ = false;
+	return can_msg;
 }
 
 /**
@@ -296,7 +309,6 @@ int can_bus_dev_t::send_can_message(can_message_t& can_msg, const struct afb_bin
 	{
 		nbytes = ::sendto(can_socket_, &f, sizeof(struct canfd_frame), 0,
 				(struct sockaddr*)&txAddress_, sizeof(txAddress_));
-				
 		if (nbytes == -1)
 		{
 			ERROR(interface, "send_can_message: Sending CAN frame failed.");
@@ -325,7 +337,6 @@ can_bus_t::can_bus_t(const afb_binding_interface *itf, int& conf_file)
 /**
  * @brief start threads relative to the can bus: decoding and pushing
  * as the reading is handled by can_bus_dev_t object
- * 
  */
 void can_bus_t::start_threads()
 {
@@ -419,14 +430,19 @@ std::vector<std::string> can_bus_t::read_conf()
  */
 openxc_VehicleMessage can_bus_t::next_vehicle_message()
 {
+	openxc_VehicleMessage v_msg;
+
 	if(! vehicle_message_q_.empty())
 	{
-		openxc_VehicleMessage v_msg = vehicle_message_q_.front();
+		v_msg = vehicle_message_q_.front();
 		vehicle_message_q_.pop();
+		DEBUG(interface_, "next_vehicle_message: next vehicle message poped");
 		return v_msg;
 	}
-
+	
+	NOTICE(interface_, "next_vehicle_message: End of vehicle message queue");
 	has_vehicle_message_ = false;
+	return v_msg;
 }
 
 /**

@@ -26,16 +26,15 @@ void can_decode_message(can_bus_t &can_bus)
 	openxc_VehicleMessage vehicle_message;
 	openxc_DynamicField search_key, ret;
 	bool send = true;
-	
+
 	decoder_t decoder();
 
 	while(true)
 	{
-		if(can_message = can_bus.next_can_message())
+		if(can_message = can_bus.next_can_message(interface))
 		{
 			/* First we have to found which CanSignal is */
 			search_key = build_DynamicField(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, (double)can_message.get_id())
-
 			signals = find_can_signals(search_key);
 			
 			/* Decoding the message ! Don't kill the messenger ! */
