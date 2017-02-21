@@ -27,31 +27,30 @@ void can_decode_message(can_bus_t &can_bus)
 	openxc_DynamicField search_key, ret;
 	bool send = true;
 
-	decoder_t decoder();
+	decoder_t decoder;
 
-	while(true)
+	while(can_bus.has_can_message())
 	{
-		if(can_message = can_bus.next_can_message(interface))
-		{
-			/* First we have to found which CanSignal is */
-			search_key = build_DynamicField((double)can_message.get_id())
-			signals = find_can_signals(search_key);
-			
-			/* Decoding the message ! Don't kill the messenger ! */
-			for(const auto& sig : signals)
-			{	
-				subscribed_signals_i = subscribed_signals.find(sig.genericName);
-				
-				if(subscribed_signals_i != subscribed_signals.end() &&
-					afb_event_is_valid(subscribed_signals_i->second))
-				{
-					ret = decoder.decodeSignal(sig, can_message, getSignals(), &send);
+		can_message = can_bus.next_can_message();
 
-					s_message = build_SimpleMessage(sig.genericName, ret);
-						
-					vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
-					vehicle_message_q.push(vehicle_message);
-				}
+		/* First we have to found which CanSignal is */
+		search_key = build_DynamicField((double)can_message.get_id());
+		signals = find_can_signals(search_key);
+		
+		/* Decoding the message ! Don't kill the messenger ! */
+		for(const auto& sig : signals)
+		{	
+			subscribed_signals_i = subscribed_signals.find(sig.genericName);
+			
+			if(subscribed_signals_i != subscribed_signals.end() &&
+				afb_event_is_valid(subscribed_signals_i->second))
+			{
+				ret = decoder.decodeSignal(sig, can_message, getSignals(), &send);
+
+				openxc_SimpleMessage s_message = build_SimpleMessage(sig.genericName, ret);
+
+				vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
+				can_bus.push_new_vehicle_message(vehicle_message);
 			}
 		}
 	}

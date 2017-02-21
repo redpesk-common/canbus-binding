@@ -232,10 +232,10 @@ canfd_frame can_bus_dev_t::read(const struct afb_binding_interface* interface)
  * @brief start reading threads and set flag is_running_
  * 
  */
-void can_bus_dev_t::start_reading()
+void can_bus_dev_t::start_reading(can_bus_t& can_bus)
 {
-	th_reading_ = std::thread(can_reader, std::ref(*this));
-	is_running_ = true;	is_running_ = true;
+	th_reading_ = std::thread(can_reader, std::ref(*this), std::ref(can_bus));
+	is_running_ = true;
 }
 
 /*
@@ -244,51 +244,6 @@ void can_bus_dev_t::start_reading()
 bool can_bus_dev_t::is_running()
 {
 	return is_running_;
-}
-
-/**
- * @brief: Get a can_message_t from can_message_q and return it
- * then point to the next can_message_t in queue.
- * 
- * @return the next queue element or NULL if queue is empty.
- */
-can_message_t can_bus_dev_t::next_can_message(const struct afb_binding_interface* interface)
-{
-	can_message_t can_msg(interface);
-
-	if(!can_message_q_.empty())
-	{
-		can_msg = can_message_q_.front();
-		can_message_q_.pop();
-		DEBUG(interface, "next_can_message: Here is the next can message : id %d, length %d", can_msg.get_id(), can_msg.get_length());
-		return can_msg;
-	}
-	
-	NOTICE(interface, "next_can_message: End of can message queue");
-	has_can_message_ = false;
-	return can_msg;
-}
-
-/**
- * @brief Append a new element to the can message queue and set
- * has_can_message_ boolean to true
- * 
- * @params[const can_message_t& can_msg] the can_message_t to append
- * 
- */
-void can_bus_dev_t::push_new_can_message(const can_message_t& can_msg)
-{
-	can_message_q_.push(can_msg);
-}
-
-/**
- * @brief Flag that let you know when can message queue is exhausted
- * 
- * @return[bool] has_can_message_ bool
- */
-bool can_bus_dev_t::has_can_message() const
-{
-	return has_can_message_;
 }
 
 /**
@@ -328,8 +283,8 @@ int can_bus_dev_t::send_can_message(can_message_t& can_msg, const struct afb_bin
 *
 *********************************************************************************/
 
-can_bus_t::can_bus_t(const afb_binding_interface *itf, int& conf_file)
-	: interface_{itf}, conf_file_{conf_file}
+can_bus_t::can_bus_t(const struct afb_binding_interface *interface, int& conf_file)
+	: interface_{interface}, conf_file_{conf_file}
 {
 }
 
@@ -366,7 +321,7 @@ int can_bus_t::init_can_dev()
 		{
 			can_bus_dev_t can_bus_device_handler(device);
 			can_bus_device_handler.open(interface_);
-			can_bus_device_handler.start_reading();
+			can_bus_device_handler.start_reading(std::ref(*this));
 			i++;
 		}
 
@@ -418,6 +373,51 @@ std::vector<std::string> can_bus_t::read_conf()
 	ERROR(interface_, "Problem at reading the conf file");
 	ret.clear();
 	return ret;
+}
+
+/**
+ * @brief: Get a can_message_t from can_message_q and return it
+ * then point to the next can_message_t in queue.
+ * 
+ * @return the next queue element or NULL if queue is empty.
+ */
+can_message_t can_bus_t::next_can_message()
+{
+	can_message_t can_msg(interface_);
+
+	if(!can_message_q_.empty())
+	{
+		can_msg = can_message_q_.front();
+		can_message_q_.pop();
+		DEBUG(interface_, "next_can_message: Here is the next can message : id %d, length %d", can_msg.get_id(), can_msg.get_length());
+		return can_msg;
+	}
+	
+	NOTICE(interface_, "next_can_message: End of can message queue");
+	has_can_message_ = false;
+	return can_msg;
+}
+
+/**
+ * @brief Append a new element to the can message queue and set
+ * has_can_message_ boolean to true
+ * 
+ * @params[const can_message_t& can_msg] the can_message_t to append
+ * 
+ */
+void can_bus_t::push_new_can_message(const can_message_t& can_msg)
+{
+	can_message_q_.push(can_msg);
+}
+
+/**
+ * @brief Flag that let you know when can message queue is exhausted
+ * 
+ * @return[bool] has_can_message_ bool
+ */
+bool can_bus_t::has_can_message() const
+{
+	return has_can_message_;
 }
 
 /**

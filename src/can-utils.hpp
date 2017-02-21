@@ -140,41 +140,6 @@ class can_message_t {
 };
 
 /** 
- * @brief Object representing a can device. Handle opening, closing and reading on the
- * socket. This is the low level object to be use by can_bus_t.
- *
- * @params[in] std::string device_name_ - name of the linux device handling the can bus. Generally vcan0, can0, etc.
- */
-class can_bus_dev_t {
-	private:
-		std::string device_name_;
-		int can_socket_;
-		bool is_fdmode_on_;
-		struct sockaddr_can txAddress_;
-
-		bool has_can_message_;
-		std::queue <can_message_t> can_message_q_;
-
-		std::thread th_reading_;
-		bool is_running_;
-
-	public:
-		can_bus_dev_t(const std::string& dev_name);
-
-		int open(const struct afb_binding_interface* interface);
-		int close();
-		bool is_running();
-		void start_reading();
-		canfd_frame read(const struct afb_binding_interface *interface);
-		
-		can_message_t next_can_message(const struct afb_binding_interface* interface);
-		void push_new_can_message(const can_message_t& can_msg);		
-		bool has_can_message() const;
-
-		int send_can_message(can_message_t& can_msg, const struct afb_binding_interface* interface);
-};
-
-/** 
  * @brief Object used to handle decoding and manage event queue to be pushed.
  *
  * @params[in] interface_ - afb_binding_interface pointer to the binder. Used to log messages
@@ -188,6 +153,9 @@ class can_bus_t {
 		std::thread th_decoding_;
 		std::thread th_pushing_;
 
+		bool has_can_message_;
+		std::queue <can_message_t> can_message_q_;
+
 		bool has_vehicle_message_;
 		std::queue <openxc_VehicleMessage> vehicle_message_q_;
 
@@ -197,10 +165,42 @@ class can_bus_t {
 		std::vector<std::string> read_conf();
 		
 		void start_threads();
+
+		can_message_t next_can_message();
+		void push_new_can_message(const can_message_t& can_msg);		
+		bool has_can_message() const;
 		
 		openxc_VehicleMessage next_vehicle_message();
 		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
 		bool has_vehicle_message() const;
+};
+
+/** 
+ * @brief Object representing a can device. Handle opening, closing and reading on the
+ * socket. This is the low level object to be use by can_bus_t.
+ *
+ * @params[in] std::string device_name_ - name of the linux device handling the can bus. Generally vcan0, can0, etc.
+ */
+class can_bus_dev_t {
+	private:
+		std::string device_name_;
+		int can_socket_;
+		bool is_fdmode_on_;
+		struct sockaddr_can txAddress_;
+
+		std::thread th_reading_;
+		bool is_running_;
+
+	public:
+		can_bus_dev_t(const std::string& dev_name);
+
+		int open(const struct afb_binding_interface* interface);
+		int close();
+		bool is_running();
+		void start_reading(can_bus_t& can_bus);
+		canfd_frame read(const struct afb_binding_interface *interface);
+		
+		int send_can_message(can_message_t& can_msg, const struct afb_binding_interface* interface);
 };
 
 /**
@@ -399,6 +399,6 @@ void logBusStatistics(can_bus_dev_t* buses, const int busCount);
 /**
  * @brief Function representing thread activated by can bus objects
  */
-void can_reader(can_bus_dev_t& can_bus);
+void can_reader(can_bus_dev_t& can_bus_dev, can_bus_t& can_bus);
 void can_decode_message(can_bus_t& can_bus);
 void can_event_push(can_bus_t& can_bus);

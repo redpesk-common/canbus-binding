@@ -18,13 +18,13 @@
 
 #include "can_reader.hpp"
 
-void can_reader(can_bus_dev_t &can_bus)
+void can_reader(can_bus_dev_t &can_bus_dev, can_bus_t& can_bus)
 {
 	can_message_t can_message(interface);
 
-	while(can_bus.is_running())
+	while(can_bus_dev.is_running())
 	{
-		can_message.convert_from_canfd_frame(can_bus.read(interface));
+		can_message.convert_from_canfd_frame(can_bus_dev.read(interface));
 		can_bus.push_new_can_message(can_message);
 	}
 }

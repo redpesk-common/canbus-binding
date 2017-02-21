@@ -22,16 +22,13 @@ void can_event_push(can_bus_t& can_bus)
 {
 	openxc_VehicleMessage v_message;
 	openxc_SimpleMessage s_message;
-	iterator it_event;
-
-	while(true)
+	
+	while(can_bus.has_vehicle_message())
 	{
-		if(v_message = can_bus->next_vehicle_message())
-		{
-			s_message = get_simple_message(v_msg);
-			const auto& it_event = subscribed_signals.find(s_message.name);
-			if(! it_event->end() && afb_event_is_valid(it_event->second))
-				afb_event_push(it_event->second, jsonify_simple(s_message));
-		}
+		v_message = can_bus.next_vehicle_message();
+		s_message = get_simple_message(v_message);
+		const auto& it_event = subscribed_signals.find(s_message.name);
+		if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
+			afb_event_push(it_event->second, jsonify_simple(s_message));
 	}
 }
