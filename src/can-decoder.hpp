@@ -22,7 +22,6 @@
 class decoder_t
 {
 	private:
-		openxc_DynamicField decoded_value;
 
 	public:
 		/* Public: Parse the signal's bitfield from the given data and return the raw
@@ -130,9 +129,8 @@ class decoder_t
 		* The decoder returns an openxc_DynamicField, which may contain a number,
 		* string or boolean. If 'send' is false, the return value is undefined.
 		*/
-		openxc_DynamicField decodeSignal(const CanSignal& signal,
-				const can_message_t& message, const CanSignal& signals,
-				bool* send);
+		openxc_DynamicField decodeSignal(const CanSignal& signal, const can_message_t& message,
+				const std::vector<CanSignal>& signals, bool* send);
 
 		/* Public: Decode a transformed, human readable value from an raw CAN signal
 		* already parsed from a CAN message.
@@ -143,5 +141,5 @@ class decoder_t
 		* else.
 		*/
 		openxc_DynamicField decodeSignal(const CanSignal& signal, float value,
-		const CanSignal& signals, bool* send);
+			const std::vector<CanSignal>& signals, bool* send);
 };

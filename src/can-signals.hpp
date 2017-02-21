@@ -64,7 +64,7 @@ CanMessageDefinition* getMessages();
 
 /* Public: Return signals from an signals array filtered on name.
  */
-CanSignal* getSignals(std::string name);
+const std::vector<CanSignal> getSignals();
 
 /* Public: Return an array of all OpenXC CAN commands enabled in the active
  * configuration that can write back to CAN with a custom handler.

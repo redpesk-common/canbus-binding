@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-decoder_t::decoder_t()
- : decoded_value{false, openxc_DynamicField_Type_STRING, false, "", false, 0, false, false}
-{
-}
+#pragma once
+
+#include "can-decoder.hpp"
 
 float decoder_t::parseSignalBitfield(const CanSignal& signal, const CanMessage& message)
 {
@@ -75,17 +74,18 @@ openxc_DynamicField decoder_t::stateDecoder(const CanSignal& signal,
 }
 
 openxc_DynamicField decoder_t::decodeSignal(const CanSignal& signal,
-        float value, const CanSignal& signals, bool* send)
+        float value, const std::vector<CanSignal>& signals, bool* send)
 {
     SignalDecoder decoder = signal->decoder == NULL ?
-				            noopDecoder : signal->decoder;
+                            noopDecoder : signal->decoder;
     openxc_DynamicField decoded_value = decoder(signal, signals,
             value, send);
     return decoded_value;
 }
 
 openxc_DynamicField decoder_t::decodeSignal(const CanSignal& signal,
-        const CanMessage& message, const CanSignal& signals, bool* send) {
+        const can_message_t& message, const std::vector<CanSignal>& signals, bool* send)
+{
     float value = parseSignalBitfield(signal, message);
     return decodeSignal(signal, value, signals, send);
 }

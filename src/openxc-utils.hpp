@@ -50,7 +50,7 @@ openxc_DynamicField build_DynamicField(double value);
  */
 openxc_DynamicField build_DynamicField(bool value);
 
-void jsonify_DynamicField(const openxc_DynamicField& field, const json_object& value);
+void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value);
 
 /**
  * @brief Extract the simple message value from an openxc_VehicleMessage
@@ -58,4 +58,4 @@ void jsonify_DynamicField(const openxc_DynamicField& field, const json_object& v
  */
 openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg);
 
-json_object jsonify_simple(const openxc_SimpleMessage& s_msg);
+json_object* jsonify_simple(const openxc_SimpleMessage& s_msg);
