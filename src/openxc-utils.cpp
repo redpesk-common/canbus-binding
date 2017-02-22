@@ -16,11 +16,6 @@
  * limitations under the License.
  */
 
-#include <string>
-#include <json-c/json.h>
-#include <sys/timeb.h>
-
-#include "openxc.pb.h"
 #include "openxc-utils.hpp"
 
 openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type, const openxc_SimpleMessage& message)
@@ -115,6 +110,9 @@ openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg)
 {
 	if (v_msg.has_simple_message)
 		return v_msg.simple_message;
+	
+	openxc_SimpleMessage s_msg = { true, "", false, build_DynamicField(false), false, build_DynamicField(false)};
+	return s_msg;
 }
 
 json_object* jsonify_simple(const openxc_SimpleMessage& s_msg)

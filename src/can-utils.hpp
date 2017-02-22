@@ -147,7 +147,6 @@ class can_message_t {
  */
 class can_bus_t {
 	private:
-		const struct afb_binding_interface *interface_;
 		int conf_file_;
 		
 		std::thread th_decoding_;
@@ -160,6 +159,8 @@ class can_bus_t {
 		std::queue <openxc_VehicleMessage> vehicle_message_q_;
 
 	public:
+		const struct afb_binding_interface *interface_;
+
 		can_bus_t(const struct afb_binding_interface *itf, int& conf_file);
 		int init_can_dev();
 		std::vector<std::string> read_conf();

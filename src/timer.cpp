@@ -17,15 +17,15 @@
 
 #include "timer.hpp"
 
-inline unsigned long systemTimeMs()
+long long int systemTimeMs()
 {
 	struct timeb t_msec;
-	unsigned long int timestamp_msec;
+	long long int timestamp_msec;
 	
 	if(!::ftime(&t_msec))
 	{
-		timestamp_msec = ((unsigned long int) t_msec.time) * 1000ll + 
-			(unsigned long int) t_msec.millitm;
+		timestamp_msec = (t_msec.time) * 1000ll + 
+			t_msec.millitm;
 	}
 	return timestamp_msec;
 }

@@ -284,7 +284,7 @@ int can_bus_dev_t::send_can_message(can_message_t& can_msg, const struct afb_bin
 *********************************************************************************/
 
 can_bus_t::can_bus_t(const struct afb_binding_interface *interface, int& conf_file)
-	: interface_{interface}, conf_file_{conf_file}
+	:  conf_file_{conf_file}, interface_{interface}
 {
 }
 

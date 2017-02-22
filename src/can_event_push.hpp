@@ -18,6 +18,8 @@
 
  #pragma once
 
-#include "low-can-binding.hpp"
+#include "can-utils.hpp"
+#include "can-signals.hpp"
+#include "openxc-utils.hpp"
 
 void can_event_push(can_bus_t& can_bus);

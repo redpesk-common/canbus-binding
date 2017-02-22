@@ -32,13 +32,15 @@ extern "C"
 
 #define MESSAGE_SET_ID 0
 
-/**
- * @brief Dumb SIGNALS array. It is composed by CanMessageSet
- * SIGNALS[MESSAGE_SET_ID][CanSignal]
+/** 
+ * @brief Can signal event map making access to afb_event
+ * externaly to an openxc existing structure.
+ *
+ * @desc Event map is making relation between CanSignal generic name
+ * and the afb_event struct used by application framework to pushed
+ * to the subscriber.
  */
-std::vector<std::vector<CanSignal>> SIGNALS {
-	{}// message set: example
-};
+static std::map<std::string, struct afb_event> subscribed_signals;
 
 /** Public: Return the currently active CAN configuration. */
 CanMessageSet* getActiveMessageSet();
@@ -94,14 +96,25 @@ CanBus* getCanBuses();
  * @brief Find one or many signals based on its name or id
  * passed through openxc_DynamicField.
  *
- * params[openxc_DynamicField&] - a const reference with the key to search into signal.
+ * @param[in] openxc_DynamicField& - a const reference with the key to search into signal.
  * Key is either a signal name or its CAN arbitration id.
  *
- * return[std::vector<std::string>] return found CanSignal generic name vector.
+ * @return std::vector<std::string> return found CanSignal generic name vector.
  */
 std::vector<CanSignal> find_can_signals(const struct afb_binding_interface* interface, const openxc_DynamicField &key);
 
-uint32_t get_CanSignal_id(const CanSignal& sig)
-{
-	return sig.message->id;
-}
+/**
+ * @brief Retrieve can arbitration id of a given CanSignal
+ *
+ * @param[in] CanSignal& - a const reference to a CanSignal
+ *
+ * @return uint32_t - unsigned integer representing the arbitration id.
+ */
+inline uint32_t get_CanSignal_id(const CanSignal& sig);
+
+/**
+ * @brief return the subscribed_signals map.
+ * 
+ * return std::map<std::string, struct afb_event> - map of subscribed signals.
+ */
+const std::map<std::string, struct afb_event> get_subscribed_signals();

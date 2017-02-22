@@ -87,9 +87,3 @@ extern "C"
 	*/
 	int afbBindingV1ServiceInit(struct afb_service service);
 };
-
-/** Can signal event map making access to afb_event
- * external to openxc existing structure.
- */
-static std::map<std::string, struct afb_event> subscribed_signals;
-static std::map<std::string, struct afb_event>::iterator subscribed_signals_i;

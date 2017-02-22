@@ -27,6 +27,7 @@ void can_event_push(can_bus_t& can_bus)
 	{
 		v_message = can_bus.next_vehicle_message();
 		s_message = get_simple_message(v_message);
+		std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
 		const auto& it_event = subscribed_signals.find(s_message.name);
 		if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
 			afb_event_push(it_event->second, jsonify_simple(s_message));

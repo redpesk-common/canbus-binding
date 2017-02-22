@@ -18,6 +18,10 @@
 
 #pragma once
 
+#include <string>
+#include <json-c/json.h>
+#include <sys/timeb.h>
+
 #include "openxc.pb.h"
 
 /**

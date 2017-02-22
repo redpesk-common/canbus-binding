@@ -17,6 +17,14 @@
 
 #include "can-signals.hpp"
 
+/**
+ * @brief Dumb SIGNALS array. It is composed by CanMessageSet
+ * SIGNALS[MESSAGE_SET_ID][CanSignal]
+ */
+std::vector<std::vector<CanSignal>> SIGNALS {
+	{}// message set: example
+};
+
 const std::vector<CanSignal> getSignals()
 {
 	return SIGNALS[MESSAGE_SET_ID];
@@ -57,4 +65,14 @@ std::vector<CanSignal> find_can_signals(const struct afb_binding_interface* inte
 			break;
 	}
 	return signals;
+}
+
+inline uint32_t get_CanSignal_id(const CanSignal& sig)
+{
+	return sig.message->id;
+}
+
+const std::map<std::string, struct afb_event> get_subscribed_signals()
+{
+	return subscribed_signals;
 }

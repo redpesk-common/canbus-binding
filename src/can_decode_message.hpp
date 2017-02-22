@@ -18,6 +18,9 @@
 
 #pragma once
 
-#include "low-can-binding.hpp"
+#include "can-utils.hpp"
+#include "openxc-utils.hpp"
+#include "can-signals.hpp"
+#include "can-decoder.hpp"
 
 void can_decode_message(can_bus_t &can_bus);

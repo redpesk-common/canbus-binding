@@ -19,6 +19,5 @@
 #pragma once
 
 #include "can-utils.hpp"
-#include "low-can-binding.hpp"
 
 void can_reader(can_bus_dev_t& can_bus_dev, can_bus_t& can_bus);

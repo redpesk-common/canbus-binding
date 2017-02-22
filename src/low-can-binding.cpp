@@ -96,7 +96,7 @@ static int subscribe_unsubscribe_all(struct afb_req request, bool subscribe)
 
 	//for (const auto& sig : SIGNALS)
 	//	e += !subscribe_unsubscribe_signals(request, subscribe, sig);
-	e += !subscribe_unsubscribe_signals(request, subscribe, SIGNALS[MESSAGE_SET_ID]);
+	e += !subscribe_unsubscribe_signals(request, subscribe, getSignals());
 	
 	return e == 0;
 }

@@ -19,7 +19,7 @@
 
 #include <sys/timeb.h>
 
-typedef unsigned long (*TimeFunction)();
+typedef long long int (*TimeFunction)();
 
 /**
  * @brief: A frequency counting clock.
