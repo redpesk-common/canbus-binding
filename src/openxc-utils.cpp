@@ -96,6 +96,15 @@ openxc_DynamicField build_DynamicField(bool value)
 	return d;
 }
 
+openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg)
+{
+	if (v_msg.has_simple_message)
+		return v_msg.simple_message;
+	
+	openxc_SimpleMessage s_msg = { false, "", false, build_DynamicField(false), false, build_DynamicField(false)};
+	return s_msg;
+}
+
 void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value)
 {
 	if(field.has_numeric_value)
@@ -106,25 +115,15 @@ void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value)
 		json_object_object_add(value, "value", json_object_new_string(field.string_value));
 }
 
-openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg)
+bool jsonify_simple(const openxc_SimpleMessage& s_msg, json_object* json)
 {
-	if (v_msg.has_simple_message)
-		return v_msg.simple_message;
-	
-	openxc_SimpleMessage s_msg = { true, "", false, build_DynamicField(false), false, build_DynamicField(false)};
-	return s_msg;
-}
-
-json_object* jsonify_simple(const openxc_SimpleMessage& s_msg)
-{
-	json_object *json;
-	json = nullptr;
-
 	if(s_msg.has_name)
 	{
 		json = json_object_new_object();
 		json_object_object_add(json, "name", json_object_new_string(s_msg.name));
 		jsonify_DynamicField(s_msg.value, json);
+		return true;
 	}
-	return json;
+	json_object_object_add(json, "error", json_object_new_string("openxc_SimpleMessage doesn't have name'"));
+	return false;
 }

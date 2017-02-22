@@ -22,6 +22,7 @@ void can_event_push(can_bus_t& can_bus)
 {
 	openxc_VehicleMessage v_message;
 	openxc_SimpleMessage s_message;
+	json_object* jo;
 	
 	while(can_bus.has_vehicle_message())
 	{
@@ -30,6 +31,10 @@ void can_event_push(can_bus_t& can_bus)
 		std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
 		const auto& it_event = subscribed_signals.find(s_message.name);
 		if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
-			afb_event_push(it_event->second, jsonify_simple(s_message));
+		{
+			jo = json_object_new_object();
+			jsonify_simple(s_message, jo);
+			afb_event_push(it_event->second, jo);
+		}
 	}
 }

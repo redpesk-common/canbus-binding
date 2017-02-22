@@ -19,15 +19,24 @@
 
 #include <sys/timeb.h>
 
+/*
+ * @brief return epoch in milliseconds
+ *
+ * @return long long int epoch in milliseconds
+ */
 typedef long long int (*TimeFunction)();
 
 /**
- * @brief: A frequency counting clock.
+ * @struct FrequencyClock 
+ * @brief A frequency counting clock.
  *
- * frequency - the clock frequency in Hz.
- * last_time - the last time (in milliseconds since startup) that the clock
+ * @var FrequencyClock::frequency
+ *  the clock frequency in Hz.
+ * @var FrequencyClock::last_time
+ *  the last time (in milliseconds since startup) that the clock
  *	ticked.
- * time_function - a function returning current time
+ * @var FrequencyClock::time_function
+ *  a function returning current time
  */
 typedef struct {
 		float frequency;
