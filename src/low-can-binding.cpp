@@ -16,32 +16,11 @@
  * limitations under the License.
  */
 
-#include <map>
-#include <queue>
-#include <vector>
-#include <string>
-#include <memory>
-#include <thread>
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include <net/if.h>
-#include <functional>
-#include <sys/ioctl.h>
-#include <linux/can.h>
-#include <openxc.pb.h>
-#include <sys/timeb.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <json-c/json.h>
-#include <linux/can/raw.h>
 #include <systemd/sd-event.h>
 
-#include "timer.hpp"
-#include "openxc.pb.h"
 #include "can-utils.hpp"
 #include "can-signals.hpp"
-#include "can-decoder.hpp"
 #include "openxc-utils.hpp"
 
 #include "low-can-binding.hpp"
@@ -195,21 +174,6 @@ static void subscribe_unsubscribe(struct afb_req request, bool subscribe)
 		afb_req_fail(request, "error", NULL);
 }
 
-static const struct afb_verb_desc_v1 verbs[]=
-{
-	{ .name= "subscribe",	.session= AFB_SESSION_NONE, .callback= subscribe,	.info= "subscribe to notification of CAN bus messages." },
-	{ .name= "unsubscribe",	.session= AFB_SESSION_NONE, .callback= unsubscribe,	.info= "unsubscribe a previous subscription." }
-};
-
-static const struct afb_binding binding_desc {
-	AFB_BINDING_VERSION_1,
-	{
-		"CAN bus service",
-		"can",
-		verbs
-	}
-};
-
 extern "C"
 {
 	static void subscribe(struct afb_req request)
@@ -221,6 +185,21 @@ extern "C"
 	{
 		subscribe_unsubscribe(request, false);
 	}
+
+	static const struct afb_verb_desc_v1 verbs[]=
+	{
+		{ .name= "subscribe",	.session= AFB_SESSION_NONE, .callback= subscribe,	.info= "subscribe to notification of CAN bus messages." },
+		{ .name= "unsubscribe",	.session= AFB_SESSION_NONE, .callback= unsubscribe,	.info= "unsubscribe a previous subscription." }
+	};
+
+	static const struct afb_binding binding_desc {
+		AFB_BINDING_VERSION_1,
+		{
+			"CAN bus service",
+			"can",
+			verbs
+		}
+	};
 
 	const struct afb_binding *afbBindingV1Register (const struct afb_binding_interface *itf)
 	{
