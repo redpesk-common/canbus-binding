@@ -46,8 +46,6 @@
 #include "can-decoder.hpp"
 #include "openxc-utils.hpp"
 
-#define MESSAGE_SET_ID 0
-
 /*
  *	Interface between the daemon and the binding
  */

@@ -24,12 +24,13 @@
 #include <linux/can.h>
 
 #include "can-utils.hpp"
-#include "low-can-binding.hpp"
 
 extern "C"
 {
 	#include <afb/afb-event-itf.h>
 }
+
+#define MESSAGE_SET_ID 0
 
 /**
  * @brief Dumb SIGNALS array. It is composed by CanMessageSet
@@ -98,7 +99,7 @@ CanBus* getCanBuses();
  *
  * return[std::vector<std::string>] return found CanSignal generic name vector.
  */
-std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key);
+std::vector<CanSignal> find_can_signals(const struct afb_binding_interface* interface, const openxc_DynamicField &key);
 
 uint32_t get_CanSignal_id(const CanSignal& sig)
 {

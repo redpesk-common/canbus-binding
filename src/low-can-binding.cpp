@@ -118,7 +118,7 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 		else
 		{
 			openxc_DynamicField search_key = build_DynamicField(name);
-			sig = find_can_signals(search_key);
+			sig = find_can_signals(interface, search_key);
 			if (sig.empty())
 				ret = 0;
 		}

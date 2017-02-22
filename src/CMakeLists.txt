@@ -40,6 +40,7 @@ add_compile_options(-Werror=implicit-function-declaration)
 add_compile_options(-ffunction-sections -fdata-sections)
 add_compile_options(-Wl,--as-needed -Wl,--gc-sections)
 add_compile_options(-fPIC)
+add_compile_options(-std=c++11)
 
 set(CMAKE_C_FLAGS_PROFILING    "-g -O0 -pg -Wp,-U_FORTIFY_SOURCE")
 set(CMAKE_C_FLAGS_DEBUG        "-g -O0 -ggdb -Wp,-U_FORTIFY_SOURCE")

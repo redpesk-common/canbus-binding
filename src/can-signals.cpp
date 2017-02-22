@@ -27,7 +27,7 @@ size_t getSignalCount()
 	return SIGNALS[MESSAGE_SET_ID].size();
 }
 
-std::vector<CanSignal> find_can_signals(openxc_DynamicField& key)
+std::vector<CanSignal> find_can_signals(const struct afb_binding_interface* interface, openxc_DynamicField& key)
 {
 	std::vector<CanSignal> signals;
 

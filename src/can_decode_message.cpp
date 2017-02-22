@@ -35,7 +35,7 @@ void can_decode_message(can_bus_t &can_bus)
 
 		/* First we have to found which CanSignal is */
 		search_key = build_DynamicField((double)can_message.get_id());
-		signals = find_can_signals(search_key);
+		signals = find_can_signals(interface, search_key);
 		
 		/* Decoding the message ! Don't kill the messenger ! */
 		for(const auto& sig : signals)
