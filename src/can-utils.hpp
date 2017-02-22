@@ -232,137 +232,210 @@ class can_message_t {
 };
 
 /** 
+ * @class can_bus_t
  * @brief Object used to handle decoding and manage event queue to be pushed.
  *
- * @params[in] interface_ - afb_binding_interface pointer to the binder. Used to log messages
- * @params[in] conf_file_ - configuration file handle used to initialize can_bus_dev_t objects.
+ * This object is also used to initialize can_bus_dev_t object after reading 
+ * json conf file describing the CAN devices to use. Thus, those object will read 
+ * on the device the CAN frame and push them into the can_bus_t can_message_q_ queue.
+ *
+ * That queue will be later used to be decoded and pushed to subscribers.
  */
 class can_bus_t {
 	private:
-		int conf_file_;
+		int conf_file_; /*!< conf_file_ - configuration file handle used to initialize can_bus_dev_t objects.*/
 		
-		std::thread th_decoding_;
-		std::thread th_pushing_;
+		std::thread th_decoding_; /*!< thread that'll handle decoding a can frame */
+		std::thread th_pushing_; /*!<  thread that'll handle pushing decoded can frame to subscribers */
 
-		bool has_can_message_;
-		std::queue <can_message_t> can_message_q_;
+		bool has_can_message_; /*!< boolean members that control whether or not there is can_message into the queue */
+		std::queue <can_message_t> can_message_q_; /*!< queue that'll store can_message_t to decoded */
 
-		bool has_vehicle_message_;
-		std::queue <openxc_VehicleMessage> vehicle_message_q_;
+		bool has_vehicle_message_; /*!< boolean members that control whether or not there is openxc_VehicleMessage into the queue */
+		std::queue <openxc_VehicleMessage> vehicle_message_q_; /*!< queue that'll store openxc_VehicleMessage to pushed */
 
 	public:
-		const struct afb_binding_interface *interface_;
+		const struct afb_binding_interface *interface_; /*!< interface_ - afb_binding_interface pointer to the binder. Used to log messages */
 
-		can_bus_t(const struct afb_binding_interface *itf, int& conf_file);
-		int init_can_dev();
-		std::vector<std::string> read_conf();
+		/**
+		 * @brief Class constructor
+		 *
+		 * @param struct afb_binding_interface *interface between daemon and binding
+		 * @param int file handle to the json configuration file.
+		 */
+		can_bus_t(const struct afb_binding_interface *interface, int& conf_file);
 		
+		/**
+		 * @brief Will initialize can_bus_dev_t objects after reading 
+		 * the configuration file passed in the constructor.
+		 */
+		int init_can_dev();
+		
+		/**
+		 * @brief read the conf_file_ and will parse json objects
+		 * in it searching for canbus objects devices name.
+		 *
+		 * @return Vector of can bus device name string.
+		 */
+		 std::vector<std::string> read_conf();
+		
+		/**
+		 * @brief Will initialize threads that will decode
+		 *  and push subscribed events.
+		 */
 		void start_threads();
 
+		/**
+		 * @brief Return first can_message_t on the queue 
+		 *
+		 * @return a can_message_t 
+		 */
 		can_message_t next_can_message();
+		
+		/**
+		 * @brief Push a can_message_t into the queue
+		 *
+		 * @param the const reference can_message_t object to push into the queue
+		 */
 		void push_new_can_message(const can_message_t& can_msg);		
+		
+		/**
+		 * @brief Return a boolean telling if there is any can_message into the queue
+		 *
+		 * @return true if there is at least a can_message_t, false if not.
+		 */
 		bool has_can_message() const;
 		
+		/**
+		 * @brief Return first openxc_VehicleMessage on the queue 
+		 *
+		 * @return a openxc_VehicleMessage containing a decoded can message
+		 */
 		openxc_VehicleMessage next_vehicle_message();
+		
+		/**
+		 * @brief Push a openxc_VehicleMessage into the queue
+		 *
+		 * @param the const reference openxc_VehicleMessage object to push into the queue
+		 */
 		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
+		
+		/**
+		 * @brief Return a boolean telling if there is any openxc_VehicleMessage into the queue
+		 *
+		 * @return true if there is at least a openxc_VehicleMessage, false if not.
+		 */
 		bool has_vehicle_message() const;
 };
 
-/** 
- * @brief Object representing a can device. Handle opening, closing and reading on the
- * socket. This is the low level object to be use by can_bus_t.
+/**
+ * @class can_bus_dev_t 
  *
- * @params[in] std::string device_name_ - name of the linux device handling the can bus. Generally vcan0, can0, etc.
+ * @brief Object representing a can device. Handle opening, closing and reading on the
+ *  socket. This is the low level object to be use by can_bus_t.
  */
 class can_bus_dev_t {
 	private:
-		std::string device_name_;
-		int can_socket_;
-		bool is_fdmode_on_;
-		struct sockaddr_can txAddress_;
+		std::string device_name_; /*!< std::string device_name_ - name of the linux device handling the can bus. Generally vcan0, can0, etc. */
+		int can_socket_; /*!< socket handler for the can device */
+		bool is_fdmode_on_; /*!< boolean telling if whether or not the can socket use fdmode. */
+		struct sockaddr_can txAddress_; /*!< internal member using to bind to the socket */
 
-		std::thread th_reading_;
-		bool is_running_;
+		std::thread th_reading_; /*!< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t */
+		bool is_running_; /*!< boolean telling whether or not reading is running or not */
 
 	public:
+		/**
+		 * @brief Class constructor 
+		 * 
+		 * @param const string representing the device name into the linux /dev tree
+		 */
 		can_bus_dev_t(const std::string& dev_name);
 
+		/**
+		 * @brief Open the can socket and returning it 
+		 *
+		 * @return 
+		 */
 		int open(const struct afb_binding_interface* interface);
 		int close();
 		bool is_running();
+		
+		/**
+ 		* @brief start reading threads and set flag is_running_
+		*
+		* @param can_bus_t reference can_bus_t. it will be passed to the thread 
+		*  to allow using afb_binding_interface and can_bus_t queue.
+ 		*/
 		void start_reading(can_bus_t& can_bus);
+
+		/**
+ 		* @brief Read the can socket and retrieve canfd_frame
+		*
+		* @param const struct afb_binding_interface* interface pointer. Used to be able to log 
+		*  using application framework logger.
+ 		*/
 		canfd_frame read(const struct afb_binding_interface *interface);
 		
+		/**
+		* @brief Send a can message from a can_message_t object.
+		* 
+		* @param const can_message_t& can_msg: the can message object to send 
+		* @param const struct afb_binding_interface* interface pointer. Used to be able to log 
+		*  using application framework logger.
+		*/
 		int send_can_message(can_message_t& can_msg, const struct afb_binding_interface* interface);
 };
 
 /**
+ * @struct CanSignalState
+ *
  * @brief A state encoded (SED) signal's mapping from numerical values to
  * OpenXC state names.
- *
- * @param[in] in value - The integer value of the state on the CAN bus.
- * @param[in] char* name  - The corresponding string name for the state in OpenXC.
  */
 struct CanSignalState {
-	const int value;
-	const char* name;
+	const int value; /*!< int value - The integer value of the state on the CAN bus.*/
+	const char* name; /*!< char* name  - The corresponding string name for the state in OpenXC. */
 };
 typedef struct CanSignalState CanSignalState;
 
 /**
- * @brief A CAN signal to decode from the bus and output over USB.
+ * @struct CanSignal
  *
- * @param[in] message	   - The message this signal is a part of.
- * @param[in] genericName - The name of the signal to be output over USB.
- * @param[in] bitPosition - The starting bit of the signal in its CAN message (assuming
- *				 non-inverted bit numbering, i.e. the most significant bit of
- *				 each byte is 0)
- * @param[in] bitSize	   - The width of the bit field in the CAN message.
- * @param[in] factor	   - The final value will be multiplied by this factor. Use 1 if you
- *				 don't need a factor.
- * @param[in] offset	   - The final value will be added to this offset. Use 0 if you
- *				 don't need an offset.
- * @param[in] minValue    - The minimum value for the processed signal.
- * @param[in] maxValue    - The maximum value for the processed signal.
- * @param[in] frequencyClock - A FrequencyClock struct to control the maximum frequency to
- *				process and send this signal. To process every value, set the
- *				clock's frequency to 0.
- * @param[in] sendSame    - If true, will re-send even if the value hasn't changed.
- * @param[in] forceSendChanged - If true, regardless of the frequency, it will send the
- *				value if it has changed.
- * @param[in] states	   - An array of CanSignalState describing the mapping
- *				 between numerical and string values for valid states.
- * @param[in] stateCount  - The length of the states array.
- * @param[in] writable    - True if the signal is allowed to be written from the USB host
- *				 back to CAN. Defaults to false.
- * @param[in] decoder	   - An optional function to decode a signal from the bus to a human
- *				readable value. If NULL, the default numerical decoder is used.
- * @param[in] encoder	   - An optional function to encode a signal value to be written to
- *				  CAN into a byte array. If NULL, the default numerical encoder
- *				  is used.
- * @param[in] received    - True if this signal has ever been received.
- * @param[in] lastValue   - The last received value of the signal. If 'received' is false,
- *		this value is undefined.
+ * @brief A CAN signal to decode from the bus and output over USB.
  */
 struct CanSignal {
-	struct CanMessageDefinition* message;
-	const char* genericName;
-	uint8_t bitPosition;
-	uint8_t bitSize;
-	float factor;
-	float offset;
-	float minValue;
-	float maxValue;
-	FrequencyClock frequencyClock;
-	bool sendSame;
-	bool forceSendChanged;
-	const CanSignalState* states;
-	uint8_t stateCount;
-	bool writable;
-	SignalDecoder decoder;
-	SignalEncoder encoder;
-	bool received;
-	float lastValue;
+	struct CanMessageDefinition* message; /*!< message	   - The message this signal is a part of. */
+	const char* genericName; /*!< genericName - The name of the signal to be output over USB.*/
+	uint8_t bitPosition; /*!< bitPosition - The starting bit of the signal in its CAN message (assuming
+ 						*	non-inverted bit numbering, i.e. the most significant bit of
+ 						*	each byte is 0) */
+	uint8_t bitSize; /*!< bitSize - The width of the bit field in the CAN message. */
+	float factor; /*!< factor - The final value will be multiplied by this factor. Use 1 if you
+ 				*	don't need a factor. */
+	float offset; /*!< offset	   - The final value will be added to this offset. Use 0 if you
+ 				*	don't need an offset. */
+	float minValue; /*!< minValue    - The minimum value for the processed signal.*/
+	float maxValue; /*!< maxValue    - The maximum value for the processed signal. */
+	FrequencyClock frequencyClock; /*!< frequencyClock - A FrequencyClock struct to control the maximum frequency to
+ 								*	process and send this signal. To process every value, set the
+ 								*	clock's frequency to 0. */
+	bool sendSame; /*!< sendSame    - If true, will re-send even if the value hasn't changed.*/
+	bool forceSendChanged; /*!< forceSendChanged - If true, regardless of the frequency, it will send the
+ 						*	value if it has changed. */
+	const CanSignalState* states; /*!< states	   - An array of CanSignalState describing the mapping
+ 								*	between numerical and string values for valid states. */
+	uint8_t stateCount; /*!< stateCount  - The length of the states array. */
+	bool writable; /*!< writable    - True if the signal is allowed to be written from the USB host
+ 				*	back to CAN. Defaults to false.*/
+	SignalDecoder decoder; /*!< decoder	   - An optional function to decode a signal from the bus to a human
+ 						*	readable value. If NULL, the default numerical decoder is used. */
+	SignalEncoder encoder; /*!< encoder	   - An optional function to encode a signal value to be written to
+ 						*	CAN into a byte array. If NULL, the default numerical encoder
+ 						*	is used. */
+	bool received; /*!< received    - True if this signal has ever been received.*/
+	float lastValue; /*!< lastValue   - The last received value of the signal. If 'received' is false,
+ 					*	this value is undefined. */
 };
 typedef struct CanSignal CanSignal;
 
@@ -490,8 +563,31 @@ bool isBusActive(can_bus_dev_t* bus);
 void logBusStatistics(can_bus_dev_t* buses, const int busCount);
 
 /**
- * @brief Function representing thread activated by can bus objects
+ * @fn void can_reader(can_bus_dev_t& can_bus_dev, can_bus_t& can_bus);
+ *
+ * @brief Thread function used to read the can socket.
+ *
+ * @param[in] can_bus_dev_t object to be used to read the can socket
+ * @param[in] can_bus_t object used to fill can_message_q_ queue
  */
 void can_reader(can_bus_dev_t& can_bus_dev, can_bus_t& can_bus);
+
+/**
+ * @fn void can_decode_message(can_bus_t& can_bus);
+ *
+ * @brief Thread function used to decode can messages read into the can_message_q_
+ *
+ * @param[in] can_bus_t object used to pop can_message_q_ queue and fill decoded message
+ * into vehicle_message_q_ queue.
+ */
 void can_decode_message(can_bus_t& can_bus);
+
+/**
+ * @fn void can_decode_message(can_bus_t& can_bus);
+ *
+ * @brief Thread function used to push afb_event
+ *
+ * @param[in] can_bus_t object used to pop can_message_q_ queue and fill decoded message
+ * into vehicle_message_q_ queue.
+ */
 void can_event_push(can_bus_t& can_bus);

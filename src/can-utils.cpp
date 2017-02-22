@@ -246,10 +246,6 @@ canfd_frame can_bus_dev_t::read(const struct afb_binding_interface* interface)
 	return canfd_frame;
 }
 
-/**
- * @brief start reading threads and set flag is_running_
- * 
- */
 void can_bus_dev_t::start_reading(can_bus_t& can_bus)
 {
 	th_reading_ = std::thread(can_reader, std::ref(*this), std::ref(can_bus));
@@ -264,12 +260,6 @@ bool can_bus_dev_t::is_running()
 	return is_running_;
 }
 
-/**
- * @brief Send a can message from a can_message_t object.
- * 
- * params[const can_message_t& can_msg] the can message object to send
- * 
- */
 int can_bus_dev_t::send_can_message(can_message_t& can_msg, const struct afb_binding_interface* interface)
 {
 	ssize_t nbytes;
@@ -306,22 +296,13 @@ can_bus_t::can_bus_t(const struct afb_binding_interface *interface, int& conf_fi
 {
 }
 
-/**
- * @brief start threads relative to the can bus: decoding and pushing
- * as the reading is handled by can_bus_dev_t object
- */
 void can_bus_t::start_threads()
 {
 	th_decoding_ = std::thread(can_decode_message, std::ref(*this));
 	th_pushing_ = std::thread(can_event_push, std::ref(*this));
 }
 
-/**
- * @brief Initialize as many as can_bus_dev_t objects with their respective reading thread
- * 
- * params[std::ifstream& conf_file] conf_file ifstream to the JSON configuration 
- * file located at the rootdir of the binding
- */
+
 int can_bus_t::init_can_dev()
 {
 	std::vector<std::string> devices_name;
@@ -350,11 +331,6 @@ int can_bus_t::init_can_dev()
 	return 1;
 }
 
-/** 
- * @brief Read the conf file and extract device name
- * 
- * @return[std:vector<std::string>] return a vector of device name
- */
 std::vector<std::string> can_bus_t::read_conf()
 {
 	std::vector<std::string> ret;
@@ -393,12 +369,6 @@ std::vector<std::string> can_bus_t::read_conf()
 	return ret;
 }
 
-/**
- * @brief: Get a can_message_t from can_message_q and return it
- * then point to the next can_message_t in queue.
- * 
- * @return the next queue element or NULL if queue is empty.
- */
 can_message_t can_bus_t::next_can_message()
 {
 	can_message_t can_msg(interface_);
@@ -416,34 +386,16 @@ can_message_t can_bus_t::next_can_message()
 	return can_msg;
 }
 
-/**
- * @brief Append a new element to the can message queue and set
- * has_can_message_ boolean to true
- * 
- * @params[const can_message_t& can_msg] the can_message_t to append
- * 
- */
 void can_bus_t::push_new_can_message(const can_message_t& can_msg)
 {
 	can_message_q_.push(can_msg);
 }
 
-/**
- * @brief Flag that let you know when can message queue is exhausted
- * 
- * @return[bool] has_can_message_ bool
- */
 bool can_bus_t::has_can_message() const
 {
 	return has_can_message_;
 }
 
-/**
- * @brief: Get a VehicleMessage from vehicle_message_q and return it
- * then point to the next VehicleMessage in queue.
- * 
- * @return the next queue element or NULL if queue is empty.
- */
 openxc_VehicleMessage can_bus_t::next_vehicle_message()
 {
 	openxc_VehicleMessage v_msg;
@@ -461,24 +413,12 @@ openxc_VehicleMessage can_bus_t::next_vehicle_message()
 	return v_msg;
 }
 
-/**
- * @brief Append a new element to the vehicle message queue and set
- * has_vehicle_message_ boolean to true
- * 
- * @params[const openxc_VehicleMessage& v_msg] the openxc_VehicleMessage to append
- * 
- */
 void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 {
 	vehicle_message_q_.push(v_msg);
 	has_vehicle_message_ = true;
 }
 
-/**
- * @brief Flag that let you know when vehicle message queue is exhausted
- * 
- * @return[bool] has_vehicle_message_ bool
- */
 bool can_bus_t::has_vehicle_message() const
 {
 	return has_vehicle_message_;
