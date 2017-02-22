@@ -84,28 +84,31 @@ typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
 		openxc_DynamicField* value, bool* send);
 
 /**
+ * @enum CanMessageFormat
  * @brief The ID format for a CAN message.
- *
- * STANDARD - standard 11-bit CAN arbitration ID.
- * EXTENDED - an extended frame, with a 29-bit arbitration ID.
  */
 enum CanMessageFormat {
-	STANDARD,
-	EXTENDED,
+	STANDARD, /*!< STANDARD - standard 11-bit CAN arbitration ID. */
+	EXTENDED, /*!< EXTENDED - an extended frame, with a 29-bit arbitration ID. */
+	ERROR,    /*!< ERROR - ERROR code used at initialization to signify that it isn't usable'*/
 };
 typedef enum CanMessageFormat CanMessageFormat;
 
 /**
+ * @class can_message_t
+ *
  * @brief A compact representation of a single CAN message, meant to be used in in/out
  * buffers.
  *
- * param[in] uint32_t id - The ID of the message.
- * param[in] CanMessageFormat format - the format of the message's ID.
- * param[in] uint8_t data  - The message's data field.
- * @param[in] uint8_t length - the length of the data array (max 8).
-*************************
-* old CanMessage struct *
-*************************
+ * param[in] 
+ * param[in] 
+ * param[in] 
+ * @param[in]
+ */
+
+/*************************
+ * old CanMessage struct *
+ *************************
 struct CanMessage {
 	uint32_t id;
 	CanMessageFormat format;
@@ -116,26 +119,115 @@ typedef struct CanMessage CanMessage;
 */
 class can_message_t {
 	private:
-		const struct afb_binding_interface* interface_;
-		uint32_t id_;
-		CanMessageFormat format_;
-		uint8_t data_;
-		uint8_t length_;
+		const struct afb_binding_interface* interface_; /*!< afb_binding_interface interface between daemon and binding */ 
+
+		uint32_t id_; /*!< uint32_t id - The ID of the message. */
+		uint8_t length_; /*!<  uint8_t length - the length of the data array (max 8). */
+		CanMessageFormat format_; /*!< CanMessageFormat format - the format of the message's ID.*/
+		uint8_t data_[CAN_MESSAGE_SIZE]; /*!< uint8_t data  - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 
 	public:
+		/**
+		 * @brief Class constructor
+		 *
+		 * Constructor about can_message_t class.
+		 *
+		 * @param interface - const structafb_binding_interface pointer
+		 */
 		can_message_t(const struct afb_binding_interface* interface);
 
+		/**
+		 * @brief Retrieve id_ member value.
+		 *
+		 * @return uint32_t id_ class member
+		 */
 		uint32_t get_id() const;
+		
+		/**
+		 * @brief Retrieve format_ member value.
+		 *
+		 * @return CanMessageFormat format_ class member
+		 */
 		int get_format() const;
+		
+		/**
+		 * @brief Retrieve data_ member value.
+		 *
+		 * @return uint8_t data_ pointer class member
+		 */
 		const uint8_t* get_data() const;
+		
+		/**
+		 * @brief Retrieve length_ member value.
+		 *
+		 * @return uint8_t length_ class member
+		 */
 		uint8_t get_length() const;
 
+		/**
+		 * @brief Control whether the object is correctly initialized
+		 *  to be sent over the CAN bus
+		 *
+		 * @return true if object correctly initialized and false if not...
+		 */
+		bool is_correct_to_send();
+		
+		/**
+		 * @brief Set id_ member value.
+		 *
+		 * Preferred way to initialize these members by using 
+		 * convert_from_canfd_frame method.
+		 *
+		 * @param uint32_t id_ class member
+		 */
 		void set_id(const uint32_t new_id);
+		
+		/**
+		 * @brief Set format_ member value.
+		 *
+		 * Preferred way to initialize these members by using 
+		 * convert_from_canfd_frame method.
+		 *
+		 * @param CanMessageFormat format_ class member
+		 */
 		void set_format(const CanMessageFormat format);
+		
+		/**
+		 * @brief Set data_ member value.
+		 *
+		 * Preferred way to initialize these members by using 
+		 * convert_from_canfd_frame method.
+		 *
+		 * @param uint8_t data_ array with a max size of 8 elements.
+		 */
 		void set_data(const uint8_t new_data);
+		
+		/**
+		 * @brief Set length_ member value.
+		 *
+		 * Preferred way to initialize these members by using 
+		 * convert_from_canfd_frame method.
+		 *
+		 * @param uint8_t length_ array with a max size of 8 elements.
+		 */
 		void set_length(const uint8_t new_length);
 
+		/**
+		 * @brief Take a canfd_frame struct to initialize class members
+		 *
+		 * This is the preferred way to initialize class members.
+		 *
+		 * @param canfd_frame struct read from can bus device.
+		 */
 		void convert_from_canfd_frame(const canfd_frame& frame);
+		
+		/**
+		 * @brief Take all initialized class's members and build an 
+		 * canfd_frame struct that can be use to send a CAN message over
+		 * the bus.
+		 *
+		 * @return canfd_frame struct built from class members.
+		 */
 		canfd_frame convert_to_canfd_frame();
 };
 

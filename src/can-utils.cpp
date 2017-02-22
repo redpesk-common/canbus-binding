@@ -24,30 +24,40 @@
 *********************************************************************************/
 
 can_message_t::can_message_t(const struct afb_binding_interface* interface)
-	: interface_{interface}
+	: interface_{interface}, id_{0}, length_{0}, format_{CanMessageFormat::ERROR}, data_{0,0,0,0,0,0,0,0}
 {}
 
 uint32_t can_message_t::get_id() const
 {
-	if (id_ != 0)
-		return id_;
-	return 0;
+	return id_;
 }
 
 int can_message_t::get_format() const
 {
 	if (format_ != CanMessageFormat::STANDARD || format_ != CanMessageFormat::EXTENDED)
-		return -1;
+		return CanMessageFormat::ERROR;
 	return format_;
 }
 
 const uint8_t* can_message_t::get_data() const
 {
-	return &data_;
+	return data_;
 }
 uint8_t can_message_t::get_length() const
 {
 	return length_;
+}
+
+bool can_message_t::is_correct_to_send()
+{
+	if (id_ != 0 && length_ != 0 && format_ != CanMessageFormat::ERROR)
+	{
+		int i;
+		for(i=0;i<CAN_MESSAGE_SIZE;i++)
+			if(data_[i] != 0)
+				return true;
+	}
+	return false;
 }
 
 void can_message_t::set_id(const uint32_t new_id)
@@ -76,23 +86,25 @@ void can_message_t::set_format(const CanMessageFormat new_format)
 
 void can_message_t::set_data(const uint8_t new_data)
 {
-	::memcpy(&data_, &new_data, sizeof(new_data));
-	length_ = sizeof(new_data);
+	if ((sizeof(new_data) / sizeof(uint8_t) > CAN_MESSAGE_SIZE))
+		ERROR(interface_, "Can set data, your data array is too big");
+	else
+	{
+		::memcpy(&data_, &new_data, sizeof(new_data));
+		length_ = sizeof(new_data);
+	}
 }
 
-/*
- * @brief This is the preferred way to initialize a CanMessage object 
- * from a read canfd_frame message.
- * 
- * @param: canfd_frame pointer
- */
 void can_message_t::convert_from_canfd_frame(const canfd_frame& frame)
 {
 	length_ = (frame.len > CAN_MAX_DLEN) ? (uint8_t)CAN_MAX_DLEN : frame.len;
 	length_ = (frame.len > CANFD_MAX_DLEN) ? (uint8_t)CANFD_MAX_DLEN : frame.len;
 
 	if (frame.can_id & CAN_ERR_FLAG)
+	{
 		id_ = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
+		format_ = CanMessageFormat::ERROR;
+	}
 	else if (frame.can_id & CAN_EFF_FLAG)
 	{
 		id_ = frame.can_id & CAN_EFF_MASK;
@@ -114,12 +126,18 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 {
 	canfd_frame frame;
 
-	frame.can_id = get_id();
-	frame.len = get_length();
-	::memcpy(frame.data, get_data(), length_);
-
+	if(is_correct_to_send())
+	{
+		frame.can_id = get_id();
+		frame.len = get_length();
+		::memcpy(frame.data, get_data(), length_);
+	}
+	else
+		ERROR(interface_, "can_message_t not correctly initialized to be sent");
+	
 	return frame;
 }
+
 /********************************************************************************
 *
 *		can_bus_dev_t method implementation
