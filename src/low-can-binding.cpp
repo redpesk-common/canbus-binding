@@ -16,7 +16,46 @@
  * limitations under the License.
  */
 
+#include <map>
+#include <queue>
+#include <vector>
+#include <string>
+#include <memory>
+#include <thread>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <net/if.h>
+#include <functional>
+#include <sys/ioctl.h>
+#include <linux/can.h>
+#include <openxc.pb.h>
+#include <sys/timeb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <json-c/json.h>
+#include <linux/can/raw.h>
+#include <systemd/sd-event.h>
+
+#include "timer.hpp"
+#include "openxc.pb.h"
+#include "can-utils.hpp"
+#include "can-signals.hpp"
+#include "can-decoder.hpp"
+#include "openxc-utils.hpp"
+
 #include "low-can-binding.hpp"
+
+extern "C"
+{
+	#include <afb/afb-binding.h>
+	#include <afb/afb-service-itf.h>
+};
+
+/*
+ *	Interface between the daemon and the binding
+ */
+const struct afb_binding_interface *binder_interface;
 
 /********************************************************************************
 *
@@ -42,15 +81,15 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 		{
 			if(!subscribe)
 			{
-				NOTICE(interface, "Event isn't valid, it can't be unsubscribed.");
+				NOTICE(binder_interface, "Event isn't valid, it can't be unsubscribed.");
 				ret = 1;
 			}
 			else
 			{
-				ss_i->second = afb_daemon_make_event(interface->daemon, ss_i->first.c_str());
+				ss_i->second = afb_daemon_make_event(binder_interface->daemon, ss_i->first.c_str());
 				if (!afb_event_is_valid(ss_i->second)) 
 				{
-					ERROR(interface, "Can't create an event, something goes wrong.");
+					ERROR(binder_interface, "Can't create an event, something goes wrong.");
 					ret = 0;
 				}
 			}
@@ -58,17 +97,17 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	}
 	else
 	{
-		subscribed_signals[sig.genericName] = afb_daemon_make_event(interface->daemon, sig.genericName);
+		subscribed_signals[sig.genericName] = afb_daemon_make_event(binder_interface->daemon, sig.genericName);
 		if (!afb_event_is_valid(ss_i->second)) 
 		{
-			ERROR(interface, "Can't create an event, something goes wrong.");
+			ERROR(binder_interface, "Can't create an event, something goes wrong.");
 			ret = 0;
 		}
 	}
 
 	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, subscribed_signals[sig.genericName])) < 0)
 	{
-		ERROR(interface, "Operation goes wrong for signal: %s", sig.genericName);
+		ERROR(binder_interface, "Operation goes wrong for signal: %s", sig.genericName);
 		ret = 0;
 	}
 	else
@@ -118,7 +157,7 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 		else
 		{
 			openxc_DynamicField search_key = build_DynamicField(name);
-			sig = find_can_signals(interface, search_key);
+			sig = find_can_signals(binder_interface, search_key);
 			if (sig.empty())
 				ret = 0;
 		}
@@ -185,7 +224,7 @@ extern "C"
 
 	const struct afb_binding *afbBindingV1Register (const struct afb_binding_interface *itf)
 	{
-		interface = itf;
+		binder_interface = itf;
 
 		return &binding_desc;
 	}
@@ -200,10 +239,10 @@ extern "C"
 	int afbBindingV1ServiceInit(struct afb_service service)
 	{
 		int fd_conf;
-		fd_conf = afb_daemon_rootdir_open_locale(interface->daemon, "can_bus.json", O_RDONLY, NULL);
+		fd_conf = afb_daemon_rootdir_open_locale(binder_interface->daemon, "can_bus.json", O_RDONLY, NULL);
 
 		/* Open CAN socket */
-		can_bus_t can_bus_handler(interface, fd_conf);
+		can_bus_t can_bus_handler(binder_interface, fd_conf);
 		if(can_bus_handler.init_can_dev() == 0)
 		{
 			can_bus_handler.start_threads();
