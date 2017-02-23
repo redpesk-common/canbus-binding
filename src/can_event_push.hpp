@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "can-utils.hpp"
-#include "can-signals.hpp"
-#include "openxc-utils.hpp"
+#include <mutex>
+#include <condition_variable>
 
-void can_event_push(can_bus_t& can_bus);
+std::condition_variable update_subscrided_signals;
+std::mutex subscribed_signals_mutex;

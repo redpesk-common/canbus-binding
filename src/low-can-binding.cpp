@@ -16,11 +16,18 @@
  * limitations under the License.
  */
 
+#include "low-can-binding.hpp"
+
+#include <queue>
+#include <vector>
+#include <thread>
+#include <fcntl.h>
+#include <linux/can.h>
 #include <json-c/json.h>
 #include <systemd/sd-event.h>
 
-#include "low-can-binding.hpp"
-
+#include "timer.hpp"
+#include "openxc.pb.h"
 #include "can-utils.hpp"
 #include "can-signals.hpp"
 #include "openxc-utils.hpp"
@@ -36,12 +43,41 @@ extern "C"
  */
 const struct afb_binding_interface *binder_interface;
 
+/*
+ * CAN bus handler pointer. This is the object that will be use to
+ * initialize each CAN devices specified into the configuration file
+ *
+ * It is used by the reading thread also because of its can_message_q_ queue
+ * that store CAN messages read from the socket.
+ */
+can_bus_t *can_bus_handler;
+
 /********************************************************************************
 *
 *		Event management
 *
 *********************************************************************************/
+int can_frame_received(sd_event_source *s, int fd, uint32_t revents, void *userdata)
+{
+	can_bus_dev_t *can_bus_dev = (can_bus_dev_t*)userdata;
+	std::lock_guard<std::mutex> can_frame_lock(can_frame_mutex);
 
+	/* Notify reading thread that there is something to read */
+	if ((revents & EPOLLIN) != 0) {
+		new_can_frame.notify_one();
+	}
+
+	/* check if error or hangup */
+	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
+	{
+		sd_event_source_unref(s);
+		can_bus_dev->close();
+		can_bus_dev->open();
+		can_bus_dev->start_reading(*can_bus_handler);
+	}
+
+	return 0;
+}
 /********************************************************************************
 *
 *		Subscription and unsubscription
@@ -220,14 +256,17 @@ extern "C"
 		int fd_conf;
 		fd_conf = afb_daemon_rootdir_open_locale(binder_interface->daemon, "can_bus.json", O_RDONLY, NULL);
 
+		/* Initialize the CAN bus handler */
+		can_bus_t cbh(fd_conf);
+		can_bus_handler = &cbh;
+
 		/* Open CAN socket */
-		can_bus_t can_bus_handler(fd_conf);
-		if(can_bus_handler.init_can_dev() == 0)
+		if(can_bus_handler->init_can_dev() == 0)
 		{
-			can_bus_handler.start_threads();
+			can_bus_handler->start_threads();
 			return 0;
 		}
-
+		ERROR(binder_interface, "There was something wrong with CAN device Initialization. Check your config file maybe");
 		return 1;
 	}
 };

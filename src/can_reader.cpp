@@ -18,13 +18,23 @@
 
 #include "can_reader.hpp"
 
+#include "low-can-binding.hpp"
+#include "can-utils.hpp"
+
 void can_reader(can_bus_dev_t &can_bus_dev, can_bus_t& can_bus)
 {
 	can_message_t can_message;
 
 	while(can_bus_dev.is_running())
 	{
-		can_message.convert_from_canfd_frame(can_bus_dev.read());
-		can_bus.push_new_can_message(can_message);
+		std::unique_lock<std::mutex> can_frame_lock(can_frame_mutex);
+		new_can_frame.wait(can_frame_lock);
+			can_message.convert_from_canfd_frame(can_bus_dev.read());
+		can_frame_mutex.unlock();
+
+		std::lock_guard<std::mutex> can_message_lock(can_message_mutex);
+			can_bus.push_new_can_message(can_message);
+		can_message_mutex.unlock();
+		new_can_message.notify_one();
 	}
 }

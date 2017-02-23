@@ -17,6 +17,10 @@
 
 #include "can-signals.hpp"
 
+#include <fnmatch.h>
+
+#include "low-can-binding.hpp"
+
 /**
  * @brief Dumb SIGNALS array. It is composed by CanMessageSet
  * SIGNALS[MESSAGE_SET_ID][CanSignal]

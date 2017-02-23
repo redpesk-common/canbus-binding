@@ -19,14 +19,18 @@
 
 #include <map>
 #include <queue>
-#include <string>
 #include <vector>
-#include <fnmatch.h>
+#include <string>
+#include <thread>
+#include <linux/can.h>
 
+#include "timer.hpp"
+#include "openxc.pb.h"
 #include "can-utils.hpp"
 
 extern "C"
 {
+	#include <afb/afb-binding.h>
 	#include <afb/afb-event-itf.h>
 }
 

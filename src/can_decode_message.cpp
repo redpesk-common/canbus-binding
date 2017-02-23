@@ -18,6 +18,13 @@
 
 #include "can_decode_message.hpp"
 
+#include "can-utils.hpp"
+#include "openxc-utils.hpp"
+#include "can-signals.hpp"
+#include "can-decoder.hpp"
+
+#include "can_reader.hpp"
+
 void can_decode_message(can_bus_t &can_bus)
 {
 	can_message_t can_message;
@@ -31,28 +38,34 @@ void can_decode_message(can_bus_t &can_bus)
 
 	while(can_bus.has_can_message())
 	{
-		can_message = can_bus.next_can_message();
+		std::unique_lock<std::mutex> can_message_lock(can_message_mutex);
+		new_can_message.wait(can_message_lock);
+			can_message = can_bus.next_can_message();
+		can_message_mutex.unlock();
 
-		/* First we have to found which CanSignal is */
-		search_key = build_DynamicField((double)can_message.get_id());
-		signals = find_can_signals(search_key);
-		
-		/* Decoding the message ! Don't kill the messenger ! */
-		for(const auto& sig : signals)
-		{	
-			std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
-			const auto& it_event = subscribed_signals.find(sig.genericName);
+		std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex);
+			/* First we have to found which CanSignal is */
+			search_key = build_DynamicField((double)can_message.get_id());
+			signals = find_can_signals(search_key);
 			
-			if(it_event != subscribed_signals.end() &&
-				afb_event_is_valid(it_event->second))
-			{
-				ret = decoder.decodeSignal(sig, can_message, getSignals(), &send);
+			/* Decoding the message ! Don't kill the messenger ! */
+			for(const auto& sig : signals)
+			{	
+				std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
+				const auto& it_event = subscribed_signals.find(sig.genericName);
+				
+				if(it_event != subscribed_signals.end() &&
+					afb_event_is_valid(it_event->second))
+				{
+					ret = decoder.decodeSignal(sig, can_message, getSignals(), &send);
 
-				openxc_SimpleMessage s_message = build_SimpleMessage(sig.genericName, ret);
+					openxc_SimpleMessage s_message = build_SimpleMessage(sig.genericName, ret);
 
-				vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
-				can_bus.push_new_vehicle_message(vehicle_message);
+					vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
+					can_bus.push_new_vehicle_message(vehicle_message);
+				}
 			}
-		}
+		decoded_can_message_mutex.unlock();
+		new_decoded_can_message.notify_one();
 	}
 }

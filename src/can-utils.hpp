@@ -17,29 +17,13 @@
 
 #pragma once
 
-#include <map>
 #include <queue>
-#include <vector>
-#include <cstdio>
-#include <string>
-#include <fcntl.h>
-#include <unistd.h>
-#include <net/if.h>
 #include <thread>
-#include <sys/ioctl.h>
 #include <linux/can.h>
-#include <sys/socket.h>
-#include <json-c/json.h>
-#include <linux/can/raw.h>
 
 #include "timer.hpp"
 #include "openxc.pb.h"
 #include "low-can-binding.hpp"
-
-extern "C"
-{
-	#include <afb/afb-binding.h>
-}
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
 #define MAX_ACCEPTANCE_FILTERS 24
@@ -342,12 +326,33 @@ class can_bus_dev_t {
 		can_bus_dev_t(const std::string& dev_name);
 
 		/**
+		 * @brief Connect to the application framework event loop and adding
+		 *  a watch on the socket that will wakeup reading thread that will
+		 * read the socket and fill can_bus_t object queue.
+		 *
+		 * @return 0 if success, anything else if not.
+		 */
+		int event_loop_connection();
+
+		/**
 		 * @brief Open the can socket and returning it 
 		 *
 		 * @return 
 		 */
 		int open();
+		
+		/**
+		 * @brief Open the can socket and returning it 
+		 *
+		 * @return 
+		 */
 		int close();
+		
+		/**
+		 * @brief Telling if the reading thread is running
+		 *
+		 * @return true if read is running, false if not.
+		 */
 		bool is_running();
 		
 		/**

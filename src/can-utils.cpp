@@ -17,6 +17,24 @@
 
 #include "can-utils.hpp"
 
+#include <map>
+#include <vector>
+#include <cstdio>
+#include <string>
+#include <fcntl.h>
+#include <unistd.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <json-c/json.h>
+#include <linux/can/raw.h>
+#include <systemd/sd-event.h>
+
+extern "C"
+{
+	#include <afb/afb-binding.h>
+}
+
 /********************************************************************************
 *
 *		CanMessage method implementation
@@ -140,6 +158,154 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 
 /********************************************************************************
 *
+*		can_bus_t method implementation
+*
+*********************************************************************************/
+
+can_bus_t::can_bus_t(int& conf_file)
+	:  conf_file_{conf_file}
+{
+}
+
+void can_bus_t::start_threads()
+{
+	th_decoding_ = std::thread(can_decode_message, std::ref(*this));
+	th_pushing_ = std::thread(can_event_push, std::ref(*this));
+}
+
+
+int can_bus_t::init_can_dev()
+{
+	std::vector<std::string> devices_name;
+	int i;
+	size_t t;
+
+	devices_name = read_conf();
+
+	if (! devices_name.empty())
+	{
+		t = devices_name.size();
+		i=0;
+
+		for(const auto& device : devices_name)
+		{
+			can_bus_dev_t can_bus_device_handler(device);
+			can_bus_device_handler.open();
+			can_bus_device_handler.start_reading(std::ref(*this));
+			i++;
+		}
+
+		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
+		return 0;
+	}
+	ERROR(binder_interface, "init_can_dev: Error at CAN device initialization. No devices read into configuration file. Did you specify canbus JSON object ?");
+	return 1;
+}
+
+std::vector<std::string> can_bus_t::read_conf()
+{
+	std::vector<std::string> ret;
+	json_object *jo, *canbus;
+	int n, i;
+
+	FILE *fd = fdopen(conf_file_, "r");
+	if (fd)
+	{
+		std::string fd_conf_content;
+		std::fseek(fd, 0, SEEK_END);
+		fd_conf_content.resize(std::ftell(fd));
+		std::rewind(fd);
+		std::fread(&fd_conf_content[0], 1, fd_conf_content.size(), fd);
+		std::fclose(fd);
+
+		jo = json_tokener_parse(fd_conf_content.c_str());
+
+		if (jo == NULL || !json_object_object_get_ex(jo, "canbus", &canbus))
+		{
+			ERROR(binder_interface, "Can't find canbus node in the configuration file. Please review it.");
+			ret.clear();
+		}
+		else if (json_object_get_type(canbus) != json_type_array)
+			ret.push_back(json_object_get_string(canbus));
+		else
+		{
+			n = json_object_array_length(canbus);
+			for (i = 0 ; i < n ; i++)
+				ret.push_back(json_object_get_string(json_object_array_get_idx(canbus, i)));
+		}
+		return ret;
+	}
+	ERROR(binder_interface, "Problem at reading the conf file");
+	ret.clear();
+	return ret;
+}
+
+can_message_t can_bus_t::next_can_message()
+{
+	can_message_t can_msg;
+
+	if(!can_message_q_.empty())
+	{
+		can_msg = can_message_q_.front();
+		can_message_q_.pop();
+		DEBUG(binder_interface, "next_can_message: Here is the next can message : id %d, length %d", can_msg.get_id(), can_msg.get_length());
+		return can_msg;
+	}
+	
+	NOTICE(binder_interface, "next_can_message: End of can message queue");
+	has_can_message_ = false;
+	return can_msg;
+}
+
+void can_bus_t::push_new_can_message(const can_message_t& can_msg)
+{
+	can_message_q_.push(can_msg);
+}
+
+bool can_bus_t::has_can_message() const
+{
+	return has_can_message_;
+}
+
+openxc_VehicleMessage can_bus_t::next_vehicle_message()
+{
+	openxc_VehicleMessage v_msg;
+
+	if(! vehicle_message_q_.empty())
+	{
+		v_msg = vehicle_message_q_.front();
+		vehicle_message_q_.pop();
+		DEBUG(binder_interface, "next_vehicle_message: next vehicle message poped");
+		return v_msg;
+	}
+	
+	NOTICE(binder_interface, "next_vehicle_message: End of vehicle message queue");
+	has_vehicle_message_ = false;
+	return v_msg;
+}
+
+void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
+{
+	vehicle_message_q_.push(v_msg);
+	has_vehicle_message_ = true;
+}
+
+bool can_bus_t::has_vehicle_message() const
+{
+	return has_vehicle_message_;
+}
+
+/********************************************************************************
+*
+*		This is the sd_event_add_io callback function declaration. 
+*		Its implementation can be found into low-can-binding.cpp.
+*
+*********************************************************************************/
+
+int can_frame_received(sd_event_source *s, int fd, uint32_t revents, void *userdata);
+
+/********************************************************************************
+*
 *		can_bus_dev_t method implementation
 *
 *********************************************************************************/
@@ -147,6 +313,22 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 can_bus_dev_t::can_bus_dev_t(const std::string &dev_name)
 	: device_name_{dev_name}
 {
+}
+
+int can_bus_dev_t::event_loop_connection()
+{
+	sd_event_source *source;
+	int rc;
+
+	/* adds to the event loop */
+	rc = sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), &source, can_socket_, EPOLLIN, can_frame_received, this);
+	if (rc < 0) {
+		close();
+		ERROR(binder_interface, "Can't coonect CAN device %s to the event loop", device_name_);
+	} else {
+		NOTICE(binder_interface, "Connected to %s", device_name_);
+	}
+	return rc;
 }
 
 int can_bus_dev_t::open()
@@ -249,7 +431,6 @@ canfd_frame can_bus_dev_t::read()
 void can_bus_dev_t::start_reading(can_bus_t& can_bus)
 {
 	th_reading_ = std::thread(can_reader, std::ref(*this), std::ref(can_bus));
-
 	is_running_ = true;
 }
 
@@ -285,142 +466,4 @@ int can_bus_dev_t::send_can_message(can_message_t& can_msg)
 		open();
 	}
 	return 0;
-}
-/********************************************************************************
-*
-*		can_bus_t method implementation
-*
-*********************************************************************************/
-
-can_bus_t::can_bus_t(int& conf_file)
-	:  conf_file_{conf_file}
-{
-}
-
-void can_bus_t::start_threads()
-{
-	th_decoding_ = std::thread(can_decode_message, std::ref(*this));
-	th_pushing_ = std::thread(can_event_push, std::ref(*this));
-}
-
-
-int can_bus_t::init_can_dev()
-{
-	std::vector<std::string> devices_name;
-	int i;
-	size_t t;
-
-	devices_name = read_conf();
-
-	if (! devices_name.empty())
-	{
-		t = devices_name.size();
-		i=0;
-
-		for(const auto& device : devices_name)
-		{
-			can_bus_dev_t can_bus_device_handler(device);
-			can_bus_device_handler.open();
-			can_bus_device_handler.start_reading(std::ref(*this));
-			i++;
-		}
-
-		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
-		return 0;
-	}
-	ERROR(binder_interface, "init_can_dev: Error at CAN device initialization.");
-	return 1;
-}
-
-std::vector<std::string> can_bus_t::read_conf()
-{
-	std::vector<std::string> ret;
-	json_object *jo, *canbus;
-	int n, i;
-
-	FILE *fd = fdopen(conf_file_, "r");
-	if (fd)
-	{
-		std::string fd_conf_content;
-		std::fseek(fd, 0, SEEK_END);
-		fd_conf_content.resize(std::ftell(fd));
-		std::rewind(fd);
-		std::fread(&fd_conf_content[0], 1, fd_conf_content.size(), fd);
-		std::fclose(fd);
-
-		jo = json_tokener_parse(fd_conf_content.c_str());
-
-		if (jo == NULL || !json_object_object_get_ex(jo, "canbus", &canbus))
-		{
-			ERROR(binder_interface, "Can't find canbus node in the configuration file. Please review it.");
-			ret.clear();
-		}
-		else if (json_object_get_type(canbus) != json_type_array)
-			ret.push_back(json_object_get_string(canbus));
-		else
-		{
-			n = json_object_array_length(canbus);
-			for (i = 0 ; i < n ; i++)
-				ret.push_back(json_object_get_string(json_object_array_get_idx(canbus, i)));
-		}
-		return ret;
-	}
-	ERROR(binder_interface, "Problem at reading the conf file");
-	ret.clear();
-	return ret;
-}
-
-can_message_t can_bus_t::next_can_message()
-{
-	can_message_t can_msg;
-
-	if(!can_message_q_.empty())
-	{
-		can_msg = can_message_q_.front();
-		can_message_q_.pop();
-		DEBUG(binder_interface, "next_can_message: Here is the next can message : id %d, length %d", can_msg.get_id(), can_msg.get_length());
-		return can_msg;
-	}
-	
-	NOTICE(binder_interface, "next_can_message: End of can message queue");
-	has_can_message_ = false;
-	return can_msg;
-}
-
-void can_bus_t::push_new_can_message(const can_message_t& can_msg)
-{
-	can_message_q_.push(can_msg);
-}
-
-bool can_bus_t::has_can_message() const
-{
-	return has_can_message_;
-}
-
-openxc_VehicleMessage can_bus_t::next_vehicle_message()
-{
-	openxc_VehicleMessage v_msg;
-
-	if(! vehicle_message_q_.empty())
-	{
-		v_msg = vehicle_message_q_.front();
-		vehicle_message_q_.pop();
-		DEBUG(binder_interface, "next_vehicle_message: next vehicle message poped");
-		return v_msg;
-	}
-	
-	NOTICE(binder_interface, "next_vehicle_message: End of vehicle message queue");
-	has_vehicle_message_ = false;
-	return v_msg;
-}
-
-void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
-{
-	vehicle_message_q_.push(v_msg);
-	has_vehicle_message_ = true;
-}
-
-bool can_bus_t::has_vehicle_message() const
-{
-	return has_vehicle_message_;
 }

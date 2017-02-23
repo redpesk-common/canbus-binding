@@ -18,6 +18,8 @@
 
 #pragma once
 
-#include "can-utils.hpp"
+#include <mutex>
+#include <condition_variable>
 
-void can_reader(can_bus_dev_t& can_bus_dev, can_bus_t& can_bus);
+extern std::condition_variable new_can_message;
+extern std::mutex can_message_mutex;

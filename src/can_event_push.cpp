@@ -18,6 +18,12 @@
 
 #include "can_event_push.hpp"
 
+#include "can-utils.hpp"
+#include "can-signals.hpp"
+#include "openxc-utils.hpp"
+
+#include "can_decode_message.hpp"
+
 void can_event_push(can_bus_t& can_bus)
 {
 	openxc_VehicleMessage v_message;
@@ -26,15 +32,23 @@ void can_event_push(can_bus_t& can_bus)
 	
 	while(can_bus.has_vehicle_message())
 	{
-		v_message = can_bus.next_vehicle_message();
+		std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex);
+		new_decoded_can_message.wait(decoded_can_message_lock);
+			v_message = can_bus.next_vehicle_message();
+		decoded_can_message_mutex.unlock();
+
 		s_message = get_simple_message(v_message);
-		std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
-		const auto& it_event = subscribed_signals.find(s_message.name);
-		if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
-		{
-			jo = json_object_new_object();
-			jsonify_simple(s_message, jo);
-			afb_event_push(it_event->second, jo);
-		}
+
+		std::lock_guard<std::mutex> push_signal_lock(subscribed_signals_mutex);
+			std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
+			const auto& it_event = subscribed_signals.find(s_message.name);
+			if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
+			{
+				jo = json_object_new_object();
+				jsonify_simple(s_message, jo);
+				afb_event_push(it_event->second, jo);
+			}
+		subscribed_signals_mutex.unlock();
+		update_subscrided_signals.notify_one();
 	}
 }
