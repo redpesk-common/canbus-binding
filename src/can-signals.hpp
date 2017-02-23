@@ -101,7 +101,7 @@ CanBus* getCanBuses();
  *
  * @return std::vector<std::string> return found CanSignal generic name vector.
  */
-std::vector<CanSignal> find_can_signals(const struct afb_binding_interface* interface, const openxc_DynamicField &key);
+std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key);
 
 /**
  * @brief Retrieve can arbitration id of a given CanSignal

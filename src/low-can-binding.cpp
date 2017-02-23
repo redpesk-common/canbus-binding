@@ -136,7 +136,7 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 		else
 		{
 			openxc_DynamicField search_key = build_DynamicField(name);
-			sig = find_can_signals(binder_interface, search_key);
+			sig = find_can_signals(search_key);
 			if (sig.empty())
 				ret = 0;
 		}
@@ -221,7 +221,7 @@ extern "C"
 		fd_conf = afb_daemon_rootdir_open_locale(binder_interface->daemon, "can_bus.json", O_RDONLY, NULL);
 
 		/* Open CAN socket */
-		can_bus_t can_bus_handler(binder_interface, fd_conf);
+		can_bus_t can_bus_handler(fd_conf);
 		if(can_bus_handler.init_can_dev() == 0)
 		{
 			can_bus_handler.start_threads();

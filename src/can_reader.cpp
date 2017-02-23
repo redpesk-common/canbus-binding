@@ -20,11 +20,11 @@
 
 void can_reader(can_bus_dev_t &can_bus_dev, can_bus_t& can_bus)
 {
-	can_message_t can_message(can_bus.interface_);
+	can_message_t can_message;
 
 	while(can_bus_dev.is_running())
 	{
-		can_message.convert_from_canfd_frame(can_bus_dev.read(can_bus.interface_));
+		can_message.convert_from_canfd_frame(can_bus_dev.read());
 		can_bus.push_new_can_message(can_message);
 	}
 }

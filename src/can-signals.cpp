@@ -35,7 +35,7 @@ size_t getSignalCount()
 	return SIGNALS[MESSAGE_SET_ID].size();
 }
 
-std::vector<CanSignal> find_can_signals(const struct afb_binding_interface* interface, openxc_DynamicField& key)
+std::vector<CanSignal> find_can_signals(openxc_DynamicField& key)
 {
 	std::vector<CanSignal> signals;
 
@@ -57,7 +57,7 @@ std::vector<CanSignal> find_can_signals(const struct afb_binding_interface* inte
 			}
 			break;
 		default:
-			ERROR(interface, "find_can_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
+			ERROR(binder_interface, "find_can_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 			CanSignal cs;
 			::memset(&cs, 0, sizeof(CanSignal));
 			signals.push_back(cs);

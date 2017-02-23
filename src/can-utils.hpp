@@ -22,10 +22,10 @@
 #include <vector>
 #include <cstdio>
 #include <string>
-#include <thread>
 #include <fcntl.h>
 #include <unistd.h>
 #include <net/if.h>
+#include <thread>
 #include <sys/ioctl.h>
 #include <linux/can.h>
 #include <sys/socket.h>
@@ -34,6 +34,7 @@
 
 #include "timer.hpp"
 #include "openxc.pb.h"
+#include "low-can-binding.hpp"
 
 extern "C"
 {
@@ -98,11 +99,6 @@ typedef enum CanMessageFormat CanMessageFormat;
  *
  * @brief A compact representation of a single CAN message, meant to be used in in/out
  * buffers.
- *
- * param[in] 
- * param[in] 
- * param[in] 
- * @param[in]
  */
 
 /*************************
@@ -118,8 +114,6 @@ typedef struct CanMessage CanMessage;
 */
 class can_message_t {
 	private:
-		const struct afb_binding_interface* interface_; /*!< afb_binding_interface interface between daemon and binding */ 
-
 		uint32_t id_; /*!< uint32_t id - The ID of the message. */
 		uint8_t length_; /*!<  uint8_t length - the length of the data array (max 8). */
 		CanMessageFormat format_; /*!< CanMessageFormat format - the format of the message's ID.*/
@@ -130,10 +124,8 @@ class can_message_t {
 		 * @brief Class constructor
 		 *
 		 * Constructor about can_message_t class.
-		 *
-		 * @param interface - const structafb_binding_interface pointer
 		 */
-		can_message_t(const struct afb_binding_interface* interface);
+		can_message_t();
 
 		/**
 		 * @brief Retrieve id_ member value.
@@ -254,15 +246,13 @@ class can_bus_t {
 		std::queue <openxc_VehicleMessage> vehicle_message_q_; /*!< queue that'll store openxc_VehicleMessage to pushed */
 
 	public:
-		const struct afb_binding_interface *interface_; /*!< interface_ - afb_binding_interface pointer to the binder. Used to log messages */
-
 		/**
 		 * @brief Class constructor
 		 *
 		 * @param struct afb_binding_interface *interface between daemon and binding
 		 * @param int file handle to the json configuration file.
 		 */
-		can_bus_t(const struct afb_binding_interface *interface, int& conf_file);
+		can_bus_t(int& conf_file);
 		
 		/**
 		 * @brief Will initialize can_bus_dev_t objects after reading 
@@ -356,7 +346,7 @@ class can_bus_dev_t {
 		 *
 		 * @return 
 		 */
-		int open(const struct afb_binding_interface* interface);
+		int open();
 		int close();
 		bool is_running();
 		
@@ -364,7 +354,7 @@ class can_bus_dev_t {
  		* @brief start reading threads and set flag is_running_
 		*
 		* @param can_bus_t reference can_bus_t. it will be passed to the thread 
-		*  to allow using afb_binding_interface and can_bus_t queue.
+		*  to allow using can_bus_t queue.
  		*/
 		void start_reading(can_bus_t& can_bus);
 
@@ -374,7 +364,7 @@ class can_bus_dev_t {
 		* @param const struct afb_binding_interface* interface pointer. Used to be able to log 
 		*  using application framework logger.
  		*/
-		canfd_frame read(const struct afb_binding_interface *interface);
+		canfd_frame read();
 		
 		/**
 		* @brief Send a can message from a can_message_t object.
@@ -383,7 +373,7 @@ class can_bus_dev_t {
 		* @param const struct afb_binding_interface* interface pointer. Used to be able to log 
 		*  using application framework logger.
 		*/
-		int send_can_message(can_message_t& can_msg, const struct afb_binding_interface* interface);
+		int send_can_message(can_message_t& can_msg);
 };
 
 /**
