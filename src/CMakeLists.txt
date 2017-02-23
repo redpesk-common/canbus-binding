@@ -67,7 +67,6 @@ link_libraries(${EXTRAS_LIBRARIES})
 message(STATUS "Creation of ${PROJECT_NAME} binding for AFB-DAEMON")
 ###########################################################################
 add_library(${PROJECT_NAME}-binding MODULE ${PROJECT_NAME}-binding.cpp can-signals.cpp can-utils.cpp can_reader.cpp can_decode_message.cpp can_event_push.cpp openxc-utils.cpp timer.cpp)
-#add_library(${PROJECT_NAME}-binding MODULE ${PROJECT_NAME}-binding.cpp can-signals.cpp can-utils.cpp obd2.cpp)
 
 set_target_properties(${PROJECT_NAME}-binding PROPERTIES
 	PREFIX ""

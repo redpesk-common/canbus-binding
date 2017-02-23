@@ -17,11 +17,11 @@
 
 #pragma once
 
+#include <map>
 #include <queue>
 #include <string>
 #include <vector>
 #include <fnmatch.h>
-#include <linux/can.h>
 
 #include "can-utils.hpp"
 

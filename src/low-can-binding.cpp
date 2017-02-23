@@ -19,11 +19,11 @@
 #include <json-c/json.h>
 #include <systemd/sd-event.h>
 
+#include "low-can-binding.hpp"
+
 #include "can-utils.hpp"
 #include "can-signals.hpp"
 #include "openxc-utils.hpp"
-
-#include "low-can-binding.hpp"
 
 extern "C"
 {

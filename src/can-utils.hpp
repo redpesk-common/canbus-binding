@@ -38,7 +38,6 @@
 extern "C"
 {
 	#include <afb/afb-binding.h>
-	#include <afb/afb-service-itf.h>
 }
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
@@ -440,53 +439,43 @@ struct CanSignal {
 typedef struct CanSignal CanSignal;
 
 /**
+ * @struct CanMessageDefinition
+ *
  * @brief The definition of a CAN message. This includes a lot of metadata, so
  * to save memory this struct should not be used for storing incoming and
  * outgoing CAN messages.
- *
- * @param[in] bus - A pointer to the bus this message is on.
- * @param[in] id - The ID of the message.
- * @param[in] format - the format of the message's ID.
- * @param[in] clock - an optional frequency clock to control the output of this
- *		message, if sent raw, or simply to mark the max frequency for custom
- *		handlers to retriec++ if ? syntaxve.
- * @param[in] forceSendChanged - If true, regardless of the frequency, it will send CAN
- *		message if it has changed when using raw passthrough.
- * @param[in] lastValue - The last received value of the message. Defaults to undefined.
- *		This is required for the forceSendChanged functionality, as the stack
- *		needs to compare an incoming CAN message with the previous frame.
  */
 struct CanMessageDefinition {
-	struct CanBus* bus;
-	uint32_t id;
-	CanMessageFormat format;
-	FrequencyClock frequencyClock;
-	bool forceSendChanged;
-	uint8_t lastValue[CAN_MESSAGE_SIZE];
+	struct CanBus* bus; /*!< bus - A pointer to the bus this message is on. */
+	uint32_t id; /*!<  id - The ID of the message.*/
+	CanMessageFormat format; /*!< format - the format of the message's ID.*/
+	FrequencyClock frequencyClock; /*!<  clock - an optional frequency clock to control the output of this
+ 									*	message, if sent raw, or simply to mark the max frequency for custom
+ 									*	handlers to retriec++ if ? syntaxve.*/
+	bool forceSendChanged; /*!< forceSendChanged - If true, regardless of the frequency, it will send CAN
+ 							*	message if it has changed when using raw passthrough.*/
+	uint8_t lastValue[CAN_MESSAGE_SIZE]; /*!< lastValue - The last received value of the message. Defaults to undefined.
+ 										*	This is required for the forceSendChanged functionality, as the stack
+ 										*	needs to compare an incoming CAN message with the previous frame.*/
 };
 typedef struct CanMessageDefinition CanMessageDefinition;
 
 /**
+ * @struct CanMessageSet
+ *
  * @brief A parent wrapper for a particular set of CAN messages and associated
  *	CAN buses(e.g. a vehicle or program).
- *
- *	@param[in] index - A numerical ID for the message set, ideally the index in an array
- *		for fast lookup
- *	@param[in] name - The name of the message set.
- *	@param[in] busCount - The number of CAN buses defined for this message set.
- *	@param[in] messageCount - The number of CAN messages (across all buses) defined for
- *		this message set.
- *	@param[in] signalCount - The number of CAN signals (across all messages) defined for
- *		this message set.
- *	@param[in] commandCount - The number of CanCommmands defined for this message set.
  */
  typedef struct {
-	uint8_t index;
-	const char* name;
-	uint8_t busCount;
-	unsigned short messageCount;
-	unsigned short signalCount;
-	unsigned short commandCount;
+	uint8_t index; /*!<index - A numerical ID for the message set, ideally the index in an array
+ 					*	for fast lookup*/
+	const char* name; /*!< name - The name of the message set.*/
+	uint8_t busCount; /*!< busCount - The number of CAN buses defined for this message set.*/
+	unsigned short messageCount; /*!< messageCount - The number of CAN messages (across all buses) defined for
+ 									*	this message set.*/
+	unsigned short signalCount; /*!< signalCount - The number of CAN signals (across all messages) defined for
+ 								*	this message set.*/
+	unsigned short commandCount; /*!< commandCount - The number of CanCommmands defined for this message set.*/
 } CanMessageSet;
 
 /**
@@ -503,9 +492,10 @@ typedef struct CanMessageDefinition CanMessageDefinition;
 typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
 		openxc_DynamicField* event, CanSignal* signals, int signalCount);
 
-/* Public: The structure to represent a supported custom OpenXC command.
+/* @struct CanCommand
+ * @brief The structure to represent a supported custom OpenXC command.
  *
- * For completely customized CAN commands without a 1-1 mapping between an
+ * @desc For completely customized CAN commands without a 1-1 mapping between an
  * OpenXC message from the host and a CAN signal, you can define the name of the
  * command and a custom function to handle it in the VI. An example is
  * the "turn_signal_status" command in OpenXC, which has a value of "left" or
@@ -515,17 +505,15 @@ typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
  *
  * Command handlers are also useful if you want to trigger multiple CAN messages
  * or signals from a signal OpenXC message.
- *
- * genericName - The name of the command.
- * handler - An function to process the received command's data and perform some
- *		action.
  */
 typedef struct {
-	const char* genericName;
-	CommandHandler handler;
+	const char* genericName; /*!< genericName - The name of the command.*/
+	CommandHandler handler; /*!< handler - An function to process the received command's data and perform some
+ 							*	action.*/
 } CanCommand;
 
 /**
+ * @fn void pre_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
  * @brief Pre initialize actions made before CAN bus initialization
  *
  * @param[in] can_bus_dev_t bus - A CanBus struct defining the bus's metadata
@@ -536,29 +524,35 @@ typedef struct {
  */
 void pre_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
 
-/* Post-initialize actions made after CAN bus initialization and before the
+/**
+ * @fn void post_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
+ * @brief Post-initialize actions made after CAN bus initialization and before the
  * event loop connection.
  *
- * bus - A CanBus struct defining the bus's metadata
- * writable - configure the controller in a writable mode. If false, it will be
+ * @param[in] bus - A CanBus struct defining the bus's metadata
+ * @param[in] writable - configure the controller in a writable mode. If false, it will be
  *		configured as "listen only" and will not allow writes or even CAN ACKs.
- * buses - An array of all CAN buses.
- * busCount - The length of the buses array.
+ * @param[in] buses - An array of all CAN buses.
+ * @param[in] busCount - The length of the buses array.
  */
 void post_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
 
-/* Public: Check if the device is connected to an active CAN bus, i.e. it's
+/**
+ * @fn bool isBusActive(can_bus_dev_t* bus);
+ * @brief Check if the device is connected to an active CAN bus, i.e. it's
  * received a message in the recent past.
  *
- * Returns true if a message was received on the CAN bus within
+ * @return true if a message was received on the CAN bus within
  * CAN_ACTIVE_TIMEOUT_S seconds.
  */
 bool isBusActive(can_bus_dev_t* bus);
 
-/* Public: Log transfer statistics about all active CAN buses to the debug log.
+/**
+ * @fn void logBusStatistics(can_bus_dev_t* buses, const int busCount);
+ * @brief Log transfer statistics about all active CAN buses to the debug log.
  *
- * buses - an array of active CAN buses.
- * busCount - the length of the buses array.
+ * @param[in] buses - an array of active CAN buses.
+ * @param[in] busCount - the length of the buses array.
  */
 void logBusStatistics(can_bus_dev_t* buses, const int busCount);
 
