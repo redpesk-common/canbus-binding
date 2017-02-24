@@ -86,51 +86,63 @@ int can_frame_received(sd_event_source *s, int fd, uint32_t revents, void *userd
 *
 *********************************************************************************/
 
+static int make_subscription_unsubscription(struct afb_req request, std::map<std::string, struct afb_event>::iterator& ss_i, bool subscribe)
+{
+	/* Make the subscription or unsubscription to the event */
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, ss_i->second)) < 0)
+	{
+		ERROR(binder_interface, "Operation goes wrong for signal: %s", ss_i->first);
+		return 0;
+	}
+	return 1;
+
+}
+
+static int create_event_handle(std::map<std::string, struct afb_event>::iterator& ss_i)
+{
+	ss_i->second = afb_daemon_make_event(binder_interface->daemon, ss_i->first.c_str());
+	if (!afb_event_is_valid(ss_i->second)) 
+	{
+		ERROR(binder_interface, "Can't create an event, something goes wrong.");
+		return 0;
+	}
+
+	return 1;
+}
+
 static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, const CanSignal& sig)
 {
 	int ret;
 
 	// TODO: lock the subscribed_signals when insert/remove
-	const auto& ss_i = subscribed_signals.find(sig.genericName);
-	if (ss_i != subscribed_signals.end())
+	auto ss_i = subscribed_signals.find(sig.genericName);
+	if (ss_i != subscribed_signals.end() && !afb_event_is_valid(ss_i->second))
 	{
-		if(!afb_event_is_valid(ss_i->second))
+		if(!subscribe)
 		{
-			if(!subscribe)
-			{
-				NOTICE(binder_interface, "Event isn't valid, it can't be unsubscribed.");
-				ret = 1;
-			}
-			else
-			{
-				ss_i->second = afb_daemon_make_event(binder_interface->daemon, ss_i->first.c_str());
-				if (!afb_event_is_valid(ss_i->second)) 
-				{
-					ERROR(binder_interface, "Can't create an event, something goes wrong.");
-					ret = 0;
-				}
-			}
+			NOTICE(binder_interface, "Event isn't valid, it can't be unsubscribed.");
+			ret = -1;
+		}
+		else
+		{
+			/* Event it isn't valid annymore, recreate it */
+			ret = create_event_handle(ss_i);
 		}
 	}
 	else
 	{
-		subscribed_signals[sig.genericName] = afb_daemon_make_event(binder_interface->daemon, sig.genericName);
-		if (!afb_event_is_valid(ss_i->second)) 
-		{
-			ERROR(binder_interface, "Can't create an event, something goes wrong.");
-			ret = 0;
-		}
+		/* Event don't exist , so let's create it */
+		struct afb_event empty_event = {nullptr, nullptr};
+		auto ss_i = subscribed_signals.insert(std::make_pair(sig.genericName, empty_event));
+		ret = create_event_handle(ss_i.first);
 	}
 
-	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, subscribed_signals[sig.genericName])) < 0)
-	{
-		ERROR(binder_interface, "Operation goes wrong for signal: %s", sig.genericName);
-		ret = 0;
-	}
-	else
-		ret = 1;
-	
-	return ret;
+	/* Check whether or not the event handler has been correctly created and
+	 * make the subscription/unsubscription operation is so.
+	 */
+	if (ret <= 0)
+		return ret;
+	return make_subscription_unsubscription(request, ss_i, subscribe);
 }
 
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<CanSignal>& signals)
