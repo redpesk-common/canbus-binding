@@ -187,18 +187,19 @@ int can_bus_t::init_can_dev()
 		t = devices_name.size();
 		i=0;
 
+		std::lock_guard<std::mutex> can_frame_lock(can_frame_mutex);
 		for(const auto& device : devices_name)
 		{
 			can_bus_dev_t can_bus_device_handler(device);
-			can_bus_device_handler.open();
+			(can_bus_device_handler.open()) ? i++ : ERROR(binder_interface, "Can't open device %s", device);
 			can_bus_device_handler.start_reading(std::ref(*this));
-			i++;
 		}
+		can_frame_mutex.unlock();
 
 		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
 		return 0;
 	}
-	ERROR(binder_interface, "init_can_dev: Error at CAN device initialization. No devices read into configuration file. Did you specify canbus JSON object ?");
+	ERROR(binder_interface, "init_can_dev: Error at CAN device initialization. No devices read from configuration file. Did you specify canbus JSON object ?");
 	return 1;
 }
 
