@@ -191,7 +191,10 @@ int can_bus_t::init_can_dev()
 		for(const auto& device : devices_name)
 		{
 			can_bus_dev_t can_bus_device_handler(device);
-			(can_bus_device_handler.open()) ? i++ : ERROR(binder_interface, "Can't open device %s", device);
+			if (can_bus_device_handler.open())
+				i++;
+			else
+				ERROR(binder_interface, "Can't open device %s", device);
 			can_bus_device_handler.start_reading(std::ref(*this));
 		}
 		can_frame_mutex.unlock();
