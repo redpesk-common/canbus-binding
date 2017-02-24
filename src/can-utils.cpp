@@ -162,16 +162,33 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 *********************************************************************************/
 
 can_bus_t::can_bus_t(int& conf_file)
-	:  conf_file_{conf_file}
+	: conf_file_{conf_file}
 {
 }
 
 void can_bus_t::start_threads()
 {
 	th_decoding_ = std::thread(can_decode_message, std::ref(*this));
+	is_decoding_ = true;
 	th_pushing_ = std::thread(can_event_push, std::ref(*this));
+	is_pushing_ = true;
 }
 
+void can_bus_t::stop_threads()
+{
+	is_decoding_ = false;
+	is_pushing_ = false;
+}
+
+bool can_bus_t::is_decoding()
+{
+	return is_decoding_;
+}
+
+bool can_bus_t::is_pushing()
+{
+	return is_pushing_;
+}
 
 int can_bus_t::init_can_dev()
 {

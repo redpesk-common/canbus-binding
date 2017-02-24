@@ -221,7 +221,9 @@ class can_bus_t {
 		int conf_file_; /*!< conf_file_ - configuration file handle used to initialize can_bus_dev_t objects.*/
 		
 		std::thread th_decoding_; /*!< thread that'll handle decoding a can frame */
+		bool is_decoding_; /*!< boolean member controling thread while loop*/
 		std::thread th_pushing_; /*!<  thread that'll handle pushing decoded can frame to subscribers */
+		bool is_pushing_; /*!< boolean member controling thread while loop*/
 
 		bool has_can_message_; /*!< boolean members that control whether or not there is can_message into the queue */
 		std::queue <can_message_t> can_message_q_; /*!< queue that'll store can_message_t to decoded */
@@ -257,6 +259,32 @@ class can_bus_t {
 		 *  and push subscribed events.
 		 */
 		void start_threads();
+
+		/**
+		 * @brief Will stop all threads holded by can_bus_t object
+		 *  which are decoding and pushing threads.
+		 */
+		void stop_threads();
+
+		/**
+		 * @brief Telling if the decoding thread is running.
+		 *  This is the boolean value on which the while loop
+		 *  take its condition. Set it to false will stop the 
+		 *  according thread.
+		 *
+		 * @return true if decoding thread is running, false if not.
+		 */
+		bool is_decoding();
+
+		/**
+		 * @brief Telling if the pushing thread is running
+		 *  This is the boolean value on which the while loop
+		 *  take its condition. Set it to false will stop the 
+		 *  according thread.
+		 *
+		 * @return true if pushing thread is running, false if not.
+		 */
+		bool is_pushing();
 
 		/**
 		 * @brief Return first can_message_t on the queue 
@@ -341,8 +369,11 @@ class can_bus_dev_t {
 		
 		/**
 		 * @brief Telling if the reading thread is running
+		 *  This is the boolean value on which the while loop
+		 *  take its condition. Set it to false will stop the 
+		 *  according thread.
 		 *
-		 * @return true if read is running, false if not.
+		 * @return true if reading thread is running, false if not.
 		 */
 		bool is_running();
 		

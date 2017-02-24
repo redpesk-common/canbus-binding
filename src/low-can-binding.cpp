@@ -19,6 +19,7 @@
 #include "low-can-binding.hpp"
 
 #include <queue>
+#include <mutex>
 #include <vector>
 #include <thread>
 #include <fcntl.h>
@@ -34,7 +35,6 @@
 
 extern "C"
 {
-	#include <afb/afb-binding.h>
 	#include <afb/afb-service-itf.h>
 };
 
@@ -42,15 +42,6 @@ extern "C"
  *	Interface between the daemon and the binding
  */
 const struct afb_binding_interface *binder_interface;
-
-/*
- * CAN bus handler pointer. This is the object that will be use to
- * initialize each CAN devices specified into the configuration file
- *
- * It is used by the reading thread also because of its can_message_q_ queue
- * that store CAN messages read from the socket.
- */
-can_bus_t *can_bus_handler;
 
 /********************************************************************************
 *
@@ -86,7 +77,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 {
 	int ret;
 
-	// TODO: lock the subscribed_signals when insert/remove
+	std::lock_guard<std::mutex> subscribed_signals_lock(subscribed_signals_mutex);
 	auto ss_i = subscribed_signals.find(sig.genericName);
 	if (ss_i != subscribed_signals.end() && !afb_event_is_valid(ss_i->second))
 	{
@@ -243,13 +234,12 @@ extern "C"
 		fd_conf = afb_daemon_rootdir_open_locale(binder_interface->daemon, "can_bus.json", O_RDONLY, NULL);
 
 		/* Initialize the CAN bus handler */
-		can_bus_t cbh(fd_conf);
-		can_bus_handler = &cbh;
+		can_bus_t can_bus_handler(fd_conf);
 
 		/* Open CAN socket */
-		if(can_bus_handler->init_can_dev() == 0)
+		if(can_bus_handler.init_can_dev() == 0)
 		{
-			can_bus_handler->start_threads();
+			can_bus_handler.start_threads();
 			return 0;
 		}
 		ERROR(binder_interface, "There was something wrong with CAN device Initialization. Check your config file maybe");

@@ -30,16 +30,18 @@ void can_event_push(can_bus_t& can_bus)
 	openxc_SimpleMessage s_message;
 	json_object* jo;
 	
-	while(can_bus.has_vehicle_message())
+	while(can_bus.is_pushing())
 	{
-		std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex);
-		new_decoded_can_message.wait(decoded_can_message_lock);
+		{
+			std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex);
+			new_decoded_can_message.wait(decoded_can_message_lock);
 			v_message = can_bus.next_vehicle_message();
-		decoded_can_message_mutex.unlock();
+		}
 
 		s_message = get_simple_message(v_message);
 
-		std::lock_guard<std::mutex> push_signal_lock(subscribed_signals_mutex);
+		{
+			std::lock_guard<std::mutex> subscribed_signals_lock(subscribed_signals_mutex);
 			std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
 			const auto& it_event = subscribed_signals.find(s_message.name);
 			if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
@@ -48,7 +50,6 @@ void can_event_push(can_bus_t& can_bus)
 				jsonify_simple(s_message, jo);
 				afb_event_push(it_event->second, jo);
 			}
-		subscribed_signals_mutex.unlock();
-		update_subscrided_signals.notify_one();
+		}
 	}
 }

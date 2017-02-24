@@ -18,8 +18,11 @@
  
 #pragma once
 
-#include <mutex>
-#include <condition_variable>
+#include <cstddef>
+extern "C"
+{
+	#include <afb/afb-binding.h>
+};
 
 extern "C" struct afb_binding_interface;
 

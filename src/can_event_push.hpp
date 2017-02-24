@@ -17,9 +17,3 @@
  */
 
 #pragma once
-
-#include <mutex>
-#include <condition_variable>
-
-std::condition_variable update_subscrided_signals;
-std::mutex subscribed_signals_mutex;
