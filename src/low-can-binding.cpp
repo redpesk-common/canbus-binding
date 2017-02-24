@@ -54,34 +54,6 @@ can_bus_t *can_bus_handler;
 
 /********************************************************************************
 *
-*		Event management
-*
-*********************************************************************************/
-int can_frame_received(sd_event_source *s, int fd, uint32_t revents, void *userdata)
-{
-	can_bus_dev_t *can_bus_dev = (can_bus_dev_t*)userdata;
-
-	/* Notify reading thread that there is something to read */
-	if ((revents & EPOLLIN) != 0) {
-		new_can_frame.notify_one();
-	}
-
-	/* check if error or hangup and reopen the socket and event_loop. 
-	 * socket is protected by a mutex */
-	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
-	{
-		std::lock_guard<std::mutex> can_frame_lock(can_frame_mutex);
-		sd_event_source_unref(s);
-		can_bus_dev->close();
-		can_bus_dev->open();
-		can_bus_dev->start_reading(*can_bus_handler);
-		can_bus_dev->event_loop_connection();
-	}
-
-	return 0;
-}
-/********************************************************************************
-*
 *		Subscription and unsubscription
 *
 *********************************************************************************/

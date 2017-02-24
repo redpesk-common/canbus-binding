@@ -326,15 +326,6 @@ class can_bus_dev_t {
 		can_bus_dev_t(const std::string& dev_name);
 
 		/**
-		 * @brief Connect to the application framework event loop and adding
-		 *  a watch on the socket that will wakeup reading thread that will
-		 * read the socket and fill can_bus_t object queue.
-		 *
-		 * @return 0 if success, anything else if not.
-		 */
-		int event_loop_connection();
-
-		/**
 		 * @brief Open the can socket and returning it 
 		 *
 		 * @return 
@@ -521,8 +512,7 @@ void pre_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, con
 
 /**
  * @fn void post_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
- * @brief Post-initialize actions made after CAN bus initialization and before the
- * event loop connection.
+ * @brief Post-initialize actions made after CAN bus initialization
  *
  * @param[in] bus - A CanBus struct defining the bus's metadata
  * @param[in] writable - configure the controller in a writable mode. If false, it will be

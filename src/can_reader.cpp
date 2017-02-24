@@ -27,13 +27,7 @@ void can_reader(can_bus_dev_t &can_bus_dev, can_bus_t& can_bus)
 
 	while(can_bus_dev.is_running())
 	{
-		/* Declare and take lock ownership of can_frame_mutex.
-		 * then waiting notification for a new can frame arrival
-		 */
-		std::unique_lock<std::mutex> can_frame_lock(can_frame_mutex);
-		new_can_frame.wait(can_frame_lock);
-			can_message.convert_from_canfd_frame(can_bus_dev.read());
-		can_frame_mutex.unlock();
+		can_message.convert_from_canfd_frame(can_bus_dev.read());
 
 		std::lock_guard<std::mutex> can_message_lock(can_message_mutex);
 			can_bus.push_new_can_message(can_message);

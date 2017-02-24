@@ -28,7 +28,6 @@
 #include <sys/socket.h>
 #include <json-c/json.h>
 #include <linux/can/raw.h>
-#include <systemd/sd-event.h>
 
 extern "C"
 {
@@ -187,7 +186,6 @@ int can_bus_t::init_can_dev()
 		t = devices_name.size();
 		i=0;
 
-		std::lock_guard<std::mutex> can_frame_lock(can_frame_mutex);
 		for(const auto& device : devices_name)
 		{
 			can_bus_dev_t can_bus_device_handler(device);
@@ -197,7 +195,6 @@ int can_bus_t::init_can_dev()
 				ERROR(binder_interface, "Can't open device %s", device);
 			can_bus_device_handler.start_reading(std::ref(*this));
 		}
-		can_frame_mutex.unlock();
 
 		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
 		return 0;
@@ -301,15 +298,6 @@ bool can_bus_t::has_vehicle_message() const
 
 /********************************************************************************
 *
-*		This is the sd_event_add_io callback function declaration. 
-*		Its implementation can be found into low-can-binding.cpp.
-*
-*********************************************************************************/
-
-int can_frame_received(sd_event_source *s, int fd, uint32_t revents, void *userdata);
-
-/********************************************************************************
-*
 *		can_bus_dev_t method implementation
 *
 *********************************************************************************/
@@ -317,22 +305,6 @@ int can_frame_received(sd_event_source *s, int fd, uint32_t revents, void *userd
 can_bus_dev_t::can_bus_dev_t(const std::string &dev_name)
 	: device_name_{dev_name}
 {
-}
-
-int can_bus_dev_t::event_loop_connection()
-{
-	sd_event_source *source;
-	int rc;
-
-	/* adds to the event loop */
-	rc = sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), &source, can_socket_, EPOLLIN, can_frame_received, this);
-	if (rc < 0) {
-		close();
-		ERROR(binder_interface, "Can't coonect CAN device %s to the event loop", device_name_);
-	} else {
-		NOTICE(binder_interface, "Connected to %s", device_name_);
-	}
-	return rc;
 }
 
 int can_bus_dev_t::open()
@@ -374,14 +346,9 @@ int can_bus_dev_t::open()
 
 			/* And bind it to txAddress */
 			if (::bind(can_socket_, (struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
-			{
 				ERROR(binder_interface, "Bind failed");
-			}
 			else
-			{
-				::fcntl(can_socket_, F_SETFL, O_NONBLOCK);
 				return 0;
-			}
 		}
 		close();
 	}

@@ -24,6 +24,3 @@
 extern "C" struct afb_binding_interface;
 
 extern const struct afb_binding_interface *binder_interface;
-
-extern std::condition_variable new_can_frame;
-extern std::mutex can_frame_mutex;

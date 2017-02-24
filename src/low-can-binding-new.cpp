@@ -23,6 +23,65 @@
 *		Subscription and unsubscription
 *
 *********************************************************************************/
+static int subscribe_unsubscribe_signal(struct afb_req request, const std::string& sig)
+{
+	int ret;
+
+	// TODO: lock the subscribed_signals when insert/remove
+	const auto& ss_i = subscribed_signals.find(sig);
+	if (ss_i != subscribed_signals.end())
+	{
+		if(!afb_event_is_valid(ss_i->second))
+		{
+			if(!subscribe)
+			{
+				NOTICE(binder_interface, "Event isn't valid, it can't be unsubscribed.");
+				ret = 1;
+			}
+			else
+			{
+				ss_i->second = afb_daemon_make_event(binder_interface->daemon, ss_i->first.c_str());
+				if (!afb_event_is_valid(ss_i->second)) 
+				{
+					ERROR(binder_interface, "Can't create an event, something goes wrong.");
+					ret = 0;
+				}
+			}
+		}
+	}
+	else
+	{
+		subscribed_signals[sig] = afb_daemon_make_event(binder_interface->daemon, sig);
+		if (!afb_event_is_valid(ss_i->second)) 
+		{
+			ERROR(binder_interface, "Can't create an event, something goes wrong.");
+			ret = 0;
+		}
+	}
+
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, subscribed_signals[sig])) < 0)
+	{
+		ERROR(binder_interface, "Operation goes wrong for signal: %s", sig);
+		ret = 0;
+	}
+	else
+		ret = 1;
+	
+	return ret;
+}
+
+static int subscribe_signals(struct afb_req request, const std::vector<std::string>& signals)
+{
+	int ret = 0;
+
+	for(const auto& signal_i : signals)
+	{
+		ret = subscribe_signal(request, subscribe, signal_i);
+		if(ret == 0)
+			return ret;
+	}
+	return ret;
+}
 
 std::vector<std::string> get_name(struct afb_req request)
 {
