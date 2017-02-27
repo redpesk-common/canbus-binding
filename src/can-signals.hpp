@@ -97,7 +97,7 @@ int getMessageCount();
  * @brief Return an array of the metadata for the 2 CAN buses you want to
  * monitor. The size of this array is fixed at 2.
  */
-CanBus* getCanBuses();
+can_bus_dev_t getCanBuses();
 
 /**
  * @brief Find one or many signals based on its name or id
