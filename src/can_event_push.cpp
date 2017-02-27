@@ -33,15 +33,15 @@ void can_event_push(can_bus_t& can_bus)
 	while(can_bus.is_pushing())
 	{
 		{
-			std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex);
-			new_decoded_can_message.wait(decoded_can_message_lock);
+			std::unique_lock<std::mutex> decoded_can_message_lock(can_bus.get_decoded_can_message_mutex());
+			can_bus.get_new_decoded_can_message().wait(decoded_can_message_lock);
 			v_message = can_bus.next_vehicle_message();
 		}
 
 		s_message = get_simple_message(v_message);
 
 		{
-			std::lock_guard<std::mutex> subscribed_signals_lock(subscribed_signals_mutex);
+			std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 			std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
 			const auto& it_event = subscribed_signals.find(s_message.name);
 			if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))

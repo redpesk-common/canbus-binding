@@ -17,9 +17,3 @@
  */
 
 #pragma once
-
-#include <mutex>
-#include <condition_variable>
-
-extern std::condition_variable new_can_message;
-extern std::mutex can_message_mutex;

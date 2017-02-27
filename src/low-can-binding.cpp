@@ -77,7 +77,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 {
 	int ret;
 
-	std::lock_guard<std::mutex> subscribed_signals_lock(subscribed_signals_mutex);
+	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 	auto ss_i = subscribed_signals.find(sig.genericName);
 	if (ss_i != subscribed_signals.end() && !afb_event_is_valid(ss_i->second))
 	{

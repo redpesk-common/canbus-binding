@@ -29,6 +29,18 @@ std::vector<std::vector<CanSignal>> SIGNALS {
 	{}// message set: example
 };
 
+/**
+* @brief Mutex allowing safe manipulation on subscribed_signals map.
+* @desc To ensure that the map object isn't modified when we read it, you
+*  have to set this mutex before use subscribed_signals map object.
+*/
+std::mutex subscribed_signals_mutex;
+
+std::mutex& get_subscribed_signals_mutex()
+{
+	return subscribed_signals_mutex;
+}
+
 const std::vector<CanSignal> getSignals()
 {
 	return SIGNALS[MESSAGE_SET_ID];

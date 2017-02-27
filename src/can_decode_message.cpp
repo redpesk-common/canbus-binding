@@ -38,8 +38,8 @@ void can_decode_message(can_bus_t &can_bus)
 	while(can_bus.is_decoding())
 	{
 		{
-			std::unique_lock<std::mutex> can_message_lock(can_message_mutex);
-			new_can_message.wait(can_message_lock);
+			std::unique_lock<std::mutex> can_message_lock(can_bus.get_can_message_mutex());
+			can_bus.get_new_can_message().wait(can_message_lock);
 			can_message = can_bus.next_can_message();
 		}
 
@@ -51,7 +51,7 @@ void can_decode_message(can_bus_t &can_bus)
 		for(auto& sig : signals)
 		{
 			{
-				std::lock_guard<std::mutex> subscribed_signals_lock(subscribed_signals_mutex);
+				std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 				std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
 				const auto& it_event = subscribed_signals.find(sig.genericName);
 				
@@ -63,10 +63,10 @@ void can_decode_message(can_bus_t &can_bus)
 					openxc_SimpleMessage s_message = build_SimpleMessage(sig.genericName, decoded_message);
 					vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
 
-					std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex);
+					std::lock_guard<std::mutex> decoded_can_message_lock(can_bus.get_decoded_can_message_mutex());
 					can_bus.push_new_vehicle_message(vehicle_message);
 				}
-				new_decoded_can_message.notify_one();
+				can_bus.get_new_decoded_can_message().notify_one();
 			}
 		}
 	}

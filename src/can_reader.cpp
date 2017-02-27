@@ -30,9 +30,9 @@ void can_reader(can_bus_dev_t &can_bus_dev, can_bus_t& can_bus)
 		can_message.convert_from_canfd_frame(can_bus_dev.read());
 
 		{
-			std::lock_guard<std::mutex> can_message_lock(can_message_mutex);
+			std::lock_guard<std::mutex> can_message_lock(can_bus.get_can_message_mutex());
 			can_bus.push_new_can_message(can_message);
 		}
-		new_can_message.notify_one();
+		can_bus.get_new_can_message().notify_one();
 	}
 }

@@ -1,7 +1,0 @@
-{
-	"canbus": {
-		"dev_name": [ "can0",
-					"can1"
-		]
-	}
-}

@@ -18,13 +18,12 @@
 #pragma once
 
 #include <map>
+#include <mutex>
 #include <queue>
 #include <vector>
 #include <string>
 #include <thread>
 #include <linux/can.h>
-#include <mutex>
-#include <condition_variable>
 
 #include "timer.hpp"
 #include "openxc.pb.h"
@@ -48,12 +47,7 @@ extern "C"
  */
 static std::map<std::string, struct afb_event> subscribed_signals;
 
-/**
-* @brief Mutex allowing safe manipulation on subscribed_signals map.
-* @desc To ensure that the map object isn't modified when we read it, you
-*  have to set this mutex before use subscribed_signals map object.
-*/
-extern std::mutex subscribed_signals_mutex;
+std::mutex& get_subscribed_signals_mutex();
 
 /** Public: Return the currently active CAN configuration. */
 CanMessageSet* getActiveMessageSet();

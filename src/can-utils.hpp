@@ -17,9 +17,11 @@
 
 #pragma once
 
+#include <mutex>
 #include <queue>
 #include <thread>
 #include <linux/can.h>
+#include <condition_variable>
 
 #include "timer.hpp"
 #include "openxc.pb.h"
@@ -225,9 +227,13 @@ class can_bus_t {
 		std::thread th_pushing_; /*!<  thread that'll handle pushing decoded can frame to subscribers */
 		bool is_pushing_; /*!< boolean member controling thread while loop*/
 
+		std::condition_variable new_can_message_;
+		std::mutex can_message_mutex_;
 		bool has_can_message_; /*!< boolean members that control whether or not there is can_message into the queue */
 		std::queue <can_message_t> can_message_q_; /*!< queue that'll store can_message_t to decoded */
 
+		std::condition_variable new_decoded_can_message_;
+		std::mutex decoded_can_message_mutex_;
 		bool has_vehicle_message_; /*!< boolean members that control whether or not there is openxc_VehicleMessage into the queue */
 		std::queue <openxc_VehicleMessage> vehicle_message_q_; /*!< queue that'll store openxc_VehicleMessage to pushed */
 
@@ -245,15 +251,20 @@ class can_bus_t {
 		 * the configuration file passed in the constructor.
 		 */
 		int init_can_dev();
-		
+
 		/**
 		 * @brief read the conf_file_ and will parse json objects
 		 * in it searching for canbus objects devices name.
 		 *
 		 * @return Vector of can bus device name string.
 		 */
-		 std::vector<std::string> read_conf();
+		std::vector<std::string> read_conf();
 		
+		std::condition_variable& get_new_can_message();
+		std::mutex& get_can_message_mutex();
+		std::condition_variable& get_new_decoded_can_message();
+		std::mutex& get_decoded_can_message_mutex();
+
 		/**
 		 * @brief Will initialize threads that will decode
 		 *  and push subscribed events.
@@ -341,7 +352,7 @@ class can_bus_dev_t {
 		int can_socket_; /*!< socket handler for the can device */
 		bool is_fdmode_on_; /*!< boolean telling if whether or not the can socket use fdmode. */
 		struct sockaddr_can txAddress_; /*!< internal member using to bind to the socket */
-
+		
 		std::thread th_reading_; /*!< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t */
 		bool is_running_; /*!< boolean telling whether or not reading is running or not */
 

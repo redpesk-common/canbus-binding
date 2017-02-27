@@ -258,6 +258,26 @@ std::vector<std::string> can_bus_t::read_conf()
 	return ret;
 }
 
+std::condition_variable& can_bus_t::get_new_can_message()
+{
+	return new_can_message_;
+}
+
+std::mutex& can_bus_t::get_can_message_mutex()
+{
+	return can_message_mutex_;
+}
+
+std::condition_variable& can_bus_t::get_new_decoded_can_message()
+{
+	return new_decoded_can_message_;
+}
+
+std::mutex& can_bus_t::get_decoded_can_message_mutex()
+{
+	return decoded_can_message_mutex_;
+}
+
 can_message_t can_bus_t::next_can_message()
 {
 	can_message_t can_msg;
