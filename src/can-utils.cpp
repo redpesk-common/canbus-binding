@@ -225,6 +225,7 @@ std::vector<std::string> can_bus_t::read_conf()
 	std::vector<std::string> ret;
 	json_object *jo, *canbus;
 	int n, i;
+	const char* taxi;
 
 	FILE *fd = fdopen(conf_file_, "r");
 	if (fd)
@@ -236,6 +237,7 @@ std::vector<std::string> can_bus_t::read_conf()
 		std::fread(&fd_conf_content[0], 1, fd_conf_content.size(), fd);
 		std::fclose(fd);
 
+		DEBUG(binder_interface, "Conf file content : %s", fd_conf_content.c_str());
 		jo = json_tokener_parse(fd_conf_content.c_str());
 
 		if (jo == NULL || !json_object_object_get_ex(jo, "canbus", &canbus))
@@ -244,7 +246,11 @@ std::vector<std::string> can_bus_t::read_conf()
 			ret.clear();
 		}
 		else if (json_object_get_type(canbus) != json_type_array)
-			ret.push_back(json_object_get_string(canbus));
+		{
+			taxi = json_object_get_string(canbus);
+			DEBUG(binder_interface, "Can bus found: %s", taxi);
+			ret.push_back(taxi);
+		}
 		else
 		{
 			n = json_object_array_length(canbus);
