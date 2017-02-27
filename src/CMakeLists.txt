@@ -106,10 +106,6 @@ add_custom_command(
 	COMMAND cp config.xml package/
 	COMMAND cp can_buses.json package/
 	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_ICON} package/icon.png
-	COMMAND cp libbitfield.a package/libs
-	COMMAND cp libisotp.a package/libs
-	COMMAND cp libuds.a package/libs
-	COMMAND cp libopenxc.a package/libs
 	COMMAND cp ${PROJECT_NAME}.so package/libs
 	COMMAND wgtpkg-pack -f -o ${PROJECT_NAME}.wgt package
 )
