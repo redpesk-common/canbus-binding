@@ -32,7 +32,6 @@ void can_decode_message(can_bus_t &can_bus)
 	std::vector <CanSignal>::iterator signals_i;
 	openxc_VehicleMessage vehicle_message;
 	openxc_DynamicField search_key, decoded_message;
-	bool send = true;
 
 	decoder_t decoder;
 
@@ -49,7 +48,7 @@ void can_decode_message(can_bus_t &can_bus)
 		signals = find_can_signals(search_key);
 
 		/* Decoding the message ! Don't kill the messenger ! */
-		for(const auto& sig : signals)
+		for(auto& sig : signals)
 		{
 			{
 				std::lock_guard<std::mutex> subscribed_signals_lock(subscribed_signals_mutex);
@@ -59,7 +58,7 @@ void can_decode_message(can_bus_t &can_bus)
 				if(it_event != subscribed_signals.end() &&
 					afb_event_is_valid(it_event->second))
 				{
-					decoded_message = decoder.decodeSignal(sig, can_message, getSignals(), &send);
+					decoded_message = decoder.translateSignal(sig, can_message, getSignals());
 
 					openxc_SimpleMessage s_message = build_SimpleMessage(sig.genericName, decoded_message);
 					vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);

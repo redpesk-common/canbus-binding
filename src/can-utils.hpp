@@ -50,8 +50,8 @@
  *
  * @return a decoded value in an openxc_DynamicField struct.
  */
-typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal* signal,
-		CanSignal* signals, int signalCount, float value, bool* send);
+typedef openxc_DynamicField (*SignalDecoder)(const struct CanSignal& signal,
+		const CanSignal& signals, float value, bool* send);
 
 /**
  * @brief: The type signature for a CAN signal encoder.
@@ -463,7 +463,7 @@ typedef struct CanSignal CanSignal;
  * outgoing CAN messages.
  */
 struct CanMessageDefinition {
-	struct CanBus* bus; /*!< bus - A pointer to the bus this message is on. */
+	//can_bus_dev_t bus; /*!< bus - A pointer to the bus this message is on. */
 	uint32_t id; /*!<  id - The ID of the message.*/
 	CanMessageFormat format; /*!< format - the format of the message's ID.*/
 	FrequencyClock frequencyClock; /*!<  clock - an optional frequency clock to control the output of this

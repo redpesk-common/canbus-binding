@@ -27,17 +27,17 @@ float decoder_t::parseSignalBitfield(const CanSignal& signal, const CanMessage& 
 }
 
 openxc_DynamicField decoder_t::noopDecoder(const CanSignal& signal,
-        const CanSignal& signals, float value, bool* send)
+		const CanSignal& signals, float value, bool* send)
 {
 	decoded_value = { .has_type = true,
 					.type = openxc_DynamicField_Type_NUM,
 					.has_numeric_value = true,
 					.numeric_value = value };
-    return decoded_value;
+	return decoded_value;
 }
 
 openxc_DynamicField decoder_t::booleanDecoder(const CanSignal& signal,
-        const CanSignal& signals, float value, bool* send)
+		const CanSignal& signals, float value, bool* send)
 {
 	decoded_value = { .has_type = true,
 					.type = openxc_DynamicField_Type_BOOL,
@@ -47,45 +47,66 @@ openxc_DynamicField decoder_t::booleanDecoder(const CanSignal& signal,
 }
 
 openxc_DynamicField decoder_t::ignoreDecoder(const CanSignal& signal,
-        const CanSignal& signals, float value, bool* send)
+		const CanSignal& signals, float value, bool* send)
 {
-    if(send)
-      *send = false;
-    
-    openxc_DynamicField decoded_value = {0};
-    return decoded_value;
+	if(send)
+	  *send = false;
+	
+	openxc_DynamicField decoded_value = {0};
+	return decoded_value;
 }
 
 openxc_DynamicField decoder_t::stateDecoder(const CanSignal& signal,
-        const CanSignal& signals, float value, bool* send)
+		const CanSignal& signals, float value, bool* send)
 {
-    openxc_DynamicField decoded_value = {0};
-    decoded_value.has_type = true;
-    decoded_value.type = openxc_DynamicField_Type_STRING;
-    decoded_value.has_string_value = true;
+	openxc_DynamicField decoded_value = {0};
+	decoded_value.has_type = true;
+	decoded_value.type = openxc_DynamicField_Type_STRING;
+	decoded_value.has_string_value = true;
 
-    const CanSignalState* signalState = lookupSignalState(value, signal);
-    if(signalState != NULL) {
-        ::strcpy(decoded_value.string_value, signalState->name);
-    } else {
-        *send = false;
-    }
-    return decoded_value;
+	const CanSignalState* signalState = lookupSignalState(value, signal);
+	if(signalState != NULL) {
+		::strcpy(decoded_value.string_value, signalState->name);
+	} else {
+		*send = false;
+	}
+	return decoded_value;
+}
+
+openxc_DynamicField decoder_t::translateSignal(CanSignal& signal, can_message_t& message,
+	const std::vector<CanSignal>& signals)
+{
+	if(signal == nullptr || message == nullptr)
+	{
+		return {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+	}
+
+	float value = parseSignalBitfield(signal, message);
+
+	bool send = true;
+	// Must call the decoders every time, regardless of if we are going to
+	// decide to send the signal or not.
+	openxc_DynamicField decoded_value = decodeSignal(signal,
+			value, signals, &send);
+
+	signal.received = true;
+	signal.lastValue = value;
+	return decoded_value;
 }
 
 openxc_DynamicField decoder_t::decodeSignal(const CanSignal& signal,
-        float value, const std::vector<CanSignal>& signals, bool* send)
+		float value, const std::vector<CanSignal>& signals, bool* send)
 {
-    SignalDecoder decoder = signal->decoder == NULL ?
-                            noopDecoder : signal->decoder;
-    openxc_DynamicField decoded_value = decoder(signal, signals,
-            value, send);
-    return decoded_value;
+	SignalDecoder decoder = signal->decoder == NULL ?
+							noopDecoder : signal->decoder;
+	openxc_DynamicField decoded_value = decoder(signal, signals,
+			value, send);
+	return decoded_value;
 }
 
 openxc_DynamicField decoder_t::decodeSignal(const CanSignal& signal,
-        const can_message_t& message, const std::vector<CanSignal>& signals, bool* send)
+		const can_message_t& message, const std::vector<CanSignal>& signals, bool* send)
 {
-    float value = parseSignalBitfield(signal, message);
-    return decodeSignal(signal, value, signals, send);
+	float value = parseSignalBitfield(signal, message);
+	return decodeSignal(signal, value, signals, send);
 }
