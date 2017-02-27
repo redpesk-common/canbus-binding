@@ -15,70 +15,76 @@
  * limitations under the License.
  */
 
-#pragma once
-
 #include "can-decoder.hpp"
+#include "canutil/read.h"
 
-float decoder_t::parseSignalBitfield(const CanSignal& signal, const CanMessage& message)
+float decoder_t::parseSignalBitfield(CanSignal& signal, const can_message_t& message)
 {
-	 return bitfield_parse_float(message->data, CAN_MESSAGE_SIZE,
-			signal->bitPosition, signal->bitSize, signal->factor,
-			signal->offset);
+	 return bitfield_parse_float(message.get_data(), CAN_MESSAGE_SIZE,
+			signal.bitPosition, signal.bitSize, signal.factor,
+			signal.offset);
 }
 
-openxc_DynamicField decoder_t::noopDecoder(const CanSignal& signal,
-		const CanSignal& signals, float value, bool* send)
+openxc_DynamicField decoder_t::noopDecoder(CanSignal& signal,
+		const std::vector<CanSignal>& signals, float value, bool* send)
 {
-	decoded_value = { .has_type = true,
-					.type = openxc_DynamicField_Type_NUM,
-					.has_numeric_value = true,
-					.numeric_value = value };
+	openxc_DynamicField decoded_value;
+	decoded_value.has_type = true;
+	decoded_value.type = openxc_DynamicField_Type_NUM;
+	decoded_value.has_numeric_value = true;
+	decoded_value.numeric_value = value;
+
 	return decoded_value;
 }
 
-openxc_DynamicField decoder_t::booleanDecoder(const CanSignal& signal,
-		const CanSignal& signals, float value, bool* send)
+openxc_DynamicField decoder_t::booleanDecoder(CanSignal& signal,
+		const std::vector<CanSignal>& signals, float value, bool* send)
 {
-	decoded_value = { .has_type = true,
-					.type = openxc_DynamicField_Type_BOOL,
-					.has_boolean_value = true,
-					.numeric_value = value == 0.0 ? false : true };
+	openxc_DynamicField decoded_value;
+	decoded_value.has_type = true;
+	decoded_value.type = openxc_DynamicField_Type_BOOL;
+	decoded_value.has_boolean_value = true;
+	decoded_value.boolean_value = value == 0.0 ? false : true;
+
 	return decoded_value;
 }
 
-openxc_DynamicField decoder_t::ignoreDecoder(const CanSignal& signal,
-		const CanSignal& signals, float value, bool* send)
+openxc_DynamicField decoder_t::ignoreDecoder(CanSignal& signal,
+		const std::vector<CanSignal>& signals, float value, bool* send)
 {
 	if(send)
 	  *send = false;
 	
-	openxc_DynamicField decoded_value = {0};
+	openxc_DynamicField decoded_value = {0, openxc_DynamicField_Type_BOOL, 0, "", 0, 0, 0, 0};
+	
 	return decoded_value;
 }
 
-openxc_DynamicField decoder_t::stateDecoder(const CanSignal& signal,
-		const CanSignal& signals, float value, bool* send)
+openxc_DynamicField decoder_t::stateDecoder(CanSignal& signal,
+		const std::vector<CanSignal>& signals, float value, bool* send)
 {
-	openxc_DynamicField decoded_value = {0};
+	openxc_DynamicField decoded_value = {0, openxc_DynamicField_Type_BOOL, 0, "", 0, 0, 0, 0};
 	decoded_value.has_type = true;
 	decoded_value.type = openxc_DynamicField_Type_STRING;
 	decoded_value.has_string_value = true;
 
+	/* TODO: Handle SignalState 
 	const CanSignalState* signalState = lookupSignalState(value, signal);
 	if(signalState != NULL) {
 		::strcpy(decoded_value.string_value, signalState->name);
 	} else {
 		*send = false;
-	}
+	}*/
 	return decoded_value;
 }
 
 openxc_DynamicField decoder_t::translateSignal(CanSignal& signal, can_message_t& message,
 	const std::vector<CanSignal>& signals)
 {
-	if(signal == nullptr || message == nullptr)
+	if(&signal == nullptr || &message == nullptr)
 	{
-		return {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+		openxc_DynamicField ret = {0, openxc_DynamicField_Type_BOOL, 0, "", 0, 0, 0, 0};
+		return ret;
 	}
 
 	float value = parseSignalBitfield(signal, message);
@@ -94,17 +100,17 @@ openxc_DynamicField decoder_t::translateSignal(CanSignal& signal, can_message_t&
 	return decoded_value;
 }
 
-openxc_DynamicField decoder_t::decodeSignal(const CanSignal& signal,
+openxc_DynamicField decoder_t::decodeSignal( CanSignal& signal,
 		float value, const std::vector<CanSignal>& signals, bool* send)
 {
-	SignalDecoder decoder = signal->decoder == NULL ?
-							noopDecoder : signal->decoder;
+	SignalDecoder decoder = signal.decoder == NULL ?
+							noopDecoder : signal.decoder;
 	openxc_DynamicField decoded_value = decoder(signal, signals,
 			value, send);
 	return decoded_value;
 }
 
-openxc_DynamicField decoder_t::decodeSignal(const CanSignal& signal,
+openxc_DynamicField decoder_t::decodeSignal( CanSignal& signal,
 		const can_message_t& message, const std::vector<CanSignal>& signals, bool* send)
 {
 	float value = parseSignalBitfield(signal, message);

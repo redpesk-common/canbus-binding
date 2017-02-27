@@ -52,8 +52,8 @@
  *
  * @return a decoded value in an openxc_DynamicField struct.
  */
-typedef openxc_DynamicField (*SignalDecoder)(const struct CanSignal& signal,
-		const CanSignal& signals, float value, bool* send);
+typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal& signal,
+		const std::vector<CanSignal>& signals, float value, bool* send);
 
 /**
  * @brief: The type signature for a CAN signal encoder.
