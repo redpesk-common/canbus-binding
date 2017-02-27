@@ -207,10 +207,12 @@ int can_bus_t::init_can_dev()
 		{
 			can_bus_dev_t can_bus_device_handler(device);
 			if (can_bus_device_handler.open())
+			{
 				i++;
+				can_bus_device_handler.start_reading(std::ref(*this));
+			}
 			else
 				ERROR(binder_interface, "Can't open device %s", device);
-			can_bus_device_handler.start_reading(std::ref(*this));
 		}
 
 		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
@@ -249,7 +251,7 @@ std::vector<std::string> can_bus_t::read_conf()
 		{
 			taxi = json_object_get_string(canbus);
 			DEBUG(binder_interface, "Can bus found: %s", taxi);
-			ret.push_back(taxi);
+			ret.push_back(std::string(taxi));
 		}
 		else
 		{
