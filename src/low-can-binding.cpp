@@ -208,8 +208,8 @@ extern "C"
 	static const struct afb_binding binding_desc {
 		AFB_BINDING_VERSION_1,
 		{
-			"CAN bus service",
-			"can",
+			"Low level CAN bus service",
+			"low-can",
 			verbs
 		}
 	};
@@ -231,7 +231,7 @@ extern "C"
 	int afbBindingV1ServiceInit(struct afb_service service)
 	{
 		int fd_conf;
-		fd_conf = afb_daemon_rootdir_open_locale(binder_interface->daemon, "can_bus.json", O_RDONLY, NULL);
+		fd_conf = afb_daemon_rootdir_open_locale(binder_interface->daemon, "can_buses.json", O_RDONLY, NULL);
 
 		/* Initialize the CAN bus handler */
 		can_bus_t can_bus_handler(fd_conf);
