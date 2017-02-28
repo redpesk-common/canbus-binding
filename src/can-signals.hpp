@@ -22,12 +22,11 @@
 #include <queue>
 #include <vector>
 #include <string>
-#include <thread>
-#include <linux/can.h>
 
 #include "timer.hpp"
 #include "openxc.pb.h"
-#include "can-utils.hpp"
+#include "can-bus.hpp"
+#include "can-message.hpp"
 
 extern "C"
 {
@@ -48,6 +47,91 @@ extern "C"
 static std::map<std::string, struct afb_event> subscribed_signals;
 
 std::mutex& get_subscribed_signals_mutex();
+
+/**
+ * @brief The type signature for a CAN signal decoder.
+ *
+ * @desc A SignalDecoder transforms a raw floating point CAN signal into a number,
+ * string or boolean.
+ *
+ * @param[in] CanSignal signal - The CAN signal that we are decoding.
+ * @param[in] CanSignal signals - The list of all signals.
+ * @param[in] int signalCount - The length of the signals array.
+ * @param[in] float value - The CAN signal parsed from the message as a raw floating point
+ *	value.
+ * @param[out] bool send - An output parameter. If the decoding failed or the CAN signal should
+ *	not send for some other reason, this should be flipped to false.
+ *
+ * @return a decoded value in an openxc_DynamicField struct.
+ */
+typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal& signal,
+		const std::vector<CanSignal>& signals, float value, bool* send);
+
+/**
+ * @brief: The type signature for a CAN signal encoder.
+ *
+ * @desc A SignalEncoder transforms a number, string or boolean into a raw floating
+ * point value that fits in the CAN signal.
+ *
+ * @params[signal] - The CAN signal to encode. 
+ * @params[value] - The dynamic field to encode.
+ * @params[send] - An output parameter. If the encoding failed or the CAN signal should
+ * not be encoded for some other reason, this will be flipped to false.
+ */
+typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
+		openxc_DynamicField* value, bool* send);
+
+/**
+ * @struct CanSignalState
+ *
+ * @brief A state encoded (SED) signal's mapping from numerical values to
+ * OpenXC state names.
+ */
+struct CanSignalState {
+	const int value; /*!< int value - The integer value of the state on the CAN bus.*/
+	const char* name; /*!< char* name  - The corresponding string name for the state in OpenXC. */
+};
+typedef struct CanSignalState CanSignalState;
+
+/**
+ * @struct CanSignal
+ *
+ * @brief A CAN signal to decode from the bus and output over USB.
+ */
+struct CanSignal {
+	struct CanMessageDefinition* message; /*!< message	   - The message this signal is a part of. */
+	const char* genericName; /*!< genericName - The name of the signal to be output over USB.*/
+	uint8_t bitPosition; /*!< bitPosition - The starting bit of the signal in its CAN message (assuming
+ 						*	non-inverted bit numbering, i.e. the most significant bit of
+ 						*	each byte is 0) */
+	uint8_t bitSize; /*!< bitSize - The width of the bit field in the CAN message. */
+	float factor; /*!< factor - The final value will be multiplied by this factor. Use 1 if you
+ 				*	don't need a factor. */
+	float offset; /*!< offset	   - The final value will be added to this offset. Use 0 if you
+ 				*	don't need an offset. */
+	float minValue; /*!< minValue    - The minimum value for the processed signal.*/
+	float maxValue; /*!< maxValue    - The maximum value for the processed signal. */
+	FrequencyClock frequencyClock; /*!< frequencyClock - A FrequencyClock struct to control the maximum frequency to
+ 								*	process and send this signal. To process every value, set the
+ 								*	clock's frequency to 0. */
+	bool sendSame; /*!< sendSame    - If true, will re-send even if the value hasn't changed.*/
+	bool forceSendChanged; /*!< forceSendChanged - If true, regardless of the frequency, it will send the
+ 						*	value if it has changed. */
+	const CanSignalState* states; /*!< states	   - An array of CanSignalState describing the mapping
+ 								*	between numerical and string values for valid states. */
+	uint8_t stateCount; /*!< stateCount  - The length of the states array. */
+	bool writable; /*!< writable    - True if the signal is allowed to be written from the USB host
+ 				*	back to CAN. Defaults to false.*/
+	SignalDecoder decoder; /*!< decoder	   - An optional function to decode a signal from the bus to a human
+ 						*	readable value. If NULL, the default numerical decoder is used. */
+	SignalEncoder encoder; /*!< encoder	   - An optional function to encode a signal value to be written to
+ 						*	CAN into a byte array. If NULL, the default numerical encoder
+ 						*	is used. */
+	bool received; /*!< received    - True if this signal has ever been received.*/
+	float lastValue; /*!< lastValue   - The last received value of the signal. If 'received' is false,
+ 					*	this value is undefined. */
+};
+typedef struct CanSignal CanSignal;
 
 /** Public: Return the currently active CAN configuration. */
 CanMessageSet* getActiveMessageSet();
@@ -76,28 +160,11 @@ CanMessageDefinition* getMessages();
  */
 const std::vector<CanSignal> getSignals();
 
-/* Public: Return an array of all OpenXC CAN commands enabled in the active
- * configuration that can write back to CAN with a custom handler.
- *
- * * Commands not defined here are handled using a 1-1 mapping from the signals
- * list.
- *		*/
-CanCommand* getCommands();
-
-/* Public: Return the length of the array returned by getCommandCount(). */
-int getCommandCount();
-
 /* Public: Return the length of the array returned by getSignals(). */
 size_t getSignalCount();
 
 /* Public: Return the length of the array returned by getMessages(). */
 int getMessageCount();
-
-/**
- * @brief Return an array of the metadata for the 2 CAN buses you want to
- * monitor. The size of this array is fixed at 2.
- */
-can_bus_dev_t getCanBuses();
 
 /**
  * @brief Find one or many signals based on its name or id

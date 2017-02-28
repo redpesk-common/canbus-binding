@@ -29,8 +29,9 @@
 
 #include "timer.hpp"
 #include "openxc.pb.h"
-#include "can-utils.hpp"
+#include "can-bus.hpp"
 #include "can-signals.hpp"
+#include "can-message.hpp"
 #include "openxc-utils.hpp"
 
 extern "C"

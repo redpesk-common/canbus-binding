@@ -18,7 +18,7 @@
 
 #include "can_decode_message.hpp"
 
-#include "can-utils.hpp"
+#include "can-bus.hpp"
 #include "openxc-utils.hpp"
 #include "can-signals.hpp"
 #include "can-decoder.hpp"

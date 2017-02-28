@@ -18,7 +18,7 @@
 
 #include "can_event_push.hpp"
 
-#include "can-utils.hpp"
+#include "can-bus.hpp"
 #include "can-signals.hpp"
 #include "openxc-utils.hpp"
 

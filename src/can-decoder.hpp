@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "can-utils.hpp"
+#include "can-bus.hpp"
 
 class decoder_t
 {

@@ -84,7 +84,7 @@ add_library(openxc STATIC ${PROJECT_LIBDIR}/openxc-message-format/gen/cpp/openxc
 
 message(STATUS "Creation of ${PROJECT_NAME} binding for AFB-DAEMON")
 ###########################################################################
-add_library(${PROJECT_NAME} MODULE ${PROJECT_NAME}.cpp can-signals.cpp can-utils.cpp can-decoder.cpp can_reader.cpp can_decode_message.cpp can_event_push.cpp openxc-utils.cpp timer.cpp)
+add_library(${PROJECT_NAME} MODULE ${PROJECT_NAME}.cpp can-bus.cpp can-message.cpp can-signals.cpp can-decoder.cpp can_reader.cpp can_decode_message.cpp can_event_push.cpp openxc-utils.cpp timer.cpp)
 target_link_libraries(${PROJECT_NAME} ${EXTRAS_LIBRARIES} bitfield isotp uds openxc pthread)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

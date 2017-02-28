@@ -19,7 +19,7 @@
 #include "can_reader.hpp"
 
 #include "low-can-binding.hpp"
-#include "can-utils.hpp"
+#include "can-bus.hpp"
 
 void can_reader(can_bus_dev_t &can_bus_dev, can_bus_t& can_bus)
 {
