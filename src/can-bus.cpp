@@ -43,7 +43,7 @@ extern "C"
 *
 *********************************************************************************/
 
-can_bus_t::can_bus_t(int& conf_file)
+can_bus_t::can_bus_t(int conf_file)
 	: conf_file_{conf_file}
 {
 }
@@ -59,7 +59,7 @@ void can_bus_t::can_decode_message()
 	decoder_t decoder;
 
 	DEBUG(binder_interface, "Beginning of decoding thread.");
-	while(is_decoding())
+	while(is_decoding_)
 	{
 		{
 			std::unique_lock<std::mutex> can_message_lock(can_message_mutex_);
@@ -102,7 +102,7 @@ void can_bus_t::can_event_push()
 	json_object* jo;
 	
 	DEBUG(binder_interface, "Beginning of the pushing thread");
-	while(is_pushing())
+	while(is_pushing_)
 	{
 		{
 			std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
@@ -128,10 +128,15 @@ void can_bus_t::can_event_push()
 
 void can_bus_t::start_threads()
 {
-	th_decoding_ = std::thread(&can_bus_t::can_decode_message, this);
 	is_decoding_ = true;
-	th_pushing_ = std::thread(&can_bus_t::can_event_push, this);
+	th_decoding_ = std::thread(&can_bus_t::can_decode_message, this);
+	if(!th_decoding_.joinable())
+		is_decoding_ = false;
+	
 	is_pushing_ = true;
+	th_pushing_ = std::thread(&can_bus_t::can_event_push, this);
+	if(!th_pushing_.joinable())
+		is_pushing_ = false;
 }
 
 void can_bus_t::stop_threads()
@@ -140,16 +145,6 @@ void can_bus_t::stop_threads()
 	is_pushing_ = false;
 	th_decoding_.join();
 	th_pushing_.join();
-}
-
-bool can_bus_t::is_decoding()
-{
-	return is_decoding_;
-}
-
-bool can_bus_t::is_pushing()
-{
-	return is_pushing_;
 }
 
 int can_bus_t::init_can_dev()
@@ -167,12 +162,12 @@ int can_bus_t::init_can_dev()
 
 		for(const auto& device : devices_name)
 		{
-			can_bus_dev_t can_bus_device_handler(device);
-			if (can_bus_device_handler.open() == 0)
+			can_devices_m_[device] = std::make_shared<can_bus_dev_t>(device);
+			if (can_devices_m_[device]->open() == 0)
 			{
 				i++;
 				DEBUG(binder_interface, "Start reading thread");
-				can_bus_device_handler.start_reading(*this);
+				can_devices_m_[device]->start_reading(*this);
 			}
 			else
 				ERROR(binder_interface, "Can't open device %s", device.c_str());
@@ -394,16 +389,13 @@ canfd_frame can_bus_dev_t::read()
 	return canfd_frame;
 }
 
-bool can_bus_dev_t::is_running()
-{
-	return is_running_;
-}
-
 void can_bus_dev_t::start_reading(can_bus_t& can_bus)
 {
 	DEBUG(binder_interface, "Launching reading thread");
-	th_reading_ = std::thread(&can_bus_dev_t::can_reader, this, std::ref(can_bus));
 	is_running_ = true;
+	th_reading_ = std::thread(&can_bus_dev_t::can_reader, this, std::ref(can_bus));
+	if(!th_reading_.joinable())
+		is_running_ = false;
 }
 
 void can_bus_dev_t::stop_reading()
@@ -417,7 +409,7 @@ void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 	can_message_t can_message;
 
 	DEBUG(binder_interface, "Beginning of reading thread");
-	while(is_running())
+	while(is_running_)
 	{
 		can_message.convert_from_canfd_frame(read());
 

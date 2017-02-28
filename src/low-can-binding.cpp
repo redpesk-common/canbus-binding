@@ -44,6 +44,8 @@ extern "C"
  */
 const struct afb_binding_interface *binder_interface;
 
+can_bus_t *can_bus_handler;
+
 /********************************************************************************
 *
 *		Subscription and unsubscription
@@ -235,12 +237,12 @@ extern "C"
 		fd_conf = afb_daemon_rootdir_open_locale(binder_interface->daemon, "can_buses.json", O_RDONLY, NULL);
 
 		/* Initialize the CAN bus handler */
-		can_bus_t can_bus_handler(fd_conf);
+		can_bus_handler = new can_bus_t(fd_conf);
 
 		/* Open CAN socket */
-		if(can_bus_handler.init_can_dev() == 0)
+		if(can_bus_handler->init_can_dev() == 0)
 		{
-			can_bus_handler.start_threads();
+			can_bus_handler->start_threads();
 			return 0;
 		}
 		ERROR(binder_interface, "There was something wrong with CAN device Initialization. Check your config file maybe");

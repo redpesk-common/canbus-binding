@@ -36,6 +36,8 @@
 
 #define CAN_ACTIVE_TIMEOUT_S 30
 
+class can_bus_dev_t;
+
 /** 
  * @class can_bus_t
  * @brief Object used to handle decoding and manage event queue to be pushed.
@@ -81,6 +83,8 @@ class can_bus_t {
 		bool has_vehicle_message_; /*!< boolean members that control whether or not there is openxc_VehicleMessage into the queue */
 		std::queue <openxc_VehicleMessage> vehicle_message_q_; /*!< queue that'll store openxc_VehicleMessage to pushed */
 
+		std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_devices_m_; /*!< Can device map containing all can_bus_dev_t objects initialized during init_can_dev function*/
+
 	public:
 		/**
 		 * @brief Class constructor
@@ -88,7 +92,7 @@ class can_bus_t {
 		 * @param struct afb_binding_interface *interface between daemon and binding
 		 * @param int file handle to the json configuration file.
 		 */
-		can_bus_t(int& conf_file);
+		can_bus_t(int conf_file);
 		
 		/**
 		 * @brief Will initialize can_bus_dev_t objects after reading 
@@ -152,11 +156,17 @@ class can_bus_t {
 		void push_new_can_message(const can_message_t& can_msg);		
 		
 		/**
-		 * @brief Return a boolean telling if there is any can_message into the queue
+		 * @brief return can_message_mutex_ member
 		 *
-		 * @return true if there is at least a can_message_t, false if not.
+		 * @return  return can_message_mutex_ member
 		 */
 		std::mutex& get_can_message_mutex();
+		
+		/**
+		 * @brief return new_can_message_ member
+		 *
+		 * @return  return new_can_message_ member
+		 */
 		std::condition_variable& get_new_can_message();
 
 
@@ -174,6 +184,7 @@ class can_bus_t {
 		 */
 		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
 };
+
 
 /**
  * @class can_bus_dev_t 
