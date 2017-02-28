@@ -279,6 +279,11 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 	has_vehicle_message_ = true;
 }
 
+std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices();
+{
+	return can_devices_m_;
+}
+
 /********************************************************************************
 *
 *		can_bus_dev_t method implementation
