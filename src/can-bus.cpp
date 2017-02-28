@@ -44,11 +44,89 @@ can_bus_t::can_bus_t(int& conf_file)
 {
 }
 
+void can_bus_t::can_decode_message()
+{
+	can_message_t can_message;
+	std::vector <CanSignal> signals;
+	std::vector <CanSignal>::iterator signals_i;
+	openxc_VehicleMessage vehicle_message;
+	openxc_DynamicField search_key, decoded_message;
+
+	decoder_t decoder;
+
+	DEBUG(binder_interface, "Beginning of decoding thread.");
+	while(is_decoding())
+	{
+		{
+			std::unique_lock<std::mutex> can_message_lock(can_message_mutex_);
+			new_can_message_.wait(can_message_lock);
+			can_message = next_can_message();
+		}
+
+		/* First we have to found which CanSignal it is */
+		search_key = build_DynamicField((double)can_message.get_id());
+		signals = find_can_signals(search_key);
+
+		/* Decoding the message ! Don't kill the messenger ! */
+		for(auto& sig : signals)
+		{
+			{
+				std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
+				std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
+				const auto& it_event = subscribed_signals.find(sig.genericName);
+				
+				if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
+				{
+					decoded_message = decoder.translateSignal(sig, can_message, getSignals());
+
+					openxc_SimpleMessage s_message = build_SimpleMessage(sig.genericName, decoded_message);
+					vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
+
+					std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
+					push_new_vehicle_message(vehicle_message);
+				}
+				new_decoded_can_message_.notify_one();
+			}
+		}
+	}
+}
+
+void can_bus_t::can_event_push()
+{
+	openxc_VehicleMessage v_message;
+	openxc_SimpleMessage s_message;
+	json_object* jo;
+	
+	DEBUG(binder_interface, "Beginning of the pushing thread");
+	while(is_pushing())
+	{
+		{
+			std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
+			new_decoded_can_message_.wait(decoded_can_message_lock);
+			v_message = next_vehicle_message();
+		}
+
+		s_message = get_simple_message(v_message);
+
+		{
+			std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
+			std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
+			const auto& it_event = subscribed_signals.find(s_message.name);
+			if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
+			{
+				jo = json_object_new_object();
+				jsonify_simple(s_message, jo);
+				afb_event_push(it_event->second, jo);
+			}
+		}
+	}
+}
+
 void can_bus_t::start_threads()
 {
-	th_decoding_ = std::thread(can_decode_message, std::ref(*this));
+	th_decoding_ = std::thread(&can_bus_t::can_decode_message, this);
 	is_decoding_ = true;
-	th_pushing_ = std::thread(can_event_push, std::ref(*this));
+	th_pushing_ = std::thread(&can_bus_t::can_event_push, this);
 	is_pushing_ = true;
 }
 
@@ -56,6 +134,8 @@ void can_bus_t::stop_threads()
 {
 	is_decoding_ = false;
 	is_pushing_ = false;
+	th_decoding_.join();
+	th_pushing_.join();
 }
 
 bool can_bus_t::is_decoding()
@@ -154,16 +234,6 @@ std::mutex& can_bus_t::get_can_message_mutex()
 	return can_message_mutex_;
 }
 
-std::condition_variable& can_bus_t::get_new_decoded_can_message()
-{
-	return new_decoded_can_message_;
-}
-
-std::mutex& can_bus_t::get_decoded_can_message_mutex()
-{
-	return decoded_can_message_mutex_;
-}
-
 can_message_t can_bus_t::next_can_message()
 {
 	can_message_t can_msg;
@@ -184,11 +254,6 @@ can_message_t can_bus_t::next_can_message()
 void can_bus_t::push_new_can_message(const can_message_t& can_msg)
 {
 	can_message_q_.push(can_msg);
-}
-
-bool can_bus_t::has_can_message() const
-{
-	return has_can_message_;
 }
 
 openxc_VehicleMessage can_bus_t::next_vehicle_message()
@@ -214,11 +279,6 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 	has_vehicle_message_ = true;
 }
 
-bool can_bus_t::has_vehicle_message() const
-{
-	return has_vehicle_message_;
-}
-
 /********************************************************************************
 *
 *		can_bus_dev_t method implementation
@@ -226,50 +286,57 @@ bool can_bus_t::has_vehicle_message() const
 *********************************************************************************/
 
 can_bus_dev_t::can_bus_dev_t(const std::string &dev_name)
-	: device_name_{dev_name}
+	: device_name_{dev_name}, can_socket_{-1}
 {
 }
 
 int can_bus_dev_t::open()
 {
 	const int canfd_on = 1;
+	const int timestamp_on = 1;
 	struct ifreq ifr;
-	struct timeval timeout = {1, 0};
+	struct timeval timeout;
 
 	DEBUG(binder_interface, "CAN Handler socket : %d", can_socket_);
 	if (can_socket_ >= 0)
 		return 0;
 
 	can_socket_ = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
+	DEBUG(binder_interface, "CAN Handler socket correctly initialized : %d", can_socket_);
 	if (can_socket_ < 0)
-	{
-		ERROR(binder_interface, "socket could not be created");
-	}
+		ERROR(binder_interface, "socket could not be created. Error was : %s", ::strerror(errno));
 	else
 	{
 		/* Set timeout for read */
 		::setsockopt(can_socket_, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+		/* Set timestamp for receveid frame */
+		if (::setsockopt(can_socket_, SOL_SOCKET, SO_TIMESTAMP, &timestamp_on, sizeof(timestamp_on)) < 0)
+			WARNING(binder_interface, "setsockopt SO_TIMESTAMP error: %s", ::strerror(errno));
+		DEBUG(binder_interface, "Switch CAN Handler socket to use fd mode");
 		/* try to switch the socket into CAN_FD mode */
 		if (::setsockopt(can_socket_, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{
 			NOTICE(binder_interface, "Can not switch into CAN Extended frame format.");
 			is_fdmode_on_ = false;
 		} else {
+			DEBUG(binder_interface, "Correctly set up CAN socket to use FD frames.");
 			is_fdmode_on_ = true;
 		}
 
 		/* Attempts to open a socket to CAN bus */
 		::strcpy(ifr.ifr_name, device_name_.c_str());
+		DEBUG(binder_interface, "ifr_name is : %s", ifr.ifr_name);
 		if(::ioctl(can_socket_, SIOCGIFINDEX, &ifr) < 0)
-			ERROR(binder_interface, "ioctl failed");
+			ERROR(binder_interface, "ioctl failed. Error was : %s", strerror(errno));
 		else
 		{
 			txAddress_.can_family = AF_CAN;
 			txAddress_.can_ifindex = ifr.ifr_ifindex;
 
 			/* And bind it to txAddress */
+			DEBUG(binder_interface, "Bind the socket");
 			if (::bind(can_socket_, (struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
-				ERROR(binder_interface, "Bind failed");
+				ERROR(binder_interface, "Bind failed. %s", strerror(errno));
 			else
 				return 0;
 		}
@@ -322,18 +389,39 @@ canfd_frame can_bus_dev_t::read()
 	return canfd_frame;
 }
 
-void can_bus_dev_t::start_reading(can_bus_t& can_bus)
-{
-	th_reading_ = std::thread(can_reader, std::ref(*this), std::ref(can_bus));
-	is_running_ = true;
-}
-
-/*
- * Return is_running_ bool
- */
 bool can_bus_dev_t::is_running()
 {
 	return is_running_;
+}
+
+void can_bus_dev_t::start_reading(can_bus_t& can_bus)
+{
+	DEBUG(binder_interface, "Launching reading thread");
+	th_reading_ = std::thread(&can_bus_dev_t::can_reader, this, std::ref(can_bus));
+	is_running_ = true;
+}
+
+void can_bus_dev_t::stop_reading()
+{
+	is_running_ = false;
+	th_reading_.join();
+}
+
+void can_bus_dev_t::can_reader(can_bus_t& can_bus)
+{
+	can_message_t can_message;
+
+	DEBUG(binder_interface, "Beginning of reading thread");
+	while(is_running())
+	{
+		can_message.convert_from_canfd_frame(read());
+
+		{
+			std::lock_guard<std::mutex> can_message_lock(can_bus.get_can_message_mutex());
+			can_bus.push_new_can_message(can_message);
+		}
+		can_bus.get_new_can_message().notify_one();
+	}
 }
 
 int can_bus_dev_t::send_can_message(can_message_t& can_msg)

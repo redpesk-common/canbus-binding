@@ -49,19 +49,35 @@
 class can_bus_t {
 	private:
 		int conf_file_; /*!< conf_file_ - configuration file handle used to initialize can_bus_dev_t objects.*/
-		
+
+		/**
+		 * @brief thread to decoding raw CAN messages. 
+		 *
+		 * @desc It will take from the can_message_q_ queue the next can message to process then it will search 
+		 *  about signal subscribed if there is a valid afb_event for it. We only decode signal for which a 
+		 *  subscription has been made. Can message will be decoded using translateSignal that will pass it to the
+		 *  corresponding decoding function if there is one assigned for that signal. If not, it will be the default
+		 *  noopDecoder function that will operate on it.
+		 */
+		void can_decode_message();
 		std::thread th_decoding_; /*!< thread that'll handle decoding a can frame */
 		bool is_decoding_; /*!< boolean member controling thread while loop*/
+
+		/**
+		 * @brief thread to push events to suscribers. It will read subscribed_signals map to look 
+		 * which are events that has to be pushed.
+		 */
+		void can_event_push();
 		std::thread th_pushing_; /*!<  thread that'll handle pushing decoded can frame to subscribers */
 		bool is_pushing_; /*!< boolean member controling thread while loop*/
 
-		std::condition_variable new_can_message_;
-		std::mutex can_message_mutex_;
+		std::condition_variable new_can_message_; /*!< condition_variable use to wait until there is a new CAN message to read*/
+		std::mutex can_message_mutex_; /*!< mutex protecting the can_message_q_ queue.*/
 		bool has_can_message_; /*!< boolean members that control whether or not there is can_message into the queue */
 		std::queue <can_message_t> can_message_q_; /*!< queue that'll store can_message_t to decoded */
 
-		std::condition_variable new_decoded_can_message_;
-		std::mutex decoded_can_message_mutex_;
+		std::condition_variable new_decoded_can_message_; /*!< condition_variable use to wait until there is a new vehicle message to read from the queue vehicle_message_q_*/
+		std::mutex decoded_can_message_mutex_;  /*!< mutex protecting the vehicle_message_q_ queue.*/
 		bool has_vehicle_message_; /*!< boolean members that control whether or not there is openxc_VehicleMessage into the queue */
 		std::queue <openxc_VehicleMessage> vehicle_message_q_; /*!< queue that'll store openxc_VehicleMessage to pushed */
 
@@ -88,11 +104,6 @@ class can_bus_t {
 		 */
 		std::vector<std::string> read_conf();
 		
-		std::condition_variable& get_new_can_message();
-		std::mutex& get_can_message_mutex();
-		std::condition_variable& get_new_decoded_can_message();
-		std::mutex& get_decoded_can_message_mutex();
-
 		/**
 		 * @brief Will initialize threads that will decode
 		 *  and push subscribed events.
@@ -101,7 +112,8 @@ class can_bus_t {
 
 		/**
 		 * @brief Will stop all threads holded by can_bus_t object
-		 *  which are decoding and pushing threads.
+		 *  which are decoding and pushing then will wait that's 
+		 * they'll finish their job.
 		 */
 		void stop_threads();
 
@@ -144,8 +156,10 @@ class can_bus_t {
 		 *
 		 * @return true if there is at least a can_message_t, false if not.
 		 */
-		bool has_can_message() const;
-		
+		std::mutex& get_can_message_mutex();
+		std::condition_variable& get_new_can_message();
+
+
 		/**
 		 * @brief Return first openxc_VehicleMessage on the queue 
 		 *
@@ -159,13 +173,6 @@ class can_bus_t {
 		 * @param the const reference openxc_VehicleMessage object to push into the queue
 		 */
 		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
-		
-		/**
-		 * @brief Return a boolean telling if there is any openxc_VehicleMessage into the queue
-		 *
-		 * @return true if there is at least a openxc_VehicleMessage, false if not.
-		 */
-		bool has_vehicle_message() const;
 };
 
 /**
@@ -183,6 +190,15 @@ class can_bus_dev_t {
 		
 		std::thread th_reading_; /*!< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t */
 		bool is_running_; /*!< boolean telling whether or not reading is running or not */
+		
+		/**
+		*
+		* @brief Thread function used to read the can socket.
+		*
+		* @param[in] can_bus_dev_t object to be used to read the can socket
+		* @param[in] can_bus_t object used to fill can_message_q_ queue
+		*/
+		void can_reader(can_bus_t& can_bus);
 
 	public:
 		/**
@@ -217,12 +233,18 @@ class can_bus_dev_t {
 		bool is_running();
 		
 		/**
- 		* @brief start reading threads and set flag is_running_
-		*
-		* @param can_bus_t reference can_bus_t. it will be passed to the thread 
-		*  to allow using can_bus_t queue.
- 		*/
+ 		 * @brief start reading threads and set flag is_running_
+		 *
+		 * @param can_bus_t reference can_bus_t. it will be passed to the thread 
+		 *  to allow using can_bus_t queue.
+ 		 */
 		void start_reading(can_bus_t& can_bus);
+
+		/**
+ 		 * @brief stop the reading thread setting flag is_running_ to false and
+		 * and wait that the thread finish its job.
+		 */
+		void stop_reading();
 
 		/**
  		* @brief Read the can socket and retrieve canfd_frame
@@ -290,16 +312,6 @@ bool isBusActive(can_bus_dev_t* bus);
  * @param[in] busCount - the length of the buses array.
  */
 void logBusStatistics(can_bus_dev_t* buses, const int busCount);
-
-/**
- * @fn void can_reader(can_bus_dev_t& can_bus_dev, can_bus_t& can_bus);
- *
- * @brief Thread function used to read the can socket.
- *
- * @param[in] can_bus_dev_t object to be used to read the can socket
- * @param[in] can_bus_t object used to fill can_message_q_ queue
- */
-void can_reader(can_bus_dev_t& can_bus_dev, can_bus_t& can_bus);
 
 /**
  * @fn void can_decode_message(can_bus_t& can_bus);
