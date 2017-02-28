@@ -18,6 +18,7 @@
 #include "can-bus.hpp"
 
 #include <map>
+#include <cerrno>
 #include <vector>
 #include <string>
 #include <fcntl.h>
@@ -27,6 +28,9 @@
 #include <sys/socket.h>
 #include <json-c/json.h>
 #include <linux/can/raw.h>
+
+#include "can-decoder.hpp"
+#include "openxc-utils.hpp"
 
 extern "C"
 {
@@ -164,13 +168,14 @@ int can_bus_t::init_can_dev()
 		for(const auto& device : devices_name)
 		{
 			can_bus_dev_t can_bus_device_handler(device);
-			if (can_bus_device_handler.open())
+			if (can_bus_device_handler.open() == 0)
 			{
 				i++;
+				DEBUG(binder_interface, "Start reading thread");
 				can_bus_device_handler.start_reading(std::ref(*this));
 			}
 			else
-				ERROR(binder_interface, "Can't open device %s", device);
+				ERROR(binder_interface, "Can't open device %s", device.c_str());
 		}
 
 		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
@@ -197,7 +202,7 @@ std::vector<std::string> can_bus_t::read_conf()
 		std::fread(&fd_conf_content[0], 1, fd_conf_content.size(), fd);
 		std::fclose(fd);
 
-		DEBUG(binder_interface, "Conf file content : %s", fd_conf_content.c_str());
+		DEBUG(binder_interface, "Configuration file content : %s", fd_conf_content.c_str());
 		jo = json_tokener_parse(fd_conf_content.c_str());
 
 		if (jo == NULL || !json_object_object_get_ex(jo, "canbus", &canbus))
