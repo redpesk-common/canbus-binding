@@ -172,7 +172,7 @@ int can_bus_t::init_can_dev()
 			{
 				i++;
 				DEBUG(binder_interface, "Start reading thread");
-				can_bus_device_handler.start_reading(std::ref(*this));
+				can_bus_device_handler.start_reading(*this);
 			}
 			else
 				ERROR(binder_interface, "Can't open device %s", device.c_str());
