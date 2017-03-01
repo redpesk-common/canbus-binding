@@ -390,7 +390,7 @@ canfd_frame can_bus_dev_t::read()
 			is_running_ = false;
 			break;
 	}
-	
+
 	return canfd_frame;
 }
 

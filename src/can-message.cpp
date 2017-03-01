@@ -119,6 +119,7 @@ void can_message_t::convert_from_canfd_frame(const canfd_frame& frame)
 		id_ = frame.can_id & CAN_SFF_MASK;
 		format_ = CanMessageFormat::STANDARD;
 	}
+	DEBUG(binder_interface, "");
 
 	if (sizeof(frame.data) <= sizeof(data_))
 		::memcpy(&data_, frame.data, length_);
