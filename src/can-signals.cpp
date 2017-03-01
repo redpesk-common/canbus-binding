@@ -23,7 +23,7 @@
 #include "low-can-binding.hpp"
 
 std::vector<std::vector<CanMessageDefinition>> CAN_MESSAGES = {
-	{{620, CanMessageFormat::STANDARD, {10, 0, nullptr}, false, (uint8_t)NULL}},
+	{{0x620, CanMessageFormat::STANDARD, {10, 0, nullptr}, false, (uint8_t)NULL}},
 };
 
 /**
@@ -58,7 +58,7 @@ size_t getSignalCount()
 
 std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key)
 {
-	std::vector<CanSignal> signals;
+	std::vector<CanSignal> signals = {};
 
 	switch(key.type)
 	{
@@ -79,9 +79,6 @@ std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key)
 			break;
 		default:
 			ERROR(binder_interface, "find_can_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
-			CanSignal cs;
-			::memset(&cs, 0, sizeof(CanSignal));
-			signals.push_back(cs);
 			return signals;
 			break;
 	}
