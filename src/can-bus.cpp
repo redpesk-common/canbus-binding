@@ -143,8 +143,6 @@ void can_bus_t::stop_threads()
 {
 	is_decoding_ = false;
 	is_pushing_ = false;
-	th_decoding_.join();
-	th_pushing_.join();
 }
 
 int can_bus_t::init_can_dev()
@@ -396,7 +394,6 @@ void can_bus_dev_t::start_reading(can_bus_t& can_bus)
 void can_bus_dev_t::stop_reading()
 {
 	is_running_ = false;
-	th_reading_.join();
 }
 
 void can_bus_dev_t::can_reader(can_bus_t& can_bus)
