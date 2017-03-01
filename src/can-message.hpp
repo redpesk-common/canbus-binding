@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <vector>
 #include <string>
 #include <cstdint>
 #include <linux/can.h>
@@ -61,7 +62,7 @@ class can_message_t {
 		uint8_t length_; /*!<  uint8_t length - the length of the data array (max 8). */
 		uint8_t flags_; /*!< unint8_t flags of a CAN FD frame. Needed if we catch FD frames.*/
 		CanMessageFormat format_; /*!< CanMessageFormat format - the format of the message's ID.*/
-		uint8_t data_[CAN_MESSAGE_SIZE]; /*!< uint8_t data  - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
+		std::vector<uint8_t> data_; /*!< uint8_t data  - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 
 		uint8_t maxdlen_;
 
@@ -104,7 +105,8 @@ class can_message_t {
 		/**
 		 * @brief Retrieve data_ member value.
 		 *
-		 * @return uint8_t data_ pointer class member
+		 * @return uint8_t data_ pointer to the first element 
+		 *  of class member data_
 		 */
 		const uint8_t* get_data() const;
 		

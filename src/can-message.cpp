@@ -55,8 +55,9 @@ uint8_t can_message_t::get_flags() const
 
 const uint8_t* can_message_t::get_data() const
 {
-	return data_;
+	return data_.data();
 }
+
 uint8_t can_message_t::get_length() const
 {
 	return length_;
@@ -149,15 +150,15 @@ void can_message_t::set_length(const uint8_t new_length)
 
 void can_message_t::set_data(const __u8 new_data[], size_t dlen)
 {
-	if (sizeof(dlen)/sizeof(__u8) > maxdlen_)
+	if (dlen > maxdlen_)
 		ERROR(binder_interface, "Can set data, too big ! It is a CAN frame ?");
 	else
 	{
 		int i;
-		/* Limiting to 8 bytes message for now on 64 bytes from fd frames*/
+		/* Limiting to 8 bytes message for now, even on 64 bytes from fd frames*/
 		for(i=0;i<CAN_MESSAGE_SIZE;i++)
 		{
-			data_[i] = new_data[i];
+			data_.push_back(new_data[i]);
 		}
 	}
 }
@@ -181,8 +182,8 @@ void can_message_t::convert_from_canfd_frame(const struct canfd_frame& frame)
 	if(maxdlen_ == CANFD_MAX_DLEN)
 		set_flags(frame.flags);
 
-	size_t dlen = sizeof(frame.data);
-	memset(data_, 0, dlen);
+	size_t dlen = sizeof(frame.data)/sizeof(__u8);
+	data_.reserve(dlen);
 	set_data(frame.data, dlen);
 
 	DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %d, format: %d, length: %d, data %d%d%d%d%d%d%d%d", id_, format_, length_,
