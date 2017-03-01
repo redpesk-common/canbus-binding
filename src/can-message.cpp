@@ -186,7 +186,7 @@ void can_message_t::convert_from_canfd_frame(const struct canfd_frame& frame)
 	data_.reserve(dlen);
 	set_data(frame.data, dlen);
 
-	DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %d, format: %d, length: %d, data %d%d%d%d%d%d%d%d", id_, format_, length_,
+	DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", id_, format_, length_,
 							data_[0], data_[1], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7]);
 }
 

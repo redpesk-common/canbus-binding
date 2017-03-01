@@ -361,7 +361,7 @@ canfd_frame can_bus_dev_t::read()
 {
 	ssize_t nbytes;
 	//int maxdlen;
-	canfd_frame canfd_frame;
+	struct canfd_frame cfd;
 
 	/* Test that socket is really opened */
 	if (can_socket_ < 0)
@@ -370,17 +370,18 @@ canfd_frame can_bus_dev_t::read()
 		is_running_ = false;
 	}
 
-	nbytes = ::read(can_socket_, &canfd_frame, CANFD_MTU);
+	nbytes = ::read(can_socket_, &cfd, CANFD_MTU);
 
 	/* if we did not fit into CAN sized messages then stop_reading. */
 	if (nbytes != CANFD_MTU && nbytes != CAN_MTU)
+	{
 		if (errno == ENETDOWN)
 			ERROR(binder_interface, "read: %s CAN device down", device_name_);
-		ERROR(binder_interface, "read: Error reading CAN bus");
-		::memset(&canfd_frame, 0, sizeof(canfd_frame));
-		stop_reading();
+		ERROR(binder_interface, "read: Incomplete CAN(FD) frame");
+		::memset(&cfd, 0, sizeof(cfd));
+	}
 
-	return canfd_frame;
+	return cfd;
 }
 
 void can_bus_dev_t::start_reading(can_bus_t& can_bus)
