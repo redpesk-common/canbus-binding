@@ -189,7 +189,7 @@ class can_bus_t {
 		 *
 		 * @return map can_bus_dev_m_ map
 		 */
-		std::map<std::string, std::shared_ptr<can_bus_dev_t>> get_can_bus_devices();
+		std::map<std::string, std::shared_ptr<can_bus_dev_t>> get_can_devices();
 };
 
 

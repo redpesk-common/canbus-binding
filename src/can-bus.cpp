@@ -279,7 +279,7 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 	has_vehicle_message_ = true;
 }
 
-std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices();
+std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices()
 {
 	return can_devices_m_;
 }
@@ -372,24 +372,13 @@ canfd_frame can_bus_dev_t::read()
 
 	nbytes = ::read(can_socket_, &canfd_frame, CANFD_MTU);
 
-	switch(nbytes)
-	{
-		case CANFD_MTU:
-			DEBUG(binder_interface, "read_can: Got an CAN FD frame with length %d", canfd_frame.len);
-			//maxdlen = CANFD_MAX_DLEN;
-			break;
-		case CAN_MTU:
-			DEBUG(binder_interface, "read_can: Got a legacy CAN frame with length %d", canfd_frame.len);
-			//maxdlen = CAN_MAX_DLEN;
-			break;
-		default:
-			if (errno == ENETDOWN)
-					ERROR(binder_interface, "read_can: %s binder_interface down", device_name_);
-			ERROR(binder_interface, "read_can: Error reading CAN bus");
-			::memset(&canfd_frame, 0, sizeof(canfd_frame));
-			is_running_ = false;
-			break;
-	}
+	/* if we did not fit into CAN sized messages then stop_reading. */
+	if (nbytes != CANFD_MTU && nbytes != CAN_MTU)
+		if (errno == ENETDOWN)
+			ERROR(binder_interface, "read: %s CAN device down", device_name_);
+		ERROR(binder_interface, "read: Error reading CAN bus");
+		::memset(&canfd_frame, 0, sizeof(canfd_frame));
+		stop_reading();
 
 	return canfd_frame;
 }

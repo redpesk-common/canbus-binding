@@ -57,9 +57,13 @@ typedef struct CanMessage CanMessage;
 class can_message_t {
 	private:
 		uint32_t id_; /*!< uint32_t id - The ID of the message. */
+		bool rtr_flag_; /*!< bool rtr_flag - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
 		uint8_t length_; /*!<  uint8_t length - the length of the data array (max 8). */
+		uint8_t flags_; /*!< unint8_t flags of a CAN FD frame. Needed if we catch FD frames.*/
 		CanMessageFormat format_; /*!< CanMessageFormat format - the format of the message's ID.*/
 		uint8_t data_[CAN_MESSAGE_SIZE]; /*!< uint8_t data  - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
+
+		uint8_t maxdlen_;
 
 	public:
 		/**
@@ -77,11 +81,25 @@ class can_message_t {
 		uint32_t get_id() const;
 		
 		/**
+		 * @brief Retrieve RTR flag member.
+		 *
+		 * @return bool rtr_flags_ class member
+		 */
+		bool get_rtr_flag_() const;
+
+		/**
 		 * @brief Retrieve format_ member value.
 		 *
 		 * @return CanMessageFormat format_ class member
 		 */
 		int get_format() const;
+		
+		/**
+		 * @brief Retrieve format_ member value.
+		 *
+		 * @return CanMessageFormat format_ class member
+		 */
+		uint8_t get_flags() const;
 		
 		/**
 		 * @brief Retrieve data_ member value.
@@ -96,6 +114,8 @@ class can_message_t {
 		 * @return uint8_t length_ class member
 		 */
 		uint8_t get_length() const;
+		
+		void set_max_data_length(const struct canfd_frame& frame);
 
 		/**
 		 * @brief Control whether the object is correctly initialized
@@ -113,7 +133,7 @@ class can_message_t {
 		 *
 		 * @param uint32_t id_ class member
 		 */
-		void set_id(const uint32_t new_id);
+		void set_id_and_format(const uint32_t new_id);
 		
 		/**
 		 * @brief Set format_ member value.
@@ -123,8 +143,29 @@ class can_message_t {
 		 *
 		 * @param CanMessageFormat format_ class member
 		 */
-		void set_format(const CanMessageFormat format);
+		void set_format(const CanMessageFormat new_format);
 		
+		/**
+		 * @brief Set format_ member value. Deducing from the can_id
+		 *  of a canfd_frame.
+		 *
+		 * Preferred way to initialize these members by using 
+		 * convert_from_canfd_frame method.
+		 *
+		 * @param uint32_t can_id integer from a canfd_frame
+		 */
+		void set_format(const uint32_t can_id);
+
+		/**
+		 * @brief Set format_ member value.
+		 *
+		 * Preferred way to initialize these members by using 
+		 * convert_from_canfd_frame method.
+		 *
+		 * @param CanMessageFormat format_ class member
+		 */
+		void set_flags(const uint8_t flags);
+
 		/**
 		 * @brief Set data_ member value.
 		 *
@@ -133,7 +174,7 @@ class can_message_t {
 		 *
 		 * @param uint8_t data_ array with a max size of 8 elements.
 		 */
-		void set_data(const uint8_t new_data);
+		void set_data(const __u8 new_data[], size_t dlen);
 		
 		/**
 		 * @brief Set length_ member value.
@@ -152,7 +193,7 @@ class can_message_t {
 		 *
 		 * @param canfd_frame struct read from can bus device.
 		 */
-		void convert_from_canfd_frame(const canfd_frame& frame);
+		void convert_from_canfd_frame(const struct canfd_frame& frame);
 		
 		/**
 		 * @brief Take all initialized class's members and build an 
