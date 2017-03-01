@@ -133,38 +133,12 @@ struct CanSignal {
 };
 typedef struct CanSignal CanSignal;
 
-/** Public: Return the currently active CAN configuration. */
-CanMessageSet* getActiveMessageSet();
-
-/** Public: Retrive a list of all possible CAN configurations.
- *
- * Returns a pointer to an array of all configurations.
- */
-CanMessageSet* getMessageSets();
-
-/** Public: Return the length of the array returned by getMessageSets() */
-int getMessageSetCount();
-
-/* Public: Return the number of CAN buses configured in the active
- * configuration. This is limited to 2, as the hardware controller only has 2
- * CAN channels.
- */
-int getCanBusCount();
-
-/* Public: Return an array of all CAN messages to be processed in the active
- * configuration.
- */
-CanMessageDefinition* getMessages();
-
 /* Public: Return signals from an signals array filtered on name.
  */
 const std::vector<CanSignal> getSignals();
 
 /* Public: Return the length of the array returned by getSignals(). */
 size_t getSignalCount();
-
-/* Public: Return the length of the array returned by getMessages(). */
-int getMessageCount();
 
 /**
  * @brief Find one or many signals based on its name or id

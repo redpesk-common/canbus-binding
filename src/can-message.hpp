@@ -203,3 +203,23 @@ typedef struct CanMessageDefinition CanMessageDefinition;
  								*	this message set.*/
 	unsigned short commandCount; /*!< commandCount - The number of CanCommmands defined for this message set.*/
 } CanMessageSet;
+
+/** Public: Return the currently active CAN configuration. */
+CanMessageSet* getActiveMessageSet();
+
+/** Public: Retrive a list of all possible CAN configurations.
+ *
+ * Returns a pointer to an array of all configurations.
+ */
+CanMessageSet* getMessageSets();
+
+/** Public: Return the length of the array returned by getMessageSets() */
+int getMessageSetCount();
+
+/* Public: Return an array of all CAN messages to be processed in the active
+ * configuration.
+ */
+CanMessageDefinition* getMessages();
+
+/* Public: Return the length of the array returned by getMessages(). */
+int getMessageCount();
