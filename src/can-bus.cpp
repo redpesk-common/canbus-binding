@@ -240,7 +240,7 @@ can_message_t can_bus_t::next_can_message()
 	{
 		can_msg = can_message_q_.front();
 		can_message_q_.pop();
-		DEBUG(binder_interface, "next_can_message: Here is the next can message : id %d, length %d", can_msg.get_id(), can_msg.get_length());
+		DEBUG(binder_interface, "next_can_message: Here is the next can message : id %X, length %X", can_msg.get_id(), can_msg.get_length());
 		return can_msg;
 	}
 	
