@@ -1,15 +1,15 @@
 [submodule "src/libs/openxc-message-format"]
 	path = src/libs/openxc-message-format
-	url = git@github.com:openxc/openxc-message-format.git
+	url = https://github.com/openxc/openxc-message-format.git
 [submodule "src/libs/nanopb"]
 	path = src/libs/nanopb
-	url = git@github.com:nanopb/nanopb.git
+	url = https://github.com/nanopb/nanopb.git
 [submodule "src/libs/uds-c"]
 	path = src/libs/uds-c
-	url = git@github.com:openxc/uds-c.git
+	url = https://github.com/openxc/uds-c.git
 [submodule "src/libs/bitfield-c"]
 	path = src/libs/bitfield-c
-	url = git@github.com:openxc/bitfield-c.git
+	url = https://github.com/openxc/bitfield-c.git
 [submodule "src/libs/isotp-c"]
 	path = src/libs/isotp-c
-	url = git@github.com:openxc/isotp-c.git
+	url = https://github.com/openxc/isotp-c.git
