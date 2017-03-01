@@ -270,7 +270,7 @@ class can_bus_dev_t {
 		* @param const struct afb_binding_interface* interface pointer. Used to be able to log 
 		*  using application framework logger.
  		*/
-		canfd_frame read();
+		std::pair<struct canfd_frame&, size_t> read();
 		
 		/**
 		* @brief Send a can message from a can_message_t object.

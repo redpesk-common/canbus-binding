@@ -355,7 +355,7 @@ int can_bus_dev_t::close()
 	return can_socket_;
 }
 
-canfd_frame can_bus_dev_t::read()
+std::pair<struct canfd_frame&, size_t> can_bus_dev_t::read()
 {
 	ssize_t nbytes;
 	//int maxdlen;
@@ -379,7 +379,7 @@ canfd_frame can_bus_dev_t::read()
 		::memset(&cfd, 0, sizeof(cfd));
 	}
 
-	return cfd;
+	return std::pair<struct canfd_frame&, size_t>(cfd, nbytes);
 }
 
 void can_bus_dev_t::start_reading(can_bus_t& can_bus)

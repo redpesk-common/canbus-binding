@@ -63,18 +63,18 @@ uint8_t can_message_t::get_length() const
 	return length_;
 }
 
-void can_message_t::set_max_data_length(const struct canfd_frame& frame)
+void can_message_t::set_max_data_length(size_t nbytes)
 {
 	maxdlen_ = 0;
 
-	switch(sizeof(frame))
+	switch(nbytes)
 	{
 		case CANFD_MTU:
-			DEBUG(binder_interface, "convert_from_canfd_frame: Got an CAN FD frame with length %d and flags %d", frame.len, frame.flags);
+			DEBUG(binder_interface, "convert_from_canfd_frame: Got an CAN FD frame");
 			maxdlen_ = CANFD_MAX_DLEN;
 			break;
 		case CAN_MTU:
-			DEBUG(binder_interface, "convert_from_canfd_frame: Got a legacy CAN frame with length %d", frame.len);
+			DEBUG(binder_interface, "convert_from_canfd_frame: Got a legacy CAN frame");
 			maxdlen_ = CAN_MAX_DLEN;
 			break;
 		default:
@@ -148,28 +148,28 @@ void can_message_t::set_length(const uint8_t new_length)
 	}
 }
 
-void can_message_t::set_data(const __u8 new_data[], size_t dlen)
+void can_message_t::set_data(const __u8* new_data)
 {
-	if (dlen > maxdlen_)
-		ERROR(binder_interface, "Can set data, too big ! It is a CAN frame ?");
-	else
-	{
 		int i;
-		/* Limiting to 8 bytes message for now, even on 64 bytes from fd frames*/
-		for(i=0;i<CAN_MESSAGE_SIZE;i++)
+
+		/* maxdlen_ is now set at CAN_MAX_DLEN or CANFD_MAX_DLEN, respectively 8 and 64 bytes*/
+		for(i=0;i<maxdlen_;i++)
 		{
 			data_.push_back(new_data[i]);
 		}
-	}
 }
 
-void can_message_t::convert_from_canfd_frame(const struct canfd_frame& frame)
+void can_message_t::convert_from_canfd_frame(const std::pair<struct canfd_frame&, size_t>args)
 {
-	set_max_data_length(frame);
+	// May be it's overkill to assign member of the pair... May be it will change...
+	struct canfd_frame frame = args.first;
+	size_t nbytes = args.second;
+	set_max_data_length(nbytes);
 	set_length(frame.len);
 	set_id_and_format(frame.can_id);
 
-	/* standard CAN frames may have RTR enabled. There are no ERR frames with RTR */
+	/* Overwrite lenght_ if RTR flags is detected.
+	 * standard CAN frames may have RTR enabled. There are no ERR frames with RTR */
 	if (frame.can_id & CAN_RTR_FLAG)
 	{
 		rtr_flag_ = true;
@@ -182,9 +182,8 @@ void can_message_t::convert_from_canfd_frame(const struct canfd_frame& frame)
 	if(maxdlen_ == CANFD_MAX_DLEN)
 		set_flags(frame.flags);
 
-	size_t dlen = sizeof(frame.data)/sizeof(__u8);
-	data_.reserve(dlen);
-	set_data(frame.data, dlen);
+	data_.reserve(maxdlen_);
+	set_data(frame.data);
 
 	DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", id_, format_, length_,
 							data_[0], data_[1], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7]);

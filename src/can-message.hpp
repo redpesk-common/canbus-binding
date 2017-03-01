@@ -117,7 +117,7 @@ class can_message_t {
 		 */
 		uint8_t get_length() const;
 		
-		void set_max_data_length(const struct canfd_frame& frame);
+		void set_max_data_length(size_t nbytes);
 
 		/**
 		 * @brief Control whether the object is correctly initialized
@@ -176,7 +176,7 @@ class can_message_t {
 		 *
 		 * @param uint8_t data_ array with a max size of 8 elements.
 		 */
-		void set_data(const __u8 new_data[], size_t dlen);
+		void set_data(const __u8* new_data);
 		
 		/**
 		 * @brief Set length_ member value.
@@ -195,7 +195,7 @@ class can_message_t {
 		 *
 		 * @param canfd_frame struct read from can bus device.
 		 */
-		void convert_from_canfd_frame(const struct canfd_frame& frame);
+		void convert_from_canfd_frame(const std::pair<struct canfd_frame&, size_t>args);
 		
 		/**
 		 * @brief Take all initialized class's members and build an 
