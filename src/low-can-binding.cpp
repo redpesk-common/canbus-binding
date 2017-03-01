@@ -52,27 +52,26 @@ can_bus_t *can_bus_handler;
 *
 *********************************************************************************/
 
-static int make_subscription_unsubscription(struct afb_req request, std::map<std::string, struct afb_event>::iterator& ss_i, bool subscribe)
+static int make_subscription_unsubscription(struct afb_req request, const char* sig_name, bool subscribe)
 {
 	/* Make the subscription or unsubscription to the event */
-	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, ss_i->second)) < 0)
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, subscribed_signals[std::string(sig_name)])) < 0)
 	{
-		ERROR(binder_interface, "Operation goes wrong for signal: %s", ss_i->first);
+		ERROR(binder_interface, "Operation goes wrong for signal: %s", sig_name);
 		return 0;
 	}
 	return 1;
 
 }
 
-static int create_event_handle(std::map<std::string, struct afb_event>::iterator& ss_i)
+static int create_event_handle(const char* sig_name)
 {
-	ss_i->second = afb_daemon_make_event(binder_interface->daemon, ss_i->first.c_str());
-	if (!afb_event_is_valid(ss_i->second)) 
+	subscribed_signals[std::string(sig_name)] = afb_daemon_make_event(binder_interface->daemon, sig_name);
+	if (!afb_event_is_valid(subscribed_signals[std::string(sig_name)]))
 	{
 		ERROR(binder_interface, "Can't create an event, something goes wrong.");
 		return 0;
 	}
-
 	return 1;
 }
 
@@ -81,8 +80,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	int ret;
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-	auto ss_i = subscribed_signals.find(sig.genericName);
-	if (ss_i != subscribed_signals.end() && !afb_event_is_valid(ss_i->second))
+	if (subscribed_signals.find(sig.genericName) != subscribed_signals.end() && !afb_event_is_valid(subscribed_signals[std::string(sig.genericName)]))
 	{
 		if(!subscribe)
 		{
@@ -90,17 +88,15 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 			ret = -1;
 		}
 		else
-		{
 			/* Event it isn't valid annymore, recreate it */
-			ret = create_event_handle(ss_i);
-		}
+			ret = create_event_handle(sig.genericName);
 	}
 	else
 	{
 		/* Event don't exist , so let's create it */
 		struct afb_event empty_event = {nullptr, nullptr};
-		auto ss_i = subscribed_signals.insert(std::make_pair(sig.genericName, empty_event));
-		ret = create_event_handle(ss_i.first);
+		subscribed_signals[sig.genericName] = empty_event;
+		ret = create_event_handle(sig.genericName);
 	}
 
 	/* Check whether or not the event handler has been correctly created and
@@ -108,7 +104,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	 */
 	if (ret <= 0)
 		return ret;
-	return make_subscription_unsubscription(request, ss_i, subscribe);
+	return make_subscription_unsubscription(request, sig.genericName, subscribe);
 }
 
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<CanSignal>& signals)
@@ -151,7 +147,7 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 		}
 		else
 		{
-			openxc_DynamicField search_key = build_DynamicField(name);
+			openxc_DynamicField search_key = build_DynamicField(std::string(name));
 			sig = find_can_signals(search_key);
 			if (sig.empty())
 				ret = 0;
