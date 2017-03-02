@@ -67,6 +67,8 @@ openxc_DynamicField build_DynamicField(const std::string& value)
 	d.type = openxc_DynamicField_Type_STRING;
 	
 	d.has_string_value = true;
+	d.has_numeric_value = false;
+	d.has_boolean_value = false;
 	::strncpy(d.string_value, value.c_str(), 100);
 	
 	return d;
@@ -78,7 +80,9 @@ openxc_DynamicField build_DynamicField(double value)
 	d.has_type = true;
 	d.type = openxc_DynamicField_Type_NUM;
 	
+	d.has_string_value = false;
 	d.has_numeric_value = true;
+	d.has_boolean_value = false;
 	d.numeric_value = value;
 	
 	return d;
@@ -90,6 +94,8 @@ openxc_DynamicField build_DynamicField(bool value)
 	d.has_type = true;
 	d.type = openxc_DynamicField_Type_BOOL;
 	
+	d.has_string_value = false;
+	d.has_numeric_value = false;
 	d.has_boolean_value = true;
 	d.boolean_value = value;
 	
