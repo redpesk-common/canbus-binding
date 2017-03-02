@@ -182,7 +182,8 @@ void can_message_t::convert_from_canfd_frame(const std::pair<struct canfd_frame&
 	if(maxdlen_ == CANFD_MAX_DLEN)
 		set_flags(frame.flags);
 
-	data_.reserve(maxdlen_);
+	if ( data_.capacity() < maxdlen_)
+		data_.reserve(maxdlen_);
 	set_data(frame.data);
 
 	DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", id_, format_, length_,
