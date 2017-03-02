@@ -75,12 +75,10 @@ class can_bus_t {
 
 		std::condition_variable new_can_message_; /*!< condition_variable use to wait until there is a new CAN message to read*/
 		std::mutex can_message_mutex_; /*!< mutex protecting the can_message_q_ queue.*/
-		bool has_can_message_; /*!< boolean members that control whether or not there is can_message into the queue */
 		std::queue <can_message_t> can_message_q_; /*!< queue that'll store can_message_t to decoded */
 
 		std::condition_variable new_decoded_can_message_; /*!< condition_variable use to wait until there is a new vehicle message to read from the queue vehicle_message_q_*/
 		std::mutex decoded_can_message_mutex_;  /*!< mutex protecting the vehicle_message_q_ queue.*/
-		bool has_vehicle_message_; /*!< boolean members that control whether or not there is openxc_VehicleMessage into the queue */
 		std::queue <openxc_VehicleMessage> vehicle_message_q_; /*!< queue that'll store openxc_VehicleMessage to pushed */
 
 		std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_devices_m_; /*!< Can device map containing all can_bus_dev_t objects initialized during init_can_dev function*/
@@ -168,8 +166,6 @@ class can_bus_t {
 		 * @return  return new_can_message_ member
 		 */
 		std::condition_variable& get_new_can_message();
-
-		bool has_can_message();
 
 		/**
 		 * @brief Return first openxc_VehicleMessage on the queue 

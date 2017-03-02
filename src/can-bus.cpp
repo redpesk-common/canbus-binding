@@ -245,18 +245,12 @@ can_message_t can_bus_t::next_can_message()
 		return can_msg;
 	}
 	
-	has_can_message_ = false;
 	return can_msg;
 }
 
 void can_bus_t::push_new_can_message(const can_message_t& can_msg)
 {
 	can_message_q_.push(can_msg);
-}
-
-bool can_bus_t::has_can_message()
-{
-	return has_can_message_;
 }
 
 openxc_VehicleMessage can_bus_t::next_vehicle_message()
@@ -271,14 +265,12 @@ openxc_VehicleMessage can_bus_t::next_vehicle_message()
 		return v_msg;
 	}
 	
-	has_vehicle_message_ = false;
 	return v_msg;
 }
 
 void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 {
 	vehicle_message_q_.push(v_msg);
-	has_vehicle_message_ = true;
 }
 
 std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices()
