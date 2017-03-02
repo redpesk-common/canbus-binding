@@ -36,17 +36,16 @@ extern "C"
 
 #define MESSAGE_SET_ID 0
 
-/** 
- * @brief Can signal event map making access to afb_event
- * externaly to an openxc existing structure.
- *
- * @desc Event map is making relation between CanSignal generic name
- * and the afb_event struct used by application framework to pushed
- * to the subscriber.
- */
-static std::map<std::string, struct afb_event> subscribed_signals;
-
+extern std::mutex subscribed_signals_mutex;
 std::mutex& get_subscribed_signals_mutex();
+
+/**
+ * @brief return the subscribed_signals map.
+ * 
+ * return std::map<std::string, struct afb_event> - map of subscribed signals.
+ */
+extern std::map<std::string, struct afb_event> subscribed_signals;
+std::map<std::string, struct afb_event>& get_subscribed_signals();
 
 /**
  * @brief The type signature for a CAN signal decoder.
@@ -135,7 +134,7 @@ typedef struct CanSignal CanSignal;
 
 /* Public: Return signals from an signals array filtered on name.
  */
-const std::vector<CanSignal> getSignals();
+const std::vector<CanSignal>& getSignals();
 
 /* Public: Return the length of the array returned by getSignals(). */
 size_t getSignalCount();
@@ -159,10 +158,3 @@ std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key);
  * @return uint32_t - unsigned integer representing the arbitration id.
  */
 inline uint32_t get_CanSignal_id(const CanSignal& sig);
-
-/**
- * @brief return the subscribed_signals map.
- * 
- * return std::map<std::string, struct afb_event> - map of subscribed signals.
- */
-const std::map<std::string, struct afb_event> get_subscribed_signals();

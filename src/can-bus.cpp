@@ -75,10 +75,16 @@ void can_bus_t::can_decode_message()
 		{
 			{
 				std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-				std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
-				const auto& it_event = subscribed_signals.find(sig.genericName);
+				std::map<std::string, struct afb_event>& s = get_subscribed_signals();
 				
-				if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
+				const auto& it = s.find(sig.genericName);
+				if (it != s.end())
+					DEBUG(binder_interface, "Iterator key: %s, event valid? %d", it->first.c_str(), afb_event_is_valid(it->second));
+				DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.genericName, afb_event_is_valid(s[sig.genericName]));
+				DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.genericName, afb_event_is_valid(s[std::string(sig.genericName)]));
+				DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.genericName));
+				DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.genericName)));
+				if( it != s.end() && afb_event_is_valid(it->second))
 				{
 					decoded_message = decoder.translateSignal(sig, can_message, getSignals());
 
@@ -87,8 +93,8 @@ void can_bus_t::can_decode_message()
 
 					std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 					push_new_vehicle_message(vehicle_message);
+					new_decoded_can_message_.notify_one();
 				}
-				new_decoded_can_message_.notify_one();
 			}
 		}
 	}
@@ -112,13 +118,12 @@ void can_bus_t::can_event_push()
 
 		{
 			std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-			std::map<std::string, struct afb_event> subscribed_signals = get_subscribed_signals();
-			const auto& it_event = subscribed_signals.find(s_message.name);
-			if(it_event != subscribed_signals.end() && afb_event_is_valid(it_event->second))
+			std::map<std::string, struct afb_event>& s = get_subscribed_signals();
+			if(s.find(std::string(s_message.name)) != s.end() && afb_event_is_valid(s[std::string(s_message.name)]))
 			{
 				jo = json_object_new_object();
 				jsonify_simple(s_message, jo);
-				afb_event_push(it_event->second, jo);
+				afb_event_push(s[std::string(s_message.name)], jo);
 			}
 		}
 	}

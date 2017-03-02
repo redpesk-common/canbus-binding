@@ -34,6 +34,16 @@ std::vector<std::vector<CanSignal>> SIGNALS = {
 	{{&(CAN_MESSAGES[0][0]), "can.driver_door.open", 2, 4, 1.000000, 0.000000, 0.000000, 0.000000, {10, 0, nullptr}, false, true, nullptr, 0, false, decoder_t::booleanDecoder, nullptr, false, (float)NULL}},
 };
 
+/** 
+ * @brief Can signal event map making access to afb_event
+ * externaly to an openxc existing structure.
+ *
+ * @desc Event map is making relation between CanSignal generic name
+ * and the afb_event struct used by application framework to pushed
+ * to the subscriber.
+ */
+std::map<std::string, struct afb_event> subscribed_signals;
+
 /**
 * @brief Mutex allowing safe manipulation on subscribed_signals map.
 * @desc To ensure that the map object isn't modified when we read it, you
@@ -46,7 +56,13 @@ std::mutex& get_subscribed_signals_mutex()
 	return subscribed_signals_mutex;
 }
 
-const std::vector<CanSignal> getSignals()
+std::map<std::string, struct afb_event>& get_subscribed_signals()
+{
+	DEBUG(binder_interface, "Here are the first subscribed_signals: %s", subscribed_signals.begin()->first.c_str() );
+	return subscribed_signals;
+}
+
+const std::vector<CanSignal>& getSignals()
 {
 	return SIGNALS[MESSAGE_SET_ID];
 }
@@ -88,9 +104,4 @@ std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key)
 inline uint32_t get_CanSignal_id(const CanSignal& sig)
 {
 	return sig.message->id;
-}
-
-const std::map<std::string, struct afb_event> get_subscribed_signals()
-{
-	return subscribed_signals;
 }

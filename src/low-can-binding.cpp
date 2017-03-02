@@ -52,10 +52,10 @@ can_bus_t *can_bus_handler;
 *
 *********************************************************************************/
 
-static int make_subscription_unsubscription(struct afb_req request, const char* sig_name, bool subscribe)
+static int make_subscription_unsubscription(struct afb_req request, const char* sig_name, std::map<std::string, struct afb_event>& s, bool subscribe)
 {
 	/* Make the subscription or unsubscription to the event */
-	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, subscribed_signals[std::string(sig_name)])) < 0)
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[std::string(sig_name)])) < 0)
 	{
 		ERROR(binder_interface, "Operation goes wrong for signal: %s", sig_name);
 		return 0;
@@ -64,10 +64,10 @@ static int make_subscription_unsubscription(struct afb_req request, const char* 
 
 }
 
-static int create_event_handle(const char* sig_name)
+static int create_event_handle(const char* sig_name, std::map<std::string, struct afb_event>& s)
 {
-	subscribed_signals[std::string(sig_name)] = afb_daemon_make_event(binder_interface->daemon, sig_name);
-	if (!afb_event_is_valid(subscribed_signals[std::string(sig_name)]))
+	s[std::string(sig_name)] = afb_daemon_make_event(binder_interface->daemon, sig_name);
+	if (!afb_event_is_valid(s[std::string(sig_name)]))
 	{
 		ERROR(binder_interface, "Can't create an event, something goes wrong.");
 		return 0;
@@ -80,7 +80,8 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	int ret;
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-	if (subscribed_signals.find(sig.genericName) != subscribed_signals.end() && !afb_event_is_valid(subscribed_signals[std::string(sig.genericName)]))
+	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
+	if (s.find(sig.genericName) != s.end() && !afb_event_is_valid(s[std::string(sig.genericName)]))
 	{
 		if(!subscribe)
 		{
@@ -89,14 +90,14 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 		}
 		else
 			/* Event it isn't valid annymore, recreate it */
-			ret = create_event_handle(sig.genericName);
+			ret = create_event_handle(sig.genericName, s);
 	}
 	else
 	{
 		/* Event don't exist , so let's create it */
 		struct afb_event empty_event = {nullptr, nullptr};
 		subscribed_signals[sig.genericName] = empty_event;
-		ret = create_event_handle(sig.genericName);
+		ret = create_event_handle(sig.genericName, s);
 	}
 
 	/* Check whether or not the event handler has been correctly created and
@@ -104,22 +105,35 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	 */
 	if (ret <= 0)
 		return ret;
-	return make_subscription_unsubscription(request, sig.genericName, subscribe);
+	return make_subscription_unsubscription(request, sig.genericName, s, subscribe);
 }
 
+/**
+ * @fn static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<CanSignal>& signals)
+ * @brief subscribe to all signals in the vector signals
+ *
+ * @param[in] afb_req request : contain original request use to subscribe or unsubscribe
+ * @param[in] subscribe boolean value used to chose between a subscription operation or an unsubscription
+ * @param[in] CanSignal  vector with CanSignal to subscribe
+ *
+ * @return Number of correctly subscribed signal
+ */
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<CanSignal>& signals)
 {
-	int ret = 0;
+	int rets = 0;
 
 	for(const auto& signal_i : signals)
 	{
-		ret = subscribe_unsubscribe_signal(request, subscribe, signal_i);
-		if(ret == 0)
+		int ret = subscribe_unsubscribe_signal(request, subscribe, signal_i);
+		if(ret <= 0)
 			return ret;
+		rets++;
+		DEBUG(binder_interface, "Signal: %s subscribed", signal_i.genericName);
 	}
-	return ret;
+	return rets;
 }
 
+// TODO
 static int subscribe_unsubscribe_all(struct afb_req request, bool subscribe)
 {
 	int e = 0;
@@ -153,6 +167,7 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 				ret = 0;
 		}
 		ret = subscribe_unsubscribe_signals(request, subscribe, sig);
+		NOTICE(binder_interface, "Subscribed correctly to %d/%d signal(s).", ret, (int)sig.size());
 	}
 	return ret;
 }
