@@ -21,6 +21,10 @@ project(low-can-binding)
 
 cmake_minimum_required(VERSION 3.3)
 
+# Include useful for CMakeTools VSCode extensions
+include(CMakeToolsHelpers REQUIRED)
+set(TARGET_DBG "root@192.168.1.206")
+
 include(GNUInstallDirs)
 
 set(PROJECT_VERSION "0.1")
@@ -57,8 +61,6 @@ set(CMAKE_CXX_FLAGS_CCOV         "-g -O2 -std=c++11 --coverage")
 include(FindPkgConfig)
 
 pkg_check_modules(EXTRAS REQUIRED json-c afb-daemon)
-#set(THREADS_PREFER_PTHREAD_FLAG ON)
-#find_package(Threads REQUIRED)
 add_compile_options(${EXTRAS_CFLAGS})
 add_compile_options(${EXTRAS_CXXFLAGS})
 
@@ -96,7 +98,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 # WGT packaging
 
 message(STATUS "Creation of ${PROJECT_NAME}.wgt package for AppFW")
-###############################################################
+###########################################################################
 configure_file(config.xml.in config.xml)
 configure_file(can_buses.json.in can_buses.json)
 
@@ -112,3 +114,13 @@ add_custom_command(
 	COMMAND wgtpkg-pack -f -o ${PROJECT_NAME}.wgt package
 )
 add_custom_target(widget ALL DEPENDS ${PROJECT_NAME}.wgt)
+
+###########################################################################
+# WGT install
+
+#message(STATUS "Creation of ${PROJECT_NAME}.wgt package for AppFW")
+###########################################################################
+install(CODE "execute_process(
+	COMMAND scp -r ${CMAKE_SOURCE_DIR} ${PROJECT_NAME}.wgt ${TARGET_DBG}:/tmp
+	COMMAND ssh ${TARGET_DBG} \"/usr/bin/afm-util remove ${PROJECT_NAME}@${PROJECT_VERSION} && /usr/bin/afm-util install /tmp/${PROJECT_NAME}.wgt\")"
+	)
