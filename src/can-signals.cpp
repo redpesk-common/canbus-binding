@@ -23,7 +23,10 @@
 #include "low-can-binding.hpp"
 
 std::vector<std::vector<CanMessageDefinition>> CAN_MESSAGES = {
-	{{0x620, CanMessageFormat::STANDARD, {10, 0, nullptr}, false, (uint8_t)NULL}},
+	{
+		{0x620, CanMessageFormat::STANDARD, {10, 0, nullptr}, false, (uint8_t)NULL},
+		{0x442, CanMessageFormat::STANDARD, {10, 0, nullptr}, false, (uint8_t)NULL},
+	},
 };
 
 /**
@@ -31,7 +34,10 @@ std::vector<std::vector<CanMessageDefinition>> CAN_MESSAGES = {
  * SIGNALS[MESSAGE_SET_ID][CanSignal]
  */
 std::vector<std::vector<CanSignal>> SIGNALS = {
-	{{&(CAN_MESSAGES[0][0]), "can.driver_door.open", 2, 4, 1.000000, 0.000000, 0.000000, 0.000000, {10, 0, nullptr}, false, true, nullptr, 0, false, decoder_t::booleanDecoder, nullptr, false, (float)NULL}},
+	{
+		{&(CAN_MESSAGES[MESSAGE_SET_ID][0]), "can.driver_door.open", 2, 4, 1.000000, 0.000000, 0.000000, 0.000000, {10, 0, nullptr}, false, true, nullptr, 0, false, decoder_t::booleanDecoder, nullptr, false, (float)NULL},
+		{&(CAN_MESSAGES[MESSAGE_SET_ID][1]), "can.driver_door.close", 2, 4, 1.000000, 0.000000, 0.000000, 0.000000, {10, 0, nullptr}, false, true, nullptr, 0, false, decoder_t::booleanDecoder, nullptr, false, (float)NULL}
+	},
 };
 
 /** 
