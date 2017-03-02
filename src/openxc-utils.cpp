@@ -125,7 +125,6 @@ bool jsonify_simple(const openxc_SimpleMessage& s_msg, json_object* json)
 {
 	if(s_msg.has_name)
 	{
-		json = json_object_new_object();
 		json_object_object_add(json, "name", json_object_new_string(s_msg.name));
 		jsonify_DynamicField(s_msg.value, json);
 		return true;
