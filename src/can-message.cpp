@@ -152,6 +152,7 @@ void can_message_t::set_data(const __u8* new_data)
 {
 		int i;
 
+		data_.clear();
 		/* maxdlen_ is now set at CAN_MAX_DLEN or CANFD_MAX_DLEN, respectively 8 and 64 bytes*/
 		for(i=0;i<maxdlen_;i++)
 		{
