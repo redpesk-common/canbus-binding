@@ -58,7 +58,6 @@ void can_bus_t::can_decode_message()
 
 	decoder_t decoder;
 
-	DEBUG(binder_interface, "Beginning of decoding thread.");
 	while(is_decoding_)
 	{
 		{
@@ -101,7 +100,6 @@ void can_bus_t::can_event_push()
 	openxc_SimpleMessage s_message;
 	json_object* jo;
 	
-	DEBUG(binder_interface, "Beginning of the pushing thread");
 	while(is_pushing_)
 	{
 		{
@@ -240,11 +238,11 @@ can_message_t can_bus_t::next_can_message()
 	{
 		can_msg = can_message_q_.front();
 		can_message_q_.pop();
-		DEBUG(binder_interface, "next_can_message: Here is the next can message : id %X, length %X", can_msg.get_id(), can_msg.get_length());
+		DEBUG(binder_interface, "next_can_message: Here is the next can message : id %X, length %X, data %02X%02X%02X%02X%02X%02X%02X%02X", can_msg.get_id(), can_msg.get_length(),
+			can_msg.get_data()[0], can_msg.get_data()[1], can_msg.get_data()[2], can_msg.get_data()[3], can_msg.get_data()[4], can_msg.get_data()[5], can_msg.get_data()[6], can_msg.get_data()[7]);
 		return can_msg;
 	}
 	
-	NOTICE(binder_interface, "next_can_message: End of can message queue");
 	has_can_message_ = false;
 	return can_msg;
 }
@@ -266,7 +264,6 @@ openxc_VehicleMessage can_bus_t::next_vehicle_message()
 		return v_msg;
 	}
 	
-	NOTICE(binder_interface, "next_vehicle_message: End of vehicle message queue");
 	has_vehicle_message_ = false;
 	return v_msg;
 }
@@ -400,7 +397,6 @@ void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 {
 	can_message_t can_message;
 
-	DEBUG(binder_interface, "Beginning of reading thread");
 	while(is_running_)
 	{
 		can_message.convert_from_canfd_frame(read());

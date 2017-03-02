@@ -88,6 +88,7 @@ openxc_DynamicField decoder_t::translateSignal(CanSignal& signal, can_message_t&
 	}
 
 	float value = parseSignalBitfield(signal, message);
+	DEBUG(binder_interface, "Decoded message: %f", value);
 
 	bool send = true;
 	// Must call the decoders every time, regardless of if we are going to
