@@ -80,31 +80,40 @@ size_t getSignalCount()
 
 std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key)
 {
-	std::vector<CanSignal> signals = {};
+	std::vector<CanSignal> found_signals = {};
+	std::vector<CanSignal> active_signals = getSignals();
+	/* STL container my love ! Welcome to the printf debugging venerable technique !
+	 * use those DEBUG message if you need to ! 
+	DEBUG(binder_interface, "We get %d signal(s) to process", (int)active_signals.size()); */
 
 	switch(key.type)
 	{
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-			for(const CanSignal& s : getSignals())
+			for(const CanSignal& s : active_signals)
 			{
-				if(fnmatch(key.string_value, s.genericName, FNM_CASEFOLD) == 0)
-					signals.push_back(s);
+				//DEBUG(binder_interface, "Processing signal: %s", s.genericName);
+				if(::fnmatch(key.string_value, s.genericName, FNM_CASEFOLD) == 0)
+				{
+					//DEBUG(binder_interface, "Matched signal: %s", s.genericName);
+					found_signals.push_back(s);
+				}
 			}
 			break;
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-			for(const CanSignal& s : getSignals())
+			for(const CanSignal& s : active_signals)
 			{
 				CanMessageDefinition *msg_def = s.message;
 				if(msg_def->id == key.numeric_value)
-					signals.push_back(s);
+					found_signals.push_back(s);
 			}
 			break;
 		default:
 			ERROR(binder_interface, "find_can_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
-			return signals;
+			return found_signals;
 			break;
 	}
-	return signals;
+	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
+	return found_signals;
 }
 
 inline uint32_t get_CanSignal_id(const CanSignal& sig)
