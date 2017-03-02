@@ -64,7 +64,6 @@ std::mutex& get_subscribed_signals_mutex()
 
 std::map<std::string, struct afb_event>& get_subscribed_signals()
 {
-	DEBUG(binder_interface, "Here are the first subscribed_signals: %s", subscribed_signals.begin()->first.c_str() );
 	return subscribed_signals;
 }
 

@@ -169,6 +169,7 @@ class can_bus_t {
 		 */
 		std::condition_variable& get_new_can_message();
 
+		bool has_can_message();
 
 		/**
 		 * @brief Return first openxc_VehicleMessage on the queue 
