@@ -77,14 +77,12 @@ void can_bus_t::can_decode_message()
 				std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 				std::map<std::string, struct afb_event>& s = get_subscribed_signals();
 				
-				const auto& it = s.find(sig.genericName);
-				if (it != s.end())
-					DEBUG(binder_interface, "Iterator key: %s, event valid? %d", it->first.c_str(), afb_event_is_valid(it->second));
+				/* DEBUG message to make easier debugger STL containers...
 				DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.genericName, afb_event_is_valid(s[sig.genericName]));
 				DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.genericName, afb_event_is_valid(s[std::string(sig.genericName)]));
 				DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.genericName));
-				DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.genericName)));
-				if( it != s.end() && afb_event_is_valid(it->second))
+				DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.genericName))); */
+				if( s.find(sig.genericName) != s.end() && afb_event_is_valid(s[sig.genericName]))
 				{
 					decoded_message = decoder.translateSignal(sig, can_message, getSignals());
 
@@ -380,7 +378,9 @@ std::pair<struct canfd_frame&, size_t> can_bus_dev_t::read()
 		ERROR(binder_interface, "read: Incomplete CAN(FD) frame");
 		::memset(&cfd, 0, sizeof(cfd));
 	}
-
+	
+	DEBUG(binder_interface, "read: Found id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", cfd.can_id, cfd.len,
+							cfd.data[0], cfd.data[1], cfd.data[2], cfd.data[3], cfd.data[4], cfd.data[5], cfd.data[6], cfd.data[7]);
 	return std::pair<struct canfd_frame&, size_t>(cfd, nbytes);
 }
 

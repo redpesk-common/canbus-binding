@@ -70,15 +70,15 @@ void can_message_t::set_max_data_length(size_t nbytes)
 	switch(nbytes)
 	{
 		case CANFD_MTU:
-			DEBUG(binder_interface, "convert_from_canfd_frame: Got an CAN FD frame");
+			DEBUG(binder_interface, "set_max_data_length: Got an CAN FD frame");
 			maxdlen_ = CANFD_MAX_DLEN;
 			break;
 		case CAN_MTU:
-			DEBUG(binder_interface, "convert_from_canfd_frame: Got a legacy CAN frame");
+			DEBUG(binder_interface, "set_max_data_length: Got a legacy CAN frame");
 			maxdlen_ = CAN_MAX_DLEN;
 			break;
 		default:
-			ERROR(binder_interface, "convert_from_canfd_frame: unsupported CAN frame");
+			ERROR(binder_interface, "set_max_data_length: unsupported CAN frame");
 			break;
 	}
 }
