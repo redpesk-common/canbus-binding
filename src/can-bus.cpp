@@ -165,6 +165,7 @@ int can_bus_t::init_can_dev()
 			{
 				i++;
 				DEBUG(binder_interface, "Start reading thread");
+				NOTICE(binder_interface, "%s device opened and reading", device.c_str());
 				can_devices_m_[device]->start_reading(*this);
 			}
 			else
