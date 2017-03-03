@@ -21,12 +21,9 @@ project(low-can-binding)
 
 cmake_minimum_required(VERSION 3.3)
 
-# Include useful for CMakeTools VSCode extensions
-include(CMakeToolsHelpers REQUIRED)
-set(TARGET_DBG "root@192.168.1.206")
-
 include(GNUInstallDirs)
 
+set(TARGET "root@192.168.1.206")
 set(PROJECT_VERSION "0.1")
 set(PROJECT_ICON "icon.png")
 set(PROJECT_LIBDIR "libs")
@@ -121,6 +118,6 @@ add_custom_target(widget ALL DEPENDS ${PROJECT_NAME}.wgt)
 #message(STATUS "Creation of ${PROJECT_NAME}.wgt package for AppFW")
 ###########################################################################
 install(CODE "execute_process(
-	COMMAND scp -r ${CMAKE_SOURCE_DIR} ${PROJECT_NAME}.wgt ${TARGET_DBG}:/tmp
-	COMMAND ssh ${TARGET_DBG} \"/usr/bin/afm-util remove ${PROJECT_NAME}@${PROJECT_VERSION} && /usr/bin/afm-util install /tmp/${PROJECT_NAME}.wgt\")"
+	COMMAND scp -r ${CMAKE_SOURCE_DIR} ${PROJECT_NAME}.wgt ${TARGET}:/tmp
+	COMMAND ssh ${TARGET} \"/usr/bin/afm-util remove ${PROJECT_NAME}@${PROJECT_VERSION} && /usr/bin/afm-util install /tmp/${PROJECT_NAME}.wgt\")"
 	)
