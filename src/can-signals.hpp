@@ -99,7 +99,7 @@ typedef struct CanSignalState CanSignalState;
  */
 struct CanSignal {
 	struct CanMessageDefinition* message; /*!< message	   - The message this signal is a part of. */
-	const char* genericName; /*!< genericName - The name of the signal to be output over USB.*/
+	const char* generic_name; /*!< generic_name - The name of the signal to be output over USB.*/
 	uint8_t bitPosition; /*!< bitPosition - The starting bit of the signal in its CAN message (assuming
  						*	non-inverted bit numbering, i.e. the most significant bit of
  						*	each byte is 0) */

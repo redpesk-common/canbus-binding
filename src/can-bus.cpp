@@ -77,15 +77,15 @@ void can_bus_t::can_decode_message()
 					std::map<std::string, struct afb_event>& s = get_subscribed_signals();
 					
 					/* DEBUG message to make easier debugger STL containers...
-					DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.genericName, afb_event_is_valid(s[sig.genericName]));
-					DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.genericName, afb_event_is_valid(s[std::string(sig.genericName)]));
-					DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.genericName));
-					DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.genericName))); */
-					if( s.find(sig.genericName) != s.end() && afb_event_is_valid(s[sig.genericName]))
+					DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[sig.generic_name]));
+					DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
+					DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.generic_name));
+					DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name))); */
+					if( s.find(sig.generic_name) != s.end() && afb_event_is_valid(s[sig.generic_name]))
 					{
 						decoded_message = decoder.translateSignal(sig, can_message, getSignals());
 
-						openxc_SimpleMessage s_message = build_SimpleMessage(sig.genericName, decoded_message);
+						openxc_SimpleMessage s_message = build_SimpleMessage(sig.generic_name, decoded_message);
 						vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
 
 						std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);

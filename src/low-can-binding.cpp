@@ -81,7 +81,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-	if (s.find(sig.genericName) != s.end() && !afb_event_is_valid(s[std::string(sig.genericName)]))
+	if (s.find(sig.generic_name) != s.end() && !afb_event_is_valid(s[std::string(sig.generic_name)]))
 	{
 		if(!subscribe)
 		{
@@ -90,14 +90,14 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 		}
 		else
 			/* Event it isn't valid annymore, recreate it */
-			ret = create_event_handle(sig.genericName, s);
+			ret = create_event_handle(sig.generic_name, s);
 	}
 	else
 	{
 		/* Event don't exist , so let's create it */
 		struct afb_event empty_event = {nullptr, nullptr};
-		subscribed_signals[sig.genericName] = empty_event;
-		ret = create_event_handle(sig.genericName, s);
+		subscribed_signals[sig.generic_name] = empty_event;
+		ret = create_event_handle(sig.generic_name, s);
 	}
 
 	/* Check whether or not the event handler has been correctly created and
@@ -105,7 +105,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	 */
 	if (ret <= 0)
 		return ret;
-	return make_subscription_unsubscription(request, sig.genericName, s, subscribe);
+	return make_subscription_unsubscription(request, sig.generic_name, s, subscribe);
 }
 
 /**
@@ -128,7 +128,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		if(ret <= 0)
 			return ret;
 		rets++;
-		DEBUG(binder_interface, "Signal: %s subscribed", signal_i.genericName);
+		DEBUG(binder_interface, "Signal: %s subscribed", signal_i.generic_name);
 	}
 	return rets;
 }

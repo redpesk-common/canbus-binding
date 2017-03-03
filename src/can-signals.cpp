@@ -90,10 +90,10 @@ std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key)
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
 			for(const CanSignal& s : active_signals)
 			{
-				//DEBUG(binder_interface, "Processing signal: %s", s.genericName);
-				if(::fnmatch(key.string_value, s.genericName, FNM_CASEFOLD) == 0)
+				//DEBUG(binder_interface, "Processing signal: %s", s.generic_name);
+				if(::fnmatch(key.string_value, s.generic_name, FNM_CASEFOLD) == 0)
 				{
-					//DEBUG(binder_interface, "Matched signal: %s", s.genericName);
+					//DEBUG(binder_interface, "Matched signal: %s", s.generic_name);
 					found_signals.push_back(s);
 				}
 			}

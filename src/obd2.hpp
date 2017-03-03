@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
- #pragma once
+#pragma once
 
 #include <vector>
 #include "uds/uds.h"
@@ -67,38 +67,37 @@ const char *UNIT_NAMES[10] = {
  */
 typedef struct _Obd2Pid {
 	uint8_t pid;
-	const char* name;
+	const char* generic_name;
 	const int min;
 	const int max;
 	enum UNIT unit;
 	int frequency;
 	bool supported;
-	struct afb_event event;
 } Obd2Pid;
 
 /*
 * Pre-defined OBD-II PIDs to query for if supported by the vehicle.
 */
 const std::vector<Obd2Pid> OBD2_PIDS {
-	{ pid: 0x04, name: "obd2.engine.load", min:0, max: 100, unit: POURCENT, frequency: 5, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x05, name: "obd2.engine.coolant.temperature", min: -40, max: 215, unit: DEGREES_CELSIUS, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x0a, name: "obd2.fuel.pressure", min: 0, max: 765, unit: KPA, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x0b, name: "obd2.intake.manifold.pressure", min: 0, max: 255, unit: KPA, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x0c, name: "obd2.engine.speed", min: 0, max: 16383, unit: RPM, frequency: 5, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x0d, name: "obd2.vehicle.speed", min: 0, max: 255, unit: KM_H, frequency: 5, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x0f, name: "obd2.intake.air.temperature", min: -40, max:215, unit: DEGREES_CELSIUS, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x10, name: "obd2.mass.airflow", min: 0, max: 655, unit: GRAMS_SEC, frequency: 5, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x11, name: "obd2.throttle.position", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x1f, name: "obd2.running.time", min: 0, max: 65535, unit: SECONDS, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x2d, name: "obd2.EGR.error", min: -100, max: 99, unit: POURCENT, frequency: 0, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x2f, name: "obd2.fuel.level", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x33, name: "obd2.barometric.pressure", min: 0, max: 255, unit: KPA, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x4c, name: "obd2.commanded.throttle.position", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x52, name: "obd2.ethanol.fuel.percentage", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x5a, name: "obd2.accelerator.pedal.position", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x5b, name: "obd2.hybrid.battery-pack.remaining.life", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x5c, name: "obd2.engine.oil.temperature",min: -40, max: 210, unit: DEGREES_CELSIUS, frequency: 1, supported: false, event: {nullptr, nullptr} },
-	{ pid: 0x63, name: "obd2.engine.torque", min: 0, max: 65535, unit: NM, frequency: 1, supported: false, event: {nullptr, nullptr} }
+	{ pid: 0x04, name: "obd2.engine.load", min:0, max: 100, unit: POURCENT, frequency: 5, supported: false},
+	{ pid: 0x05, name: "obd2.engine.coolant.temperature", min: -40, max: 215, unit: DEGREES_CELSIUS, frequency: 1, supported: false},
+	{ pid: 0x0a, name: "obd2.fuel.pressure", min: 0, max: 765, unit: KPA, frequency: 1, supported: false},
+	{ pid: 0x0b, name: "obd2.intake.manifold.pressure", min: 0, max: 255, unit: KPA, frequency: 1, supported: false},
+	{ pid: 0x0c, name: "obd2.engine.speed", min: 0, max: 16383, unit: RPM, frequency: 5, supported: false},
+	{ pid: 0x0d, name: "obd2.vehicle.speed", min: 0, max: 255, unit: KM_H, frequency: 5, supported: false},
+	{ pid: 0x0f, name: "obd2.intake.air.temperature", min: -40, max:215, unit: DEGREES_CELSIUS, frequency: 1, supported: false},
+	{ pid: 0x10, name: "obd2.mass.airflow", min: 0, max: 655, unit: GRAMS_SEC, frequency: 5, supported: false},
+	{ pid: 0x11, name: "obd2.throttle.position", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false},
+	{ pid: 0x1f, name: "obd2.running.time", min: 0, max: 65535, unit: SECONDS, frequency: 1, supported: false},
+	{ pid: 0x2d, name: "obd2.EGR.error", min: -100, max: 99, unit: POURCENT, frequency: 0, supported: false},
+	{ pid: 0x2f, name: "obd2.fuel.level", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false},
+	{ pid: 0x33, name: "obd2.barometric.pressure", min: 0, max: 255, unit: KPA, frequency: 1, supported: false},
+	{ pid: 0x4c, name: "obd2.commanded.throttle.position", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false},
+	{ pid: 0x52, name: "obd2.ethanol.fuel.percentage", min: 0, max: 100, unit: POURCENT, frequency: 1, supported: false},
+	{ pid: 0x5a, name: "obd2.accelerator.pedal.position", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false},
+	{ pid: 0x5b, name: "obd2.hybrid.battery-pack.remaining.life", min: 0, max: 100, unit: POURCENT, frequency: 5, supported: false},
+	{ pid: 0x5c, name: "obd2.engine.oil.temperature",min: -40, max: 210, unit: DEGREES_CELSIUS, frequency: 1, supported: false},
+	{ pid: 0x63, name: "obd2.engine.torque", min: 0, max: 65535, unit: NM, frequency: 1, supported: false}
 };
 
 /**

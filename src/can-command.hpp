@@ -49,7 +49,7 @@ typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
  * or signals from a signal OpenXC message.
  */
 typedef struct {
-	const char* genericName; /*!< genericName - The name of the command.*/
+	const char* generic_name; /*!< generic_name - The name of the command.*/
 	CommandHandler handler; /*!< handler - An function to process the received command's data and perform some
  							*	action.*/
 } CanCommand;
