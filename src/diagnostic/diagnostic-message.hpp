@@ -61,54 +61,34 @@ typedef struct _Obd2Pid {
 	bool supported;
 } Obd2Pid;
 
-std::vector<Obd2Pid>& get_obd2_signals();
-uint32_t get_signal_id(const Obd2Pid& sig);
-void find_obd2_signals(const openxc_DynamicField &key, std::vector<Obd2Pid*>& found_signals);
-
-bool is_obd2_response(can_message_t can_message);
-
 /**
  * @brief - Object to handle obd2 session with pre-scan of supported pid
  * then request them regularly
  */
-class obd2_handler_t {
+class obd2_signals_t {
 	private:
+		uint8_t pid_;
+		const char* generic_name_;
+		const int min_;
+		const int max_;
+		enum UNIT unit_;
+		int frequency_;
+		bool supported_;
 
 	public:
-		obd2_handler_t();
-		/**
-		 * @brief:
-		 *
-		 * Returns
-		 */
-		void find_obd2_pid(const char *name, std::vector<Obd2Pid> *pids);
+		obd2_signals_t(uint8_t pid, const char* generic_name, const int min_, const int max_, enum UNIT unit, int frequency, bool supported);
 
-		/**
-		 * @brief Check if a request is an OBD-II PID request.
-		 *
-		 * @return true if the request is a mode 1 request and it has a 1 byte PID.
-		 */
+		void init_diagnostic_shims(can_bus_dev_t& can_bus_dev)
+		void add_request(int pid);
+		std::vector<Obd2Pid>& get_obd2_signals();
+
+		uint32_t get_signal_id(const Obd2Pid& sig);
+		void find_obd2_signals(const openxc_DynamicField &key, std::vector<Obd2Pid*>& found_signals);
+
+
+		bool is_obd2_response(can_message_t can_message);
 		bool is_obd2_request(DiagnosticRequest *request);
-
-		/**
-		* @brief Check if requested signal name is an obd2 pid
-		* 
-		* @return true if name began with obd2 else false.
-		*/
 		bool is_obd2_signal(const char *name);
 
-		/**
-		* @brief Decode the payload of an OBD-II PID.
-		*
-		* This function matches the type signature for a DiagnosticResponseDecoder, so
-		* it can be used as the decoder for a DiagnosticRequest. It returns the decoded
-		* value of the PID, using the standard formulas (see
-		* http://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_01).
-		*
-		* @param[in] DiagnosticResponse response - the received DiagnosticResponse (the data is in response.payload,
-		*  a byte array). This is most often used when the byte order is
-		*  signiticant, i.e. with many OBD-II PID formulas.
-		* @param[in] float parsed_payload - the entire payload of the response parsed as an int.
-		*/
-		float handle_obd2_pid(const DiagnosticResponse* response, float parsedPayload);
+		float decode_obd2_response(const DiagnosticResponse* response, float parsedPayload);
 };

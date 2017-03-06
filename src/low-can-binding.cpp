@@ -119,33 +119,33 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
  *
  * @return Number of correctly subscribed signal
  */
-static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, std::vector<std::string>& signals)
+static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<std::string>& signals)
 {
 	int rets = 0;
 
-	for(auto& signal_i : signals)
+	for(auto& sig : signals)
 	{
-		int ret = subscribe_unsubscribe_signal(request, subscribe, signal_i);
+		int ret = subscribe_unsubscribe_signal(request, subscribe, sig);
 		if(ret <= 0)
 			return ret;
 		rets++;
-		DEBUG(binder_interface, "Signal: %s subscribed", signal_i.c_str());
+		DEBUG(binder_interface, "Signal: %s subscribed", sig.c_str());
 	}
 	return rets;
 }
 
 static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, const char *name)
 {
-	std::vector<std::string> sig;
+	std::vector<std::string> signals;
 	int ret = 0;
 
 	openxc_DynamicField search_key = build_DynamicField(std::string(name));
-	sig = find_signals(search_key);
-	if (sig.empty())
+	signals = find_signals(search_key);
+	if (signalssig.empty())
 		ret = 0;
 
-	ret = subscribe_unsubscribe_signals(request, subscribe, sig);
-	NOTICE(binder_interface, "Subscribed correctly to %d/%d signal(s).", ret, (int)sig.size());
+	ret = subscribe_unsubscribe_signals(request, subscribe, signals);
+	NOTICE(binder_interface, "Subscribed correctly to %d/%d signal(s).", ret, (int)signals.size());
 
 	return ret;
 }
