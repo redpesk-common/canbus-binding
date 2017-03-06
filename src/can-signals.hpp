@@ -23,6 +23,7 @@
 #include <vector>
 #include <string>
 
+#include "obd2-signals.hpp"
 #include "timer.hpp"
 #include "openxc.pb.h"
 #include "can-bus.hpp"
@@ -134,9 +135,9 @@ typedef struct CanSignal CanSignal;
 
 /* Public: Return signals from an signals array filtered on name.
  */
-const std::vector<CanSignal>& getSignals();
+std::vector<CanSignal>& get_can_signals();
 
-/* Public: Return the length of the array returned by getSignals(). */
+/* Public: Return the length of the array returned by get_can_signals(). */
 size_t getSignalCount();
 
 /**
@@ -148,7 +149,7 @@ size_t getSignalCount();
  *
  * @return std::vector<std::string> return found CanSignal generic name vector.
  */
-std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key);
+void find_can_signals(const openxc_DynamicField &key, std::vector<CanSignal*>& found_signals);
 
 /**
  * @brief Retrieve can arbitration id of a given CanSignal
@@ -157,4 +158,4 @@ std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key);
  *
  * @return uint32_t - unsigned integer representing the arbitration id.
  */
-inline uint32_t get_CanSignal_id(const CanSignal& sig);
+uint32_t get_signal_id(const CanSignal& sig);

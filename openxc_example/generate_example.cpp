@@ -167,7 +167,7 @@ int openxc::signals::getMessageCount() {
     return getActiveMessageSet()->messageCount;
 }
 
-CanSignal* openxc::signals::getSignals() {
+CanSignal* openxc::signals::get_can_signals() {
     return SIGNALS[getActiveMessageSet()->index];
 }
 

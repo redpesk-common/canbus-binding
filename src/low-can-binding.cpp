@@ -28,8 +28,9 @@
 #include <systemd/sd-event.h>
 
 #include "timer.hpp"
-#include "openxc.pb.h"
+#include "signals.hpp"
 #include "can-bus.hpp"
+#include "openxc.pb.h"
 #include "can-signals.hpp"
 #include "can-message.hpp"
 #include "openxc-utils.hpp"
@@ -52,10 +53,10 @@ can_bus_t *can_bus_handler;
 *
 *********************************************************************************/
 
-static int make_subscription_unsubscription(struct afb_req request, const char* sig_name, std::map<std::string, struct afb_event>& s, bool subscribe)
+static int make_subscription_unsubscription(struct afb_req request, const std::string& sig_name, std::map<std::string, struct afb_event>& s, bool subscribe)
 {
 	/* Make the subscription or unsubscription to the event */
-	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[std::string(sig_name)])) < 0)
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[sig_name.c_str()])) < 0)
 	{
 		ERROR(binder_interface, "Operation goes wrong for signal: %s", sig_name);
 		return 0;
@@ -64,10 +65,10 @@ static int make_subscription_unsubscription(struct afb_req request, const char* 
 
 }
 
-static int create_event_handle(const char* sig_name, std::map<std::string, struct afb_event>& s)
+static int create_event_handle(const std::string& sig_name, std::map<std::string, struct afb_event>& s)
 {
-	s[std::string(sig_name)] = afb_daemon_make_event(binder_interface->daemon, sig_name);
-	if (!afb_event_is_valid(s[std::string(sig_name)]))
+	s[sig_name] = afb_daemon_make_event(binder_interface->daemon, sig_name.c_str());
+	if (!afb_event_is_valid(s[sig_name]))
 	{
 		ERROR(binder_interface, "Can't create an event, something goes wrong.");
 		return 0;
@@ -75,13 +76,13 @@ static int create_event_handle(const char* sig_name, std::map<std::string, struc
 	return 1;
 }
 
-static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, const CanSignal& sig)
+static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, const std::string& sig)
 {
 	int ret;
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-	if (s.find(sig.generic_name) != s.end() && !afb_event_is_valid(s[std::string(sig.generic_name)]))
+	if (s.find(sig) != s.end() && !afb_event_is_valid(s[std::string(sig)]))
 	{
 		if(!subscribe)
 		{
@@ -90,14 +91,14 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 		}
 		else
 			/* Event it isn't valid annymore, recreate it */
-			ret = create_event_handle(sig.generic_name, s);
+			ret = create_event_handle(sig, s);
 	}
 	else
 	{
 		/* Event don't exist , so let's create it */
 		struct afb_event empty_event = {nullptr, nullptr};
-		subscribed_signals[sig.generic_name] = empty_event;
-		ret = create_event_handle(sig.generic_name, s);
+		subscribed_signals[sig] = empty_event;
+		ret = create_event_handle(sig, s);
 	}
 
 	/* Check whether or not the event handler has been correctly created and
@@ -105,7 +106,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	 */
 	if (ret <= 0)
 		return ret;
-	return make_subscription_unsubscription(request, sig.generic_name, s, subscribe);
+	return make_subscription_unsubscription(request, sig, s, subscribe);
 }
 
 /**
@@ -118,57 +119,34 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
  *
  * @return Number of correctly subscribed signal
  */
-static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<CanSignal>& signals)
+static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, std::vector<std::string>& signals)
 {
 	int rets = 0;
 
-	for(const auto& signal_i : signals)
+	for(auto& signal_i : signals)
 	{
 		int ret = subscribe_unsubscribe_signal(request, subscribe, signal_i);
 		if(ret <= 0)
 			return ret;
 		rets++;
-		DEBUG(binder_interface, "Signal: %s subscribed", signal_i.generic_name);
+		DEBUG(binder_interface, "Signal: %s subscribed", signal_i.c_str());
 	}
 	return rets;
 }
 
-// TODO
-static int subscribe_unsubscribe_all(struct afb_req request, bool subscribe)
-{
-	int e = 0;
-
-	//for (const auto& sig : SIGNALS)
-	//	e += !subscribe_unsubscribe_signals(request, subscribe, sig);
-	e += !subscribe_unsubscribe_signals(request, subscribe, getSignals());
-	
-	return e == 0;
-}
-
 static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, const char *name)
 {
-	std::vector<CanSignal> sig;
+	std::vector<std::string> sig;
 	int ret = 0;
 
-	if (!::strcmp(name, "*"))
-		ret = subscribe_unsubscribe_all(request, subscribe);
-	else
-	{
-		//if(obd2_handler_c.is_obd2_signal(name))
-		if(false)
-		{
-		// TODO
-		}
-		else
-		{
-			openxc_DynamicField search_key = build_DynamicField(std::string(name));
-			sig = find_can_signals(search_key);
-			if (sig.empty())
-				ret = 0;
-		}
-		ret = subscribe_unsubscribe_signals(request, subscribe, sig);
-		NOTICE(binder_interface, "Subscribed correctly to %d/%d signal(s).", ret, (int)sig.size());
-	}
+	openxc_DynamicField search_key = build_DynamicField(std::string(name));
+	sig = find_signals(search_key);
+	if (sig.empty())
+		ret = 0;
+
+	ret = subscribe_unsubscribe_signals(request, subscribe, sig);
+	NOTICE(binder_interface, "Subscribed correctly to %d/%d signal(s).", ret, (int)sig.size());
+
 	return ret;
 }
 
@@ -180,7 +158,7 @@ static void subscribe_unsubscribe(struct afb_req request, bool subscribe)
 	/* makes the subscription/unsubscription */
 	args = afb_req_json(request);
 	if (args == NULL || !json_object_object_get_ex(args, "event", &a)) {
-		ok = subscribe_unsubscribe_all(request, subscribe);
+		ok = subscribe_unsubscribe_name(request, subscribe, "*");
 	} else if (json_object_get_type(a) != json_type_array) {
 		ok = subscribe_unsubscribe_name(request, subscribe, json_object_get_string(a));
 	} else {

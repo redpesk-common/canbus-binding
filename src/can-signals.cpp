@@ -19,6 +19,8 @@
 
 #include <fnmatch.h>
 
+#include "signals.hpp"
+#include "obd2-signals.hpp"
 #include "can-decoder.hpp"
 #include "low-can-binding.hpp"
 
@@ -35,8 +37,8 @@ std::vector<std::vector<CanMessageDefinition>> CAN_MESSAGES = {
  */
 std::vector<std::vector<CanSignal>> SIGNALS = {
 	{
-		{&(CAN_MESSAGES[MESSAGE_SET_ID][0]), "can.driver_door.open", 2, 4, 1.000000, 0.000000, 0.000000, 0.000000, {10, 0, nullptr}, false, true, nullptr, 0, false, decoder_t::booleanDecoder, nullptr, false, (float)NULL},
-		{&(CAN_MESSAGES[MESSAGE_SET_ID][1]), "can.driver_door.close", 0, 4, 1.000000, 0.000000, 0.000000, 0.000000, {10, 0, nullptr}, false, true, nullptr, 0, false, decoder_t::booleanDecoder, nullptr, false, (float)NULL}
+		{&(CAN_MESSAGES[MESSAGE_SET_ID][0]), "can.driver_door.open", 2, 4, 1.000000, 0.000000, 0.000000, 0.000000, {10, 0, nullptr}, false, true, nullptr, 0, false, decoder_t::booleanDecoder, nullptr, false, 0.0},
+		{&(CAN_MESSAGES[MESSAGE_SET_ID][1]), "can.driver_door.close", 0, 4, 1.000000, 0.000000, 0.000000, 0.000000, {10, 0, nullptr}, false, true, nullptr, 0, false, decoder_t::booleanDecoder, nullptr, false, 0.0}
 	},
 };
 
@@ -67,7 +69,7 @@ std::map<std::string, struct afb_event>& get_subscribed_signals()
 	return subscribed_signals;
 }
 
-const std::vector<CanSignal>& getSignals()
+std::vector<CanSignal>& get_can_signals()
 {
 	return SIGNALS[MESSAGE_SET_ID];
 }
@@ -77,45 +79,33 @@ size_t getSignalCount()
 	return SIGNALS[MESSAGE_SET_ID].size();
 }
 
-std::vector<CanSignal> find_can_signals(const openxc_DynamicField &key)
+uint32_t get_signal_id(const CanSignal& sig)
 {
-	std::vector<CanSignal> found_signals = {};
-	std::vector<CanSignal> active_signals = getSignals();
-	/* STL container my love ! Welcome to the printf debugging venerable technique !
-	 * use those DEBUG message if you need to ! 
-	DEBUG(binder_interface, "We get %d signal(s) to process", (int)active_signals.size()); */
+	return sig.message->id;
+}
 
+/**
+ * @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
+ * @brief return signals name found searching through CAN_signals and OBD2 pid
+ * 
+ * @param[in] const openxc_DynamicField : can contain numeric or string value in order to search against 
+ *   can signals or obd2 signals name.
+ *
+ * @return std::vector<std::string> Vector of signals name found. 
+ */
+void find_can_signals(const openxc_DynamicField& key, std::vector<CanSignal*>& found_signals)
+{
 	switch(key.type)
 	{
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-			for(const CanSignal& s : active_signals)
-			{
-				//DEBUG(binder_interface, "Processing signal: %s", s.generic_name);
-				if(::fnmatch(key.string_value, s.generic_name, FNM_CASEFOLD) == 0)
-				{
-					//DEBUG(binder_interface, "Matched signal: %s", s.generic_name);
-					found_signals.push_back(s);
-				}
-			}
+			lookup_signals_by_name(key.string_value, get_can_signals(), found_signals);
 			break;
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-			for(const CanSignal& s : active_signals)
-			{
-				CanMessageDefinition *msg_def = s.message;
-				if(msg_def->id == key.numeric_value)
-					found_signals.push_back(s);
-			}
+			lookup_signals_by_id(key.numeric_value, get_can_signals(), found_signals);
 			break;
 		default:
-			ERROR(binder_interface, "find_can_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
-			return found_signals;
+			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 			break;
 	}
 	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
-	return found_signals;
-}
-
-inline uint32_t get_CanSignal_id(const CanSignal& sig)
-{
-	return sig.message->id;
 }
