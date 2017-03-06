@@ -51,8 +51,7 @@ can_bus_t::can_bus_t(int conf_file)
 void can_bus_t::can_decode_message()
 {
 	can_message_t can_message;
-	std::vector <CanSignal> signals;
-	std::vector <CanSignal>::iterator signals_i;
+	std::vector <CanSignal*> signals;
 	openxc_VehicleMessage vehicle_message;
 	openxc_DynamicField search_key, decoded_message;
 
@@ -60,39 +59,36 @@ void can_bus_t::can_decode_message()
 
 	while(is_decoding_)
 	{
+		std::unique_lock<std::mutex> can_message_lock(can_message_mutex_);
+		new_can_message_.wait(can_message_lock);
+		can_message = next_can_message();
+	
+		/* First we have to found which CanSignal it is */
+		search_key = build_DynamicField((double)can_message.get_id());
+		signals.clear();
+		find_can_signals(search_key, signals);
+
+		/* Decoding the message ! Don't kill the messenger ! */
+		for(auto& sig : signals)
 		{
-			std::unique_lock<std::mutex> can_message_lock(can_message_mutex_);
-			new_can_message_.wait(can_message_lock);
-			can_message = next_can_message();
-		
-			/* First we have to found which CanSignal it is */
-			search_key = build_DynamicField((double)can_message.get_id());
-			signals = find_can_signals(search_key);
-
-			/* Decoding the message ! Don't kill the messenger ! */
-			for(auto& sig : signals)
+			std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
+			std::map<std::string, struct afb_event>& s = get_subscribed_signals();
+			
+			/* DEBUG message to make easier debugger STL containers...
+			DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[sig.generic_name]));
+			DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
+			DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.generic_name));
+			DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name))); */
+			if( s.find(sig->generic_name) != s.end() && afb_event_is_valid(s[sig->generic_name]))
 			{
-				{
-					std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-					std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-					
-					/* DEBUG message to make easier debugger STL containers...
-					DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[sig.generic_name]));
-					DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
-					DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.generic_name));
-					DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name))); */
-					if( s.find(sig.generic_name) != s.end() && afb_event_is_valid(s[sig.generic_name]))
-					{
-						decoded_message = decoder.translateSignal(sig, can_message, getSignals());
+				decoded_message = decoder.translateSignal(*sig, can_message, get_can_signals());
 
-						openxc_SimpleMessage s_message = build_SimpleMessage(sig.generic_name, decoded_message);
-						vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
+				openxc_SimpleMessage s_message = build_SimpleMessage(sig->generic_name, decoded_message);
+				vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
 
-						std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
-						push_new_vehicle_message(vehicle_message);
-						new_decoded_can_message_.notify_one();
-					}
-				}
+				std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
+				push_new_vehicle_message(vehicle_message);
+				new_decoded_can_message_.notify_one();
 			}
 		}
 	}
@@ -106,21 +102,19 @@ void can_bus_t::can_event_push()
 	
 	while(is_pushing_)
 	{
-		{
-			std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
-			new_decoded_can_message_.wait(decoded_can_message_lock);
-			v_message = next_vehicle_message();
+		std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
+		new_decoded_can_message_.wait(decoded_can_message_lock);
+		v_message = next_vehicle_message();
 
-			s_message = get_simple_message(v_message);
+		s_message = get_simple_message(v_message);
+		{
+			std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
+			std::map<std::string, struct afb_event>& s = get_subscribed_signals();
+			if(s.find(std::string(s_message.name)) != s.end() && afb_event_is_valid(s[std::string(s_message.name)]))
 			{
-				std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-				std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-				if(s.find(std::string(s_message.name)) != s.end() && afb_event_is_valid(s[std::string(s_message.name)]))
-				{
-					jo = json_object_new_object();
-					jsonify_simple(s_message, jo);
-					afb_event_push(s[std::string(s_message.name)], jo);
-				}
+				jo = json_object_new_object();
+				jsonify_simple(s_message, jo);
+				afb_event_push(s[std::string(s_message.name)], jo);
 			}
 		}
 	}
