@@ -102,6 +102,45 @@ void shims_timer()
 {
 }
 
+bool is_obd2_response(can_message_t can_message)
+{
+	if(can_message.get_id() >= 0x7E8 && can_message.get_id() <= 0x7EF)
+	{
+		openxc_VehicleMessage message = {0};
+		message.has_type = true;
+		message.type = openxc_VehicleMessage_Type_DIAGNOSTIC;
+		message.has_diagnostic_response = true;
+		message.diagnostic_response = {0};
+		message.diagnostic_response.has_bus = true;
+		message.diagnostic_response.bus = bus->address;
+		message.diagnostic_response.has_message_id = true;
+		//7DF should respond with a random message id between 7e8 and 7ef
+		//7E0 through 7E7 should respond with a id that is 8 higher (7E0->7E8)
+		if(commandRequest->message_id == 0x7DF)
+		{
+			message.diagnostic_response.message_id = rand()%(0x7EF-0x7E8 + 1) + 0x7E8;
+		}
+		else if(commandRequest->message_id >= 0x7E0 && commandRequest->message_id <= 0x7E7)
+		{
+			message.diagnostic_response.message_id = commandRequest->message_id + 8;
+		}
+		message.diagnostic_response.has_mode = true;
+		message.diagnostic_response.mode = commandRequest->mode;
+		if(commandRequest->has_pid)
+		{
+			message.diagnostic_response.has_pid = true;
+			message.diagnostic_response.pid = commandRequest->pid;
+		}
+		message.diagnostic_response.has_value = true;
+		message.diagnostic_response.value = rand() % 100;
+		pipeline::publish(&message, &getConfiguration()->pipeline);
+	}
+	else //If it's outside the range, the command_request will return false
+	{
+		debug("Sent message ID is outside the valid range for emulator (7DF to 7E7)");
+		status=false;
+};
+
 /*
  * Will scan for supported Obd2 pids
  *

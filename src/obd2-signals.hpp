@@ -21,6 +21,7 @@
 
 #include "uds/uds.h"
 #include "can-bus.hpp"
+#include "can-message.hpp"
 
 #include "low-can-binding.hpp"
 
@@ -64,6 +65,8 @@ std::vector<Obd2Pid>& get_obd2_signals();
 uint32_t get_signal_id(const Obd2Pid& sig);
 void find_obd2_signals(const openxc_DynamicField &key, std::vector<Obd2Pid*>& found_signals);
 
+bool is_obd2_response(can_message_t can_message);
+
 /**
  * @brief - Object to handle obd2 session with pre-scan of supported pid
  * then request them regularly
@@ -83,14 +86,14 @@ class obd2_handler_t {
 		/**
 		 * @brief Check if a request is an OBD-II PID request.
 		 *
-		 * @return true if the request is a mode 1  request and it has a 1 byte PID.
+		 * @return true if the request is a mode 1 request and it has a 1 byte PID.
 		 */
 		bool is_obd2_request(DiagnosticRequest *request);
 
 		/**
 		* @brief Check if requested signal name is an obd2 pid
 		* 
-		* @return true if name began with ob2.* else false.
+		* @return true if name began with obd2 else false.
 		*/
 		bool is_obd2_signal(const char *name);
 
@@ -103,8 +106,8 @@ class obd2_handler_t {
 		* http://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_01).
 		*
 		* @param[in] DiagnosticResponse response - the received DiagnosticResponse (the data is in response.payload,
-		*      a byte array). This is most often used when the byte order is
-		*      signiticant, i.e. with many OBD-II PID formulas.
+		*  a byte array). This is most often used when the byte order is
+		*  signiticant, i.e. with many OBD-II PID formulas.
 		* @param[in] float parsed_payload - the entire payload of the response parsed as an int.
 		*/
 		float handle_obd2_pid(const DiagnosticResponse* response, float parsedPayload);
