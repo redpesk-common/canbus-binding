@@ -69,7 +69,7 @@ add_compile_options(${EXTRAS_CXXFLAGS})
 add_definitions(-DPB_FIELD_16BIT)
 
 # Needed extra directories to hit the required headers files.
-include_directories(${EXTRAS_INCLUDE_DIRS} ${PROJECT_LIBDIR}/openxc-message-format/gen/cpp ${PROJECT_LIBDIR}/nanopb/  ${PROJECT_LIBDIR}/uds-c/src  ${PROJECT_LIBDIR}/bitfield-c/src ${PROJECT_LIBDIR}/isotp-c/src)
+include_directories(${EXTRAS_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR} ${PROJECT_LIBDIR}/openxc-message-format/gen/cpp ${PROJECT_LIBDIR}/nanopb/  ${PROJECT_LIBDIR}/uds-c/src  ${PROJECT_LIBDIR}/bitfield-c/src ${PROJECT_LIBDIR}/isotp-c/src)
 
 ###########################################################################
 # the library used by the binding : openxc, bitfield, uds, isotp
@@ -83,7 +83,10 @@ add_library(openxc STATIC ${PROJECT_LIBDIR}/openxc-message-format/gen/cpp/openxc
 
 message(STATUS "Creation of ${PROJECT_NAME} binding for AFB-DAEMON")
 ###########################################################################
-add_library(${PROJECT_NAME} MODULE ${PROJECT_NAME}.cpp can-bus.cpp can-message.cpp can-signals.cpp can-decoder.cpp obd2-signals.cpp signals.cpp openxc-utils.cpp timer.cpp)
+add_library(${PROJECT_NAME} MODULE ${PROJECT_NAME}.cpp 
+	can/can-bus.cpp can/can-message.cpp can/can-signals.cpp can/can-decoder.cpp
+	obd2/obd2-signals.cpp
+	utils/signals.cpp utils/openxc-utils.cpp utils/timer.cpp)
 target_link_libraries(${PROJECT_NAME} ${EXTRAS_LIBRARIES} bitfield isotp uds openxc pthread)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

@@ -23,11 +23,11 @@
 #include <vector>
 #include <string>
 
-#include "obd2-signals.hpp"
-#include "timer.hpp"
 #include "openxc.pb.h"
-#include "can-bus.hpp"
-#include "can-message.hpp"
+#include "utils/timer.hpp"
+#include "can/can-bus.hpp"
+#include "can/can-message.hpp"
+#include "obd2/obd2-signals.hpp"
 
 extern "C"
 {

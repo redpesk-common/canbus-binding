@@ -23,10 +23,10 @@
 #include <linux/can.h>
 #include <condition_variable>
 
-#include "timer.hpp"
 #include "openxc.pb.h"
-#include "can-signals.hpp"
-#include "can-message.hpp"
+#include "utils/timer.hpp"
+#include "can/can-signals.hpp"
+#include "can/can-message.hpp"
 #include "low-can-binding.hpp"
 
 // TODO actual max is 32 but dropped to 24 for memory considerations

@@ -22,8 +22,8 @@
 #include <fnmatch.h>
 
 #include "openxc.pb.h"
-#include "can-signals.hpp"
-#include "obd2-signals.hpp"
+#include "can/can-signals.hpp"
+#include "obd2/obd2-signals.hpp"
 
 template <typename T>
 void lookup_signals_by_name(const std::string& key, std::vector<T>& signals, std::vector<T*>& found_signals)

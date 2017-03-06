@@ -20,8 +20,8 @@
 #include <vector>
 
 #include "uds/uds.h"
-#include "can-bus.hpp"
-#include "can-message.hpp"
+#include "can/can-bus.hpp"
+#include "can/can-message.hpp"
 
 #include "low-can-binding.hpp"
 
@@ -78,7 +78,7 @@ class obd2_signals_t {
 	public:
 		obd2_signals_t(uint8_t pid, const char* generic_name, const int min_, const int max_, enum UNIT unit, int frequency, bool supported);
 
-		void init_diagnostic_shims(can_bus_dev_t& can_bus_dev)
+		void init_diagnostic_shims(can_bus_dev_t& can_bus_dev);
 		void add_request(int pid);
 		std::vector<Obd2Pid>& get_obd2_signals();
 

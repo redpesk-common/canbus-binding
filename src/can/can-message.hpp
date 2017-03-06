@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <linux/can.h>
 
-#include "timer.hpp"
+#include "utils/timer.hpp"
 
 #define CAN_MESSAGE_SIZE 8
 
