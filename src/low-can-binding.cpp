@@ -141,7 +141,7 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 
 	openxc_DynamicField search_key = build_DynamicField(std::string(name));
 	signals = find_signals(search_key);
-	if (signalssig.empty())
+	if (signals.empty())
 		ret = 0;
 
 	ret = subscribe_unsubscribe_signals(request, subscribe, signals);
