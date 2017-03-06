@@ -42,56 +42,46 @@ std::vector<std::vector<CanSignal>> SIGNALS = {
 	},
 };
 
-/** 
- * @brief Can signal event map making access to afb_event
- * externaly to an openxc existing structure.
- *
- * @desc Event map is making relation between CanSignal generic name
- * and the afb_event struct used by application framework to pushed
- * to the subscriber.
- */
-std::map<std::string, struct afb_event> subscribed_signals;
-
 /**
-* @brief Mutex allowing safe manipulation on subscribed_signals map.
-* @desc To ensure that the map object isn't modified when we read it, you
-*  have to set this mutex before use subscribed_signals map object.
-*/
-std::mutex subscribed_signals_mutex;
-
-std::mutex& get_subscribed_signals_mutex()
-{
-	return subscribed_signals_mutex;
-}
-
-std::map<std::string, struct afb_event>& get_subscribed_signals()
-{
-	return subscribed_signals;
-}
-
+ * @fn std::vector<CanSignal>& get_can_signals()
+ *
+ * @return A reference to a vector of signals
+ */
 std::vector<CanSignal>& get_can_signals()
 {
 	return SIGNALS[MESSAGE_SET_ID];
 }
 
+/**
+ * @fn size_t getSignalCount()
+ *
+ * @return the length of the array returned by get_can_signals().
+ */
 size_t getSignalCount()
 {
 	return SIGNALS[MESSAGE_SET_ID].size();
 }
 
+/**
+ * @brief Retrieve can arbitration id of a given CanSignal
+ *
+ * @param[in] CanSignal& - a const reference to a CanSignal
+ *
+ * @return uint32_t - unsigned integer representing the arbitration id.
+ */
 uint32_t get_signal_id(const CanSignal& sig)
 {
 	return sig.message->id;
 }
 
 /**
- * @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
+ * @fn void find_can_signals(const openxc_DynamicField& key, std::vector<CanSignal*>& found_signals)
  * @brief return signals name found searching through CAN_signals and OBD2 pid
  * 
  * @param[in] const openxc_DynamicField : can contain numeric or string value in order to search against 
  *   can signals or obd2 signals name.
+ * @param[out] std::vector<CanSignal*>& found_signals : provided vector to fill with ponter to signals matched.
  *
- * @return std::vector<std::string> Vector of signals name found. 
  */
 void find_can_signals(const openxc_DynamicField& key, std::vector<CanSignal*>& found_signals)
 {

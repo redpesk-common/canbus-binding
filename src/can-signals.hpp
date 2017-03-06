@@ -133,29 +133,10 @@ struct CanSignal {
 };
 typedef struct CanSignal CanSignal;
 
-/* Public: Return signals from an signals array filtered on name.
- */
 std::vector<CanSignal>& get_can_signals();
 
-/* Public: Return the length of the array returned by get_can_signals(). */
 size_t getSignalCount();
 
-/**
- * @brief Find one or many signals based on its name or id
- * passed through openxc_DynamicField.
- *
- * @param[in] openxc_DynamicField& - a const reference with the key to search into signal.
- * Key is either a signal name or its CAN arbitration id.
- *
- * @return std::vector<std::string> return found CanSignal generic name vector.
- */
 void find_can_signals(const openxc_DynamicField &key, std::vector<CanSignal*>& found_signals);
 
-/**
- * @brief Retrieve can arbitration id of a given CanSignal
- *
- * @param[in] CanSignal& - a const reference to a CanSignal
- *
- * @return uint32_t - unsigned integer representing the arbitration id.
- */
 uint32_t get_signal_id(const CanSignal& sig);
