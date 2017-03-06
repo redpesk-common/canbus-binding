@@ -42,12 +42,26 @@ extern "C"
 *		can_bus_t method implementation
 *
 *********************************************************************************/
-
+/**
+* @brief Class constructor
+*
+* @param struct afb_binding_interface *interface between daemon and binding
+* @param int file handle to the json configuration file.
+*/
 can_bus_t::can_bus_t(int conf_file)
 	: conf_file_{conf_file}
 {
 }
 
+/**
+* @brief thread to decoding raw CAN messages. 
+*
+* @desc It will take from the can_message_q_ queue the next can message to process then it will search 
+*  about signal subscribed if there is a valid afb_event for it. We only decode signal for which a 
+*  subscription has been made. Can message will be decoded using translateSignal that will pass it to the
+*  corresponding decoding function if there is one assigned for that signal. If not, it will be the default
+*  noopDecoder function that will operate on it.
+*/
 void can_bus_t::can_decode_message()
 {
 	can_message_t can_message;
@@ -94,6 +108,10 @@ void can_bus_t::can_decode_message()
 	}
 }
 
+/**
+* @brief thread to push events to suscribers. It will read subscribed_signals map to look 
+* which are events that has to be pushed.
+*/
 void can_bus_t::can_event_push()
 {
 	openxc_VehicleMessage v_message;
@@ -120,9 +138,13 @@ void can_bus_t::can_event_push()
 	}
 }
 
+/**
+	* @brief Will initialize threads that will decode
+	*  and push subscribed events.
+	*/
 void can_bus_t::start_threads()
 {
-	is_decoding_ = true;
+	v_ = true;
 	th_decoding_ = std::thread(&can_bus_t::can_decode_message, this);
 	if(!th_decoding_.joinable())
 		is_decoding_ = false;
@@ -133,12 +155,21 @@ void can_bus_t::start_threads()
 		is_pushing_ = false;
 }
 
+/**
+* @brief Will stop all threads holded by can_bus_t object
+*  which are decoding and pushing then will wait that's 
+* they'll finish their job.
+*/
 void can_bus_t::stop_threads()
 {
 	is_decoding_ = false;
 	is_pushing_ = false;
 }
 
+/**
+* @brief Will initialize can_bus_dev_t objects after reading 
+* the configuration file passed in the constructor.
+*/
 int can_bus_t::init_can_dev()
 {
 	std::vector<std::string> devices_name;
@@ -173,6 +204,12 @@ int can_bus_t::init_can_dev()
 	return 1;
 }
 
+/**
+* @brief read the conf_file_ and will parse json objects
+* in it searching for canbus objects devices name.
+*
+* @return Vector of can bus device name string.
+*/
 std::vector<std::string> can_bus_t::read_conf()
 {
 	std::vector<std::string> ret;
@@ -194,7 +231,15 @@ std::vector<std::string> can_bus_t::read_conf()
 		jo = json_tokener_parse(fd_conf_content.c_str());
 
 		if (jo == NULL || !json_object_object_get_ex(jo, "canbus", &canbus))
-		{
+		{/**
+* @brief Telling if the pushing thread is running
+*  This is the boolean value on which the while loop
+*  take its condition. Set it to false will stop the 
+*  according thread.
+*
+* @return true if pushing thread is running, false if not.
+*/
+
 			ERROR(binder_interface, "Can't find canbus node in the configuration file. Please review it.");
 			ret.clear();
 		}
@@ -217,16 +262,31 @@ std::vector<std::string> can_bus_t::read_conf()
 	return ret;
 }
 
-std::condition_variable& can_bus_t::get_new_can_message()
+/**
+* @brief return new_can_message_ member
+*
+* @return  return new_can_message_ member
+*/
+std::condition_variable& can_bus_t::get_new_can_message_cv()
 {
-	return new_can_message_;
+	return new_can_message_cv_;
 }
 
+/**
+* @brief return can_message_mutex_ member
+*
+* @return  return can_message_mutex_ member
+*/
 std::mutex& can_bus_t::get_can_message_mutex()
 {
 	return can_message_mutex_;
 }
 
+/**
+* @brief Return first can_message_t on the queue 
+*
+* @return a can_message_t 
+*/
 can_message_t can_bus_t::next_can_message()
 {
 	can_message_t can_msg;
@@ -243,11 +303,21 @@ can_message_t can_bus_t::next_can_message()
 	return can_msg;
 }
 
+/**
+* @brief Push a can_message_t into the queue
+*
+* @param the const reference can_message_t object to push into the queue
+*/
 void can_bus_t::push_new_can_message(const can_message_t& can_msg)
 {
 	can_message_q_.push(can_msg);
 }
 
+/**
+* @brief Return first openxc_VehicleMessage on the queue 
+*
+* @return a openxc_VehicleMessage containing a decoded can message
+*/
 openxc_VehicleMessage can_bus_t::next_vehicle_message()
 {
 	openxc_VehicleMessage v_msg;
@@ -263,11 +333,21 @@ openxc_VehicleMessage can_bus_t::next_vehicle_message()
 	return v_msg;
 }
 
+/**
+* @brief Push a openxc_VehicleMessage into the queue
+*
+* @param the const reference openxc_VehicleMessage object to push into the queue
+*/
 void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 {
 	vehicle_message_q_.push(v_msg);
 }
 
+/**
+* @brief Return a map with the can_bus_dev_t initialized
+*
+* @return map can_bus_dev_m_ map
+*/
 std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices()
 {
 	return can_devices_m_;
@@ -278,12 +358,21 @@ std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices
 *		can_bus_dev_t method implementation
 *
 *********************************************************************************/
-
+/**
+* @brief Class constructor 
+*
+* @param const string representing the device name into the linux /dev tree
+*/
 can_bus_dev_t::can_bus_dev_t(const std::string &dev_name)
 	: device_name_{dev_name}, can_socket_{-1}
 {
 }
 
+/**
+* @brief Open the can socket and returning it 
+*
+* @return 
+*/
 int can_bus_dev_t::open()
 {
 	const int canfd_on = 1;
@@ -339,6 +428,11 @@ int can_bus_dev_t::open()
 	return -1;
 }
 
+/**
+	* @brief Open the can socket and returning it 
+	*
+	* @return 
+	*/
 int can_bus_dev_t::close()
 {
 	::close(can_socket_);
@@ -346,6 +440,12 @@ int can_bus_dev_t::close()
 	return can_socket_;
 }
 
+/**
+* @brief Read the can socket and retrieve canfd_frame
+*
+* @param const struct afb_binding_interface* interface pointer. Used to be able to log 
+*  using application framework logger.
+*/
 std::pair<struct canfd_frame&, size_t> can_bus_dev_t::read()
 {
 	ssize_t nbytes;
@@ -375,6 +475,12 @@ std::pair<struct canfd_frame&, size_t> can_bus_dev_t::read()
 	return std::pair<struct canfd_frame&, size_t>(cfd, nbytes);
 }
 
+/**
+* @brief start reading threads and set flag is_running_
+*
+* @param can_bus_t reference can_bus_t. it will be passed to the thread 
+*  to allow using can_bus_t queue.
+*/
 void can_bus_dev_t::start_reading(can_bus_t& can_bus)
 {
 	DEBUG(binder_interface, "Launching reading thread");
@@ -384,11 +490,22 @@ void can_bus_dev_t::start_reading(can_bus_t& can_bus)
 		is_running_ = false;
 }
 
+/**
+* @brief stop the reading thread setting flag is_running_ to false and
+* and wait that the thread finish its job.
+*/
 void can_bus_dev_t::stop_reading()
 {
 	is_running_ = false;
 }
 
+/**
+*
+* @brief Thread function used to read the can socket.
+*
+* @param[in] can_bus_dev_t object to be used to read the can socket
+* @param[in] can_bus_t object used to fill can_message_q_ queue
+*/
 void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 {
 	can_message_t can_message;
@@ -401,10 +518,17 @@ void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 			std::lock_guard<std::mutex> can_message_lock(can_bus.get_can_message_mutex());
 			can_bus.push_new_can_message(can_message);
 		}
-		can_bus.get_new_can_message().notify_one();
+		can_bus.get_new_can_message_cv_().notify_one();
 	}
 }
 
+/**
+* @brief Send a can message from a can_message_t object.
+* 
+* @param const can_message_t& can_msg: the can message object to send 
+* @param const struct afb_binding_interface* interface pointer. Used to be able to log 
+*  using application framework logger.
+*/
 int can_bus_dev_t::send_can_message(can_message_t& can_msg)
 {
 	ssize_t nbytes;

@@ -67,143 +67,26 @@ class can_message_t {
 		uint8_t maxdlen_;
 
 	public:
-		/**
-		 * @brief Class constructor
-		 *
-		 * Constructor about can_message_t class.
-		 */
 		can_message_t();
 
-		/**
-		 * @brief Retrieve id_ member value.
-		 *
-		 * @return uint32_t id_ class member
-		 */
 		uint32_t get_id() const;
-		
-		/**
-		 * @brief Retrieve RTR flag member.
-		 *
-		 * @return bool rtr_flags_ class member
-		 */
 		bool get_rtr_flag_() const;
-
-		/**
-		 * @brief Retrieve format_ member value.
-		 *
-		 * @return CanMessageFormat format_ class member
-		 */
 		int get_format() const;
-		
-		/**
-		 * @brief Retrieve format_ member value.
-		 *
-		 * @return CanMessageFormat format_ class member
-		 */
 		uint8_t get_flags() const;
-		
-		/**
-		 * @brief Retrieve data_ member value.
-		 *
-		 * @return uint8_t data_ pointer to the first element 
-		 *  of class member data_
-		 */
 		const uint8_t* get_data() const;
-		
-		/**
-		 * @brief Retrieve length_ member value.
-		 *
-		 * @return uint8_t length_ class member
-		 */
 		uint8_t get_length() const;
-		
+
 		void set_max_data_length(size_t nbytes);
-
-		/**
-		 * @brief Control whether the object is correctly initialized
-		 *  to be sent over the CAN bus
-		 *
-		 * @return true if object correctly initialized and false if not...
-		 */
-		bool is_correct_to_send();
-		
-		/**
-		 * @brief Set id_ member value.
-		 *
-		 * Preferred way to initialize these members by using 
-		 * convert_from_canfd_frame method.
-		 *
-		 * @param uint32_t id_ class member
-		 */
 		void set_id_and_format(const uint32_t new_id);
-		
-		/**
-		 * @brief Set format_ member value.
-		 *
-		 * Preferred way to initialize these members by using 
-		 * convert_from_canfd_frame method.
-		 *
-		 * @param CanMessageFormat format_ class member
-		 */
 		void set_format(const CanMessageFormat new_format);
-		
-		/**
-		 * @brief Set format_ member value. Deducing from the can_id
-		 *  of a canfd_frame.
-		 *
-		 * Preferred way to initialize these members by using 
-		 * convert_from_canfd_frame method.
-		 *
-		 * @param uint32_t can_id integer from a canfd_frame
-		 */
 		void set_format(const uint32_t can_id);
-
-		/**
-		 * @brief Set format_ member value.
-		 *
-		 * Preferred way to initialize these members by using 
-		 * convert_from_canfd_frame method.
-		 *
-		 * @param CanMessageFormat format_ class member
-		 */
 		void set_flags(const uint8_t flags);
-
-		/**
-		 * @brief Set data_ member value.
-		 *
-		 * Preferred way to initialize these members by using 
-		 * convert_from_canfd_frame method.
-		 *
-		 * @param uint8_t data_ array with a max size of 8 elements.
-		 */
 		void set_data(const __u8* new_data);
-		
-		/**
-		 * @brief Set length_ member value.
-		 *
-		 * Preferred way to initialize these members by using 
-		 * convert_from_canfd_frame method.
-		 *
-		 * @param uint8_t length_ array with a max size of 8 elements.
-		 */
 		void set_length(const uint8_t new_length);
 
-		/**
-		 * @brief Take a canfd_frame struct to initialize class members
-		 *
-		 * This is the preferred way to initialize class members.
-		 *
-		 * @param canfd_frame struct read from can bus device.
-		 */
+		bool is_correct_to_send();
+
 		void convert_from_canfd_frame(const std::pair<struct canfd_frame&, size_t>args);
-		
-		/**
-		 * @brief Take all initialized class's members and build an 
-		 * canfd_frame struct that can be use to send a CAN message over
-		 * the bus.
-		 *
-		 * @return canfd_frame struct built from class members.
-		 */
 		canfd_frame convert_to_canfd_frame();
 };
 
