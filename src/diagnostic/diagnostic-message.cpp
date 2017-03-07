@@ -59,14 +59,24 @@ const char *UNIT_NAMES[10] = {
 	{ 0x63, "obd2.engine.torque", 0, 65535, NM, 1, false}
 };
 
-obd2_signals_t::obd2_signals_t(uint8_t pid, const char* generic_name, const int min, const int max, enum UNIT unit, int frequency, bool supported)
-	:	pid_{pid}, generic_name_{generic_name}, min_{min}, max_{max}, unit_{unit}, frequency_{frequency}, supported_{supported}
+uint32_t get_signal_id(obd2_signals_t& sig)
 {
+	return sig.get_pid();
 }
 
 std::vector<obd2_signals_t>& get_obd2_signals()
 {
 	return OBD2_PIDS;
+}
+
+obd2_signals_t::obd2_signals_t(uint8_t pid, const char* generic_name, const int min, const int max, enum UNIT unit, int frequency, bool supported)
+	:	pid_{pid}, generic_name_{generic_name}, min_{min}, max_{max}, unit_{unit}, frequency_{frequency}, supported_{supported}
+{
+}
+
+uint32_t obd2_signals_t::get_pid()
+{
+	return (uint32_t)pid_;
 }
 
 /**
