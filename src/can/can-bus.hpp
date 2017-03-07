@@ -27,7 +27,6 @@
 #include "utils/timer.hpp"
 #include "can/can-signals.hpp"
 #include "can/can-message.hpp"
-#include "obd2/diagnostic-manager.hpp"
 
 #include "low-can-binding.hpp"
 
@@ -39,7 +38,6 @@
 #define CAN_ACTIVE_TIMEOUT_S 30
 
 class can_bus_dev_t;
-class diagnostic_manager_t;
 
 /** 
  * @class can_bus_t
@@ -108,9 +106,6 @@ class can_bus_dev_t {
 		int can_socket_; /*!< socket handler for the can device */
 		bool is_fdmode_on_; /*!< boolean telling if whether or not the can socket use fdmode. */
 		struct sockaddr_can txAddress_; /*!< internal member using to bind to the socket */
-
-		diagnostic_manager_t diagnostic_manager_; /*!< diagnostic_manager_t diagnostic_manager_ - A diagnostic_manager_t object instance
-												   * that will handle diagnostic obd2 protocol requests and responses.*/
 
 		std::thread th_reading_; /*!< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t */
 		bool is_running_; /*!< boolean telling whether or not reading is running or not */
