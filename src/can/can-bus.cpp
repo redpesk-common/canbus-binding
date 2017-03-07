@@ -31,6 +31,7 @@
 
 #include "can/can-decoder.hpp"
 #include "utils/openxc-utils.hpp"
+#include "obd2/diagnostic-manager.hpp"
 
 extern "C"
 {
@@ -363,10 +364,9 @@ std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices
 *
 * @param const string representing the device name into the linux /dev tree
 */
-can_bus_dev_t::can_bus_dev_t(const std::string &dev_name)
-	: device_name_{dev_name}, can_socket_{-1}
-{
-}
+can_bus_dev_t::can_bus_dev_t(const std::string& dev_name)
+	: device_name_{dev_name}, can_socket_{-1}, diagnostic_manager_{diagnostic_manager_t(*this)}
+{}
 
 /**
 * @brief Open the can socket and returning it 

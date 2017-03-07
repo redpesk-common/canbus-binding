@@ -105,22 +105,9 @@ void obd2_signals_t::find_obd2_signals(const openxc_DynamicField &key, std::vect
 	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
 }
 
-uint32_t get_signal_id(const obd2_signals_t& sig)
-{
-	return (uint32_t)sig.pid;
-}
-
-void shims_logger(const char* m, const struct afb_binding_interface *interface)
-{
-	DEBUG(interface, "%s", m);
-}
-
-void shims_timer()
-{
-}
-
 bool obd2_signals_t::is_obd2_response(can_message_t can_message)
 {
+	/*
 	if(can_message.get_id() >= 0x7E8 && can_message.get_id() <= 0x7EF)
 	{
 		openxc_VehicleMessage message = {0};
