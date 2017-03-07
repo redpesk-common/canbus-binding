@@ -95,7 +95,7 @@ void obd2_signals_t::find_obd2_signals(const openxc_DynamicField &key, std::vect
 	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
 }
 
-uint32_t get_signal_id(const Obd2Pid& sig)
+uint32_t get_signal_id(const obd2_signals_t& sig)
 {
 	return (uint32_t)sig.pid;
 }

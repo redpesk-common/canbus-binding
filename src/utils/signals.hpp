@@ -60,7 +60,7 @@ void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector
 template <typename T>
 void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector<std::string>& found_signals_name)
 {
-	for(T& s : signals)
+	for(const T& s : signals)
 	{
 		if(get_signal_id(s) == key)
 		{
