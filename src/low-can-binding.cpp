@@ -82,7 +82,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-	if (s.find(sig) != s.end() && !afb_event_is_valid(s[std::string(sig)]))
+	if (s.find(sig) != s.end() && !afb_event_is_valid(s[sig]))
 	{
 		if(!subscribe)
 		{
@@ -90,12 +90,14 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 			ret = -1;
 		}
 		else
+		{
 			/* Event it isn't valid annymore, recreate it */
 			ret = create_event_handle(sig, s);
+		}
 	}
 	else
 	{
-		/* Event don't exist , so let's create it */
+		/* Event doesn't exist , so let's create it */
 		struct afb_event empty_event = {nullptr, nullptr};
 		subscribed_signals[sig] = empty_event;
 		ret = create_event_handle(sig, s);

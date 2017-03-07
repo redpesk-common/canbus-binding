@@ -67,13 +67,13 @@ typedef struct _Obd2Pid {
  */
 class obd2_signals_t {
 	private:
-		uint8_t pid_;
-		const char* generic_name_;
-		const int min_;
-		const int max_;
-		enum UNIT unit_;
-		int frequency_;
-		bool supported_;
+		uint8_t pid_; /*!< pid - The 1 byte PID.*/
+		const char* generic_name_; /*!< generic_name_ - A human readable name to use for this PID when published.*/
+		const int min_; /*!< min_ - Minimum value that can take this pid */
+		const int max_; /*!< max_ - Maximum value that can take this pid */
+		enum UNIT unit_; /*!< unit_ : Which unit system is used by that pid. See enum UNIT above.*/
+		int frequency_; /*!< frequency - The frequency to request this PID if supported by the vehicle when automatic, recurring OBD-II requests are enabled.*/
+		bool supported_; /*!< supported_ - boolean indicating whether this pid is supported by the vehicle or not.*/
 
 	public:
 		const char* generic_name = generic_name_;
