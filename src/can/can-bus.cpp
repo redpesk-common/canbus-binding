@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-#include "can/can-bus.hpp"
-
 #include <map>
 #include <cerrno>
 #include <vector>
@@ -37,6 +35,8 @@ extern "C"
 	#include <afb/afb-binding.h>
 }
 
+#include "can/can-bus.hpp"
+
 /********************************************************************************
 *
 *		can_bus_t method implementation
@@ -52,6 +52,7 @@ can_bus_t::can_bus_t(int conf_file)
 	: conf_file_{conf_file}
 {
 }
+
 
 /**
 * @brief thread to decoding raw CAN messages. 
@@ -358,74 +359,6 @@ std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices
 *		can_bus_dev_t method implementation
 *
 *********************************************************************************/
-/**
-* @brief Class constructor 
-*
-* @param const string representing the device name into the linux /dev tree
-*/
-can_bus_dev_t::can_bus_dev_t(const std::string& dev_name)
-	: device_name_{dev_name}, can_socket_{-1}
-{}
-
-/**
-* @brief Open the can socket and returning it 
-*
-* @return 
-*/
-int can_bus_dev_t::open()
-{
-	const int canfd_on = 1;
-	const int timestamp_on = 1;
-	struct ifreq ifr;
-	struct timeval timeout;
-
-	DEBUG(binder_interface, "CAN Handler socket : %d", can_socket_);
-	if (can_socket_ >= 0)
-		return 0;
-
-	can_socket_ = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
-	DEBUG(binder_interface, "CAN Handler socket correctly initialized : %d", can_socket_);
-	if (can_socket_ < 0)
-		ERROR(binder_interface, "socket could not be created. Error was : %s", ::strerror(errno));
-	else
-	{
-		/* Set timeout for read */
-		::setsockopt(can_socket_, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
-		/* Set timestamp for receveid frame */
-		if (::setsockopt(can_socket_, SOL_SOCKET, SO_TIMESTAMP, &timestamp_on, sizeof(timestamp_on)) < 0)
-			WARNING(binder_interface, "setsockopt SO_TIMESTAMP error: %s", ::strerror(errno));
-		DEBUG(binder_interface, "Switch CAN Handler socket to use fd mode");
-		/* try to switch the socket into CAN_FD mode */
-		if (::setsockopt(can_socket_, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
-		{
-			NOTICE(binder_interface, "Can not switch into CAN Extended frame format.");
-			is_fdmode_on_ = false;
-		} else {
-			DEBUG(binder_interface, "Correctly set up CAN socket to use FD frames.");
-			is_fdmode_on_ = true;
-		}
-
-		/* Attempts to open a socket to CAN bus */
-		::strcpy(ifr.ifr_name, device_name_.c_str());
-		DEBUG(binder_interface, "ifr_name is : %s", ifr.ifr_name);
-		if(::ioctl(can_socket_, SIOCGIFINDEX, &ifr) < 0)
-			ERROR(binder_interface, "ioctl failed. Error was : %s", strerror(errno));
-		else
-		{
-			txAddress_.can_family = AF_CAN;
-			txAddress_.can_ifindex = ifr.ifr_ifindex;
-
-			/* And bind it to txAddress */
-			DEBUG(binder_interface, "Bind the socket");
-			if (::bind(can_socket_, (struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
-				ERROR(binder_interface, "Bind failed. %s", strerror(errno));
-			else
-				return 0;
-		}
-		close();
-	}
-	return -1;
-}
 
 /**
 	* @brief Open the can socket and returning it 
