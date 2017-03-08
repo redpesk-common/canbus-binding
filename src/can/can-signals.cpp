@@ -24,6 +24,16 @@
 #include "obd2/obd2-signals.hpp"
 #include "low-can-binding.hpp"
 
+can_message_definition_t& can_signal_t::get_message() const
+{
+	return message_;
+}
+
+std::string& can_signal_t::get_generic_name() const
+{
+	return generic_name_;
+}
+
 /**
  * @fn void find_can_signals(const openxc_DynamicField& key, std::vector<CanSignal*>& found_signals)
  * @brief return signals name found searching through CAN_signals and OBD2 pid
