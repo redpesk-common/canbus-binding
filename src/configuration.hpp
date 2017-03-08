@@ -51,61 +51,29 @@ class configuration_t
 		const std::vector<std::vector<can_signal_t>> can_signals_;
 		const std::vector<std::vector<can_message_definition_t>> can_message_definition_;
 
-		configuration_t& get_configuration()
-		{ 
-			return *this;
-		}
+		configuration_t& get_configuration() const;
 
-		can_bus_t& get_can_bus_manager()
-		{
-			return can_bus_manager_;
-		}
+		can_bus_t& get_can_bus_manager() const;
 
-		diagnostic_manager_t& get_diagnostic_manager()
-		{
-			return diagnostic_manager_;
-		}
+		diagnostic_manager_t& get_diagnostic_manager() const;
 
-		uint8_t get_active_message_set()
-		{
-			return active_message_set_;
-		}
+		uint8_t get_active_message_set() const;
 
-		const std::vector<can_message_set_t>& get_can_message_set()
-		{
-			return can_message_set_;
-		}
+		const std::vector<can_message_set_t>& get_can_message_set() const;
 
-		const std::vector<can_signal_t>& get_can_signals()
-		{
-			return can_signals_[active_message_set_];
-		}
+		const std::vector<can_signal_t>& get_can_signals() const;
 
-		const std::vector<can_message_definition_t>& get_can_message_definition()
-		{
-			return can_message_definition_[active_message_set_];
-		}
+		const std::vector<can_message_definition_t>& get_can_message_definition() const;
 
-		const std::vector<obd2_signal_t>& get_obd2_signals()
-		{
-			return obd2_signals_;
-		}
+		const std::vector<obd2_signal_t>& get_obd2_signals() const;
 
-		uint32_t get_signal_id(obd2_signal_t& sig)
-		{
-			return sig.get_pid();
-		}
+		uint32_t get_signal_id(obd2_signal_t& sig) const;
 
-		uint32_t get_signal_id(can_signal_t& sig)
-		{
-			return sig.get_message()->id;
-		}
+		uint32_t get_signal_id(can_signal_t& sig) const;
 
-		void set_active_message_set(uint8_t id)
-		{
-			active_message_set_ = id;
-		}
+		void set_active_message_set(uint8_t id);
 
+/*
 		/// TODO: implement this function as method into can_bus class
 		/// @brief Pre initialize actions made before CAN bus initialization
 		/// @param[in] bus A CanBus struct defining the bus's metadata
@@ -129,5 +97,5 @@ class configuration_t
 		/// @param[in] buses An array of active CAN buses.
 		/// @param[in] busCount The length of the buses array.
 		bool isBusActive(can_bus_dev_t* bus);
-
+		*/
 };
