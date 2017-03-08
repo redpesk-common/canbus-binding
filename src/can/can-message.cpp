@@ -32,7 +32,7 @@
 * Constructor about can_message_t class.
 */
 can_message_t::can_message_t()
-	: id_{0}, rtr_flag_{false}, length_{0}, flags_{0}, format_{CanMessageFormat::ERROR}
+	: id_{0}, rtr_flag_{false}, length_{0}, flags_{0}, format_{CanMessageFormat::ERROR}, maxdlen_{0}
 {}
 
 /**
@@ -98,26 +98,6 @@ uint8_t can_message_t::get_length() const
 	return length_;
 }
 
-void can_message_t::set_max_data_length(size_t nbytes)
-{
-	maxdlen_ = 0;
-
-	switch(nbytes)
-	{
-		case CANFD_MTU:
-			DEBUG(binder_interface, "set_max_data_length: Got an CAN FD frame");
-			maxdlen_ = CANFD_MAX_DLEN;
-			break;
-		case CAN_MTU:
-			DEBUG(binder_interface, "set_max_data_length: Got a legacy CAN frame");
-			maxdlen_ = CAN_MAX_DLEN;
-			break;
-		default:
-			ERROR(binder_interface, "set_max_data_length: unsupported CAN frame");
-			break;
-	}
-}
-
 /**
 * @brief Control whether the object is correctly initialized
 *  to be sent over the CAN bus
@@ -137,34 +117,6 @@ bool can_message_t::is_correct_to_send()
 }
 
 /**
-* @brief Set id_ member value.
-*
-* Preferred way to initialize these members by using 
-* convert_from_canfd_frame method.
-*
-* @param[in] id_ class member
-*/
-void can_message_t::set_id_and_format(const uint32_t new_id)
-{
-	set_format(new_id);
-	switch(format_)
-	{
-		case CanMessageFormat::STANDARD:
-			id_ = new_id & CAN_SFF_MASK;
-			break;
-		case CanMessageFormat::EXTENDED:
-			id_ = new_id & CAN_EFF_MASK;
-			break;
-		case CanMessageFormat::ERROR:
-			id_ = new_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
-			break;
-		default:
-			ERROR(binder_interface, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
-			break;
-	}
-}
-
-/**
 * @brief Set format_ member value.
 *
 * Preferred way to initialize these members by using 
@@ -181,111 +133,94 @@ void can_message_t::set_format(const CanMessageFormat new_format)
 }
 
 /**
-* @brief Set format_ member value. Deduced from the can_id
-*  of a canfd_frame.
-*
-* Preferred way to initialize these members by using 
-* convert_from_canfd_frame method.
-*
-* @param[in] can_id - integer from a canfd_frame
-*/
-void can_message_t::set_format(const uint32_t can_id)
-{
-	if (can_id & CAN_ERR_FLAG)
-		format_ = CanMessageFormat::ERROR;
-	else if (can_id & CAN_EFF_FLAG)
-		format_ = CanMessageFormat::EXTENDED;
-	else
-		format_ = CanMessageFormat::STANDARD;
-}
-
-/**
-* @brief Set format_ member value.
-*
-* Preferred way to initialize these members by using 
-* convert_from_canfd_frame method.
-*
-* @param[in] format_ - class member
-*/
-void can_message_t::set_flags(const uint8_t flags)
-{
-	flags_ = flags & 0xF;
-}
-
-/**
-* @brief Set length_ member value.
-*
-* Preferred way to initialize these members by using 
-* convert_from_canfd_frame method.
-*
-* @param[in] new_length - array with a max size of 8 elements.
-*/
-void can_message_t::set_length(const uint8_t new_length)
-{
-	if(rtr_flag_)
-		length_ = new_length & 0xF;
-	else
-	{
-		length_ = (new_length > maxdlen_) ? maxdlen_ : new_length;
-	}
-}
-
-/**
-* @brief Set data_ member value.
-*
-* Preferred way to initialize these members by using 
-* convert_from_canfd_frame method.
-*
-* @param[in] new_data - array with a max size of 8 elements.
-*/
-void can_message_t::set_data(const __u8* new_data)
-{
-		int i;
-
-		data_.clear();
-		/* maxdlen_ is now set at CAN_MAX_DLEN or CANFD_MAX_DLEN, respectively 8 and 64 bytes*/
-		for(i=0;i<maxdlen_;i++)
-		{
-			data_.push_back(new_data[i]);
-		}
-}
-
-/**
 * @brief Take a canfd_frame struct to initialize class members
 *
 * This is the preferred way to initialize class members.
 *
 * @param[in] args - struct read from can bus device.
 */
-void can_message_t::convert_from_canfd_frame(const std::pair<struct canfd_frame&, size_t> args)
+can_message_t can_message_t::convert_to_canfd_frame(const struct canfd_frame& frame, size_t nbytes)
 {
-	// May be it's overkill to assign member of the pair... May be it will change...
-	struct canfd_frame frame = args.first;
-	size_t nbytes = args.second;
-	set_max_data_length(nbytes);
-	set_length(frame.len);
-	set_id_and_format(frame.can_id);
+ 	switch(nbytes)
+	{
+		case CANFD_MTU:
+			DEBUG(binder_interface, "set_max_data_length: Got an CAN FD frame");
+			maxdlen_ = CANFD_MAX_DLEN;
+			break;
+		case CAN_MTU:
+			DEBUG(binder_interface, "set_max_data_length: Got a legacy CAN frame");
+			maxdlen_ = CAN_MAX_DLEN;
+			break;
+		default:
+			ERROR(binder_interface, "set_max_data_length: unsupported CAN frame");
+			break;
+	}
 
+	if(rtr_flag_)
+		length_ = frame.len& 0xF;
+	else
+	{
+		length_ = (frame.len > maxdlen_) ? maxdlen_ : frame.len;
+	}
+	
+	if (frame.can_id & CAN_ERR_FLAG)
+		format_ = CanMessageFormat::ERROR;
+	else if (frame.can_id & CAN_EFF_FLAG)
+		format_ = CanMessageFormat::EXTENDED;
+	else
+		format_ = CanMessageFormat::STANDARD;
+		
+	switch(format_)
+	{
+		case CanMessageFormat::STANDARD:
+			id_ = frame.can_id & CAN_SFF_MASK;
+			break;
+		case CanMessageFormat::EXTENDED:
+			id_ = frame.can_id & CAN_EFF_MASK;
+			break;
+		case CanMessageFormat::ERROR:
+			id_ = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
+			break;
+		default:
+			ERROR(binder_interface, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
+			break;
+	}
+	
 	/* Overwrite lenght_ if RTR flags is detected.
 	 * standard CAN frames may have RTR enabled. There are no ERR frames with RTR */
 	if (frame.can_id & CAN_RTR_FLAG)
 	{
 		rtr_flag_ = true;
 		if(frame.len && frame.len <= CAN_MAX_DLC)
-			set_length(frame.len);
-		return;
+		{
+    	if(rtr_flag_)
+    		length_ = frame.len& 0xF;
+    	else
+    	{
+    		length_ = (frame.len > maxdlen_) ? maxdlen_ : frame.len;
+    	}	
+		}
 	}
+	else
+	{
+  	/* Flags field only present for CAN FD frames*/
+  	if(maxdlen_ == CANFD_MAX_DLEN)
+  			flags_ = frame.flags & 0xF;
+  
+  	if (data_.capacity() < maxdlen_)
+  		data_.reserve(maxdlen_);
+  			int i;
 
-	/* Flags field only present for CAN FD frames*/
-	if(maxdlen_ == CANFD_MAX_DLEN)
-		set_flags(frame.flags);
-
-	if ( data_.capacity() < maxdlen_)
-		data_.reserve(maxdlen_);
-	set_data(frame.data);
-
-	DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", id_, format_, length_,
-							data_[0], data_[1], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7]);
+		data_.clear();
+		/* maxdlen_ is now set at CAN_MAX_DLEN or CANFD_MAX_DLEN, respectively 8 and 64 bytes*/
+		for(i=0;i<maxdlen_;i++)
+		{
+			data_.push_back(frame.data[i]);
+		};
+  
+  	DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", id_, format_, length_,
+  							data_[0], data_[1], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7]);
+	}
 }
 
 /**
@@ -310,4 +245,3 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 	
 	return frame;
 }
-

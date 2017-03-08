@@ -31,19 +31,11 @@
  * @enum CanMessageFormat
  * @brief The ID format for a CAN message.
  */
-enum CanMessageFormat {
+class enum CanMessageFormat {
 	STANDARD, /*!< STANDARD - standard 11-bit CAN arbitration ID. */
 	EXTENDED, /*!< EXTENDED - an extended frame, with a 29-bit arbitration ID. */
 	ERROR,    /*!< ERROR - ERROR code used at initialization to signify that it isn't usable'*/
 };
-typedef enum CanMessageFormat CanMessageFormat;
-
-/**
- * @class can_message_t
- *
- * @brief A compact representation of a single CAN message, meant to be used in in/out
- * buffers.
- */
 
 /*************************
  * old CanMessage struct *
@@ -56,6 +48,13 @@ struct CanMessage {
 };
 typedef struct CanMessage CanMessage;
 */
+
+/**
+ * @class can_message_t
+ *
+ * @brief A compact representation of a single CAN message, meant to be used in in/out
+ * buffers.
+ */
 class can_message_t {
 	private:
 		uint32_t id_; /*!< id_ - The ID of the message. */
@@ -77,17 +76,11 @@ class can_message_t {
 		const uint8_t* get_data() const;
 		uint8_t get_length() const;
 
-		void set_max_data_length(size_t nbytes);
-		void set_id_and_format(const uint32_t new_id);
 		void set_format(const CanMessageFormat new_format);
-		void set_format(const uint32_t can_id);
-		void set_flags(const uint8_t flags);
-		void set_data(const __u8* new_data);
-		void set_length(const uint8_t new_length);
 
 		bool is_correct_to_send();
 
-		void convert_from_canfd_frame(const std::pair<struct canfd_frame&, size_t>args);
+    static can_message_t convert_to_canfd_frame(const struct canfd_frame& frame, size_t nbytes);
 		canfd_frame convert_to_canfd_frame();
 };
 
