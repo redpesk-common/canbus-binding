@@ -122,4 +122,43 @@ struct CanSignal {
 };
 typedef struct CanSignal CanSignal;
 
+class can_signal_t
+{
+	private:
+		struct CanMessageDefinition* message_; /*!< message	   - The message this signal is a part of. */
+		const std::string generic_name_; /*!< generic_name - The name of the signal to be output over USB.*/
+		uint8_t bitPosition_; /*!< bitPosition - The starting bit of the signal in its CAN message (assuming
+							   *	non-inverted bit numbering, i.e. the most significant bit of
+							   *	each byte is 0) */
+		uint8_t bitSize_; /*!< bitSize - The width of the bit field in the CAN message. */
+		float factor_; /*!< factor - The final value will be multiplied by this factor. Use 1 if you
+						*	don't need a factor. */
+		float offset_; /*!< offset - The final value will be added to this offset. Use 0 if you
+						*	don't need an offset. */
+		float min_value_; /*!< minValue - The minimum value for the processed signal.*/
+		float max_value_; /*!< maxValue - The maximum value for the processed signal. */
+		FrequencyClock clock_; /*!< clock_ - A FrequencyClock struct to control the maximum frequency to
+								*	process and send this signal. To process every value, set the
+								*	clock's frequency to 0. */
+		bool sendSame_; /*!< sendSame - If true, will re-send even if the value hasn't changed.*/
+		bool forceSendChanged_; /*!< forceSendChanged - If true, regardless of the frequency, it will send the
+								 *	value if it has changed. */
+		const std::map<const int, const std::string> states_; /*!< states_ - A map of CAN signal state describing the mapping
+															   * between numerical and string values for valid states. */
+		uint8_t state_count_; /*!< state_count_ - The length of the states array. */
+		bool writable_; /*!< writable - True if the signal is allowed to be written from the USB host
+						*	back to CAN. Defaults to false.*/
+		SignalDecoder decoder_; /*!< decoder_ - An optional function to decode a signal from the bus to a human
+								 * readable value. If NULL, the default numerical decoder is used. */
+		SignalEncoder encoder_; /*!< encoder_ - An optional function to encode a signal value to be written to
+								 * CAN into a byte array. If NULL, the default numerical encoder
+								 * is used. */
+		bool received_; /*!< received_ - True if this signal has ever been received.*/
+		float lastValue_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
+						  *	this value is undefined. */
+
+	public:
+
+};
+
 void find_can_signals(const openxc_DynamicField &key, std::vector<CanSignal*>& found_signals);

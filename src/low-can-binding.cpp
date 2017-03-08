@@ -34,11 +34,7 @@
 #include "utils/timer.hpp"
 #include "utils/signals.hpp"
 #include "utils/openxc-utils.hpp"
-
-extern "C"
-{
-	#include <afb/afb-service-itf.h>
-};
+#include "configuration.hpp"
 
 // Interface between the daemon and the binding
 const struct afb_binding_interface *binder_interface;

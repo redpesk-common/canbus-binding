@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+/////////////////////////////////////////////////////////////////////////////////////
+//							THIS IS AN EXAMPLE
+/////////////////////////////////////////////////////////////////////////////////////
+
 #include <configuration.hpp>
 
 #define OBD2_FUNCTIONAL_BROADCAST_ID 0x7df
@@ -22,7 +26,7 @@
 /*
 * Pre-defined OBD-II PIDs to query for if supported by the vehicle.
 */
- std::vector<obd2_signals_t> OBD2_PIDS = {
+ std::vector<obd2_signal_t> OBD2_PIDS = {
 	{ 0x04, "obd2.engine.load", 0, 100, POURCENT, 5, false},
 	{ 0x05, "obd2.engine.coolant.temperature", -40, 215, DEGREES_CELSIUS, 1, false},
 	{ 0x0a, "obd2.fuel.pressure", 0, 765, KPA, 1, false},

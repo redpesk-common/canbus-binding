@@ -112,6 +112,24 @@ struct CanMessageDefinition {
 };
 typedef struct CanMessageDefinition CanMessageDefinition;
 
+class can_message_definition_t
+{
+	private:
+	can_bus_dev_t& bus_; /*!< bus - A pointer to the bus this message is on. */
+	uint32_t id_; /*!<  id - The ID of the message.*/
+	CanMessageFormat format_; /*!< format - the format of the message's ID.*/
+	FrequencyClock clock_; /*!<  clock - an optional frequency clock to control the output of this
+ 							*	message, if sent raw, or simply to mark the max frequency for custom
+ 							*	handlers to retriec++ if ? syntaxve.*/
+	bool forceSendChanged_; /*!< forceSendChanged - If true, regardless of the frequency, it will send CAN
+ 							 *	message if it has changed when using raw passthrough.*/
+	uint8_t lastValue_[CAN_MESSAGE_SIZE]; /*!< lastValue - The last received value of the message. Defaults to undefined.
+ 										  *	This is required for the forceSendChanged functionality, as the stack
+ 										  *	needs to compare an incoming CAN message with the previous frame.*/
+	
+	public:
+};
+
 /**
  * @struct CanMessageSet
  *

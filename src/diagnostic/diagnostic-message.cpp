@@ -32,12 +32,12 @@ const char *UNIT_NAMES[10] = {
 	"NM"
 };
 
-obd2_signals_t::obd2_signals_t(uint8_t pid, const char* generic_name, const int min, const int max, enum UNIT unit, int frequency, bool supported)
+obd2_signal_t::obd2_signal_t(uint8_t pid, const char* generic_name, const int min, const int max, enum UNIT unit, int frequency, bool supported)
 	:	pid_{pid}, generic_name_{generic_name}, min_{min}, max_{max}, unit_{unit}, frequency_{frequency}, supported_{supported}
 {
 }
 
-uint32_t obd2_signals_t::get_pid()
+uint32_t obd2_signal_t::get_pid()
 {
 	return (uint32_t)pid_;
 }
@@ -51,7 +51,7 @@ uint32_t obd2_signals_t::get_pid()
  *
  * @return std::vector<std::string> Vector of signals name found. 
  */
-void obd2_signals_t::find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signals_t*>& found_signals)
+void obd2_signal_t::find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signal_t*>& found_signals)
 {
 	switch(key.type)
 	{
@@ -68,7 +68,7 @@ void obd2_signals_t::find_obd2_signals(const openxc_DynamicField &key, std::vect
 	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
 }
 
-bool obd2_signals_t::is_obd2_response(can_message_t can_message)
+bool obd2_signal_t::is_obd2_response(can_message_t can_message)
 {
 	/*
 	if(can_message.get_id() >= 0x7E8 && can_message.get_id() <= 0x7EF)
@@ -111,7 +111,7 @@ bool obd2_signals_t::is_obd2_response(can_message_t can_message)
 	*/
 }
 
-void obd2_signals_t::add_request(int pid)
+void obd2_signal_t::add_request(int pid)
 {
 	DiagnosticRequest request = {
 	arbitration_id: OBD2_FUNCTIONAL_BROADCAST_ID,
@@ -123,7 +123,7 @@ void obd2_signals_t::add_request(int pid)
 *
 * @return true if the request is a mode 1 request and it has a 1 byte PID.
 */
-bool obd2_signals_t::is_obd2_request(DiagnosticRequest* request)
+bool obd2_signal_t::is_obd2_request(DiagnosticRequest* request)
 {
 	return request->mode == 0x1 && request->has_pid && request->pid < 0xff;
 }
@@ -133,7 +133,7 @@ bool obd2_signals_t::is_obd2_request(DiagnosticRequest* request)
 * 
 * @return true if name began with obd2 else false.
 */
-bool obd2_signals_t::is_obd2_signal(const char *name)
+bool obd2_signal_t::is_obd2_signal(const char *name)
 {
 	if(fnmatch("obd2.*", name, FNM_CASEFOLD) == 0)
 		return true;
@@ -153,7 +153,7 @@ bool obd2_signals_t::is_obd2_signal(const char *name)
 *  signiticant, i.e. with many OBD-II PID formulas.
 * @param[in] float parsed_payload - the entire payload of the response parsed as an int.
 */
-float obd2_signals_t::decode_obd2_response(const DiagnosticResponse* response, float parsedPayload)
+float obd2_signal_t::decode_obd2_response(const DiagnosticResponse* response, float parsedPayload)
 {
 	return diagnostic_decode_obd2_pid(response);
 }
