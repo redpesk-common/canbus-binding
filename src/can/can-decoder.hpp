@@ -21,8 +21,6 @@
 
 class decoder_t
 {
-	private:
-
 	public:
 		/* Public: Parse the signal's bitfield from the given data and return the raw
 		* value.
@@ -34,13 +32,13 @@ class decoder_t
 		* Returns the raw value of the signal parsed as a bitfield from the given byte
 		* array.
 		*/
-		float parseSignalBitfield(CanSignal& signal, const can_message_t& message);
+		static float parseSignalBitfield(can_signal_t& signal, const can_message_t& message);
 
 		/* Public: Find and return the corresponding string state for a CAN signal's
 		* raw integer value.
 		*
 		* This is an implementation of the SignalDecoder type signature, and can be
-		* used directly in the CanSignal.decoder field.
+		* used directly in the can_signal_t.decoder field.
 		*
 		* signal  - The details of the signal that contains the state mapping.
 		* signals - The list of all signals.
@@ -53,13 +51,13 @@ class decoder_t
 		* the signal. If an equivalent isn't found, send is sent to false and the
 		* return value is undefined.
 		*/
-		static openxc_DynamicField stateDecoder(CanSignal& signal, const std::vector<CanSignal>& signals,
+		static openxc_DynamicField stateDecoder(can_signal_t& signal, const std::vector<can_signal_t>& signals,
 				float value, bool* send);
 
 		/* Public: Coerces a numerical value to a boolean.
 		*
 		* This is an implementation of the SignalDecoder type signature, and can be
-		* used directly in the CanSignal.decoder field.
+		* used directly in the can_signal_t.decoder field.
 		*
 		* signal  - The details of the signal that contains the state mapping.
 		* signals - The list of all signals
@@ -72,13 +70,13 @@ class decoder_t
 		* is 0.0, otherwise true. The 'send' argument will not be modified as this
 		* decoder always succeeds.
 		*/
-		static openxc_DynamicField booleanDecoder(CanSignal& signal, const std::vector<CanSignal>& signals,
+		static openxc_DynamicField booleanDecoder(can_signal_t& signal, const std::vector<can_signal_t>& signals,
 				float value, bool* send);
 
 		/* Public: Update the metadata for a signal and the newly received value.
 		*
 		* This is an implementation of the SignalDecoder type signature, and can be
-		* used directly in the CanSignal.decoder field.
+		* used directly in the can_signal_t.decoder field.
 		*
 		* This function always flips 'send' to false.
 		*
@@ -91,13 +89,13 @@ class decoder_t
 		*
 		* The return value is undefined.
 		*/
-		 openxc_DynamicField ignoreDecoder(CanSignal& signal, const std::vector<CanSignal>& signals,
+		static openxc_DynamicField ignoreDecoder(can_signal_t& signal, const std::vector<can_signal_t>& signals,
 				float value, bool* send);
 
 		/* Public: Wrap a raw CAN signal value in a DynamicField without modification.
 		*
 		* This is an implementation of the SignalDecoder type signature, and can be
-		* used directly in the CanSignal.decoder field.
+		* used directly in the can_signal_t.decoder field.
 		*
 		* signal  - The details of the signal that contains the state mapping.
 		* signals - The list of all signals
@@ -110,14 +108,14 @@ class decoder_t
 		* its numeric value. The 'send' argument will not be modified as this decoder
 		* always succeeds.
 		*/
-		static openxc_DynamicField noopDecoder(CanSignal& signal, const std::vector<CanSignal>& signals,
+		static openxc_DynamicField noopDecoder(can_signal_t& signal, const std::vector<can_signal_t>& signals,
 				float value, bool* send);
 
 
 		/* Public: Parse a signal from a CAN message, apply any required transforations
 		 *      to get a human readable value and public the result to the pipeline.
 		 *
-		* If the CanSignal has a non-NULL 'decoder' field, the raw CAN signal value
+		* If the can_signal_t has a non-NULL 'decoder' field, the raw CAN signal value
 		* will be passed to the decoder before publishing.
 		*
 		* signal - The details of the signal to decode and forward.
@@ -127,13 +125,13 @@ class decoder_t
 		* The decoder returns an openxc_DynamicField, which may contain a number,
 		* string or boolean.
 		*/
-		openxc_DynamicField translateSignal(CanSignal& signal, can_message_t& message,
-			const std::vector<CanSignal>& signals);
+		static openxc_DynamicField translateSignal(can_signal_t& signal, can_message_t& message,
+			const std::vector<can_signal_t>& signals);
 		
 		/* Public: Parse a signal from a CAN message and apply any required
 		* transforations to get a human readable value.
 		*
-		* If the CanSignal has a non-NULL 'decoder' field, the raw CAN signal value
+		* If the can_signal_t has a non-NULL 'decoder' field, the raw CAN signal value
 		* will be passed to the decoder before returning.
 		*
 		* signal - The details of the signal to decode and forward.
@@ -145,17 +143,17 @@ class decoder_t
 		* The decoder returns an openxc_DynamicField, which may contain a number,
 		* string or boolean. If 'send' is false, the return value is undefined.
 		*/
-		openxc_DynamicField decodeSignal(CanSignal& signal, const can_message_t& message,
-				const std::vector<CanSignal>& signals, bool* send);
+		static openxc_DynamicField decodeSignal(can_signal_t& signal, const can_message_t& message,
+				const std::vector<can_signal_t>& signals, bool* send);
 
 		/* Public: Decode a transformed, human readable value from an raw CAN signal
 		* already parsed from a CAN message.
 		*
-		* This is the same as decodeSignal(const CanSignal&, CanMessage*, const CanSignal&, int,
+		* This is the same as decodeSignal(const can_signal_t&, CanMessage*, const can_signal_t&, int,
 		* bool*) but you must parse the bitfield value of the signal from the CAN
 		* message yourself. This is useful if you need that raw value for something
 		* else.
 		*/
-		openxc_DynamicField decodeSignal(CanSignal& signal, float value,
-			const std::vector<CanSignal>& signals, bool* send);
+		static openxc_DynamicField decodeSignal(can_signal_t& signal, float value,
+			const std::vector<can_signal_t>& signals, bool* send);
 };
