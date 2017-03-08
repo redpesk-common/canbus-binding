@@ -72,6 +72,7 @@ private:
 
 public:
 	can_bus_t(int conf_file);
+	can_bus_t(can_bus_t&&);
 
 	int init_can_dev();
 	std::vector<std::string> read_conf();
