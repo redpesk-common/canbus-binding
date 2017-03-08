@@ -55,7 +55,7 @@ class configuration_t
 
 		configuration_t& get_configuration() const;
 
-		can_bus_t& get_can_bus_manager() const;
+		can_bus_t& get_can_bus_manager();
 
 		diagnostic_manager_t& get_diagnostic_manager() const;
 

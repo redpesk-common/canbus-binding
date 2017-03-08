@@ -57,7 +57,7 @@ configuration_t& configuration_t::get_configuration()
 	return *this;
 }
 
-can_bus_t& configuration_t::get_can_bus_manager() const
+can_bus_t& configuration_t::get_can_bus_manager()
 {
 	return can_bus_manager_;
 }

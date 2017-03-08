@@ -222,7 +222,7 @@ extern "C"
 	{
 		config = new configuration_t();
 
-		can_bus_t can_bus_manager = config->get_can_bus_manager();
+		can_bus_t& can_bus_manager = config->get_can_bus_manager();
 
 		/* Open CAN socket */
 		if(can_bus_manager.init_can_dev() == 0)
