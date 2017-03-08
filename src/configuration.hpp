@@ -18,6 +18,7 @@
 #pragma once
 
 #include <vector>
+#include <fcntl.h>
 
 #include "can/can-bus.hpp"
 #include "can/can-signals.hpp"
@@ -52,14 +53,14 @@ class configuration_t
 
 		configuration_t& get_configuration()
 		{ 
-			return this;
+			return *this;
 		}
 
 		can_bus_t& get_can_bus_manager()
 		{
 			return can_bus_manager_;
 		}
-		
+
 		diagnostic_manager_t& get_diagnostic_manager()
 		{
 			return diagnostic_manager_;
@@ -70,34 +71,24 @@ class configuration_t
 			return active_message_set_;
 		}
 
-		std::vector<can_message_set>& get_can_message_set()
+		const std::vector<can_message_set_t>& get_can_message_set()
 		{
 			return can_message_set_;
 		}
 
-		std::vector<can_signal>& get_can_signals()
+		const std::vector<can_signal_t>& get_can_signals()
 		{
-			return can_signal_[active_message_set_];
+			return can_signals_[active_message_set_];
 		}
 
-		std::vector<CanSignal>& get_can_signals()
-		{
-			return SIGNALS[active_message_set_];
-		}
-
-		std::vector<can_message_definition>& get_can_message_definition()
+		const std::vector<can_message_definition_t>& get_can_message_definition()
 		{
 			return can_message_definition_[active_message_set_];
 		}
 
-		std::vector<obd2_signal_t>& get_obd2_signals()
+		const std::vector<obd2_signal_t>& get_obd2_signals()
 		{
 			return obd2_signals_;
-		}
-
-		std::vector<obd2_signal_t>& get_obd2_signals()
-		{
-			return OBD2_PIDS;
 		}
 
 		uint32_t get_signal_id(obd2_signal_t& sig)
@@ -105,13 +96,18 @@ class configuration_t
 			return sig.get_pid();
 		}
 
-		uint32_t get_signal_id(const CanSignal& sig)
+		uint32_t get_signal_id(can_signal_t& sig)
 		{
-			return sig.message->id;
+			return sig.get_message()->id;
 		}
 
 		void set_active_message_set(uint8_t id)
 		{
 			active_message_set_ = id;
 		}
+
+		void pre_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
+		void post_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
+		void logBusStatistics(can_bus_dev_t* buses, const int busCount);
+		bool isBusActive(can_bus_dev_t* bus);
 };
