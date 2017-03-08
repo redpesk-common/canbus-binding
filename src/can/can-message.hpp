@@ -96,7 +96,7 @@ class can_message_definition_t
  										  *	needs to compare an incoming CAN message with the previous frame.*/
 	
 	public:
-	  can_message_definition_t();
+	  can_message_definition_t(can_bus_dev_t& cbd);
 		uint32_t get_id() const;
 };
 
