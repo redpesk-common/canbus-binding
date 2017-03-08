@@ -91,6 +91,3 @@ class obd2_signal_t {
 
 		float decode_obd2_response(const DiagnosticResponse* response, float parsedPayload);
 };
-
-uint32_t get_signal_id(obd2_signal_t& sig);
-std::vector<obd2_signal_t>& get_obd2_signals();
