@@ -23,13 +23,13 @@
 /**
  * @brief The type signature for a function to handle a custom OpenXC command.
  *
- * @param[in] char* name - the name of the received command.
- * @param[in] openxc_DynamicField* value - the value of the received command, in a DynamicField. The actual type
+ * @param[in] name - the name of the received command.
+ * @param[in] value - the value of the received command, in a DynamicField. The actual type
  *		may be a number, string or bool.
- * @param[in] openxc_DynamicField* event - an optional event from the received command, in a DynamicField. The
+ * @param[in] event - an optional event from the received command, in a DynamicField. The
  *		actual type may be a number, string or bool.
- * @param[in] CanSignal* signals - The list of all signals.
- * @param[in] int signalCount - The length of the signals array.
+ * @param[in] signals - The list of all signals.
+ * @param[in] signalCount - The length of the signals array.
  */
 typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
 		openxc_DynamicField* event, CanSignal* signals, int signalCount);
@@ -51,15 +51,15 @@ typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
 typedef struct {
 	const char* generic_name; /*!< generic_name - The name of the command.*/
 	CommandHandler handler; /*!< handler - An function to process the received command's data and perform some
- 							*	action.*/
+ 							 *	action.*/
 } CanCommand;
 
 /* Public: Return an array of all OpenXC CAN commands enabled in the active
  * configuration that can write back to CAN with a custom handler.
  *
- * * Commands not defined here are handled using a 1-1 mapping from the signals
+ * Commands not defined here are handled using a 1-1 mapping from the signals
  * list.
- *		*/
+ */
 CanCommand* getCommands();
 
 /* Public: Return the length of the array returned by getCommandCount(). */

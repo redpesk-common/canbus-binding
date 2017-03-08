@@ -56,26 +56,26 @@ typedef void (*DiagnosticResponseCallback)(const active_diagnostic_request_t* re
  */
 class active_diagnostic_request_t {
 	private:
-		can_bus_dev_t* bus_; /*!< can_bus_dev_t* bus_ - The CAN bus this request should be made on, or is currently in flight-on*/
-		uint32_t id_; /*!< The arbitration ID (aka message ID) for the request.*/
-		DiagnosticRequestHandle* handle_; /*!< DiagnosticRequestHandle* handle - A handle for the request to keep track of it between
+		can_bus_dev_t* bus_; /*!< bus_ - The CAN bus this request should be made on, or is currently in flight-on*/
+		uint32_t id_; /*!< id_ - The arbitration ID (aka message ID) for the request.*/
+		DiagnosticRequestHandle* handle_; /*!< handle_ - A handle for the request to keep track of it between
 										   * sending the frames of the request and receiving all frames of the response.*/
-		std::string name_; /*!< std::string name_ - An optional human readable name this response, to be used when publishing received 
+		std::string name_; /*!< name_ - An optional human readable name this response, to be used when publishing received 
 							* responses. If the name is NULL, the published output will use the raw OBD-II response format.*/
-		DiagnosticResponseDecoder decoder_; /*!< decoder - An optional DiagnosticResponseDecoder to parse the payload of responses
+		DiagnosticResponseDecoder decoder_; /*!< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses
 											 * to this request. If the decoder is NULL, the output will include the raw payload
 											 * instead of a parsed value.*/
-		DiagnosticResponseCallback callback_; /*!< callback - An optional DiagnosticResponseCallback to be notified whenever a
+		DiagnosticResponseCallback callback_; /*!< callback_ - An optional DiagnosticResponseCallback to be notified whenever a
 											   * response is received for this request.*/
 		bool recurring_; /*!< bool recurring_ - If true, this is a recurring request and it will remain as active until explicitly cancelled.
 						  * The frequencyClock attribute controls how often a recurrin request is made.*/
-		bool waitForMultipleResponses_; /*!< bool waitForMultipleResponses_ - False by default, when any response is received for a request
+		bool waitForMultipleResponses_; /*!< waitForMultipleResponses_ - False by default, when any response is received for a request
 										 * it will be removed from the active list. If true, the request will remain active until the timeout
 										 * clock expires, to allow it to receive multiple response (e.g. to a functional broadcast request).*/
-		bool inFlight_; /*!< inFlight - True if the request has been sent and we are waiting for a response.*/
-		FrequencyClock frequencyClock_; /*!< FrequencyClock frequencyClock_ - A FrequencyClock struct to control the send rate for a
+		bool inFlight_; /*!< inFlight_ - True if the request has been sent and we are waiting for a response.*/
+		FrequencyClock frequency_clock_; /*!< frequency_clock_ - A FrequencyClock object to control the send rate for a
 										 * recurring request. If the request is not reecurring, this attribute is not used.*/
-		FrequencyClock timeoutClock_; /*!< FrequencyClock timeoutClock_ - A FrequencyClock struct to monitor how long it's been since
+		FrequencyClock timeout_clock_; /*!< timeout_clock_ - A FrequencyClock object to monitor how long it's been since
 									   * this request was sent.*/
 	public:
 };

@@ -81,7 +81,7 @@ public:
 	void stop_threads();
 
 	can_message_t next_can_message();
-	void push_new_can_message(const can_message_t& can_msg);		
+	void push_new_can_message(const can_message_t& can_msg);
 	std::mutex& get_can_message_mutex();
 	std::condition_variable& get_new_can_message_cv();
 

@@ -58,14 +58,14 @@ typedef struct CanMessage CanMessage;
 */
 class can_message_t {
 	private:
-		uint32_t id_; /*!< uint32_t id - The ID of the message. */
-		bool rtr_flag_; /*!< bool rtr_flag - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
-		uint8_t length_; /*!<  uint8_t length - the length of the data array (max 8). */
-		uint8_t flags_; /*!< unint8_t flags of a CAN FD frame. Needed if we catch FD frames.*/
-		CanMessageFormat format_; /*!< CanMessageFormat format - the format of the message's ID.*/
-		std::vector<uint8_t> data_; /*!< uint8_t data  - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
+		uint32_t id_; /*!< id_ - The ID of the message. */
+		bool rtr_flag_; /*!< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
+		uint8_t length_; /*!< length_ - the length of the data array (max 8). */
+		uint8_t flags_; /*!< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
+		CanMessageFormat format_; /*!< format_ - the format of the message's ID.*/
+		std::vector<uint8_t> data_; /*!< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 
-		uint8_t maxdlen_;
+		uint8_t maxdlen_; /*!< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
 
 	public:
 		can_message_t();
@@ -153,16 +153,16 @@ class can_message_definition_t
 class can_message_set_t
 {
 	private:
-		uint8_t index; /*!<index - A numerical ID for the message set, ideally the index in an array
+		uint8_t index_; /*!<index_ - A numerical ID for the message set, ideally the index in an array
 						*	for fast lookup*/
-		const std::string name; /*!< name - The name of the message set.*/
-		uint8_t can_bus_count; /*!< busCount - The number of CAN buses defined for this message set.*/
-		unsigned short can_message_count; /*!< messageCount - The number of CAN messages (across all buses) defined for
+		const std::string name_; /*!< name_ - The name of the message set.*/
+		uint8_t can_bus_count_; /*!< can_bus_count_ - The number of CAN buses defined for this message set.*/
+		unsigned short can_message_count_; /*!< can_message_count_ - The number of CAN messages (across all buses) defined for
 										*	this message set.*/
-		unsigned short can_signal_count; /*!< signalCount - The number of CAN signals (across all messages) defined for
+		unsigned short can_signal_count_; /*!< can_signal_count_ - The number of CAN signals (across all messages) defined for
 									*	this message set.*/
-		unsigned short can_command_count; /*!< commandCount - The number of CanCommmands defined for this message set.*/
-		unsigned short obd2_signal_count; /*!< commandCount - The number of obd2 signals defined for this message set.*/
+		unsigned short can_command_count_; /*!< can_command_count_ - The number of CanCommmands defined for this message set.*/
+		unsigned short obd2_signal_count_; /*!< obd2_signal_count_ - The number of obd2 signals defined for this message set.*/
 };
 
 /** Public: Return the currently active CAN configuration. */

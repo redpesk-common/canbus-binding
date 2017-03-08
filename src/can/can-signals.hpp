@@ -43,12 +43,12 @@ extern "C"
  * @desc A SignalDecoder transforms a raw floating point CAN signal into a number,
  * string or boolean.
  *
- * @param[in] CanSignal signal - The CAN signal that we are decoding.
- * @param[in] CanSignal signals - The list of all signals.
- * @param[in] int signalCount - The length of the signals array.
- * @param[in] float value - The CAN signal parsed from the message as a raw floating point
+ * @param[in] signal - The CAN signal that we are decoding.
+ * @param[in] signals - The list of all signals.
+ * @param[in] signalCount - The length of the signals array.
+ * @param[in] value - The CAN signal parsed from the message as a raw floating point
  *	value.
- * @param[out] bool send - An output parameter. If the decoding failed or the CAN signal should
+ * @param[out] send - An output parameter. If the decoding failed or the CAN signal should
  *	not send for some other reason, this should be flipped to false.
  *
  * @return a decoded value in an openxc_DynamicField struct.
@@ -62,9 +62,9 @@ typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal& signal,
  * @desc A SignalEncoder transforms a number, string or boolean into a raw floating
  * point value that fits in the CAN signal.
  *
- * @params[signal] - The CAN signal to encode. 
- * @params[value] - The dynamic field to encode.
- * @params[send] - An output parameter. If the encoding failed or the CAN signal should
+ * @params[in] signal - The CAN signal to encode. 
+ * @params[in] value - The dynamic field to encode.
+ * @params send - An output parameter. If the encoding failed or the CAN signal should
  * not be encoded for some other reason, this will be flipped to false.
  */
 typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
@@ -77,8 +77,8 @@ typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
  * OpenXC state names.
  */
 struct CanSignalState {
-	const int value; /*!< int value - The integer value of the state on the CAN bus.*/
-	const char* name; /*!< char* name  - The corresponding string name for the state in OpenXC. */
+	const int value; /*!< value - The integer value of the state on the CAN bus.*/
+	const char* name; /*!< name - The corresponding string name for the state in OpenXC. */
 };
 typedef struct CanSignalState CanSignalState;
 
@@ -88,7 +88,7 @@ typedef struct CanSignalState CanSignalState;
  * @brief A CAN signal to decode from the bus and output over USB.
  */
 struct CanSignal {
-	struct CanMessageDefinition* message; /*!< message	   - The message this signal is a part of. */
+	struct CanMessageDefinition* message; /*!< message - The message this signal is a part of. */
 	const char* generic_name; /*!< generic_name - The name of the signal to be output over USB.*/
 	uint8_t bitPosition; /*!< bitPosition - The starting bit of the signal in its CAN message (assuming
  						*	non-inverted bit numbering, i.e. the most significant bit of
@@ -125,23 +125,23 @@ typedef struct CanSignal CanSignal;
 class can_signal_t
 {
 	private:
-		struct can_message_definition_t* message_; /*!< message	   - The message this signal is a part of. */
-		const std::string generic_name_; /*!< generic_name - The name of the signal to be output over USB.*/
-		uint8_t bitPosition_; /*!< bitPosition - The starting bit of the signal in its CAN message (assuming
+		struct can_message_definition_t* message_; /*!< message_ - The message this signal is a part of. */
+		const std::string generic_name_; /*!< generic_name_ - The name of the signal to be output over USB.*/
+		uint8_t bitPosition_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
 							   *	non-inverted bit numbering, i.e. the most significant bit of
 							   *	each byte is 0) */
-		uint8_t bitSize_; /*!< bitSize - The width of the bit field in the CAN message. */
-		float factor_; /*!< factor - The final value will be multiplied by this factor. Use 1 if you
+		uint8_t bitSize_; /*!< bitSize_ - The width of the bit field in the CAN message. */
+		float factor_; /*!< factor_ - The final value will be multiplied by this factor. Use 1 if you
 						*	don't need a factor. */
-		float offset_; /*!< offset - The final value will be added to this offset. Use 0 if you
+		float offset_; /*!< offset_ - The final value will be added to this offset. Use 0 if you
 						*	don't need an offset. */
-		float min_value_; /*!< minValue - The minimum value for the processed signal.*/
-		float max_value_; /*!< maxValue - The maximum value for the processed signal. */
-		FrequencyClock clock_; /*!< clock_ - A FrequencyClock struct to control the maximum frequency to
+		float min_value_; /*!< min_value_ - The minimum value for the processed signal.*/
+		float max_value_; /*!< max_value_ - The maximum value for the processed signal. */
+		FrequencyClock frequency_; /*!< frequency_ - A FrequencyClock struct to control the maximum frequency to
 								*	process and send this signal. To process every value, set the
 								*	clock's frequency to 0. */
-		bool sendSame_; /*!< sendSame - If true, will re-send even if the value hasn't changed.*/
-		bool forceSendChanged_; /*!< forceSendChanged - If true, regardless of the frequency, it will send the
+		bool send_same_; /*!< send_same_ - If true, will re-send even if the value hasn't changed.*/
+		bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send the
 								 *	value if it has changed. */
 		const std::map<const int, const std::string> states_; /*!< states_ - A map of CAN signal state describing the mapping
 															   * between numerical and string values for valid states. */

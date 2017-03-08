@@ -46,10 +46,10 @@ uint32_t obd2_signal_t::get_pid()
  * @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
  * @brief return signals name found searching through CAN_signals and OBD2 pid
  * 
- * @param[in] const openxc_DynamicField : can contain numeric or string value in order to search against 
+ * @param[in] key - can contain numeric or string value in order to search against 
  *   can signals or obd2 signals name.
  *
- * @return std::vector<std::string> Vector of signals name found. 
+ * @return Vector of signals name found. 
  */
 void obd2_signal_t::find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signal_t*>& found_signals)
 {
@@ -148,10 +148,10 @@ bool obd2_signal_t::is_obd2_signal(const char *name)
 * value of the PID, using the standard formulas (see
 * http://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_01).
 *
-* @param[in] DiagnosticResponse response - the received DiagnosticResponse (the data is in response.payload,
+* @param[in] response - the received DiagnosticResponse (the data is in response.payload,
 *  a byte array). This is most often used when the byte order is
 *  signiticant, i.e. with many OBD-II PID formulas.
-* @param[in] float parsed_payload - the entire payload of the response parsed as an int.
+* @param[in] parsed_payload - the entire payload of the response parsed as an int.
 */
 float obd2_signal_t::decode_obd2_response(const DiagnosticResponse* response, float parsedPayload)
 {

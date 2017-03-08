@@ -34,7 +34,7 @@ std::mutex& get_subscribed_signals_mutex();
 /**
  * @brief return the subscribed_signals map.
  * 
- * return std::map<std::string, struct afb_event> - map of subscribed signals.
+ * return Map of subscribed signals.
  */
 extern std::map<std::string, struct afb_event> subscribed_signals;
 std::map<std::string, struct afb_event>& get_subscribed_signals();
