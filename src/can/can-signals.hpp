@@ -53,7 +53,7 @@ extern "C"
  *
  * @return a decoded value in an openxc_DynamicField struct.
  */
-typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal& signal,
+typedef openxc_DynamicField (*SignalDecoder)(can_signal_t& signal,
 		const std::vector<CanSignal>& signals, float value, bool* send);
 
 /**
@@ -67,106 +67,48 @@ typedef openxc_DynamicField (*SignalDecoder)(struct CanSignal& signal,
  * @params send - An output parameter. If the encoding failed or the CAN signal should
  * not be encoded for some other reason, this will be flipped to false.
  */
-typedef uint64_t (*SignalEncoder)(struct CanSignal* signal,
+typedef uint64_t (*SignalEncoder)(can_signal_t* signal,
 		openxc_DynamicField* value, bool* send);
 
-/**
- * @struct CanSignalState
- *
- * @brief A state encoded (SED) signal's mapping from numerical values to
- * OpenXC state names.
- */
-struct CanSignalState {
-	const int value; /*!< value - The integer value of the state on the CAN bus.*/
-	const char* name; /*!< name - The corresponding string name for the state in OpenXC. */
-};
-typedef struct CanSignalState CanSignalState;
-
-/**
- * @struct CanSignal
- *
- * @brief A CAN signal to decode from the bus and output over USB.
- */
-struct CanSignal {
-	struct CanMessageDefinition* message; /*!< message - The message this signal is a part of. */
-	const char* generic_name; /*!< generic_name - The name of the signal to be output over USB.*/
-	uint8_t bitPosition; /*!< bitPosition - The starting bit of the signal in its CAN message (assuming
- 						*	non-inverted bit numbering, i.e. the most significant bit of
- 						*	each byte is 0) */
-	uint8_t bitSize; /*!< bitSize - The width of the bit field in the CAN message. */
-	float factor; /*!< factor - The final value will be multiplied by this factor. Use 1 if you
- 				*	don't need a factor. */
-	float offset; /*!< offset	   - The final value will be added to this offset. Use 0 if you
- 				*	don't need an offset. */
-	float minValue; /*!< minValue    - The minimum value for the processed signal.*/
-	float maxValue; /*!< maxValue    - The maximum value for the processed signal. */
-	FrequencyClock frequencyClock; /*!< frequencyClock - A FrequencyClock struct to control the maximum frequency to
- 								*	process and send this signal. To process every value, set the
- 								*	clock's frequency to 0. */
-	bool sendSame; /*!< sendSame    - If true, will re-send even if the value hasn't changed.*/
-	bool forceSendChanged; /*!< forceSendChanged - If true, regardless of the frequency, it will send the
- 						*	value if it has changed. */
-	const CanSignalState* states; /*!< states	   - An array of CanSignalState describing the mapping
- 								*	between numerical and string values for valid states. */
-	uint8_t stateCount; /*!< stateCount  - The length of the states array. */
-	bool writable; /*!< writable    - True if the signal is allowed to be written from the USB host
- 				*	back to CAN. Defaults to false.*/
-	SignalDecoder decoder; /*!< decoder	   - An optional function to decode a signal from the bus to a human
- 						*	readable value. If NULL, the default numerical decoder is used. */
-	SignalEncoder encoder; /*!< encoder	   - An optional function to encode a signal value to be written to
- 						*	CAN into a byte array. If NULL, the default numerical encoder
- 						*	is used. */
-	bool received; /*!< received    - True if this signal has ever been received.*/
-	float lastValue; /*!< lastValue   - The last received value of the signal. If 'received' is false,
- 					*	this value is undefined. */
-};
-typedef struct CanSignal CanSignal;
 
 class can_signal_t
 {
-	private:
-		struct can_message_definition_t* message_; /*!< message_ - The message this signal is a part of. */
-		const std::string generic_name_; /*!< generic_name_ - The name of the signal to be output over USB.*/
-		uint8_t bitPosition_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
-							   *	non-inverted bit numbering, i.e. the most significant bit of
-							   *	each byte is 0) */
-		uint8_t bitSize_; /*!< bitSize_ - The width of the bit field in the CAN message. */
-		float factor_; /*!< factor_ - The final value will be multiplied by this factor. Use 1 if you
-						*	don't need a factor. */
-		float offset_; /*!< offset_ - The final value will be added to this offset. Use 0 if you
-						*	don't need an offset. */
-		float min_value_; /*!< min_value_ - The minimum value for the processed signal.*/
-		float max_value_; /*!< max_value_ - The maximum value for the processed signal. */
-		FrequencyClock frequency_; /*!< frequency_ - A FrequencyClock struct to control the maximum frequency to
+private:
+	can_message_definition_t message_; /*!< message_ - The message this signal is a part of. */
+	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output over USB.*/
+	uint8_t bitPosition_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
+										*	non-inverted bit numbering, i.e. the most significant bit of
+										*	each byte is 0) */
+	uint8_t bitSize_; /*!< bitSize_ - The width of the bit field in the CAN message. */
+	float factor_; /*!< factor_ - The final value will be multiplied by this factor. Use 1 if you
+							*	don't need a factor. */
+	float offset_; /*!< offset_ - The final value will be added to this offset. Use 0 if you
+							*	don't need an offset. */
+	float min_value_; /*!< min_value_ - The minimum value for the processed signal.*/
+	float max_value_; /*!< max_value_ - The maximum value for the processed signal. */
+	FrequencyClock frequency_; /*!< frequency_ - A FrequencyClock struct to control the maximum frequency to
 								*	process and send this signal. To process every value, set the
 								*	clock's frequency to 0. */
-		bool send_same_; /*!< send_same_ - If true, will re-send even if the value hasn't changed.*/
-		bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send the
-								 *	value if it has changed. */
-		const std::map<const int, const std::string> states_; /*!< states_ - A map of CAN signal state describing the mapping
-															   * between numerical and string values for valid states. */
-		uint8_t state_count_; /*!< state_count_ - The length of the states array. */
-		bool writable_; /*!< writable - True if the signal is allowed to be written from the USB host
-						*	back to CAN. Defaults to false.*/
-		SignalDecoder decoder_; /*!< decoder_ - An optional function to decode a signal from the bus to a human
-								 * readable value. If NULL, the default numerical decoder is used. */
-		SignalEncoder encoder_; /*!< encoder_ - An optional function to encode a signal value to be written to
-								 * CAN into a byte array. If NULL, the default numerical encoder
-								 * is used. */
-		bool received_; /*!< received_ - True if this signal has ever been received.*/
-		float lastValue_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
-						   *	this value is undefined. */
+	bool send_same_; /*!< send_same_ - If true, will re-send even if the value hasn't changed.*/
+	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send the
+								*	value if it has changed. */
+	std::map<int, std::string> states_; /*!< states_ - A map of CAN signal state describing the mapping
+																	* between numerical and string values for valid states. */
+	uint8_t state_count_; /*!< state_count_ - The length of the states array. */
+	bool writable_; /*!< writable - True if the signal is allowed to be written from the USB host
+					*	back to CAN. Defaults to false.*/
+	SignalDecoder decoder_; /*!< decoder_ - An optional function to decode a signal from the bus to a human
+								* readable value. If NULL, the default numerical decoder is used. */
+	SignalEncoder encoder_; /*!< encoder_ - An optional function to encode a signal value to be written to
+							 * CAN into a byte array. If NULL, the default numerical encoder
+							 * is used. */
+	bool received_; /*!< received_ - True if this signal has ever been received.*/
+	float lastValue_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
+					   *	this value is undefined. */
 
-	public:
-		can_message_definition_t* get_message()
-		{
-			return message_;
-		}
-
-		const std::string& get_generic_name()
-		{
-			return generic_name_;
-		}
+public:
+	can_message_definition_t& get_message() const;
+	std::string& get_generic_name() const;
 };
 
 void find_can_signals(const openxc_DynamicField &key, std::vector<CanSignal*>& found_signals);
