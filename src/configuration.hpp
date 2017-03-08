@@ -46,6 +46,8 @@ class configuration_t
 		uint8_t active_message_set_ = 0;
 
 	public:
+		configuration_t();
+
 		const std::vector<obd2_signal_t> obd2_signals_;
 		const std::vector<can_message_set_t> can_message_set_;
 		const std::vector<std::vector<can_signal_t>> can_signals_;
