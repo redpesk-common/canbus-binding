@@ -126,46 +126,29 @@ class can_bus_dev_t {
 		int send_can_message(can_message_t& can_msg);
 };
 
-/** TODO: implement this function as method into can_bus class
- * @fn void pre_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
- * @brief Pre initialize actions made before CAN bus initialization
- *
- * @param[in] can_bus_dev_t bus - A CanBus struct defining the bus's metadata
- * @param[in] bool writable - configure the controller in a writable mode. If false, it will be
- *		configured as "listen only" and will not allow writes or even CAN ACKs.
- * @param[in] buses - An array of all CAN buses.
- * @param[in] int busCount - The length of the buses array.
- */
+/// TODO: implement this function as method into can_bus class
+/// @brief Pre initialize actions made before CAN bus initialization
+/// @param[in] bus A CanBus struct defining the bus's metadata
+/// @param[in] writable Configure the controller in a writable mode. If false, it will be configured as "listen only" and will not allow writes or even CAN ACKs.
+/// @param[in] buses An array of all CAN buses.
+/// @param[in] busCount The length of the buses array.
 void pre_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
 
-/** TODO: implement this function as method into can_bus class
- * @fn void post_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
- * @brief Post-initialize actions made after CAN bus initialization
- *
- * @param[in] bus - A CanBus struct defining the bus's metadata
- * @param[in] writable - configure the controller in a writable mode. If false, it will be
- *		configured as "listen only" and will not allow writes or even CAN ACKs.
- * @param[in] buses - An array of all CAN buses.
- * @param[in] busCount - The length of the buses array.
- */
+/// TODO: implement this function as method into can_bus class
+/// @brief Post-initialize actions made after CAN bus initialization
+/// @param[in] bus A CanBus struct defining the bus's metadata
+/// @param[in] writable Configure the controller in a writable mode. If false, it will be configured as "listen only" and will not allow writes or even CAN ACKs.
+/// @param[in] buses An array of all CAN buses.
+/// @param[in] busCount The length of the buses array.
 void post_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
 
-/** TODO: implement this function as method into can_bus class
- * @fn bool isBusActive(can_bus_dev_t* bus);
- * @brief Check if the device is connected to an active CAN bus, i.e. it's
- * received a message in the recent past.
- *
- * @return true if a message was received on the CAN bus within
- * CAN_ACTIVE_TIMEOUT_S seconds.
- */
+/// TODO: implement this function as method into can_bus class
+/// @brief Check if the device is connected to an active CAN bus, i.e. it's received a message in the recent past.
+/// @return true if a message was received on the CAN bus within CAN_ACTIVE_TIMEOUT_S seconds.
 bool isBusActive(can_bus_dev_t* bus);
 
-/** TODO: implement this function as method into can_bus class
- *
- * @fn void logBusStatistics(can_bus_dev_t* buses, const int busCount);
- * @brief Log transfer statistics about all active CAN buses to the debug log.
- *
- * @param[in] buses - an array of active CAN buses.
- * @param[in] busCount - the length of the buses array.
- */
+/// TODO: implement this function as method into can_bus class
+/// @brief Log transfer statistics about all active CAN buses to the debug log.
+/// @param[in] buses An array of active CAN buses.
+/// @param[in] busCount The length of the buses array.
 void logBusStatistics(can_bus_dev_t* buses, const int busCount);

@@ -78,5 +78,4 @@ class active_diagnostic_request_t {
 		FrequencyClock timeoutClock_; /*!< FrequencyClock timeoutClock_ - A FrequencyClock struct to monitor how long it's been since
 									   * this request was sent.*/
 	public:
-
 };
