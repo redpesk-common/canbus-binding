@@ -245,3 +245,19 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 	
 	return frame;
 }
+
+/********************************************************************************
+*
+*		can_message_definition_t method implementation
+*
+*********************************************************************************/
+
+can_message_definition_t::can_message_definition_t()
+  : last_value_(CAN_MESSAGE_SIZE)
+{}
+
+uint32_t get_id() const
+{
+  return id_;
+}
+}

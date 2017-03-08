@@ -37,18 +37,6 @@ class enum CanMessageFormat {
 	ERROR,    /*!< ERROR - ERROR code used at initialization to signify that it isn't usable'*/
 };
 
-/*************************
- * old CanMessage struct *
- *************************
-struct CanMessage {
-	uint32_t id;
-	CanMessageFormat format;
-	uint8_t data[CAN_MESSAGE_SIZE];
-	uint8_t length;
-};
-typedef struct CanMessage CanMessage;
-*/
-
 /**
  * @class can_message_t
  *
@@ -85,27 +73,12 @@ class can_message_t {
 };
 
 /**
- * @struct CanMessageDefinition
+ * @class can_message_definition_t
  *
  * @brief The definition of a CAN message. This includes a lot of metadata, so
  * to save memory this struct should not be used for storing incoming and
  * outgoing CAN messages.
  */
-struct CanMessageDefinition {
-	//can_bus_dev_t bus; /*!< bus - A pointer to the bus this message is on. */
-	uint32_t id; /*!<  id - The ID of the message.*/
-	CanMessageFormat format; /*!< format - the format of the message's ID.*/
-	FrequencyClock frequencyClock; /*!<  clock - an optional frequency clock to control the output of this
- 									*	message, if sent raw, or simply to mark the max frequency for custom
- 									*	handlers to retriec++ if ? syntaxve.*/
-	bool forceSendChanged; /*!< forceSendChanged - If true, regardless of the frequency, it will send CAN
- 							*	message if it has changed when using raw passthrough.*/
-	uint8_t lastValue[CAN_MESSAGE_SIZE]; /*!< lastValue - The last received value of the message. Defaults to undefined.
- 										*	This is required for the forceSendChanged functionality, as the stack
- 										*	needs to compare an incoming CAN message with the previous frame.*/
-};
-typedef struct CanMessageDefinition CanMessageDefinition;
-
 class can_message_definition_t
 {
 	private:
@@ -113,36 +86,25 @@ class can_message_definition_t
 	uint32_t id_; /*!< id_ - The ID of the message.*/
 	CanMessageFormat format_; /*!< format_ - the format of the message's ID.*/
 	FrequencyClock clock_; /*!<  clock_ - an optional frequency clock to control the output of this
- 							*	message, if sent raw, or simply to mark the max frequency for custom
- 							*	handlers to retriec++ if ? syntaxve.*/
+                          *      message, if sent raw, or simply to mark the max frequency for custom
+                          *      handlers to retrieve.*/
 	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send CAN
  							 *	message if it has changed when using raw passthrough.*/
-	uint8_t last_value_[CAN_MESSAGE_SIZE]; /*!< last_value_ - The last received value of the message. Defaults to undefined.
+	std::vector<uint8_t> last_value_; /*!< last_value_ - The last received value of the message. Defaults to undefined.
  										  *	This is required for the forceSendChanged functionality, as the stack
  										  *	needs to compare an incoming CAN message with the previous frame.*/
 	
 	public:
+	  can_message_definition_t();
 		uint32_t get_id() const;
 };
 
 /**
- * @struct CanMessageSet
+ * @class can_message_set_t
  *
  * @brief A parent wrapper for a particular set of CAN messages and associated
  *	CAN buses(e.g. a vehicle or program).
  */
- typedef struct {
-	uint8_t index; /*!<index - A numerical ID for the message set, ideally the index in an array
- 					*	for fast lookup*/
-	const std::string name; /*!< name - The name of the message set.*/
-	uint8_t busCount; /*!< busCount - The number of CAN buses defined for this message set.*/
-	unsigned short messageCount; /*!< messageCount - The number of CAN messages (across all buses) defined for
- 									*	this message set.*/
-	unsigned short signalCount; /*!< signalCount - The number of CAN signals (across all messages) defined for
- 								*	this message set.*/
-	unsigned short commandCount; /*!< commandCount - The number of CanCommmands defined for this message set.*/
-} CanMessageSet;
-
 class can_message_set_t
 {
 	private:
@@ -157,9 +119,6 @@ class can_message_set_t
 		unsigned short can_command_count_; /*!< can_command_count_ - The number of CanCommmands defined for this message set.*/
 		unsigned short obd2_signal_count_; /*!< obd2_signal_count_ - The number of obd2 signals defined for this message set.*/
 };
-
-/** Public: Return the currently active CAN configuration. */
-CanMessageSet* getActiveMessageSet();
 
 /** Public: Retrive a list of all possible CAN configurations.
  *
