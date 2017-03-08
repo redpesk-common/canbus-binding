@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <linux/can.h>
 
+#include "can/can-bus.hpp"
 #include "utils/timer.hpp"
 
 #define CAN_MESSAGE_SIZE 8
@@ -115,15 +116,15 @@ typedef struct CanMessageDefinition CanMessageDefinition;
 class can_message_definition_t
 {
 	private:
-	can_bus_dev_t& bus_; /*!< bus - A pointer to the bus this message is on. */
-	uint32_t id_; /*!<  id - The ID of the message.*/
-	CanMessageFormat format_; /*!< format - the format of the message's ID.*/
-	FrequencyClock clock_; /*!<  clock - an optional frequency clock to control the output of this
+	can_bus_dev_t& bus_; /*!< bus_ - A pointer to the bus this message is on. */
+	uint32_t id_; /*!< id_ - The ID of the message.*/
+	CanMessageFormat format_; /*!< format_ - the format of the message's ID.*/
+	FrequencyClock clock_; /*!<  clock_ - an optional frequency clock to control the output of this
  							*	message, if sent raw, or simply to mark the max frequency for custom
  							*	handlers to retriec++ if ? syntaxve.*/
-	bool forceSendChanged_; /*!< forceSendChanged - If true, regardless of the frequency, it will send CAN
+	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send CAN
  							 *	message if it has changed when using raw passthrough.*/
-	uint8_t lastValue_[CAN_MESSAGE_SIZE]; /*!< lastValue - The last received value of the message. Defaults to undefined.
+	uint8_t last_value_[CAN_MESSAGE_SIZE]; /*!< last_value_ - The last received value of the message. Defaults to undefined.
  										  *	This is required for the forceSendChanged functionality, as the stack
  										  *	needs to compare an incoming CAN message with the previous frame.*/
 	

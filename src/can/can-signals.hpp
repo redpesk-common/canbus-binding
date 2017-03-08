@@ -155,10 +155,18 @@ class can_signal_t
 								 * is used. */
 		bool received_; /*!< received_ - True if this signal has ever been received.*/
 		float lastValue_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
-						  *	this value is undefined. */
+						   *	this value is undefined. */
 
 	public:
+		can_message_definition_t* get_message()
+		{
+			return message_;
+		}
 
+		const std::string& get_generic_name()
+		{
+			return generic_name_;
+		}
 };
 
 void find_can_signals(const openxc_DynamicField &key, std::vector<CanSignal*>& found_signals);
