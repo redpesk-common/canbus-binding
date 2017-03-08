@@ -125,7 +125,7 @@ typedef struct CanSignal CanSignal;
 class can_signal_t
 {
 	private:
-		struct CanMessageDefinition* message_; /*!< message	   - The message this signal is a part of. */
+		struct can_message_definition_t* message_; /*!< message	   - The message this signal is a part of. */
 		const std::string generic_name_; /*!< generic_name - The name of the signal to be output over USB.*/
 		uint8_t bitPosition_; /*!< bitPosition - The starting bit of the signal in its CAN message (assuming
 							   *	non-inverted bit numbering, i.e. the most significant bit of
