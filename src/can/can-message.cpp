@@ -166,11 +166,6 @@ can_message_t can_message_t::convert_to_canfd_frame(const struct canfd_frame& fr
 			break;
 	}
 
-	if(rtr_flag)
-		length = frame.len& 0xF;
-	else
-		length = (frame.len > maxdlen) ? maxdlen : frame.len;
-
 	if (frame.can_id & CAN_ERR_FLAG)
 		format = can_message_format_t::ERROR;
 	else if (frame.can_id & CAN_EFF_FLAG)
@@ -211,6 +206,8 @@ can_message_t can_message_t::convert_to_canfd_frame(const struct canfd_frame& fr
 	}
 	else
 	{
+		length = (frame.len > maxdlen) ? maxdlen : frame.len;
+
 		/* Flags field only present for CAN FD frames*/
 		if(maxdlen == CANFD_MAX_DLEN)
 				flags = frame.flags & 0xF;
