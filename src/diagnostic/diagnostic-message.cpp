@@ -19,8 +19,6 @@
 
 #include "utils/signals.hpp"
 
-#define OBD2_FUNCTIONAL_BROADCAST_ID 0x7df
-
 const char *UNIT_NAMES[10] = {
 	"POURCENT",
 	"DEGREES_CELSIUS",
@@ -33,41 +31,6 @@ const char *UNIT_NAMES[10] = {
 	"PA",
 	"NM"
 };
-
-/*
-* Pre-defined OBD-II PIDs to query for if supported by the vehicle.
-*/
- std::vector<obd2_signals_t> OBD2_PIDS = {
-	{ 0x04, "obd2.engine.load", 0, 100, POURCENT, 5, false},
-	{ 0x05, "obd2.engine.coolant.temperature", -40, 215, DEGREES_CELSIUS, 1, false},
-	{ 0x0a, "obd2.fuel.pressure", 0, 765, KPA, 1, false},
-	{ 0x0b, "obd2.intake.manifold.pressure", 0, 255, KPA, 1, false},
-	{ 0x0c, "obd2.engine.speed", 0, 16383, RPM, 5, false},
-	{ 0x0d, "obd2.vehicle.speed", 0, 255, KM_H, 5, false},
-	{ 0x0f, "obd2.intake.air.temperature", -40, 215, DEGREES_CELSIUS, 1, false},
-	{ 0x10, "obd2.mass.airflow", 0, 655, GRAMS_SEC, 5, false},
-	{ 0x11, "obd2.throttle.position", 0, 100, POURCENT, 5, false},
-	{ 0x1f, "obd2.running.time", 0, 65535, SECONDS, 1, false},
-	{ 0x2d, "obd2.EGR.error", -100, 99, POURCENT, 0, false},
-	{ 0x2f, "obd2.fuel.level", 0, 100, POURCENT, 1, false},
-	{ 0x33, "obd2.barometric.pressure", 0, 255, KPA, 1, false},
-	{ 0x4c, "obd2.commanded.throttle.position", 0, 100, POURCENT, 1, false},
-	{ 0x52, "obd2.ethanol.fuel.percentage", 0, 100, POURCENT, 1, false},
-	{ 0x5a, "obd2.accelerator.pedal.position", 0, 100, POURCENT, 5, false},
-	{ 0x5b, "obd2.hybrid.battery-pack.remaining.life", 0, 100, POURCENT, 5, false},
-	{ 0x5c, "obd2.engine.oil.temperature",-40, 210, DEGREES_CELSIUS, 1, false},
-	{ 0x63, "obd2.engine.torque", 0, 65535, NM, 1, false}
-};
-
-uint32_t get_signal_id(obd2_signals_t& sig)
-{
-	return sig.get_pid();
-}
-
-std::vector<obd2_signals_t>& get_obd2_signals()
-{
-	return OBD2_PIDS;
-}
 
 obd2_signals_t::obd2_signals_t(uint8_t pid, const char* generic_name, const int min, const int max, enum UNIT unit, int frequency, bool supported)
 	:	pid_{pid}, generic_name_{generic_name}, min_{min}, max_{max}, unit_{unit}, frequency_{frequency}, supported_{supported}

@@ -130,6 +130,21 @@ typedef struct CanMessageDefinition CanMessageDefinition;
 	unsigned short commandCount; /*!< commandCount - The number of CanCommmands defined for this message set.*/
 } CanMessageSet;
 
+class can_message_set_t
+{
+	private:
+		uint8_t index; /*!<index - A numerical ID for the message set, ideally the index in an array
+						*	for fast lookup*/
+		const std::string name; /*!< name - The name of the message set.*/
+		uint8_t can_bus_count; /*!< busCount - The number of CAN buses defined for this message set.*/
+		unsigned short can_message_count; /*!< messageCount - The number of CAN messages (across all buses) defined for
+										*	this message set.*/
+		unsigned short can_signal_count; /*!< signalCount - The number of CAN signals (across all messages) defined for
+									*	this message set.*/
+		unsigned short can_command_count; /*!< commandCount - The number of CanCommmands defined for this message set.*/
+		unsigned short obd2_signal_count; /*!< commandCount - The number of obd2 signals defined for this message set.*/
+};
+
 /** Public: Return the currently active CAN configuration. */
 CanMessageSet* getActiveMessageSet();
 

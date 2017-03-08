@@ -25,6 +25,17 @@
 #include "can/can-signals.hpp"
 #include "obd2/obd2-signals.hpp"
 
+extern std::mutex subscribed_signals_mutex;
+std::mutex& get_subscribed_signals_mutex();
+
+/**
+ * @brief return the subscribed_signals map.
+ * 
+ * return std::map<std::string, struct afb_event> - map of subscribed signals.
+ */
+extern std::map<std::string, struct afb_event> subscribed_signals;
+std::map<std::string, struct afb_event>& get_subscribed_signals();
+
 template <typename T>
 void lookup_signals_by_name(const std::string& key, std::vector<T>& signals, std::vector<T*>& found_signals)
 {

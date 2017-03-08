@@ -40,12 +40,8 @@ extern "C"
 	#include <afb/afb-service-itf.h>
 };
 
-/*
- *	Interface between the daemon and the binding
- */
+// Interface between the daemon and the binding
 const struct afb_binding_interface *binder_interface;
-
-can_bus_t *can_bus_handler;
 
 /********************************************************************************
 *
@@ -224,16 +220,14 @@ extern "C"
 	*/
 	int afbBindingV1ServiceInit(struct afb_service service)
 	{
-		int fd_conf;
-		fd_conf = afb_daemon_rootdir_open_locale(binder_interface->daemon, "can_buses.json", O_RDONLY, NULL);
+		configuration_t config;
 
-		/* Initialize the CAN bus handler */
-		can_bus_handler = new can_bus_t(fd_conf);
+		can_bus_manager = config.get_can_bus_manager();
 
 		/* Open CAN socket */
-		if(can_bus_handler->init_can_dev() == 0)
+		if(can_bus_manager.init_can_dev() == 0)
 		{
-			can_bus_handler->start_threads();
+			can_bus_manager.start_threads();
 			return 0;
 		}
 		ERROR(binder_interface, "There was something wrong with CAN device Initialization. Check your config file maybe");

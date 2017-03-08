@@ -37,17 +37,6 @@ extern "C"
 
 #define MESSAGE_SET_ID 0
 
-extern std::mutex subscribed_signals_mutex;
-std::mutex& get_subscribed_signals_mutex();
-
-/**
- * @brief return the subscribed_signals map.
- * 
- * return std::map<std::string, struct afb_event> - map of subscribed signals.
- */
-extern std::map<std::string, struct afb_event> subscribed_signals;
-std::map<std::string, struct afb_event>& get_subscribed_signals();
-
 /**
  * @brief The type signature for a CAN signal decoder.
  *
@@ -133,10 +122,4 @@ struct CanSignal {
 };
 typedef struct CanSignal CanSignal;
 
-std::vector<CanSignal>& get_can_signals();
-
-size_t getSignalCount();
-
 void find_can_signals(const openxc_DynamicField &key, std::vector<CanSignal*>& found_signals);
-
-uint32_t get_signal_id(const CanSignal& sig);
