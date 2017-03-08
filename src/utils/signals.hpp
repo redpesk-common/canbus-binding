@@ -22,8 +22,11 @@
 #include <fnmatch.h>
 
 #include "openxc.pb.h"
+#include "configuration.hpp"
 #include "can/can-signals.hpp"
 #include "obd2/obd2-signals.hpp"
+
+#include "low-can-binding.hpp"
 
 extern std::mutex subscribed_signals_mutex;
 std::mutex& get_subscribed_signals_mutex();
@@ -61,7 +64,7 @@ void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector
 {
 	for(T& s : signals)
 	{
-		if(get_signal_id(s) == key)
+		if(config->get_signal_id(s) == key)
 		{
 			found_signals.push_back(&s);
 		}
@@ -73,7 +76,7 @@ void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector
 {
 	for(const T& s : signals)
 	{
-		if(get_signal_id(s) == key)
+		if(config->get_signal_id(s) == key)
 		{
 			found_signals_name.push_back(s.generic_name);
 		}

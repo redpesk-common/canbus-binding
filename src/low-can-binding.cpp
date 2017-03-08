@@ -22,7 +22,6 @@
 #include <mutex>
 #include <vector>
 #include <thread>
-#include <fcntl.h>
 #include <linux/can.h>
 #include <json-c/json.h>
 #include <systemd/sd-event.h>
@@ -34,10 +33,10 @@
 #include "utils/timer.hpp"
 #include "utils/signals.hpp"
 #include "utils/openxc-utils.hpp"
-#include "configuration.hpp"
 
 // Interface between the daemon and the binding
 const struct afb_binding_interface *binder_interface;
+configuration_t *config;
 
 /********************************************************************************
 *
@@ -216,9 +215,9 @@ extern "C"
 	*/
 	int afbBindingV1ServiceInit(struct afb_service service)
 	{
-		configuration_t config;
+		config = new configuration_t();
 
-		can_bus_manager = config.get_can_bus_manager();
+		can_bus_t can_bus_manager = config->get_can_bus_manager();
 
 		/* Open CAN socket */
 		if(can_bus_manager.init_can_dev() == 0)
@@ -226,6 +225,7 @@ extern "C"
 			can_bus_manager.start_threads();
 			return 0;
 		}
+
 		ERROR(binder_interface, "There was something wrong with CAN device Initialization. Check your config file maybe");
 		return 1;
 	}
