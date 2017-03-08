@@ -32,7 +32,11 @@
 * Constructor about can_message_t class.
 */
 can_message_t::can_message_t()
-	: id_{0}, rtr_flag_{false}, length_{0}, flags_{0}, format_{can_message_format_t::ERROR}, maxdlen_{0}
+	: maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::ERROR}, rtr_flag_{false}, flags_{0}
+{}
+
+can_message_t::can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, can_message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t> data)
+	:  maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::ERROR}, rtr_flag_{false}, flags_{0}, data_{data}
 {}
 
 /**
@@ -141,86 +145,92 @@ void can_message_t::set_format(const can_message_format_t new_format)
 */
 can_message_t can_message_t::convert_to_canfd_frame(const struct canfd_frame& frame, size_t nbytes)
 {
- 	switch(nbytes)
+	uint8_t maxdlen, length, flags = (uint8_t)NULL;
+	uint32_t id;
+	can_message_format_t format;
+	bool rtr_flag;
+	std::vector<uint8_t> data;
+
+	switch(nbytes)
 	{
 		case CANFD_MTU:
 			DEBUG(binder_interface, "set_max_data_length: Got an CAN FD frame");
-			maxdlen_ = CANFD_MAX_DLEN;
+			maxdlen = CANFD_MAX_DLEN;
 			break;
 		case CAN_MTU:
 			DEBUG(binder_interface, "set_max_data_length: Got a legacy CAN frame");
-			maxdlen_ = CAN_MAX_DLEN;
+			maxdlen = CAN_MAX_DLEN;
 			break;
 		default:
 			ERROR(binder_interface, "set_max_data_length: unsupported CAN frame");
 			break;
 	}
 
-	if(rtr_flag_)
-		length_ = frame.len& 0xF;
+	if(rtr_flag)
+		length = frame.len& 0xF;
 	else
-	{
-		length_ = (frame.len > maxdlen_) ? maxdlen_ : frame.len;
-	}
-	
+		length = (frame.len > maxdlen) ? maxdlen : frame.len;
+
 	if (frame.can_id & CAN_ERR_FLAG)
-		format_ = can_message_format_t::ERROR;
+		format = can_message_format_t::ERROR;
 	else if (frame.can_id & CAN_EFF_FLAG)
-		format_ = can_message_format_t::EXTENDED;
+		format = can_message_format_t::EXTENDED;
 	else
-		format_ = can_message_format_t::STANDARD;
-		
-	switch(format_)
+		format = can_message_format_t::STANDARD;
+
+	switch(format)
 	{
 		case can_message_format_t::STANDARD:
-			id_ = frame.can_id & CAN_SFF_MASK;
+			id = frame.can_id & CAN_SFF_MASK;
 			break;
 		case can_message_format_t::EXTENDED:
-			id_ = frame.can_id & CAN_EFF_MASK;
+			id = frame.can_id & CAN_EFF_MASK;
 			break;
 		case can_message_format_t::ERROR:
-			id_ = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
+			id = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
 			break;
 		default:
 			ERROR(binder_interface, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
 			break;
 	}
-	
-	/* Overwrite lenght_ if RTR flags is detected.
+
+	/* Overwrite length_ if RTR flags is detected.
 	 * standard CAN frames may have RTR enabled. There are no ERR frames with RTR */
 	if (frame.can_id & CAN_RTR_FLAG)
 	{
-		rtr_flag_ = true;
+		rtr_flag = true;
 		if(frame.len && frame.len <= CAN_MAX_DLC)
 		{
-    	if(rtr_flag_)
-    		length_ = frame.len& 0xF;
-    	else
-    	{
-    		length_ = (frame.len > maxdlen_) ? maxdlen_ : frame.len;
-    	}	
+			if(rtr_flag)
+				length = frame.len& 0xF;
+			else
+			{
+				length = (frame.len > maxdlen) ? maxdlen : frame.len;
+			}	
 		}
 	}
 	else
 	{
-  	/* Flags field only present for CAN FD frames*/
-  	if(maxdlen_ == CANFD_MAX_DLEN)
-  			flags_ = frame.flags & 0xF;
-  
-  	if (data_.capacity() < maxdlen_)
-  		data_.reserve(maxdlen_);
-  			int i;
+		/* Flags field only present for CAN FD frames*/
+		if(maxdlen == CANFD_MAX_DLEN)
+				flags = frame.flags & 0xF;
 
-		data_.clear();
-		/* maxdlen_ is now set at CAN_MAX_DLEN or CANFD_MAX_DLEN, respectively 8 and 64 bytes*/
-		for(i=0;i<maxdlen_;i++)
-		{
-			data_.push_back(frame.data[i]);
-		};
-  
-  	DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", id_, format_, length_,
-  							data_[0], data_[1], data_[2], data_[3], data_[4], data_[5], data_[6], data_[7]);
+		if (data.capacity() < maxdlen)
+			data.reserve(maxdlen);
+				int i;
+
+			data.clear();
+			/* maxdlen_ is now set at CAN_MAX_DLEN or CANFD_MAX_DLEN, respectively 8 and 64 bytes*/
+			for(i=0;i<maxdlen;i++)
+			{
+				data.push_back(frame.data[i]);
+			};
+
+		DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", 
+								id, format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 	}
+
+	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data);
 }
 
 /**
@@ -242,7 +252,7 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 	}
 	else
 		ERROR(binder_interface, "can_message_t not correctly initialized to be sent");
-	
+
 	return frame;
 }
 
@@ -253,11 +263,10 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 *********************************************************************************/
 
 can_message_definition_t::can_message_definition_t()
-  : last_value_(CAN_MESSAGE_SIZE)
+	: last_value_(CAN_MESSAGE_SIZE)
 {}
 
-uint32_t get_id() const
+uint32_t can_message_definition_t::get_id() const
 {
-  return id_;
-}
+	return id_;
 }

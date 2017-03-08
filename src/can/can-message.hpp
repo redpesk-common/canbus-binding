@@ -45,32 +45,32 @@ enum class can_message_format_t {
  * buffers.
  */
 class can_message_t {
-	private:
-		uint32_t id_; /*!< id_ - The ID of the message. */
-		bool rtr_flag_; /*!< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
-		uint8_t length_; /*!< length_ - the length of the data array (max 8). */
-		uint8_t flags_; /*!< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
-		can_message_format_t format_; /*!< format_ - the format of the message's ID.*/
-		std::vector<uint8_t> data_; /*!< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
+private:
+	uint8_t maxdlen_; /*!< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
+	uint32_t id_; /*!< id_ - The ID of the message. */
+	uint8_t length_; /*!< length_ - the length of the data array (max 8). */
+	can_message_format_t format_; /*!< format_ - the format of the message's ID.*/
+	bool rtr_flag_; /*!< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
+	uint8_t flags_; /*!< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
+	std::vector<uint8_t> data_; /*!< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 
-		uint8_t maxdlen_; /*!< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
+public:
+	can_message_t();
+	can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, can_message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t> data);
 
-	public:
-		can_message_t();
+	uint32_t get_id() const;
+	bool get_rtr_flag_() const;
+	can_message_format_t get_format() const;
+	uint8_t get_flags() const;
+	const uint8_t* get_data() const;
+	uint8_t get_length() const;
 
-		uint32_t get_id() const;
-		bool get_rtr_flag_() const;
-		can_message_format_t get_format() const;
-		uint8_t get_flags() const;
-		const uint8_t* get_data() const;
-		uint8_t get_length() const;
+	void set_format(const can_message_format_t new_format);
 
-		void set_format(const can_message_format_t new_format);
+	bool is_correct_to_send();
 
-		bool is_correct_to_send();
-
-    static can_message_t convert_to_canfd_frame(const struct canfd_frame& frame, size_t nbytes);
-		canfd_frame convert_to_canfd_frame();
+static can_message_t convert_to_canfd_frame(const struct canfd_frame& frame, size_t nbytes);
+	canfd_frame convert_to_canfd_frame();
 };
 
 /**
