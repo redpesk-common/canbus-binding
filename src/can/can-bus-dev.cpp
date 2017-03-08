@@ -24,15 +24,15 @@
 #include "can-bus-dev.hpp"
 #include "low-can-binding.hpp"
 
-/// @brief Class constructor 
+/// @brief Class constructor
 /// @param dev_name String representing the device name into the linux /dev tree
 can_bus_dev_t::can_bus_dev_t(const std::string& dev_name)
 	: device_name_{dev_name}
 {
 }
 
-/// @brief Open the can socket and returning it 
-/// @return -1 
+/// @brief Open the can socket and returning it
+/// @return -1
 int can_bus_dev_t::open()
 {
 	const int canfd_on = 1;
@@ -47,15 +47,15 @@ int can_bus_dev_t::open()
 	if (can_socket_)
 	{
 		DEBUG(binder_interface, "CAN Handler socket correctly initialized : %d", can_socket_.socket());
-		
+
 		// Set timeout for read
 		can_socket_.setopt(SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
-		
+
 		// Set timestamp for receveid frame
 		if (can_socket_.setopt(SOL_SOCKET, SO_TIMESTAMP, &timestamp_on, sizeof(timestamp_on)) < 0)
 			WARNING(binder_interface, "setsockopt SO_TIMESTAMP error: %s", ::strerror(errno));
 		DEBUG(binder_interface, "Switch CAN Handler socket to use fd mode");
-		
+
 		// try to switch the socket into CAN_FD mode
 		if (can_socket_.setopt(SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{

@@ -41,17 +41,17 @@
 #define CAN_ACTIVE_TIMEOUT_S 30
 
 /// @brief Object used to handle decoding and manage event queue to be pushed.
-/// 
-/// This object is also used to initialize can_bus_dev_t object after reading 
-/// json conf file describing the CAN devices to use. Thus, those object will read 
+///
+/// This object is also used to initialize can_bus_dev_t object after reading
+/// json conf file describing the CAN devices to use. Thus, those object will read
 /// on the device the CAN frame and push them into the can_bus_t can_message_q_ queue.
-/// 
+///
 /// That queue will be later used to be decoded and pushed to subscribers.
 class can_bus_t
 {
 private:
 	int conf_file_; /// < configuration file handle used to initialize can_bus_dev_t objects.
-	
+
 	void can_decode_message();
 	std::thread th_decoding_; /// < thread that'll handle decoding a can frame
 	bool is_decoding_; /// < boolean member controling thread while loop

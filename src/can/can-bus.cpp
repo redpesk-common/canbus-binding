@@ -55,10 +55,10 @@ can_bus_t::can_bus_t(int conf_file)
 
 
 /**
-* @brief thread to decoding raw CAN messages. 
+* @brief thread to decoding raw CAN messages.
 *
-* @desc It will take from the can_message_q_ queue the next can message to process then it will search 
-*  about signal subscribed if there is a valid afb_event for it. We only decode signal for which a 
+* @desc It will take from the can_message_q_ queue the next can message to process then it will search
+*  about signal subscribed if there is a valid afb_event for it. We only decode signal for which a
 *  subscription has been made. Can message will be decoded using translateSignal that will pass it to the
 *  corresponding decoding function if there is one assigned for that signal. If not, it will be the default
 *  noopDecoder function that will operate on it.
@@ -77,7 +77,7 @@ void can_bus_t::can_decode_message()
 		std::unique_lock<std::mutex> can_message_lock(can_message_mutex_);
 		new_can_message_cv_.wait(can_message_lock);
 		can_message = next_can_message();
-	
+
 		/* First we have to found which CanSignal it is */
 		search_key = build_DynamicField((double)can_message.get_id());
 		signals.clear();
@@ -88,7 +88,7 @@ void can_bus_t::can_decode_message()
 		{
 			std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 			std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-			
+
 			/* DEBUG message to make easier debugger STL containers...
 			DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[sig.generic_name]));
 			DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
@@ -110,7 +110,7 @@ void can_bus_t::can_decode_message()
 }
 
 /**
-* @brief thread to push events to suscribers. It will read subscribed_signals map to look 
+* @brief thread to push events to suscribers. It will read subscribed_signals map to look
 * which are events that has to be pushed.
 */
 void can_bus_t::can_event_push()
@@ -118,7 +118,7 @@ void can_bus_t::can_event_push()
 	openxc_VehicleMessage v_message;
 	openxc_SimpleMessage s_message;
 	json_object* jo;
-	
+
 	while(is_pushing_)
 	{
 		std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
@@ -149,7 +149,7 @@ void can_bus_t::start_threads()
 	th_decoding_ = std::thread(&can_bus_t::can_decode_message, this);
 	if(!th_decoding_.joinable())
 		is_decoding_ = false;
-	
+
 	is_pushing_ = true;
 	th_pushing_ = std::thread(&can_bus_t::can_event_push, this);
 	if(!th_pushing_.joinable())
@@ -158,7 +158,7 @@ void can_bus_t::start_threads()
 
 /**
 * @brief Will stop all threads holded by can_bus_t object
-*  which are decoding and pushing then will wait that's 
+*  which are decoding and pushing then will wait that's
 * they'll finish their job.
 */
 void can_bus_t::stop_threads()
@@ -168,7 +168,7 @@ void can_bus_t::stop_threads()
 }
 
 /**
-* @brief Will initialize can_bus_dev_t objects after reading 
+* @brief Will initialize can_bus_dev_t objects after reading
 * the configuration file passed in the constructor.
 */
 int can_bus_t::init_can_dev()
@@ -235,7 +235,7 @@ std::vector<std::string> can_bus_t::read_conf()
 		{/**
 * @brief Telling if the pushing thread is running
 *  This is the boolean value on which the while loop
-*  take its condition. Set it to false will stop the 
+*  take its condition. Set it to false will stop the
 *  according thread.
 *
 * @return true if pushing thread is running, false if not.
@@ -284,9 +284,9 @@ std::mutex& can_bus_t::get_can_message_mutex()
 }
 
 /**
-* @brief Return first can_message_t on the queue 
+* @brief Return first can_message_t on the queue
 *
-* @return a can_message_t 
+* @return a can_message_t
 */
 can_message_t can_bus_t::next_can_message()
 {
@@ -300,7 +300,7 @@ can_message_t can_bus_t::next_can_message()
 			can_msg.get_data()[0], can_msg.get_data()[1], can_msg.get_data()[2], can_msg.get_data()[3], can_msg.get_data()[4], can_msg.get_data()[5], can_msg.get_data()[6], can_msg.get_data()[7]);
 		return can_msg;
 	}
-	
+
 	return can_msg;
 }
 
@@ -315,7 +315,7 @@ void can_bus_t::push_new_can_message(const can_message_t& can_msg)
 }
 
 /**
-* @brief Return first openxc_VehicleMessage on the queue 
+* @brief Return first openxc_VehicleMessage on the queue
 *
 * @return a openxc_VehicleMessage containing a decoded can message
 */
@@ -330,7 +330,7 @@ openxc_VehicleMessage can_bus_t::next_vehicle_message()
 		DEBUG(binder_interface, "next_vehicle_message: next vehicle message poped");
 		return v_msg;
 	}
-	
+
 	return v_msg;
 }
 
@@ -354,135 +354,3 @@ std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices
 	return can_devices_m_;
 }
 
-/********************************************************************************
-*
-*		can_bus_dev_t method implementation
-*
-*********************************************************************************/
-
-/**
-	* @brief Open the can socket and returning it 
-	*
-	* @return 
-	*/
-int can_bus_dev_t::close()
-{
-	::close(can_socket_);
-	can_socket_ = -1;
-	return can_socket_;
-}
-
-/**
-* @brief Read the can socket and retrieve canfd_frame
-*
-* @param const struct afb_binding_interface* interface pointer. Used to be able to log 
-*  using application framework logger.
-*/
-std::pair<struct canfd_frame&, size_t> can_bus_dev_t::read()
-{
-	ssize_t nbytes;
-	//int maxdlen;
-	struct canfd_frame cfd;
-
-	/* Test that socket is really opened */
-	if (can_socket_ < 0)
-	{
-		ERROR(binder_interface, "read_can: Socket unavailable. Closing thread.");
-		is_running_ = false;
-	}
-
-	nbytes = ::read(can_socket_, &cfd, CANFD_MTU);
-
-	/* if we did not fit into CAN sized messages then stop_reading. */
-	if (nbytes != CANFD_MTU && nbytes != CAN_MTU)
-	{
-		if (errno == ENETDOWN)
-			ERROR(binder_interface, "read: %s CAN device down", device_name_);
-		ERROR(binder_interface, "read: Incomplete CAN(FD) frame");
-		::memset(&cfd, 0, sizeof(cfd));
-	}
-	
-	DEBUG(binder_interface, "read: Found id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", cfd.can_id, cfd.len,
-							cfd.data[0], cfd.data[1], cfd.data[2], cfd.data[3], cfd.data[4], cfd.data[5], cfd.data[6], cfd.data[7]);
-	return std::pair<struct canfd_frame&, size_t>(cfd, nbytes);
-}
-
-/**
-* @brief start reading threads and set flag is_running_
-*
-* @param can_bus_t reference can_bus_t. it will be passed to the thread 
-*  to allow using can_bus_t queue.
-*/
-void can_bus_dev_t::start_reading(can_bus_t& can_bus)
-{
-	DEBUG(binder_interface, "Launching reading thread");
-	is_running_ = true;
-	th_reading_ = std::thread(&can_bus_dev_t::can_reader, this, std::ref(can_bus));
-	if(!th_reading_.joinable())
-		is_running_ = false;
-}
-
-/**
-* @brief stop the reading thread setting flag is_running_ to false and
-* and wait that the thread finish its job.
-*/
-void can_bus_dev_t::stop_reading()
-{
-	is_running_ = false;
-}
-
-/**
-*
-* @brief Thread function used to read the can socket.
-*
-* @param[in] can_bus_dev_t object to be used to read the can socket
-* @param[in] can_bus_t object used to fill can_message_q_ queue
-*/
-void can_bus_dev_t::can_reader(can_bus_t& can_bus)
-{
-	can_message_t can_message;
-
-	while(is_running_)
-	{
-		can_message.convert_from_canfd_frame(read());
-
-		{
-			std::lock_guard<std::mutex> can_message_lock(can_bus.get_can_message_mutex());
-			can_bus.push_new_can_message(can_message);
-		}
-		can_bus.get_new_can_message_cv().notify_one();
-	}
-}
-
-/**
-* @brief Send a can message from a can_message_t object.
-* 
-* @param const can_message_t& can_msg: the can message object to send 
-* @param const struct afb_binding_interface* interface pointer. Used to be able to log 
-*  using application framework logger.
-*/
-int can_bus_dev_t::send_can_message(can_message_t& can_msg)
-{
-	ssize_t nbytes;
-	canfd_frame f;
-
-	f = can_msg.convert_to_canfd_frame();
-
-	if(can_socket_ >= 0)
-	{
-		nbytes = ::sendto(can_socket_, &f, sizeof(struct canfd_frame), 0,
-				(struct sockaddr*)&txAddress_, sizeof(txAddress_));
-		if (nbytes == -1)
-		{
-			ERROR(binder_interface, "send_can_message: Sending CAN frame failed.");
-			return -1;
-		}
-		return (int)nbytes;
-	}
-	else
-	{
-		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
-		open();
-	}
-	return 0;
-}
