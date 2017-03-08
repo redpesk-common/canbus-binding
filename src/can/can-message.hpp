@@ -22,10 +22,11 @@
 #include <cstdint>
 #include <linux/can.h>
 
-#include "can/can-bus.hpp"
 #include "utils/timer.hpp"
 
 #define CAN_MESSAGE_SIZE 8
+
+class can_bus_dev_t;
 
 /**
  * @enum can_message_format
