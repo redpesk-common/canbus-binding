@@ -21,7 +21,7 @@
  * @brief Can signal event map making access to afb_event
  * externaly to an openxc existing structure.
  *
- * @desc Event map is making relation between CanSignal generic name
+ * @desc Event map is making relation between can_signal_t generic name
  * and the afb_event struct used by application framework to pushed
  * to the subscriber.
  */

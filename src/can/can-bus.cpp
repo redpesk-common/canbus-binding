@@ -66,7 +66,7 @@ can_bus_t::can_bus_t(int conf_file)
 void can_bus_t::can_decode_message()
 {
 	can_message_t can_message;
-	std::vector <CanSignal*> signals;
+	std::vector <can_signal_t*> signals;
 	openxc_VehicleMessage vehicle_message;
 	openxc_DynamicField search_key, decoded_message;
 
@@ -78,7 +78,7 @@ void can_bus_t::can_decode_message()
 		new_can_message_cv_.wait(can_message_lock);
 		can_message = next_can_message();
 
-		/* First we have to found which CanSignal it is */
+		/* First we have to found which can_signal_t it is */
 		search_key = build_DynamicField((double)can_message.get_id());
 		signals.clear();
 		find_can_signals(search_key, signals);

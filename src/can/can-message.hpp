@@ -87,8 +87,8 @@ class can_message_definition_t
 	uint32_t id_; /*!< id_ - The ID of the message.*/
 	can_message_format format_; /*!< format_ - the format of the message's ID.*/
 	FrequencyClock clock_; /*!<  clock_ - an optional frequency clock to control the output of this
-                          *      message, if sent raw, or simply to mark the max frequency for custom
-                          *      handlers to retrieve.*/
+							*      message, if sent raw, or simply to mark the max frequency for custom
+							*      handlers to retrieve.*/
 	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send CAN
  							 *	message if it has changed when using raw passthrough.*/
 	std::vector<uint8_t> last_value_; /*!< last_value_ - The last received value of the message. Defaults to undefined.
@@ -125,7 +125,7 @@ class can_message_set_t
  *
  * Returns a pointer to an array of all configurations.
  */
-CanMessageSet* getMessageSets();
+can_message_set_t* getMessageSets();
 
 /** Public: Return the length of the array returned by getMessageSets() */
 int getMessageSetCount();
@@ -133,7 +133,7 @@ int getMessageSetCount();
 /* Public: Return an array of all CAN messages to be processed in the active
  * configuration.
  */
-CanMessageDefinition* getMessages();
+can_message_definition_t* getMessages();
 
 /* Public: Return the length of the array returned by getMessages(). */
 int getMessageCount();

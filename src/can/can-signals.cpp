@@ -35,7 +35,7 @@ std::string& can_signal_t::get_generic_name() const
 }
 
 /**
- * @fn void find_can_signals(const openxc_DynamicField& key, std::vector<CanSignal*>& found_signals)
+ * @fn void find_can_signals(const openxc_DynamicField& key, std::vector<can_signal_t*>& found_signals)
  * @brief return signals name found searching through CAN_signals and OBD2 pid
  * 
  * @param[in] key - can contain numeric or string value in order to search against 
@@ -43,7 +43,7 @@ std::string& can_signal_t::get_generic_name() const
  * @param[out] found_signals - provided vector to fill with ponter to signals matched.
  *
  */
-void find_can_signals(const openxc_DynamicField& key, std::vector<CanSignal*>& found_signals)
+void find_can_signals(const openxc_DynamicField& key, std::vector<can_signal_t*>& found_signals)
 {
 	switch(key.type)
 	{

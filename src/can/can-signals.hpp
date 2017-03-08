@@ -37,6 +37,8 @@ extern "C"
 
 #define MESSAGE_SET_ID 0
 
+class can_signal_t;
+
 /**
  * @brief The type signature for a CAN signal decoder.
  *
@@ -54,7 +56,7 @@ extern "C"
  * @return a decoded value in an openxc_DynamicField struct.
  */
 typedef openxc_DynamicField (*SignalDecoder)(can_signal_t& signal,
-		const std::vector<CanSignal>& signals, float value, bool* send);
+		const std::vector<can_signal_t>& signals, float value, bool* send);
 
 /**
  * @brief: The type signature for a CAN signal encoder.
@@ -69,7 +71,6 @@ typedef openxc_DynamicField (*SignalDecoder)(can_signal_t& signal,
  */
 typedef uint64_t (*SignalEncoder)(can_signal_t* signal,
 		openxc_DynamicField* value, bool* send);
-
 
 class can_signal_t
 {
@@ -111,4 +112,4 @@ public:
 	std::string& get_generic_name() const;
 };
 
-void find_can_signals(const openxc_DynamicField &key, std::vector<CanSignal*>& found_signals);
+void find_can_signals(const openxc_DynamicField &key, std::vector<can_signal_t*>& found_signals);

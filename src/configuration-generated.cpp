@@ -21,8 +21,8 @@ std::vector<std::vector<can_message_definition_t>> CAN_MESSAGES_DEFINTION = {
 };
 
 /**
- * @brief Dumb SIGNALS array. It is composed by CanMessageSet
- * SIGNALS[MESSAGE_SET_ID][CanSignal]
+ * @brief Dumb SIGNALS array. It is composed by can_message_set_t
+ * SIGNALS[MESSAGE_SET_ID][can_signal_t]
  */
 std::vector<std::vector<can_signal_t>> SIGNALS = {
 	{
