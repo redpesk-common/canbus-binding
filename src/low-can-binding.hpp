@@ -20,8 +20,6 @@
 
 #include <cstddef>
 
-#include "configuration.hpp"
-
 extern "C"
 {
 	#include <afb/afb-binding.h>
@@ -30,5 +28,3 @@ extern "C"
 extern "C" struct afb_binding_interface;
 
 extern const struct afb_binding_interface *binder_interface;
-
-extern configuration_t *config;

@@ -101,3 +101,7 @@ class configuration_t
 		bool isBusActive(can_bus_dev_t* bus);
 		*/
 };
+
+// Make a global variable pointer
+extern configuration_t *config;
+

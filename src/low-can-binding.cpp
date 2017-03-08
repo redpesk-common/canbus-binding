@@ -27,6 +27,7 @@
 #include <systemd/sd-event.h>
 
 #include "openxc.pb.h"
+#include "configuration.hpp"
 #include "can/can-bus.hpp"
 #include "can/can-signals.hpp"
 #include "can/can-message.hpp"
