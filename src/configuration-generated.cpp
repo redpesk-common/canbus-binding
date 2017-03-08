@@ -15,8 +15,8 @@ std::vector<can_message_set_t> CAN_MESSAGE_SET =
 
 std::vector<std::vector<can_message_definition_t>> CAN_MESSAGES_DEFINTION = {
 	{
-		{0x620, CanMessageFormat::STANDARD, {10, 0, nullptr}, false, (uint8_t)NULL},
-		{0x442, CanMessageFormat::STANDARD, {10, 0, nullptr}, false, (uint8_t)NULL},
+		{0x620, can_message_format::STANDARD, {10, 0, nullptr}, false, (uint8_t)NULL},
+		{0x442, can_message_format::STANDARD, {10, 0, nullptr}, false, (uint8_t)NULL},
 	},
 };
 

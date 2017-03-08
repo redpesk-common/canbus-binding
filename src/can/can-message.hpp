@@ -28,10 +28,10 @@
 #define CAN_MESSAGE_SIZE 8
 
 /**
- * @enum CanMessageFormat
+ * @enum can_message_format
  * @brief The ID format for a CAN message.
  */
-class enum CanMessageFormat {
+enum class can_message_format {
 	STANDARD, /*!< STANDARD - standard 11-bit CAN arbitration ID. */
 	EXTENDED, /*!< EXTENDED - an extended frame, with a 29-bit arbitration ID. */
 	ERROR,    /*!< ERROR - ERROR code used at initialization to signify that it isn't usable'*/
@@ -49,7 +49,7 @@ class can_message_t {
 		bool rtr_flag_; /*!< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
 		uint8_t length_; /*!< length_ - the length of the data array (max 8). */
 		uint8_t flags_; /*!< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
-		CanMessageFormat format_; /*!< format_ - the format of the message's ID.*/
+		can_message_format format_; /*!< format_ - the format of the message's ID.*/
 		std::vector<uint8_t> data_; /*!< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 
 		uint8_t maxdlen_; /*!< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
@@ -64,7 +64,7 @@ class can_message_t {
 		const uint8_t* get_data() const;
 		uint8_t get_length() const;
 
-		void set_format(const CanMessageFormat new_format);
+		void set_format(const can_message_format new_format);
 
 		bool is_correct_to_send();
 
@@ -84,7 +84,7 @@ class can_message_definition_t
 	private:
 	can_bus_dev_t& bus_; /*!< bus_ - A pointer to the bus this message is on. */
 	uint32_t id_; /*!< id_ - The ID of the message.*/
-	CanMessageFormat format_; /*!< format_ - the format of the message's ID.*/
+	can_message_format format_; /*!< format_ - the format of the message's ID.*/
 	FrequencyClock clock_; /*!<  clock_ - an optional frequency clock to control the output of this
                           *      message, if sent raw, or simply to mark the max frequency for custom
                           *      handlers to retrieve.*/

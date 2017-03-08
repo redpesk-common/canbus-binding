@@ -32,7 +32,7 @@
 * Constructor about can_message_t class.
 */
 can_message_t::can_message_t()
-	: id_{0}, rtr_flag_{false}, length_{0}, flags_{0}, format_{CanMessageFormat::ERROR}, maxdlen_{0}
+	: id_{0}, rtr_flag_{false}, length_{0}, flags_{0}, format_{can_message_format::ERROR}, maxdlen_{0}
 {}
 
 /**
@@ -62,8 +62,8 @@ bool can_message_t::get_rtr_flag_() const
 */
 int can_message_t::get_format() const
 {
-	if (format_ != CanMessageFormat::STANDARD || format_ != CanMessageFormat::EXTENDED)
-		return CanMessageFormat::ERROR;
+	if (format_ != can_message_format::STANDARD || format_ != can_message_format::EXTENDED)
+		return can_message_format::ERROR;
 	return format_;
 }
 
@@ -106,7 +106,7 @@ uint8_t can_message_t::get_length() const
 */
 bool can_message_t::is_correct_to_send()
 {
-	if (id_ != 0 && length_ != 0 && format_ != CanMessageFormat::ERROR)
+	if (id_ != 0 && length_ != 0 && format_ != can_message_format::ERROR)
 	{
 		int i;
 		for(i=0;i<CAN_MESSAGE_SIZE;i++)
@@ -124,9 +124,9 @@ bool can_message_t::is_correct_to_send()
 *
 * @param[in] new_format - class member
 */
-void can_message_t::set_format(const CanMessageFormat new_format)
+void can_message_t::set_format(const can_message_format new_format)
 {
-	if(new_format == CanMessageFormat::STANDARD || new_format == CanMessageFormat::EXTENDED || new_format == CanMessageFormat::ERROR)
+	if(new_format == can_message_format::STANDARD || new_format == can_message_format::EXTENDED || new_format == can_message_format::ERROR)
 		format_ = new_format;
 	else
 		ERROR(binder_interface, "ERROR: Can set format, wrong format chosen");
@@ -164,21 +164,21 @@ can_message_t can_message_t::convert_to_canfd_frame(const struct canfd_frame& fr
 	}
 	
 	if (frame.can_id & CAN_ERR_FLAG)
-		format_ = CanMessageFormat::ERROR;
+		format_ = can_message_format::ERROR;
 	else if (frame.can_id & CAN_EFF_FLAG)
-		format_ = CanMessageFormat::EXTENDED;
+		format_ = can_message_format::EXTENDED;
 	else
-		format_ = CanMessageFormat::STANDARD;
+		format_ = can_message_format::STANDARD;
 		
 	switch(format_)
 	{
-		case CanMessageFormat::STANDARD:
+		case can_message_format::STANDARD:
 			id_ = frame.can_id & CAN_SFF_MASK;
 			break;
-		case CanMessageFormat::EXTENDED:
+		case can_message_format::EXTENDED:
 			id_ = frame.can_id & CAN_EFF_MASK;
 			break;
-		case CanMessageFormat::ERROR:
+		case can_message_format::ERROR:
 			id_ = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
 			break;
 		default:
