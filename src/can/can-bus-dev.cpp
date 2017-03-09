@@ -131,7 +131,7 @@ std::pair<struct canfd_frame&, size_t> can_bus_dev_t::read()
 
 	DEBUG(binder_interface, "read: Found id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", cfd.can_id, cfd.len,
 							cfd.data[0], cfd.data[1], cfd.data[2], cfd.data[3], cfd.data[4], cfd.data[5], cfd.data[6], cfd.data[7]);
-	return can_message_t::convert_to_canfd_frame(cfd, nbytes);
+	return can_message_t::convert_from_canfd_frame(cfd, nbytes);
 }
 
 /// @brief start reading threads and set flag is_running_
@@ -167,7 +167,7 @@ void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 }
 
 /// @brief Send a can message from a can_message_t object.
-/// @param[in] can_msg the can message object to send 
+/// @param[in] can_msg the can message object to send
 int can_bus_dev_t::send_can_message(can_message_t& can_msg)
 {
 	ssize_t nbytes;

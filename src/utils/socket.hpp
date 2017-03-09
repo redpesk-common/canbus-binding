@@ -30,15 +30,15 @@ namespace utils
 		socket_t(const socket_t&) = delete;
 		socket_t(socket_t&&);
 		~socket_t();
-		
+
 		explicit operator bool() const;
-		
+
 		int open(int domain, int type, int protocol);
 		int close();
 		int setopt(int level, int optname, const void* optval, socklen_t optlen);
 		int socket() const;
 		int bind(const struct sockaddr* addr, socklen_t len);
-		
+
 	private:
 		int socket_;
 	};

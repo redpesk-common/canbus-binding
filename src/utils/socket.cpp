@@ -39,14 +39,14 @@ namespace utils
 		if(socket_ != INVALID_SOCKET)
 			::close(socket_);
 	}
-	
+
 	/// @brief Test if socket is valid.
 	/// @return true if valid, false otherwise.
 	socket_t::operator bool() const
 	{
 		return socket_ != INVALID_SOCKET;
 	}
-	
+
 	/// @brief Open the socket.
 	/// @param[in] domain Specifies the communications domain in which a socket is to be created.
 	/// @param[in] type Specifies the type of socket to be created.
@@ -58,28 +58,28 @@ namespace utils
 		socket_ = ::socket(domain, type, protocol);
 		return socket_;
 	}
-	
+
 	/// @brief Close the socket.
 	/// @return 0 if success.
 	int socket_t::close()
 	{
 		return socket_ != INVALID_SOCKET ? ::close(socket_) : 0;
 	}
-	
+
 	/// @brief Set socket option.
 	/// @return 0 if success.
 	int socket_t::setopt(int level, int optname, const void* optval, socklen_t optlen)
 	{
 		return socket_ != INVALID_SOCKET ? ::setsockopt(socket_, level, optname, optval, optlen) : 0;
 	}
-	
+
 	/// @brief Bind the socket.
 	/// @return 0 if success.
 	int socket_t::bind(const struct sockaddr* addr, socklen_t len)
 	{
 		return socket_ != INVALID_SOCKET ? ::bind(socket_, addr, len) : 0;
 	}
-		
+
 	/// @brief Get the file descriptor.
 	/// @return The socket's file descriptor
 	int socket_t::socket() const

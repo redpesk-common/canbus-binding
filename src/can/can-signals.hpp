@@ -77,10 +77,10 @@ class can_signal_t
 private:
 	can_message_definition_t message_; /*!< message_ - The message this signal is a part of. */
 	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output over USB.*/
-	uint8_t bitPosition_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
+	uint8_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
 										*	non-inverted bit numbering, i.e. the most significant bit of
 										*	each byte is 0) */
-	uint8_t bitSize_; /*!< bitSize_ - The width of the bit field in the CAN message. */
+	uint8_t bit_size_; /*!< bitSize_ - The width of the bit field in the CAN message. */
 	float factor_; /*!< factor_ - The final value will be multiplied by this factor. Use 1 if you
 							*	don't need a factor. */
 	float offset_; /*!< offset_ - The final value will be added to this offset. Use 0 if you
@@ -95,7 +95,6 @@ private:
 								*	value if it has changed. */
 	std::map<int, std::string> states_; /*!< states_ - A map of CAN signal state describing the mapping
 																	* between numerical and string values for valid states. */
-	uint8_t state_count_; /*!< state_count_ - The length of the states array. */
 	bool writable_; /*!< writable - True if the signal is allowed to be written from the USB host
 					*	back to CAN. Defaults to false.*/
 	SignalDecoder decoder_; /*!< decoder_ - An optional function to decode a signal from the bus to a human
@@ -104,7 +103,7 @@ private:
 							 * CAN into a byte array. If NULL, the default numerical encoder
 							 * is used. */
 	bool received_; /*!< received_ - True if this signal has ever been received.*/
-	float lastValue_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
+	float last_value_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
 					   *	this value is undefined. */
 
 public:

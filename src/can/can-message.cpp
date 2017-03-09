@@ -74,7 +74,7 @@ can_message_format_t can_message_t::get_format() const
 /**
 * @brief Retrieve flags_ member value.
 *
-* @return flags_ class member 
+* @return flags_ class member
 */
 uint8_t can_message_t::get_flags() const
 {
@@ -84,7 +84,7 @@ uint8_t can_message_t::get_flags() const
 /**
 * @brief Retrieve data_ member value.
 *
-* @return pointer to the first element 
+* @return pointer to the first element
 *  of class member data_
 */
 const uint8_t* can_message_t::get_data() const
@@ -123,7 +123,7 @@ bool can_message_t::is_correct_to_send()
 /**
 * @brief Set format_ member value.
 *
-* Preferred way to initialize these members by using 
+* Preferred way to initialize these members by using
 * convert_from_canfd_frame method.
 *
 * @param[in] new_format - class member
@@ -143,7 +143,7 @@ void can_message_t::set_format(const can_message_format_t new_format)
 *
 * @param[in] args - struct read from can bus device.
 */
-can_message_t can_message_t::convert_to_canfd_frame(const struct canfd_frame& frame, size_t nbytes)
+can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& frame, size_t nbytes)
 {
 	uint8_t maxdlen, length, flags = (uint8_t)NULL;
 	uint32_t id;
@@ -223,7 +223,7 @@ can_message_t can_message_t::convert_to_canfd_frame(const struct canfd_frame& fr
 				data.push_back(frame.data[i]);
 			};
 
-		DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", 
+		DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X",
 								id, format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 	}
 
@@ -231,7 +231,7 @@ can_message_t can_message_t::convert_to_canfd_frame(const struct canfd_frame& fr
 }
 
 /**
-* @brief Take all initialized class's members and build an 
+* @brief Take all initialized class's members and build an
 * canfd_frame struct that can be use to send a CAN message over
 * the bus.
 *
