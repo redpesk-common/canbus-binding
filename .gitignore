@@ -3,4 +3,9 @@
 *.kdev4
 *.swp
 *.kate-swp
+.vs
+*.sln
+*.vcxproj
+*.user
+obj
 build
