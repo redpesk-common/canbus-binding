@@ -17,10 +17,6 @@
 # limitations under the License.
 ###########################################################################
 
-project(low-can-binding)
-
-cmake_minimum_required(VERSION 3.3)
-
 include(GNUInstallDirs)
 
 set(TARGET "root@192.168.1.206")
