@@ -87,7 +87,7 @@ private:
 							*	don't need an offset. */
 	float min_value_; /*!< min_value_ - The minimum value for the processed signal.*/
 	float max_value_; /*!< max_value_ - The maximum value for the processed signal. */
-	FrequencyClock frequency_; /*!< frequency_ - A FrequencyClock struct to control the maximum frequency to
+	frequency_clock_t frequency_; /*!< frequency_ - A frequency_clock_t struct to control the maximum frequency to
 								*	process and send this signal. To process every value, set the
 								*	clock's frequency to 0. */
 	bool send_same_; /*!< send_same_ - If true, will re-send even if the value hasn't changed.*/
@@ -115,7 +115,7 @@ public:
 	float get_offset() const;
 	float get_min_value() const;
 	float get_max_value() const;
-	FrequencyClock& get_frequency();
+	frequency_clock_t& get_frequency();
 	bool get_send_same() const;
 	bool get_force_send_changed() const;
 	std::map<int, std::string> get_state() const;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "utils/timer.hpp"
+#include "timer.hpp"
 
 long long int systemTimeMs()
 {
@@ -29,3 +29,8 @@ long long int systemTimeMs()
 	}
 	return timestamp_msec;
 }
+
+
+frequency_clock_t::frequency_clock_t()
+	: frequency_{0.0}, last_tick_{0}, time_function_{nullptr}
+{}

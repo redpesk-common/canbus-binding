@@ -86,7 +86,7 @@ class can_message_definition_t
 	can_bus_dev_t& bus_; /*!< bus_ - A pointer to the bus this message is on. */
 	uint32_t id_; /*!< id_ - The ID of the message.*/
 	can_message_format_t format_; /*!< format_ - the format of the message's ID.*/
-	FrequencyClock clock_; /*!<  clock_ - an optional frequency clock to control the output of this
+	frequency_clock_t clock_; /*!<  clock_ - an optional frequency clock to control the output of this
 							*      message, if sent raw, or simply to mark the max frequency for custom
 							*      handlers to retrieve.*/
 	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send CAN

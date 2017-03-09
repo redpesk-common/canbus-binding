@@ -65,7 +65,7 @@ float can_signal_t::get_max_value() const
 	return max_value_;
 }
 
-FrequencyClock& can_signal_t::get_frequency()
+frequency_clock_t& can_signal_t::get_frequency()
 {
 	return frequency_;
 }

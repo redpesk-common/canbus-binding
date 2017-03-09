@@ -27,19 +27,24 @@
 typedef long long int (*TimeFunction)();
 
 /**
- * @struct FrequencyClock 
+ * @class frequency_clock_t 
  * @brief A frequency counting clock.
  *
- * @var FrequencyClock::frequency
+ * @var frequency_clock_t::frequency
  *  the clock frequency in Hz.
- * @var FrequencyClock::last_time
+ * @var frequency_clock_t::last_time
  *  the last time (in milliseconds since startup) that the clock
  *	ticked.
- * @var FrequencyClock::time_function
+ * @var frequency_clock_t::time_function
  *  a function returning current time
  */
-typedef struct {
-		float frequency;
-		unsigned long lastTick;
-		TimeFunction timeFunction;
-} FrequencyClock;
+class frequency_clock_t
+{
+private:
+	float frequency_;
+	unsigned long last_tick_;
+	TimeFunction time_function_;
+
+public:
+	frequency_clock_t();
+}
