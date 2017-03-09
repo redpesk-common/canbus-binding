@@ -23,7 +23,7 @@ diagnostic_manager_t::diagnostic_manager_t(can_bus_dev_t& bus)
 	: bus_(bus)
 {}
 
-void diagnostic_manager_t::shims_logger(const char* m)
+void diagnostic_manager_t::shims_logger(const char* m, ...)
 {
 	DEBUG(binder_interface, "%s", m);
 }

@@ -39,8 +39,8 @@
  */
 class diagnostic_manager_t {
 	protected:
-	void shims_logger(const char* m);
-	void shims_timer();
+	static void shims_logger(const char* m, ...);
+	static void shims_timer();
 
 	private:
 		DiagnosticShims shims_; /*!< shims_ - An array of shim functions for each CAN bus that plug the diagnostics
