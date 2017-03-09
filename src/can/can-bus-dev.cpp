@@ -175,7 +175,7 @@ int can_bus_dev_t::send_can_message(can_message_t& can_msg)
 
 	f = can_msg.convert_to_canfd_frame();
 
-	if(can_socket_)
+	if(can_socket_.socket())
 	{
 		nbytes = ::sendto(can_socket_.socket(), &f, sizeof(struct canfd_frame), 0,
 			(struct sockaddr*)&txAddress_, sizeof(txAddress_));
