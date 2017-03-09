@@ -168,7 +168,7 @@ void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 
 /// @brief Send a can message from a can_message_t object.
 /// @param[in] can_msg the can message object to send
-int can_bus_dev_t::send_can_message(can_message_t& can_msg)
+int can_bus_dev_t::send(can_message_t& can_msg)
 {
 	ssize_t nbytes;
 	canfd_frame f;
@@ -197,7 +197,7 @@ int can_bus_dev_t::send_can_message(can_message_t& can_msg)
 /// @brief Send a can message from a can_message_t object.
 /// @param[in] can bus used to send the message
 /// @param[in] can_msg the can message object to send
-bool can_bus_dev_t::send_can_message(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
+bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
 	ssize_t nbytes;
 	canfd_frame f;
@@ -206,9 +206,9 @@ bool can_bus_dev_t::send_can_message(const uint32_t arbitration_id, const uint8_
 	f.len = size;
 	::memcpy(f.data, data, size);
 
-	if(socket.socket())
+	if(can_socket_.socket())
 	{
-		nbytes = ::sendto(socket.socket(), &f, sizeof(struct canfd_frame), 0,
+		nbytes = ::sendto(can_socket_.socket(), &f, sizeof(struct canfd_frame), 0,
 			(struct sockaddr*)&txAddress_, sizeof(txAddress_));
 		if (nbytes == -1)
 		{

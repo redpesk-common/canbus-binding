@@ -17,7 +17,8 @@
 
 #include "obd2/diagnostic-manager.hpp"
 
-#include "low-can-binding.hpp"
+#include "../configuration.hpp"
+#include "../low-can-binding.hpp"
 
 diagnostic_manager_t::diagnostic_manager_t()
 {}
@@ -25,6 +26,12 @@ diagnostic_manager_t::diagnostic_manager_t()
 diagnostic_manager_t::diagnostic_manager_t(can_bus_dev_t& bus)
 	: bus_(&bus)
 {}
+
+bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
+{
+	can_bus_dev_t *can_bus_dev = config->get_diagnostic_manager().get_can_bus_dev();
+	return can_bus_dev->shims_send(arbitration_id, data, size);
+}
 
 void diagnostic_manager_t::shims_logger(const char* m, ...)
 {
@@ -34,6 +41,10 @@ void diagnostic_manager_t::shims_logger(const char* m, ...)
 void diagnostic_manager_t::shims_timer()
 {}
 
+can_bus_dev_t* diagnostic_manager_t::get_can_bus_dev()
+{
+	return bus_;
+}
 /**
  * @brief initialize shims used by UDS lib and set initialized_ to true.
  *  It is needed before used the diagnostic manager fully because shims are
@@ -41,6 +52,6 @@ void diagnostic_manager_t::shims_timer()
  */
 void diagnostic_manager_t::init_diagnostic_shims()
 {
-	DiagnosticShims shims_ = diagnostic_init_shims(shims_logger, bus_.send_can_message, NULL);
+	DiagnosticShims shims_ = diagnostic_init_shims(shims_logger, shims_send, NULL);
 	initialized_ = true;
 }

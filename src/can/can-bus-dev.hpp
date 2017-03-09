@@ -57,6 +57,6 @@ public:
 
 	can_message_t read();
 
-	int send_can_message(can_message_t& can_msg);
-	static bool send_can_message(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
+	int send(can_message_t& can_msg);
+	bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
 };

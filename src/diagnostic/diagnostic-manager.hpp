@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "uds/uds.h"
-#include "can/can-bus.hpp"
+#include "can/can-bus-dev.hpp"
 #include "can/can-message.hpp"
 #include "obd2/active-diagnostic-request.hpp"
 
@@ -39,6 +39,7 @@
  */
 class diagnostic_manager_t {
 protected:
+	static bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
 	static void shims_logger(const char* m, ...);
 	static void shims_timer();
 
@@ -65,6 +66,8 @@ public:
 	diagnostic_manager_t(can_bus_dev_t& bus);
 
 	void init_diagnostic_shims();
+
+	can_bus_dev_t* get_can_bus_dev();
 
 	void checkSupportedPids(const active_diagnostic_request_t& request,
 	const DiagnosticResponse& response, float parsedPayload);
