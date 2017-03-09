@@ -83,7 +83,6 @@ class obd2_signal_t {
 
 		void add_request(int pid);
 
-		void find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signal_t*>& found_signals);
 
 		bool is_obd2_response(can_message_t can_message);
 		bool is_obd2_request(DiagnosticRequest *request);

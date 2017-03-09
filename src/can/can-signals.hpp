@@ -127,6 +127,5 @@ public:
 	float get_last_value() const;
 
 	void set_received(bool r);
-void find_can_signals(const openxc_DynamicField &key, std::vector<can_signal_t*>& found_signals);	void set_received(bool r);
 	void set_last_value(float val);
 };

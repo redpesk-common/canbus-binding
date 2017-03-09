@@ -63,17 +63,21 @@ class configuration_t
 
 		const std::vector<can_message_set_t>& get_can_message_set() const;
 
-		const std::vector<can_signal_t>& get_can_signals() const;
+		std::vector<can_signal_t>& get_can_signals() const;
 
 		const std::vector<can_message_definition_t>& get_can_message_definition() const;
 
-		const std::vector<obd2_signal_t>& get_obd2_signals() const;
+		std::vector<obd2_signal_t>& get_obd2_signals() const;
 
 		uint32_t get_signal_id(obd2_signal_t& sig) const;
 
 		uint32_t get_signal_id(can_signal_t& sig) const;
 
 		void set_active_message_set(uint8_t id);
+
+		void find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signal_t*>& found_signals);
+
+		void find_can_signals(const openxc_DynamicField &key, std::vector<can_signal_t*>& found_signals);
 
 /*
 		/// TODO: implement this function as method into can_bus class

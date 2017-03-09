@@ -77,7 +77,7 @@ const std::vector<can_message_set_t>& configuration_t::get_can_message_set() con
 	return can_message_set_;
 }
 
-const std::vector<can_signal_t>& configuration_t::get_can_signals() const
+std::vector<can_signal_t>& configuration_t::get_can_signals() const
 {
 	return can_signals_[active_message_set_];
 }
@@ -87,7 +87,7 @@ const std::vector<can_message_definition_t>& configuration_t::get_can_message_de
 	return can_message_definition_[active_message_set_];
 }
 
-const std::vector<obd2_signal_t>& configuration_t::get_obd2_signals() const
+std::vector<obd2_signal_t>& configuration_t::get_obd2_signals() const
 {
 	return obd2_signals_;
 }
@@ -105,4 +105,56 @@ uint32_t configuration_t::get_signal_id(can_signal_t& sig) const
 void configuration_t::set_active_message_set(uint8_t id)
 {
 	active_message_set_ = id;
+}
+
+/**
+ * @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
+ * @brief return signals name found searching through CAN_signals and OBD2 pid
+ * 
+ * @param[in] key - can contain numeric or string value in order to search against 
+ *   can signals or obd2 signals name.
+ *
+ * @return Vector of signals name found. 
+ */
+void configuration_t::find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signal_t*>& found_signals)
+{
+	switch(key.type)
+	{
+		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
+				lookup_signals_by_name(key.string_value, obd2_signals_, found_signals);
+			break;
+		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
+				lookup_signals_by_id(key.numeric_value, obd2_signals_, found_signals);
+			break;
+		default:
+			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
+			break;
+	}
+	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
+}
+
+/**
+ * @fn void find_can_signals(const openxc_DynamicField& key, std::vector<can_signal_t*>& found_signals)
+ * @brief return signals name found searching through CAN_signals and OBD2 pid
+ * 
+ * @param[in] key - can contain numeric or string value in order to search against 
+ *   can signals or obd2 signals name.
+ * @param[out] found_signals - provided vector to fill with ponter to signals matched.
+ *
+ */
+void configuration_t::find_can_signals(const openxc_DynamicField& key, std::vector<can_signal_t*>& found_signals)
+{
+	switch(key.type)
+	{
+		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
+			lookup_signals_by_name(std::string(key.string_value), can_signals_, found_signals);
+			break;
+		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
+			lookup_signals_by_id(key.numeric_value, can_signals_ found_signals);
+			break;
+		default:
+			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
+			break;
+	}
+	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
 }

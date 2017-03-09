@@ -42,30 +42,9 @@ uint32_t obd2_signal_t::get_pid()
 	return (uint32_t)pid_;
 }
 
-/**
- * @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
- * @brief return signals name found searching through CAN_signals and OBD2 pid
- * 
- * @param[in] key - can contain numeric or string value in order to search against 
- *   can signals or obd2 signals name.
- *
- * @return Vector of signals name found. 
- */
-void obd2_signal_t::find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signal_t*>& found_signals)
+std::string& obd2_signal_t::get_generic_name()
 {
-	switch(key.type)
-	{
-		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-				lookup_signals_by_name(key.string_value, get_obd2_signals(), found_signals);
-			break;
-		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-				lookup_signals_by_id(key.numeric_value, get_obd2_signals(), found_signals);
-			break;
-		default:
-			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
-			break;
-	}
-	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
+	return generic_name_;
 }
 
 bool obd2_signal_t::is_obd2_response(can_message_t can_message)

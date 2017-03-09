@@ -44,30 +44,6 @@ uint8_t can_signal_t::get_bit_size() const
 	return bit_size_;
 }
 
-/**
- * @fn void find_can_signals(const openxc_DynamicField& key, std::vector<can_signal_t*>& found_signals)
- * @brief return signals name found searching through CAN_signals and OBD2 pid
- * 
- * @param[in] key - can contain numeric or string value in order to search against 
- *   can signals or obd2 signals name.
- * @param[out] found_signals - provided vector to fill with ponter to signals matched.
- *
- */
-void find_can_signals(const openxc_DynamicField& key, std::vector<can_signal_t*>& found_signals)
-{
-	switch(key.type)
-	{
-		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-			lookup_signals_by_name(key.string_value, get_can_signals(), found_signals);
-			break;
-		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-			lookup_signals_by_id(key.numeric_value, get_can_signals(), found_signals);
-			break;
-		default:
-			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
-			break;
-	}
-	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
 float can_signal_t::get_factor() const
 {
 	return factor_;
