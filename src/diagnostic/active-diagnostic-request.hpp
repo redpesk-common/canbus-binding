@@ -55,27 +55,32 @@ typedef void (*DiagnosticResponseCallback)(const active_diagnostic_request_t* re
  * @brief An active diagnostic request, either recurring or one-time.
  */
 class active_diagnostic_request_t {
-	private:
-		can_bus_dev_t* bus_; /*!< bus_ - The CAN bus this request should be made on, or is currently in flight-on*/
-		uint32_t id_; /*!< id_ - The arbitration ID (aka message ID) for the request.*/
-		DiagnosticRequestHandle* handle_; /*!< handle_ - A handle for the request to keep track of it between
-										   * sending the frames of the request and receiving all frames of the response.*/
-		std::string name_; /*!< name_ - An optional human readable name this response, to be used when publishing received 
-							* responses. If the name is NULL, the published output will use the raw OBD-II response format.*/
-		DiagnosticResponseDecoder decoder_; /*!< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses
-											 * to this request. If the decoder is NULL, the output will include the raw payload
-											 * instead of a parsed value.*/
-		DiagnosticResponseCallback callback_; /*!< callback_ - An optional DiagnosticResponseCallback to be notified whenever a
-											   * response is received for this request.*/
-		bool recurring_; /*!< bool recurring_ - If true, this is a recurring request and it will remain as active until explicitly cancelled.
-						  * The frequencyClock attribute controls how often a recurrin request is made.*/
-		bool waitForMultipleResponses_; /*!< waitForMultipleResponses_ - False by default, when any response is received for a request
-										 * it will be removed from the active list. If true, the request will remain active until the timeout
-										 * clock expires, to allow it to receive multiple response (e.g. to a functional broadcast request).*/
-		bool inFlight_; /*!< inFlight_ - True if the request has been sent and we are waiting for a response.*/
-		FrequencyClock frequency_clock_; /*!< frequency_clock_ - A FrequencyClock object to control the send rate for a
-										 * recurring request. If the request is not reecurring, this attribute is not used.*/
-		FrequencyClock timeout_clock_; /*!< timeout_clock_ - A FrequencyClock object to monitor how long it's been since
-									   * this request was sent.*/
-	public:
+private:
+	can_bus_dev_t* bus_; /*!< bus_ - The CAN bus this request should be made on, or is currently in flight-on*/
+	uint32_t id_; /*!< id_ - The arbitration ID (aka message ID) for the request.*/
+	DiagnosticRequestHandle* handle_; /*!< handle_ - A handle for the request to keep track of it between
+										* sending the frames of the request and receiving all frames of the response.*/
+	std::string name_; /*!< name_ - An optional human readable name this response, to be used when publishing received 
+						* responses. If the name is NULL, the published output will use the raw OBD-II response format.*/
+	DiagnosticResponseDecoder decoder_; /*!< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses
+											* to this request. If the decoder is NULL, the output will include the raw payload
+											* instead of a parsed value.*/
+	DiagnosticResponseCallback callback_; /*!< callback_ - An optional DiagnosticResponseCallback to be notified whenever a
+											* response is received for this request.*/
+	bool recurring_; /*!< bool recurring_ - If true, this is a recurring request and it will remain as active until explicitly cancelled.
+						* The frequencyClock attribute controls how often a recurrin request is made.*/
+	bool wait_for_multiple_responses_; /*!< wait_for_multiple_responses_ - False by default, when any response is received for a request
+										* it will be removed from the active list. If true, the request will remain active until the timeout
+										* clock expires, to allow it to receive multiple response (e.g. to a functional broadcast request).*/
+	bool in_flight_; /*!< in_flight_ - True if the request has been sent and we are waiting for a response.*/
+	frequency_clock_t frequency_clock_; /*!< frequency_clock_ - A frequency_clock_t object to control the send rate for a
+										* recurring request. If the request is not reecurring, this attribute is not used.*/
+	frequency_clock_t timeout_clock_; /*!< timeout_clock_ - A frequency_clock_t object to monitor how long it's been since
+									* this request was sent.*/
+public:
+	active_diagnostic_request_t();
+
+	void updateDiagnosticRequestEntry(DiagnosticsManager* manager, CanBus* bus, DiagnosticRequest* request,
+		const char* name, bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
+		const DiagnosticResponseCallback callback, float frequencyHz);
 };

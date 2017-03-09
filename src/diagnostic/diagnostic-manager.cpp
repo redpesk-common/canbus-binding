@@ -19,12 +19,14 @@
 
 #include "../configuration.hpp"
 #include "../low-can-binding.hpp"
+#define MAX_REQUEST_ENTRIES 50
 
 diagnostic_manager_t::diagnostic_manager_t()
+	: request_list_entries_(MAX_REQUEST_ENTRIES, active_diagnostic_request_t())
 {}
 
 diagnostic_manager_t::diagnostic_manager_t(can_bus_dev_t& bus)
-	: bus_(&bus)
+	: bus_(&bus), request_list_entries_(MAX_REQUEST_ENTRIES, active_diagnostic_request_t())
 {}
 
 bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
