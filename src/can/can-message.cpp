@@ -201,7 +201,7 @@ can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& 
 			else
 			{
 				length = (frame.len > maxdlen) ? maxdlen : frame.len;
-			}	
+			}
 		}
 	}
 	else
