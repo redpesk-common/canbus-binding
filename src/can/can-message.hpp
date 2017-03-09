@@ -100,27 +100,6 @@ class can_message_definition_t
 		uint32_t get_id() const;
 };
 
-/**
- * @class can_message_set_t
- *
- * @brief A parent wrapper for a particular set of CAN messages and associated
- *	CAN buses(e.g. a vehicle or program).
- */
-class can_message_set_t
-{
-	private:
-		uint8_t index_; /*!<index_ - A numerical ID for the message set, ideally the index in an array
-						*	for fast lookup*/
-		const std::string name_; /*!< name_ - The name of the message set.*/
-		uint8_t can_bus_count_; /*!< can_bus_count_ - The number of CAN buses defined for this message set.*/
-		unsigned short can_message_count_; /*!< can_message_count_ - The number of CAN messages (across all buses) defined for
-										*	this message set.*/
-		unsigned short can_signal_count_; /*!< can_signal_count_ - The number of CAN signals (across all messages) defined for
-									*	this message set.*/
-		unsigned short can_command_count_; /*!< can_command_count_ - The number of CanCommmands defined for this message set.*/
-		unsigned short obd2_signal_count_; /*!< obd2_signal_count_ - The number of obd2 signals defined for this message set.*/
-};
-
 /** Public: Retrive a list of all possible CAN configurations.
  *
  * Returns a pointer to an array of all configurations.
