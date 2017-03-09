@@ -39,7 +39,7 @@ can_bus_dev_t::can_bus_dev_t(const std::string& dev_name)
 }
 
 /// @brief Open the can socket and returning it
-/// @return -1
+/// @return -1 if something wrong.
 int can_bus_dev_t::open()
 {
 	const int canfd_on = 1;
@@ -48,7 +48,8 @@ int can_bus_dev_t::open()
 	struct timeval timeout;
 
 	DEBUG(binder_interface, "CAN Handler socket : %d", can_socket_.socket());
-	if (can_socket_) return 0;
+	if (can_socket_)
+		return 0;
 
 	can_socket_.open(PF_CAN, SOCK_RAW, CAN_RAW);
 	if (can_socket_)
