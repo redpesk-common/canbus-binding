@@ -17,7 +17,7 @@
 */
 
 
-
+#include <unistd.h>
 #include <string.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
@@ -100,13 +100,13 @@ int can_bus_dev_t::open()
 }
 
 /// @brief Close the bus.
-void can_bus_dev_t::close()
+int can_bus_dev_t::close()
 {
-	can_socket_.close();
+	return can_socket_.close();
 }
 
 /// @brief Read the can socket and retrieve canfd_frame
-std::pair<struct canfd_frame&, size_t> can_bus_dev_t::read()
+can_message_t can_bus_dev_t::read()
 {
 	ssize_t nbytes;
 	struct canfd_frame cfd;
@@ -197,7 +197,7 @@ int can_bus_dev_t::send_can_message(can_message_t& can_msg)
 /// @brief Send a can message from a can_message_t object.
 /// @param[in] can bus used to send the message
 /// @param[in] can_msg the can message object to send
-bool can_bus_dev_t::send_can_message(const uint16_t arbitration_id, const uint8_t* data, const uint8_t size)
+bool can_bus_dev_t::send_can_message(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
 	ssize_t nbytes;
 	canfd_frame f;
