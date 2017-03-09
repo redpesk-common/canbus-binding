@@ -21,8 +21,8 @@
 float decoder_t::parseSignalBitfield(can_signal_t& signal, const can_message_t& message)
 {
 	 return bitfield_parse_float(message.get_data(), CAN_MESSAGE_SIZE,
-			signal.bitPosition, signal.bitSize, signal.factor,
-			signal.offset);
+			signal.get_bit_position(), signal.get_bit_size(), signal.get_factor(),
+			signal.get_offset());
 }
 
 openxc_DynamicField decoder_t::noopDecoder(can_signal_t& signal,
@@ -96,16 +96,16 @@ openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, can_message
 	openxc_DynamicField decoded_value = decoder_t::decodeSignal(signal,
 			value, signals, &send);
 
-	signal.received_ = true;
-	signal.last_value_ = value;
+	signal.set_received(true);
+	signal.set_last_value(value);
 	return decoded_value;
 }
 
 openxc_DynamicField decoder_t::decodeSignal( can_signal_t& signal,
 		float value, const std::vector<can_signal_t>& signals, bool* send)
 {
-	SignalDecoder decoder = signal.decoder == NULL ?
-							noopDecoder : signal.decoder;
+	SignalDecoder decoder = signal.get_decoder() == NULL ?
+							noopDecoder : signal.get_decoder();
 	openxc_DynamicField decoded_value = decoder(signal, signals,
 			value, send);
 	return decoded_value;

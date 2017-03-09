@@ -107,8 +107,26 @@ private:
 					   *	this value is undefined. */
 
 public:
-	can_message_definition_t& get_message() const;
-	std::string& get_generic_name() const;
-};
+	can_message_definition_t& get_message();
+	std::string& get_generic_name();
+	uint8_t get_bit_position() const;
+	uint8_t get_bit_size() const;
+	float get_factor() const;
+	float get_offset() const;
+	float get_min_value() const;
+	float get_max_value() const;
+	FrequencyClock& get_frequency();
+	bool get_send_same() const;
+	bool get_force_send_changed() const;
+	std::map<int, std::string> get_state() const;
+	size_t get_state_count() const;
+	bool get_writable() const;
+	SignalDecoder& get_decoder();
+	SignalEncoder& get_encoder();
+	bool get_received() const;
+	float get_last_value() const;
 
-void find_can_signals(const openxc_DynamicField &key, std::vector<can_signal_t*>& found_signals);
+	void set_received(bool r);
+void find_can_signals(const openxc_DynamicField &key, std::vector<can_signal_t*>& found_signals);	void set_received(bool r);
+	void set_last_value(float val);
+};
