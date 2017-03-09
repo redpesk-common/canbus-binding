@@ -19,9 +19,9 @@
 #pragma once
 
 #include <stdint.h>
+#include <linux/can.h>
 #include <string>
 #include <thread>
-#include <linux/can.h>
 
 #include "../utils/socket.hpp"
 
