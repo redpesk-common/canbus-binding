@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-#include <configuration.hpp>
+#include "configuration.hpp"
+
+#include "utils/signals.hpp"
 
 #define OBD2_FUNCTIONAL_BROADCAST_ID 0x7df
 
@@ -51,9 +53,10 @@ std::vector<std::vector<can_signal_t>> SIGNALS;
 
 configuration_t::configuration_t()
 	: obd2_signals_{OBD2_PIDS}, can_message_set_{CAN_MESSAGE_SET}, can_signals_{SIGNALS}, can_message_definition_{CAN_MESSAGES_DEFINTION}
+{}
 
 configuration_t& configuration_t::get_configuration()
-{ 
+{
 	return *this;
 }
 
@@ -62,7 +65,7 @@ can_bus_t& configuration_t::get_can_bus_manager()
 	return can_bus_manager_;
 }
 
-diagnostic_manager_t& configuration_t::get_diagnostic_manager() const
+diagnostic_manager_t& configuration_t::get_diagnostic_manager()
 {
 	return diagnostic_manager_;
 }
@@ -72,24 +75,24 @@ uint8_t configuration_t::get_active_message_set() const
 	return active_message_set_;
 }
 
-const std::vector<can_message_set_t>& configuration_t::get_can_message_set() const
+const std::vector<can_message_set_t>& configuration_t::get_can_message_set()
 {
 	return can_message_set_;
 }
 
-std::vector<can_signal_t>& configuration_t::get_can_signals() const
+std::vector<can_signal_t>& configuration_t::get_can_signals()
 {
 	return can_signals_[active_message_set_];
 }
 
-const std::vector<can_message_definition_t>& configuration_t::get_can_message_definition() const
+const std::vector<can_message_definition_t>& configuration_t::get_can_message_definition()
 {
 	return can_message_definition_[active_message_set_];
 }
 
-std::vector<obd2_signal_t>& configuration_t::get_obd2_signals() const
+std::vector<obd2_signal_t>& configuration_t::get_obd2_signals()
 {
-	return obd2_signals_;
+	return obd2_signals_[active_message_set_];
 }
 
 uint32_t configuration_t::get_signal_id(obd2_signal_t& sig) const
@@ -99,7 +102,7 @@ uint32_t configuration_t::get_signal_id(obd2_signal_t& sig) const
 
 uint32_t configuration_t::get_signal_id(can_signal_t& sig) const
 {
-	return sig.get_message()->get_id();
+	return sig.get_message().get_id();
 }
 
 void configuration_t::set_active_message_set(uint8_t id)
@@ -121,10 +124,10 @@ void configuration_t::find_obd2_signals(const openxc_DynamicField &key, std::vec
 	switch(key.type)
 	{
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-				lookup_signals_by_name(key.string_value, obd2_signals_, found_signals);
+				lookup_signals_by_name(key.string_value, obd2_signals_[active_message_set_], found_signals);
 			break;
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-				lookup_signals_by_id(key.numeric_value, obd2_signals_, found_signals);
+				lookup_signals_by_id(key.numeric_value, obd2_signals_[active_message_set_], found_signals);
 			break;
 		default:
 			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
@@ -147,10 +150,10 @@ void configuration_t::find_can_signals(const openxc_DynamicField& key, std::vect
 	switch(key.type)
 	{
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-			lookup_signals_by_name(std::string(key.string_value), can_signals_, found_signals);
+			lookup_signals_by_name(std::string(key.string_value), can_signals_[active_message_set_], found_signals);
 			break;
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-			lookup_signals_by_id(key.numeric_value, can_signals_ found_signals);
+			lookup_signals_by_id(key.numeric_value, can_signals_[active_message_set_], found_signals);
 			break;
 		default:
 			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");

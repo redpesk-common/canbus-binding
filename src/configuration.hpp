@@ -48,26 +48,26 @@ class configuration_t
 	public:
 		configuration_t();
 
-		const std::vector<obd2_signal_t> obd2_signals_;
-		const std::vector<can_message_set_t> can_message_set_;
-		const std::vector<std::vector<can_signal_t>> can_signals_;
-		const std::vector<std::vector<can_message_definition_t>> can_message_definition_;
+		std::vector<can_message_set_t> can_message_set_;
+		std::vector<std::vector<can_signal_t>> can_signals_;
+		std::vector<std::vector<obd2_signal_t>> obd2_signals_;
+		std::vector<std::vector<can_message_definition_t>> can_message_definition_;
 
-		configuration_t& get_configuration() const;
+		configuration_t& get_configuration() ;
 
 		can_bus_t& get_can_bus_manager();
 
-		diagnostic_manager_t& get_diagnostic_manager() const;
+		diagnostic_manager_t& get_diagnostic_manager() ;
 
 		uint8_t get_active_message_set() const;
 
-		const std::vector<can_message_set_t>& get_can_message_set() const;
+		const std::vector<can_message_set_t>& get_can_message_set();
 
-		std::vector<can_signal_t>& get_can_signals() const;
+		std::vector<can_signal_t>& get_can_signals();
 
-		const std::vector<can_message_definition_t>& get_can_message_definition() const;
+		const std::vector<can_message_definition_t>& get_can_message_definition();
 
-		std::vector<obd2_signal_t>& get_obd2_signals() const;
+		std::vector<obd2_signal_t>& get_obd2_signals();
 
 		uint32_t get_signal_id(obd2_signal_t& sig) const;
 
