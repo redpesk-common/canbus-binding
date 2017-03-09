@@ -45,7 +45,7 @@ protected:
 private:
 	DiagnosticShims shims_; /*!< shims_ - An array of shim functions for each CAN bus that plug the diagnostics
 								* library (uds-c) into the VI's CAN peripheral.*/
-	can_bus_dev_t& bus_; /*!< bus_ - A reference to the CAN bus that should be used for all standard OBD-II requests, if the bus is not
+	can_bus_dev_t* bus_; /*!< bus_ - A pointer to the CAN bus that should be used for all standard OBD-II requests, if the bus is not
 							* explicitly spcified in the request. If NULL, all requests require an explicit bus.*/
 	std::queue<active_diagnostic_request_t> recurringRequests_; /*!< recurringRequests - A queue of active, recurring diagnostic requests. When
 																* a response is received for a recurring request or it times out, it is
@@ -61,7 +61,9 @@ private:
 	bool initialized_; /*!< * initialized - True if the DiagnosticsManager has been initialized with shims. It will interface with the uds-c lib*/
 
 public:
+	diagnostic_manager_t();
 	diagnostic_manager_t(can_bus_dev_t& bus);
+
 	void init_diagnostic_shims();
 
 	void checkSupportedPids(const active_diagnostic_request_t& request,
