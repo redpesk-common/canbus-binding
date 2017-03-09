@@ -52,9 +52,9 @@ void lookup_signals_by_name(const std::string& key, std::vector<T>& signals, std
 template <typename T>
 void lookup_signals_by_name(const std::string& key, std::vector<T>& signals, std::vector<std::string>& found_signals_name)
 {
-	for(const T& s : signals)
+	for(T& s : signals)
 	{
-		if(::fnmatch(key.c_str(), s.generic_name, FNM_CASEFOLD) == 0)
+		if(::fnmatch(key.c_str(), s.get_generic_name().c_str(), FNM_CASEFOLD) == 0)
 			found_signals_name.push_back(s.get_generic_name());
 	}
 }
@@ -74,11 +74,11 @@ void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector
 template <typename T>
 void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector<std::string>& found_signals_name)
 {
-	for(const T& s : signals)
+	for(T& s : signals)
 	{
 		if(config->get_signal_id(s) == key)
 		{
-			found_signals_name.push_back(s.generic_name);
+			found_signals_name.push_back(s.get_generic_name());
 		}
 	}
 }
