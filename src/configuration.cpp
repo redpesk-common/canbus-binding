@@ -52,7 +52,7 @@ std::vector<std::vector<can_message_definition_t>> CAN_MESSAGES_DEFINTION;
 std::vector<std::vector<can_signal_t>> SIGNALS;
 
 configuration_t::configuration_t()
-	: obd2_signals_{OBD2_PIDS}, can_message_set_{CAN_MESSAGE_SET}, can_signals_{SIGNALS}, can_message_definition_{CAN_MESSAGES_DEFINTION}
+	: can_message_set_{CAN_MESSAGE_SET}, can_signals_{SIGNALS}, obd2_signals_{OBD2_PIDS}, can_message_definition_{CAN_MESSAGES_DEFINTION}
 {}
 
 configuration_t& configuration_t::get_configuration()
