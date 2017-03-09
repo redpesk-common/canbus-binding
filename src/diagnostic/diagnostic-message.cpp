@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-#include "obd2/obd2-signals.hpp"
+#include "obd2-signals.hpp"
 
-#include "utils/signals.hpp"
+#include "../configuration.hpp"
+#include "../utils/signals.hpp"
 
 const char *UNIT_NAMES[10] = {
 	"POURCENT",

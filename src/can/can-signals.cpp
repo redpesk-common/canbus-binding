@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-#include "can/can-signals.hpp"
-
 #include <fnmatch.h>
 
-#include "utils/signals.hpp"
-#include "can/can-decoder.hpp"
-#include "obd2/obd2-signals.hpp"
-#include "low-can-binding.hpp"
+#include "can-signals.hpp"
+
+#include "../configuration.hpp"
+#include "../utils/signals.hpp"
+#include "can-decoder.hpp"
+#include "../obd2/obd2-signals.hpp"
+#include "../low-can-binding.hpp"
 
 can_message_definition_t& can_signal_t::get_message()
 {

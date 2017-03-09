@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "utils/signals.hpp"
+#include "signals.hpp"
 
 /** 
  * @brief Can signal event map making access to afb_event

@@ -22,11 +22,11 @@
 #include <fnmatch.h>
 
 #include "openxc.pb.h"
-#include "configuration.hpp"
-#include "can/can-signals.hpp"
-#include "obd2/obd2-signals.hpp"
+#include "../configuration.hpp"
+#include "../can/can-signals.hpp"
+#include "../obd2/obd2-signals.hpp"
 
-#include "low-can-binding.hpp"
+#include "../low-can-binding.hpp"
 
 extern std::mutex subscribed_signals_mutex;
 std::mutex& get_subscribed_signals_mutex();
