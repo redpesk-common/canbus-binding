@@ -80,9 +80,9 @@ class obd2_signal_t {
 		obd2_signal_t(uint8_t pid, const char* generic_name, const int min_, const int max_, enum UNIT unit, int frequency, bool supported);
 
 		uint32_t get_pid();
+		std::string& get_generic_name();
 
 		void add_request(int pid);
-
 
 		bool is_obd2_response(can_message_t can_message);
 		bool is_obd2_request(DiagnosticRequest *request);
