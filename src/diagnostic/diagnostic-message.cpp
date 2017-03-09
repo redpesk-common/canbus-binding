@@ -89,13 +89,14 @@ bool obd2_signal_t::is_obd2_response(can_message_t can_message)
 	}
 	return false;
 	*/
-}
+	return false;
+} 	
 
 void obd2_signal_t::add_request(int pid)
 {
 	DiagnosticRequest request = {
 	arbitration_id: OBD2_FUNCTIONAL_BROADCAST_ID,
-	mode: 0x1, has_pid: true, pid_ };
+	mode: 0x1, has_pid: true, pid: pid_ };
 }
 
 /**

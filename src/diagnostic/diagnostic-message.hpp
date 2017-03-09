@@ -20,10 +20,10 @@
 #include <vector>
 
 #include "uds/uds.h"
-#include "can/can-bus.hpp"
-#include "can/can-message.hpp"
+#include "../can/can-bus.hpp"
+#include "../can/can-message.hpp"
 
-#include "low-can-binding.hpp"
+#include "../low-can-binding.hpp"
 
 enum UNIT {
 	POURCENT,

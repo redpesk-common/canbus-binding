@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include "active-diagnostic-request.hpp"
+
 active_diagnostic_request_t::active_diagnostic_request_t()
 	: can_bus_dev_{nullptr}, uint32_t id_{0}, DiagnosticRequestHandle{nullptr}, name_{""},
 	  decoder_{nullptr}, callback_{nullptr}, reccuring_{false}, wait_for_multiple_responses_{false},

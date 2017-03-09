@@ -15,10 +15,13 @@
  * limitations under the License.
  */
 
-#include "obd2/diagnostic-manager.hpp"
+#include <algorithm>
 
+#include "diagnostic-manager.hpp"
+
+#include "uds/uds.h"
 #include "../configuration.hpp"
-#include "../low-can-binding.hpp"
+
 #define MAX_REQUEST_ENTRIES 50
 
 diagnostic_manager_t::diagnostic_manager_t()

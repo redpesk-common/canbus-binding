@@ -29,7 +29,7 @@
 
 #include "can-bus.hpp"
 #include "can-message.hpp"
-#include "low-can-binding.hpp"
+#include "../low-can-binding.hpp"
 
 /// @brief Class constructor
 /// @param dev_name String representing the device name into the linux /dev tree

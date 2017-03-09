@@ -25,13 +25,12 @@
 #include <condition_variable>
 
 #include "openxc.pb.h"
-#include "utils/timer.hpp"
-#include "can/can-signals.hpp"
-#include "can/can-message.hpp"
-
-#include "low-can-binding.hpp"
-
+#include "../utils/timer.hpp"
+#include "can-signals.hpp"
+#include "can-message.hpp"
 #include "can-bus-dev.hpp"
+
+#include "../low-can-binding.hpp"
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
 #define MAX_ACCEPTANCE_FILTERS 24

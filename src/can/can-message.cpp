@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "can/can-message.hpp"
+#include "can-message.hpp"
 
 #include <cstring>
 
-#include "low-can-binding.hpp"
+#include "../low-can-binding.hpp"
 
 /********************************************************************************
 *

@@ -24,10 +24,10 @@
 #include <string>
 
 #include "openxc.pb.h"
-#include "utils/timer.hpp"
-#include "can/can-bus.hpp"
-#include "can/can-message.hpp"
-#include "obd2/obd2-signals.hpp"
+#include "../utils/timer.hpp"
+#include "can-bus.hpp"
+#include "can-message.hpp"
+#include "../obd2/obd2-signals.hpp"
 
 extern "C"
 {

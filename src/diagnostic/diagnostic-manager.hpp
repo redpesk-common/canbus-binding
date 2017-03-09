@@ -17,14 +17,15 @@
 
 #pragma once
 
+#include <queue>
 #include <vector>
 
 #include "uds/uds.h"
-#include "can/can-bus-dev.hpp"
-#include "can/can-message.hpp"
-#include "obd2/active-diagnostic-request.hpp"
+#include "../can/can-bus-dev.hpp"
+#include "../can/can-message.hpp"
+#include "active-diagnostic-request.hpp"
 
-#include "low-can-binding.hpp"
+#include "../low-can-binding.hpp"
 
 /* Private: Each CAN bus needs its own set of shim functions, so this should
  * match the maximum CAN controller count.
@@ -57,7 +58,7 @@ private:
 	std::vector<active_diagnostic_request_t> free_request_entries_; /*!< freeRequestEntries - A list of all available slots for active diagnostic
 																	 * requests. This free list is backed by statically allocated entries in
 																	 * the requestListEntries attribute.*/
-	std::vector<active_diagnostic_request_t> request_list_entries_ /*!< requestListEntries - Static allocation for all active diagnostic requests.*/
+	std::vector<active_diagnostic_request_t> request_list_entries_; /*!< requestListEntries - Static allocation for all active diagnostic requests.*/
 
 	bool initialized_; /*!< * initialized - True if the DiagnosticsManager has been initialized with shims. It will interface with the uds-c lib*/
 
@@ -72,11 +73,13 @@ public:
 	void checkSupportedPids(const active_diagnostic_request_t& request,
 	const DiagnosticResponse& response, float parsedPayload);
 
-	bool addRecurringRequest(DiagnosticRequest* request, const char* name,
+	bool add_request(DiagnosticRequest* request, const std::string name,
+		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
+		const DiagnosticResponseCallback callback);
+
+	bool add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
 
 	void reset();
-
-	void add_request(int pid);
 };

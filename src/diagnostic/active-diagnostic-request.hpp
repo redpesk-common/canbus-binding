@@ -21,13 +21,14 @@
 
 #include "uds/uds.h"
 #include "uds/uds_types.h"
-#include "can/can-bus.hpp"
-#include "can/can-message.hpp"
+#include "../can/can-bus-dev.hpp"
+#include "../can/can-message.hpp"
+#include "diagnostic-manager.hpp"
 
-#include "low-can-binding.hpp"
+#include "../low-can-binding.hpp"
 
 class active_diagnostic_request_t;
-class can_bus_dev_t;
+class diagnostic_manager_t;
 
 /* Public: The signature for an optional function that can apply the neccessary
  * formula to translate the binary payload into meaningful data.
@@ -80,7 +81,7 @@ private:
 public:
 	active_diagnostic_request_t();
 
-	void updateDiagnosticRequestEntry(DiagnosticsManager* manager, CanBus* bus, DiagnosticRequest* request,
-		const char* name, bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
+	void updateDiagnosticRequestEntry(diagnostic_manager_t* manager, can_bus_dev_t* bus, DiagnosticRequest* request,
+		const std::string name, bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
 };

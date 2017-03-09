@@ -47,4 +47,4 @@ private:
 
 public:
 	frequency_clock_t();
-}
+};
