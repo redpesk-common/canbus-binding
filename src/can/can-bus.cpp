@@ -81,7 +81,7 @@ void can_bus_t::can_decode_message()
 		/* First we have to found which can_signal_t it is */
 		search_key = build_DynamicField((double)can_message.get_id());
 		signals.clear();
-		find_can_signals(search_key, signals);
+		config->find_can_signals(search_key, signals);
 
 		/* Decoding the message ! Don't kill the messenger ! */
 		for(auto& sig : signals)
