@@ -57,4 +57,5 @@ public:
 	std::pair<struct canfd_frame&, size_t> read();
 
 	int send_can_message(can_message_t& can_msg);
+	static bool send_can_message(const uint16_t arbitration_id, const uint8_t* data, const uint8_t size);
 };

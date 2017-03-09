@@ -193,3 +193,34 @@ int can_bus_dev_t::send_can_message(can_message_t& can_msg)
 	}
 	return 0;
 }
+
+/// @brief Send a can message from a can_message_t object.
+/// @param[in] can bus used to send the message
+/// @param[in] can_msg the can message object to send
+bool can_bus_dev_t::send_can_message(const uint16_t arbitration_id, const uint8_t* data, const uint8_t size)
+{
+	ssize_t nbytes;
+	canfd_frame f;
+
+	f.can_id = arbitration_id;
+	f.len = size;
+	::memcpy(f.data, data, size);
+
+	if(socket.socket())
+	{
+		nbytes = ::sendto(socket.socket(), &f, sizeof(struct canfd_frame), 0,
+			(struct sockaddr*)&txAddress_, sizeof(txAddress_));
+		if (nbytes == -1)
+		{
+			ERROR(binder_interface, "send_can_message: Sending CAN frame failed.");
+			return -1;
+		}
+		return (int)nbytes;
+	}
+	else
+	{
+		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
+		open();
+	}
+	return 0;
+}
