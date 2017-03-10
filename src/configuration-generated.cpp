@@ -5,9 +5,6 @@
 
 #include <configuration.hpp>
 
-#define OBD2_FUNCTIONAL_BROADCAST_ID 0x7df
-
-
 std::vector<can_message_set_t> CAN_MESSAGE_SET =
 {
 	{0, "example_messages", 1, 2, 2, 0, 19},

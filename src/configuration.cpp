@@ -19,8 +19,6 @@
 
 #include "utils/signals.hpp"
 
-#define OBD2_FUNCTIONAL_BROADCAST_ID 0x7df
-
 // Pre-defined OBD-II PIDs to query for if supported by the vehicle.
  std::vector<obd2_signal_t> OBD2_PIDS = {
 	{ 0x04, "obd2.engine.load", 0, 100, POURCENT, 5, false},
