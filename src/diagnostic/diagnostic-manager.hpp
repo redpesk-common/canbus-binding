@@ -32,6 +32,7 @@
  */
 #define MAX_SHIM_COUNT can_bus_t.get_can_devices().size()
 
+
 /**
  * @brief The core structure for running the diagnostics module on the VI.
  *
@@ -49,7 +50,7 @@ private:
 							 * library (uds-c) into the VI's CAN peripheral.*/
 	can_bus_dev_t* bus_; /*!< bus_ - A pointer to the CAN bus that should be used for all standard OBD-II requests, if the bus is not
 						  * explicitly spcified in the request. If NULL, all requests require an explicit bus.*/
-	std::queue<active_diagnostic_request_t> recurring_requests_; /*!< recurringRequests - A queue of active, recurring diagnostic requests. When
+	std::vector<active_diagnostic_request_t> recurring_requests_; /*!< recurringRequests - A queue of active, recurring diagnostic requests. When
 																  * a response is received for a recurring request or it times out, it is
 																  * popped from the queue and pushed onto the back. */
 	std::vector<active_diagnostic_request_t> non_recurring_requests_; /*!< nonrecurringRequests - A list of active one-time diagnostic requests. When a
@@ -69,9 +70,20 @@ public:
 	void init_diagnostic_shims();
 
 	can_bus_dev_t* get_can_bus_dev();
+	active_diagnostic_request_t& get_free_entry();
+
+	void find_and_erase(active_diagnostic_request_t& entry, std::vector<active_diagnostic_request_t>& requests_list);
+	void cancel_request(active_diagnostic_request_t& entry);
+	void cleanup_request(active_diagnostic_request_t& entry, bool force);
+	void cleanup_active_requests(bool force);
+	bool lookup_recurring_request(const DiagnosticRequest* request);
+
+
+	bool validate_optional_request_attributes(float frequencyHz);
+	void reset();
 
 	void checkSupportedPids(const active_diagnostic_request_t& request,
-	const DiagnosticResponse& response, float parsedPayload);
+		const DiagnosticResponse& response, float parsedPayload);
 
 	bool add_request(DiagnosticRequest* request, const std::string name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
@@ -80,6 +92,4 @@ public:
 	bool add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
-
-	void reset();
 };

@@ -17,35 +17,88 @@
 
 #include "active-diagnostic-request.hpp"
 
+bool& operator==(const active_diagnostic_request_t& adr) const
+{
+	return (bus_ == adr.bus_ && id_ == adr.id_ && handle_ == adr.handle_) ? true : false;
+}
+
+active_diagnostic_request_t& operator=(const active_diagnostic_request_t& adr)
+	: can_bus_dev_{adr.can_bus_dev_}, id_{adr.id_}, handle_{adr.handle_}, name_{adr.name_},
+	  decoder_{adr.decoder_}, callback_{adr.callback_}, reccuring_{adr.reccuring_}, wait_for_multiple_responses_{adr.wait_for_multiple_responses_},
+	  in_flight_{adr.in_flight_}, frequency_clock_{adr.frequency_clock_}, timeout_clock_{adr.timeout_clock_}
+{}
+
 active_diagnostic_request_t::active_diagnostic_request_t()
-	: can_bus_dev_{nullptr}, uint32_t id_{0}, DiagnosticRequestHandle{nullptr}, name_{""},
+	: can_bus_dev_{nullptr}, id_{0}, handle_{nullptr}, name_{""},
 	  decoder_{nullptr}, callback_{nullptr}, reccuring_{false}, wait_for_multiple_responses_{false},
 	  in_flight_{false}, frequency_clock_{frequency_clock_t()}, timeout_clock_{frequency_clock_t()}
 {}
 
-void updateDiagnosticRequestEntry(CanBus* bus, DiagnosticRequest* request,
-		const char* name, bool waitForMultipleResponses,
+active_diagnostic_request_t(can_bus_dev_t* bus, DiagnosticRequest* request,
+		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz)
+	: bus_{bus}, id_{request->arbitration_id}, handle_{nullptr}, name_{name},
+	  decoder_{decoder}, callback_{callback}, reccuring_{frequencyHz ? true : false}, wait_for_multiple_responses_{wait_for_multiple_responses},
+	  in_flight_{false}, frequency_clock_{frequency_clock_t(frequencyHz)}, timeout_clock_{frequency_clock_t(10)}
 {
-	entry->bus = bus;
-	entry->arbitration_id = request->arbitration_id;
 	entry->handle = generate_diagnostic_request(
-			&manager->shims[bus->address - 1], request, NULL);
-	if(name != NULL) {
-		strncpy(entry->name, name, MAX_GENERIC_NAME_LENGTH);
-	} else {
-		entry->name[0] = '\0';
-	}
-	entry->waitForMultipleResponses = waitForMultipleResponses;
+	&manager->shims[bus->address - 1], request, NULL);
+}
 
-	entry->decoder = decoder;
-	entry->callback = callback;
-	entry->recurring = frequencyHz != 0;
-	entry->frequencyClock = {0};
-	entry->frequencyClock.frequency = entry->recurring ? frequencyHz : 0;
-	// time out after 100ms
-	entry->timeoutClock = {0};
-	entry->timeoutClock.frequency = 10;
-	entry->inFlight = false;
-	}
+can_bus_dev_t* active_diagnostic_request_t::get_can_bus_dev()
+{
+	return can_bus_dev_;
+}
+
+DiagnosticRequestHandle& active_diagnostic_request_t::get_handle()
+{
+	return handle_;
+}
+
+bool active_diagnostic_request_t::get_recurring() const
+{
+	return recurring_;
+}
+
+bool active_diagnostic_request_t::get_in_flight() const
+{
+	return in_flight_;
+}
+
+void active_diagnostic_request_t::set_handle(DiagnosticShims& shims, DiagnosticRequest& request)
+{
+	handle_ = generate_diagnostic_request(shims_, request, nullptr)
+}
+
+void active_diagnostic_request_t::set_in_flight(bool val)
+{
+	in_flight_ = val;
+}
+
+bool active_diagnostic_request_t::timed_out() const
+{
+	// don't use staggered start with the timeout clock
+	return timeout_clock_.elapsed(false);
+}
+
+/// @brief Returns true if a sufficient response has been received for a
+/// diagnostic request.
+///
+/// This is true when at least one response has been received and the request is
+/// configured to not wait for multiple responses. Functional broadcast requests
+/// may often wish to wait the full 100ms for modules to respond.
+bool active_diagnostic_request_t::response_received() const
+{
+	return !wait_for_multiple_responses_ &&
+				handle_.completed;
+}
+
+/// @brief Returns true if the request has timed out waiting for a response,
+/// or a sufficient number of responses has been received.
+///
+bool active_diagnostic_request_t::request_completed() const
+{
+	return response_received() || 
+		(timed_out() && diagnostic_request_sent(handle_));
+}
