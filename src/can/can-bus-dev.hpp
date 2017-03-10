@@ -48,6 +48,8 @@ private:
 public:
 	can_bus_dev_t(const std::string& dev_name);
 
+	std::string get_device_name() const;
+
 	int open();
 	int close();
 
