@@ -76,7 +76,9 @@ class can_signal_t
 {
 private:
 	can_message_definition_t message_; /*!< message_ - The message this signal is a part of. */
-	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output over USB.*/
+	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
+	std::string prefix_ = "messages."; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
+						  * which make easier to sort message when the come in.*/
 	uint8_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
 										*	non-inverted bit numbering, i.e. the most significant bit of
 										*	each byte is 0) */
@@ -109,6 +111,7 @@ private:
 public:
 	can_message_definition_t& get_message();
 	std::string& get_generic_name();
+	std::string get_name();
 	uint8_t get_bit_position() const;
 	uint8_t get_bit_size() const;
 	float get_factor() const;
@@ -126,6 +129,7 @@ public:
 	bool get_received() const;
 	float get_last_value() const;
 
+	void set_prefix(std::string val);
 	void set_received(bool r);
 	void set_last_value(float val);
 };

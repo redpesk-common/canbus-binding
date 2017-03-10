@@ -21,25 +21,25 @@
 
 // Pre-defined OBD-II PIDs to query for if supported by the vehicle.
  std::vector<obd2_signal_t> OBD2_PIDS = {
-	{ 0x04, "obd2.engine.load", 0, 100, POURCENT, 5, false},
-	{ 0x05, "obd2.engine.coolant.temperature", -40, 215, DEGREES_CELSIUS, 1, false},
-	{ 0x0a, "obd2.fuel.pressure", 0, 765, KPA, 1, false},
-	{ 0x0b, "obd2.intake.manifold.pressure", 0, 255, KPA, 1, false},
-	{ 0x0c, "obd2.engine.speed", 0, 16383, RPM, 5, false},
-	{ 0x0d, "obd2.vehicle.speed", 0, 255, KM_H, 5, false},
-	{ 0x0f, "obd2.intake.air.temperature", -40, 215, DEGREES_CELSIUS, 1, false},
-	{ 0x10, "obd2.mass.airflow", 0, 655, GRAMS_SEC, 5, false},
-	{ 0x11, "obd2.throttle.position", 0, 100, POURCENT, 5, false},
-	{ 0x1f, "obd2.running.time", 0, 65535, SECONDS, 1, false},
-	{ 0x2d, "obd2.EGR.error", -100, 99, POURCENT, 0, false},
-	{ 0x2f, "obd2.fuel.level", 0, 100, POURCENT, 1, false},
-	{ 0x33, "obd2.barometric.pressure", 0, 255, KPA, 1, false},
-	{ 0x4c, "obd2.commanded.throttle.position", 0, 100, POURCENT, 1, false},
-	{ 0x52, "obd2.ethanol.fuel.percentage", 0, 100, POURCENT, 1, false},
-	{ 0x5a, "obd2.accelerator.pedal.position", 0, 100, POURCENT, 5, false},
-	{ 0x5b, "obd2.hybrid.battery-pack.remaining.life", 0, 100, POURCENT, 5, false},
-	{ 0x5c, "obd2.engine.oil.temperature",-40, 210, DEGREES_CELSIUS, 1, false},
-	{ 0x63, "obd2.engine.torque", 0, 65535, NM, 1, false}
+	obd2_signal_t(0x04, "engine.load", 0, 100, POURCENT, 5, false),
+	obd2_signal_t(0x05, "engine.coolant.temperature", -40, 215, DEGREES_CELSIUS, 1, false),
+	obd2_signal_t(0x0a, "fuel.pressure", 0, 765, KPA, 1, false),
+	obd2_signal_t(0x0b, "intake.manifold.pressure", 0, 255, KPA, 1, false),
+	obd2_signal_t(0x0c, "engine.speed", 0, 16383, RPM, 5, false),
+	obd2_signal_t(0x0d, "vehicle.speed", 0, 255, KM_H, 5, false),
+	obd2_signal_t(0x0f, "intake.air.temperature", -40, 215, DEGREES_CELSIUS, 1, false),
+	obd2_signal_t(0x10, "mass.airflow", 0, 655, GRAMS_SEC, 5, false),
+	obd2_signal_t(0x11, "throttle.position", 0, 100, POURCENT, 5, false),
+	obd2_signal_t(0x1f, "running.time", 0, 65535, SECONDS, 1, false),
+	obd2_signal_t(0x2d, "EGR.error", -100, 99, POURCENT, 0, false),
+	obd2_signal_t(0x2f, "fuel.level", 0, 100, POURCENT, 1, false),
+	obd2_signal_t(0x33, "barometric.pressure", 0, 255, KPA, 1, false),
+	obd2_signal_t(0x4c, "commanded.throttle.position", 0, 100, POURCENT, 1, false),
+	obd2_signal_t(0x52, "ethanol.fuel.percentage", 0, 100, POURCENT, 1, false),
+	obd2_signal_t(0x5a, "accelerator.pedal.position", 0, 100, POURCENT, 5, false),
+	obd2_signal_t(0x5b, "hybrid.battery-pack.remaining.life", 0, 100, POURCENT, 5, false),
+	obd2_signal_t(0x5c, "engine.oil.temperature",-40, 210, DEGREES_CELSIUS, 1, false),
+	obd2_signal_t(0x63, "engine.torque", 0, 65535, NM, 1, false)
 };
 
 // Dumb signals and message implementation. To get compile.
@@ -115,7 +115,7 @@ void configuration_t::set_active_message_set(uint8_t id)
 }
 
 /**
- * @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
+ * @fn std::vector<std::string> find_can_signals(const openxc_DynamicField &key)
  * @brief return signals name found searching through CAN_signals and OBD2 pid
  * 
  * @param[in] key - can contain numeric or string value in order to search against 
@@ -134,7 +134,7 @@ void configuration_t::find_obd2_signals(const openxc_DynamicField &key, std::vec
 				lookup_signals_by_id(key.numeric_value, obd2_signals_[active_message_set_], found_signals);
 			break;
 		default:
-			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
+			ERROR(binder_interface, "find_obd2_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 			break;
 	}
 	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
@@ -160,7 +160,7 @@ void configuration_t::find_can_signals(const openxc_DynamicField& key, std::vect
 			lookup_signals_by_id(key.numeric_value, can_signals_[active_message_set_], found_signals);
 			break;
 		default:
-			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
+			ERROR(binder_interface, "find_can_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 			break;
 	}
 	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());

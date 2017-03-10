@@ -55,7 +55,7 @@ void lookup_signals_by_name(const std::string& key, std::vector<T>& signals, std
 	for(T& s : signals)
 	{
 		if(::fnmatch(key.c_str(), s.get_generic_name().c_str(), FNM_CASEFOLD) == 0)
-			found_signals_name.push_back(s.get_generic_name());
+			found_signals_name.push_back(s.get_name());
 	}
 }
 
@@ -78,7 +78,7 @@ void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector
 	{
 		if(configuration_t::instance().get_signal_id(s) == key)
 		{
-			found_signals_name.push_back(s.get_generic_name());
+			found_signals_name.push_back(s.get_name());
 		}
 	}
 }

@@ -48,6 +48,16 @@ std::string& obd2_signal_t::get_generic_name()
 	return generic_name_;
 }
 
+std::string obd2_signal_t::get_name()
+{
+	return prefix_ + "." + generic_name_;
+}
+
+void obd2_signal_t::set_prefix(std::string val)
+{
+	prefix_ = val;
+}
+
 bool obd2_signal_t::is_obd2_response(can_message_t can_message)
 {
 	/*

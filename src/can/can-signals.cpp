@@ -35,6 +35,11 @@ std::string& can_signal_t::get_generic_name()
 	return generic_name_;
 }
 
+std::string can_signal_t::get_name()
+{
+	return prefix_ + "." + generic_name_;
+}
+
 uint8_t can_signal_t::get_bit_position() const
 {
 	return bit_position_;
@@ -112,6 +117,11 @@ bool can_signal_t::get_received() const
 float can_signal_t::get_last_value() const
 {
 	return last_value_;
+}
+
+void can_signal_t::set_prefix(std::string val)
+{
+	prefix_ = val;
 }
 
 void can_signal_t::set_received(bool r)
