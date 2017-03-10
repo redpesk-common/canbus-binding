@@ -24,7 +24,10 @@
  *
  * @return long long int epoch in milliseconds
  */
-typedef long long int (*TimeFunction)();
+typedef long long int (*time_function_t)();
+
+
+long long int system_time_ms();
 
 /**
  * @class frequency_clock_t 
@@ -43,8 +46,14 @@ class frequency_clock_t
 private:
 	float frequency_;
 	unsigned long last_tick_;
-	TimeFunction time_function_;
+	time_function_t time_function_;
 
 public:
 	frequency_clock_t();
+	frequency_clock_t(float frequency);
+
+	static float frequency_to_period(float frequency);
+	bool started();
+	time_function_t get_time_function();
+	bool elapsed(bool stagger);
 };

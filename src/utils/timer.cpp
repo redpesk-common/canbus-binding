@@ -15,9 +15,13 @@
  * limitations under the License.
  */
 
+#include <stdlib.h> 
+
 #include "timer.hpp"
 
-long long int systemTimeMs()
+#define MS_PER_SECOND 1000
+
+long long int system_time_ms()
 {
 	struct timeb t_msec;
 	long long int timestamp_msec;
@@ -30,7 +34,40 @@ long long int systemTimeMs()
 	return timestamp_msec;
 }
 
-
 frequency_clock_t::frequency_clock_t()
 	: frequency_{0.0}, last_tick_{0}, time_function_{nullptr}
 {}
+
+
+frequency_clock_t::frequency_clock_t(float frequency)
+	: frequency_{frequency}, last_tick_{0}, time_function_{nullptr}
+{}
+
+/// @brief Return the period in ms given the frequency in hertz.
+float frequency_clock_t::frequency_to_period(float frequency)
+{
+	return 1 / frequency * MS_PER_SECOND;
+}
+
+bool frequency_clock_t::started()
+{
+	return last_tick_ != 0;
+}
+
+time_function_t frequency_clock_t::get_time_function()
+{
+	return time_function_ != nullptr ? time_function_ : system_time_ms;
+}
+
+bool frequency_clock_t::elapsed(bool stagger)
+{
+	float period = frequency_to_period(frequency_);
+	float elapsed_time = 0;
+	if(!started() && stagger)
+		last_tick_ = get_time_function()() - (rand() % int(period));
+	else
+		// Make sure it ticks the the first call to conditionalTick(...)
+		elapsed_time = !started() ? period : get_time_function()() - last_tick_;
+
+	return frequency_ == 0 || elapsed_time >= period;
+}
