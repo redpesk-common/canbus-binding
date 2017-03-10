@@ -64,7 +64,7 @@ void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector
 {
 	for(T& s : signals)
 	{
-		if(config->get_signal_id(s) == key)
+		if(configuration_t::instance().get_signal_id(s) == key)
 		{
 			found_signals.push_back(&s);
 		}
@@ -76,7 +76,7 @@ void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector
 {
 	for(T& s : signals)
 	{
-		if(config->get_signal_id(s) == key)
+		if(configuration_t::instance().get_signal_id(s) == key)
 		{
 			found_signals_name.push_back(s.get_generic_name());
 		}

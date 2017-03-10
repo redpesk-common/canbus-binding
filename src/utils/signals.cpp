@@ -60,12 +60,12 @@ std::vector<std::string> find_signals(const openxc_DynamicField &key)
 	switch(key.type)
 	{
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-				lookup_signals_by_name(key.string_value, config->get_can_signals(), found_signals_name);
-				lookup_signals_by_name(key.string_value, config->get_obd2_signals(), found_signals_name);
+				lookup_signals_by_name(key.string_value, configuration_t::instance().get_can_signals(), found_signals_name);
+				lookup_signals_by_name(key.string_value, configuration_t::instance().get_obd2_signals(), found_signals_name);
 			break;
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-				lookup_signals_by_id(key.numeric_value, config->get_can_signals(), found_signals_name);
-				lookup_signals_by_id(key.numeric_value, config->get_obd2_signals(), found_signals_name);
+				lookup_signals_by_id(key.numeric_value, configuration_t::instance().get_can_signals(), found_signals_name);
+				lookup_signals_by_id(key.numeric_value, configuration_t::instance().get_obd2_signals(), found_signals_name);
 			break;
 		default:
 			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");

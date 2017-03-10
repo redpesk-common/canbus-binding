@@ -81,7 +81,7 @@ void can_bus_t::can_decode_message()
 		/* First we have to found which can_signal_t it is */
 		search_key = build_DynamicField((double)can_message.get_id());
 		signals.clear();
-		config->find_can_signals(search_key, signals);
+		configuration_t::instance().find_can_signals(search_key, signals);
 
 		/* Decoding the message ! Don't kill the messenger ! */
 		for(auto& sig : signals)
@@ -96,7 +96,7 @@ void can_bus_t::can_decode_message()
 			DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name)));*/
 			if( s.find(sig->get_generic_name()) != s.end() && afb_event_is_valid(s[sig->get_generic_name()]))
 			{
-				decoded_message = decoder_t::translateSignal(*sig, can_message, config->get_can_signals());
+				decoded_message = decoder_t::translateSignal(*sig, can_message, configuration_t::instance().get_can_signals());
 
 				openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_generic_name(), decoded_message);
 				vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);

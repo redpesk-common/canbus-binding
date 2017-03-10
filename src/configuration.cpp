@@ -51,6 +51,12 @@ std::vector<std::vector<can_message_definition_t>> CAN_MESSAGES_DEFINTION;
 
 std::vector<std::vector<can_signal_t>> SIGNALS;
 
+configuration_t& configuration_t::instance()
+{
+	static configuration_t config;
+	return config;
+}
+
 configuration_t::configuration_t()
 	: can_message_set_{CAN_MESSAGE_SET}, can_signals_{SIGNALS}, obd2_signals_{OBD2_PIDS}, can_message_definition_{CAN_MESSAGES_DEFINTION}
 {}

@@ -246,7 +246,7 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 
 bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
-	can_bus_dev_t *can_bus_dev = config->get_diagnostic_manager().get_can_bus_dev();
+	can_bus_dev_t *can_bus_dev = configuration_t::instance().get_diagnostic_manager().get_can_bus_dev();
 	return can_bus_dev->shims_send(arbitration_id, data, size);
 }
 

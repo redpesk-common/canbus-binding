@@ -42,7 +42,6 @@ extern "C"
 
 // Interface between the daemon and the binding
 const struct afb_binding_interface *binder_interface;
-configuration_t *config;
 
 /********************************************************************************
 *
@@ -221,9 +220,7 @@ extern "C"
 	*/
 	int afbBindingV1ServiceInit(struct afb_service service)
 	{
-		config = new configuration_t();
-
-		can_bus_t& can_bus_manager = config->get_can_bus_manager();
+		can_bus_t& can_bus_manager = configuration_t::instance().get_can_bus_manager();
 
 		/* Open CAN socket */
 		if(can_bus_manager.init_can_dev() == 0)
