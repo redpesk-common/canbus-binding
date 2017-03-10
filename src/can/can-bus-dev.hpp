@@ -36,7 +36,7 @@ private:
 	std::string device_name_;
 	utils::socket_t can_socket_;
 
-	int32_t id_; /// < an identifier used through binding that refer to that device
+	int32_t address_; /// < an identifier used through binding that refer to that device
 
 	bool is_fdmode_on_; /// < boolean telling if whether or not the can socket use fdmode.
 	struct sockaddr_can txAddress_; /// < internal member using to bind to the socket
@@ -46,7 +46,7 @@ private:
 	void can_reader(can_bus_t& can_bus);
 
 public:
-	can_bus_dev_t(const std::string& dev_name);
+	can_bus_dev_t(const std::string& dev_name, int32_t address);
 
 	std::string get_device_name() const;
 

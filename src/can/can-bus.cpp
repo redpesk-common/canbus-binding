@@ -186,7 +186,7 @@ int can_bus_t::init_can_dev()
 
 		for(const auto& device : devices_name)
 		{
-			can_devices_m_[device] = std::make_shared<can_bus_dev_t>(device);
+			can_devices_m_[device] = std::make_shared<can_bus_dev_t>(device, i);
 			if (can_devices_m_[device]->open() == 0)
 			{
 				i++;

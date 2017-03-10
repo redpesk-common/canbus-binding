@@ -33,10 +33,9 @@
 
 /// @brief Class constructor
 /// @param dev_name String representing the device name into the linux /dev tree
-can_bus_dev_t::can_bus_dev_t(const std::string& dev_name)
-	: device_name_{dev_name}
-{
-}
+can_bus_dev_t::can_bus_dev_t(const std::string& dev_name, int32_t address)
+	: device_name_{dev_name}, address_{address}
+{}
 
 std::string can_bus_dev_t::get_device_name() const
 {
