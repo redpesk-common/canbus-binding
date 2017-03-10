@@ -123,6 +123,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 
 	for(auto& sig : signals)
 	{
+		//if (sig.find_first_of())
 		int ret = subscribe_unsubscribe_signal(request, subscribe, sig);
 		if(ret <= 0)
 			return ret;

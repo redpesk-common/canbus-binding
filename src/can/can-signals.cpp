@@ -30,14 +30,19 @@ can_message_definition_t& can_signal_t::get_message()
 	return message_;
 }
 
-std::string& can_signal_t::get_generic_name()
+const std::string& can_signal_t::get_generic_name() const
 {
 	return generic_name_;
 }
 
-std::string can_signal_t::get_name()
+const std::string can_signal_t::get_name() const
 {
 	return prefix_ + "." + generic_name_;
+}
+
+const std::string& can_signal_t::get_prefix() const
+{
+	return prefix_;
 }
 
 uint8_t can_signal_t::get_bit_position() const

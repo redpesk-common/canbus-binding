@@ -110,8 +110,9 @@ private:
 
 public:
 	can_message_definition_t& get_message();
-	std::string& get_generic_name();
-	std::string get_name();
+	const std::string& get_generic_name() const;
+	const std::string get_name() const;
+	const std::string& get_prefix() const;
 	uint8_t get_bit_position() const;
 	uint8_t get_bit_size() const;
 	float get_factor() const;
