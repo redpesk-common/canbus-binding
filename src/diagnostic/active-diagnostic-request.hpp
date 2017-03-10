@@ -23,7 +23,6 @@
 #include "uds/uds_types.h"
 #include "../can/can-bus-dev.hpp"
 #include "../can/can-message.hpp"
-#include "diagnostic-manager.hpp"
 
 #include "../low-can-binding.hpp"
 
@@ -79,25 +78,25 @@ private:
 	frequency_clock_t timeout_clock_; /*!< timeout_clock_ - A frequency_clock_t object to monitor how long it's been since
 									* this request was sent.*/
 public:
-	bool& operator==(const active_diagnostic_request_t& adr) const;
+	bool operator==(const active_diagnostic_request_t& b);
 	active_diagnostic_request_t& operator=(const active_diagnostic_request_t& adr);
 	active_diagnostic_request_t();
 	active_diagnostic_request_t(active_diagnostic_request_t&&) = default;
 	active_diagnostic_request_t(const active_diagnostic_request_t&) = default;
 	active_diagnostic_request_t(can_bus_dev_t* bus, DiagnosticRequest* request,
-		const std::string& name, bool waitForMultipleResponses,
+		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
 	
 	can_bus_dev_t* get_can_bus_dev();
-	DiagnosticRequestHandle& get_handle();
+	DiagnosticRequestHandle* get_handle();
 	bool get_recurring() const;
 	bool get_in_flight() const;
-
+	
 	void set_handle(DiagnosticShims& shims, DiagnosticRequest* request);
 	void set_in_flight(bool val);
 
-	bool timed_out() const;
+	bool timed_out();
 	bool response_received() const;
-	bool request_completed() const;
+	bool request_completed();
 };

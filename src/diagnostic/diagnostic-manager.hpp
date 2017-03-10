@@ -32,6 +32,7 @@
  */
 #define MAX_SHIM_COUNT can_bus_t.get_can_devices().size()
 
+class active_diagnostic_request_t;
 
 /**
  * @brief The core structure for running the diagnostics module on the VI.

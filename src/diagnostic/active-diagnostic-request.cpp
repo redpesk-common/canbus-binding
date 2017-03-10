@@ -17,41 +17,49 @@
 
 #include "active-diagnostic-request.hpp"
 
-bool& operator==(const active_diagnostic_request_t& adr) const
+bool active_diagnostic_request_t::operator==(const active_diagnostic_request_t& b)
 {
-	return (bus_ == adr.bus_ && id_ == adr.id_ && handle_ == adr.handle_) ? true : false;
+	return (bus_ == b.bus_ && id_ == b.id_ && handle_ == b.handle_) ? true : false;
 }
 
-active_diagnostic_request_t& operator=(const active_diagnostic_request_t& adr)
-	: can_bus_dev_{adr.can_bus_dev_}, id_{adr.id_}, handle_{adr.handle_}, name_{adr.name_},
-	  decoder_{adr.decoder_}, callback_{adr.callback_}, reccuring_{adr.reccuring_}, wait_for_multiple_responses_{adr.wait_for_multiple_responses_},
-	  in_flight_{adr.in_flight_}, frequency_clock_{adr.frequency_clock_}, timeout_clock_{adr.timeout_clock_}
-{}
+active_diagnostic_request_t& active_diagnostic_request_t::operator=(const active_diagnostic_request_t& adr)
+{
+	bus_ = adr.bus_;
+	id_ = adr.id_;
+	handle_ = adr.handle_;
+	name_ = adr.name_;
+	decoder_ = adr.decoder_;
+	callback_ = adr.callback_;
+	recurring_ = adr.recurring_; 
+	wait_for_multiple_responses_ = adr.wait_for_multiple_responses_;
+	in_flight_ = adr.in_flight_;
+	frequency_clock_ = adr.frequency_clock_;
+	timeout_clock_ = adr.timeout_clock_;
+
+	return *this;
+}
 
 active_diagnostic_request_t::active_diagnostic_request_t()
-	: can_bus_dev_{nullptr}, id_{0}, handle_{nullptr}, name_{""},
-	  decoder_{nullptr}, callback_{nullptr}, reccuring_{false}, wait_for_multiple_responses_{false},
+	: bus_{nullptr}, id_{0}, handle_{nullptr}, name_{""},
+	  decoder_{nullptr}, callback_{nullptr}, recurring_{false}, wait_for_multiple_responses_{false},
 	  in_flight_{false}, frequency_clock_{frequency_clock_t()}, timeout_clock_{frequency_clock_t()}
 {}
 
-active_diagnostic_request_t(can_bus_dev_t* bus, DiagnosticRequest* request,
+active_diagnostic_request_t::active_diagnostic_request_t(can_bus_dev_t* bus, DiagnosticRequest* request,
 		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz)
 	: bus_{bus}, id_{request->arbitration_id}, handle_{nullptr}, name_{name},
-	  decoder_{decoder}, callback_{callback}, reccuring_{frequencyHz ? true : false}, wait_for_multiple_responses_{wait_for_multiple_responses},
+	  decoder_{decoder}, callback_{callback}, recurring_{frequencyHz ? true : false}, wait_for_multiple_responses_{wait_for_multiple_responses},
 	  in_flight_{false}, frequency_clock_{frequency_clock_t(frequencyHz)}, timeout_clock_{frequency_clock_t(10)}
-{
-	entry->handle = generate_diagnostic_request(
-	&manager->shims[bus->address - 1], request, NULL);
-}
+{}
 
 can_bus_dev_t* active_diagnostic_request_t::get_can_bus_dev()
 {
-	return can_bus_dev_;
+	return bus_;
 }
 
-DiagnosticRequestHandle& active_diagnostic_request_t::get_handle()
+DiagnosticRequestHandle* active_diagnostic_request_t::get_handle()
 {
 	return handle_;
 }
@@ -66,9 +74,9 @@ bool active_diagnostic_request_t::get_in_flight() const
 	return in_flight_;
 }
 
-void active_diagnostic_request_t::set_handle(DiagnosticShims& shims, DiagnosticRequest& request)
+void active_diagnostic_request_t::set_handle(DiagnosticShims& shims, DiagnosticRequest* request)
 {
-	handle_ = generate_diagnostic_request(shims_, request, nullptr)
+	handle_ = new DiagnosticRequestHandle(generate_diagnostic_request(&shims, request, nullptr));
 }
 
 void active_diagnostic_request_t::set_in_flight(bool val)
@@ -76,7 +84,7 @@ void active_diagnostic_request_t::set_in_flight(bool val)
 	in_flight_ = val;
 }
 
-bool active_diagnostic_request_t::timed_out() const
+bool active_diagnostic_request_t::timed_out()
 {
 	// don't use staggered start with the timeout clock
 	return timeout_clock_.elapsed(false);
@@ -91,13 +99,12 @@ bool active_diagnostic_request_t::timed_out() const
 bool active_diagnostic_request_t::response_received() const
 {
 	return !wait_for_multiple_responses_ &&
-				handle_.completed;
+				handle_->completed;
 }
 
 /// @brief Returns true if the request has timed out waiting for a response,
 /// or a sufficient number of responses has been received.
-///
-bool active_diagnostic_request_t::request_completed() const
+bool active_diagnostic_request_t::request_completed()
 {
 	return response_received() || 
 		(timed_out() && diagnostic_request_sent(handle_));

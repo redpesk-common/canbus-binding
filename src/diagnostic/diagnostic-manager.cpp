@@ -75,7 +75,7 @@ void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t& entry, b
 		entry.set_in_flight(false);
 
 		char request_string[128] = {0};
-		diagnostic_request_to_string(&entry.get_handle().request,
+		diagnostic_request_to_string(&entry.get_handle()->request,
 			request_string, sizeof(request_string));
 		if(entry.get_recurring())
 		{
@@ -116,7 +116,7 @@ bool diagnostic_manager_t::lookup_recurring_request(const DiagnosticRequest* req
 	{
 		active_diagnostic_request_t& candidate = entry;
 		if(candidate.get_can_bus_dev()->get_device_name() == bus_->get_device_name() &&
-			diagnostic_request_equals(&candidate.get_handle().request, request))
+			diagnostic_request_equals(&candidate.get_handle()->request, request))
 		{
 			find_and_erase(entry, recurring_requests_);
 			//existingEntry = entry;
@@ -171,7 +171,7 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 		entry.set_handle(shims_, request);
 
 		char request_string[128] = {0};
-		diagnostic_request_to_string(&entry.get_handle().request, request_string,
+		diagnostic_request_to_string(&entry.get_handle()->request, request_string,
 				sizeof(request_string));
 
 		find_and_erase(entry, non_recurring_requests_);
@@ -213,7 +213,7 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 			entry.set_handle(shims_, request);
 
 			char request_string[128] = {0};
-			diagnostic_request_to_string(&entry.get_handle().request, request_string,
+			diagnostic_request_to_string(&entry.get_handle()->request, request_string,
 					sizeof(request_string));
 
 			find_and_erase(entry, recurring_requests_);
