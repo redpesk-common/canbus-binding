@@ -82,7 +82,7 @@ public:
 	active_diagnostic_request_t& operator=(const active_diagnostic_request_t& adr);
 	active_diagnostic_request_t();
 	active_diagnostic_request_t(active_diagnostic_request_t&&) = default;
-	active_diagnostic_request_t(const active_diagnostic_request_t&) = default;
+	//active_diagnostic_request_t(const active_diagnostic_request_t&) = default;
 	active_diagnostic_request_t(can_bus_dev_t* bus, DiagnosticRequest* request,
 		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,

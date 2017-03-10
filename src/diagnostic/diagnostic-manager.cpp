@@ -38,7 +38,7 @@ diagnostic_manager_t::diagnostic_manager_t(can_bus_dev_t& bus)
 	reset();
 }
 
-void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t& entry, std::vector<active_diagnostic_request_t>& requests_list)
+void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t* entry, std::vector<active_diagnostic_request_t*>& requests_list)
 {
 	auto i = std::find(requests_list.begin(), requests_list.end(), entry);
 	if ( i != requests_list.end())
@@ -47,7 +47,7 @@ void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t& entry, st
 
 /// Move the entry to the free list and decrement the lock count for any
 /// CAN filters it used.
-void diagnostic_manager_t::cancel_request(active_diagnostic_request_t& entry)
+void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 {
 	free_request_entries_.push_back(entry);
 	/* TODO: implement acceptance filters.
@@ -68,16 +68,16 @@ void diagnostic_manager_t::cancel_request(active_diagnostic_request_t& entry)
 	}*/
 }
 
-void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t& entry, bool force)
+void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, bool force)
 {
-	if(force || (entry.get_in_flight() && entry.request_completed()))
+	if(force || (entry->get_in_flight() && entry->request_completed()))
 	{
-		entry.set_in_flight(false);
+		entry->set_in_flight(false);
 
 		char request_string[128] = {0};
-		diagnostic_request_to_string(&entry.get_handle()->request,
+		diagnostic_request_to_string(&entry->get_handle()->request,
 			request_string, sizeof(request_string));
-		if(entry.get_recurring())
+		if(entry->get_recurring())
 		{
 			find_and_erase(entry, recurring_requests_);
 			if(force)
@@ -114,12 +114,11 @@ bool diagnostic_manager_t::lookup_recurring_request(const DiagnosticRequest* req
 	active_diagnostic_request_t existingEntry;
 	for (auto& entry : recurring_requests_)
 	{
-		active_diagnostic_request_t& candidate = entry;
-		if(candidate.get_can_bus_dev()->get_device_name() == bus_->get_device_name() &&
-			diagnostic_request_equals(&candidate.get_handle()->request, request))
+		active_diagnostic_request_t* candidate = entry;
+		if(candidate->get_can_bus_dev()->get_device_name() == bus_->get_device_name() &&
+			diagnostic_request_equals(&candidate->get_handle()->request, request))
 		{
 			find_and_erase(entry, recurring_requests_);
-			//existingEntry = entry;
 			return true;
 			break;
 		}
@@ -144,13 +143,12 @@ can_bus_dev_t* diagnostic_manager_t::get_can_bus_dev()
 	return bus_;
 }
 
-active_diagnostic_request_t& diagnostic_manager_t::get_free_entry()
+active_diagnostic_request_t* diagnostic_manager_t::get_free_entry()
 {
-	//FIXME: Test against empty vector
-	//if (request_list_entries_.empty())
-	//	return;
+	if (request_list_entries_.empty())
+		return nullptr;
 
-	active_diagnostic_request_t& adr = request_list_entries_.back();
+	active_diagnostic_request_t* adr = request_list_entries_.back();
 	request_list_entries_.pop_back();
 	return adr;
 }
@@ -162,24 +160,31 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 	cleanup_active_requests(false);
 
 	bool added = true;
-	active_diagnostic_request_t& entry = get_free_entry();
+	active_diagnostic_request_t* entry = get_free_entry();
 
-	// TODO: implement Acceptance Filter
-	//	if(updateRequiredAcceptanceFilters(bus, request)) {
-		entry = active_diagnostic_request_t(bus_, request, name,
-				wait_for_multiple_responses, decoder, callback, 0);
-		entry.set_handle(shims_, request);
+	if (entry != nullptr)
+	{
+		// TODO: implement Acceptance Filter
+		//	if(updateRequiredAcceptanceFilters(bus, request)) {
+			entry = new active_diagnostic_request_t(bus_, request, name,
+					wait_for_multiple_responses, decoder, callback, 0);
+			entry->set_handle(shims_, request);
 
-		char request_string[128] = {0};
-		diagnostic_request_to_string(&entry.get_handle()->request, request_string,
-				sizeof(request_string));
+			char request_string[128] = {0};
+			diagnostic_request_to_string(&entry->get_handle()->request, request_string,
+					sizeof(request_string));
 
-		find_and_erase(entry, non_recurring_requests_);
-		DEBUG(binder_interface, "Added one-time diagnostic request on bus %s: %s",
-				bus_->get_device_name(), request_string);
+			find_and_erase(entry, non_recurring_requests_);
+			DEBUG(binder_interface, "Added one-time diagnostic request on bus %s: %s",
+					bus_->get_device_name(), request_string);
 
-		non_recurring_requests_.push_back(entry);
-
+			non_recurring_requests_.push_back(entry);
+	}
+	else
+	{
+		WARNING(binder_interface, "There isn't enough request entry. Vector exhausted %d/%d", (int)request_list_entries_.size(), (int)request_list_entries_.max_size());
+		added = false;
+	}
 	return added;
 }
 
@@ -205,22 +210,31 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 	bool added = true;
 	if(lookup_recurring_request(request))
 	{
-		active_diagnostic_request_t& entry = get_free_entry();
-		// TODO: implement Acceptance Filter
-		//if(updateRequiredAcceptanceFilters(bus, request)) {
-			entry = active_diagnostic_request_t(bus_, request, name,
-					wait_for_multiple_responses, decoder, callback, frequencyHz);
-			entry.set_handle(shims_, request);
+		active_diagnostic_request_t* entry = get_free_entry();
 
-			char request_string[128] = {0};
-			diagnostic_request_to_string(&entry.get_handle()->request, request_string,
-					sizeof(request_string));
+		if(entry != nullptr)
+		{
+			// TODO: implement Acceptance Filter
+			//if(updateRequiredAcceptanceFilters(bus, request)) {
+				entry = new active_diagnostic_request_t(bus_, request, name,
+						wait_for_multiple_responses, decoder, callback, frequencyHz);
+				entry->set_handle(shims_, request);
 
-			find_and_erase(entry, recurring_requests_);
-			DEBUG(binder_interface, "Added recurring diagnostic request (freq: %f) on bus %d: %s",
-					frequencyHz, bus_->get_device_name(), request_string);
+				char request_string[128] = {0};
+				diagnostic_request_to_string(&entry->get_handle()->request, request_string,
+						sizeof(request_string));
 
-			recurring_requests_.push_back(entry);
+				find_and_erase(entry, recurring_requests_);
+				DEBUG(binder_interface, "Added recurring diagnostic request (freq: %f) on bus %d: %s",
+						frequencyHz, bus_->get_device_name(), request_string);
+
+				recurring_requests_.push_back(entry);
+		}
+		else
+		{
+			WARNING(binder_interface, "There isn't enough request entry. Vector exhausted %d/%d", (int)request_list_entries_.size(), (int)request_list_entries_.max_size());
+			added = false;
+		}
 	}
 	else
 	{

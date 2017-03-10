@@ -51,16 +51,16 @@ private:
 							 * library (uds-c) into the VI's CAN peripheral.*/
 	can_bus_dev_t* bus_; /*!< bus_ - A pointer to the CAN bus that should be used for all standard OBD-II requests, if the bus is not
 						  * explicitly spcified in the request. If NULL, all requests require an explicit bus.*/
-	std::vector<active_diagnostic_request_t> recurring_requests_; /*!< recurringRequests - A queue of active, recurring diagnostic requests. When
+	std::vector<active_diagnostic_request_t*> recurring_requests_; /*!< recurringRequests - A queue of active, recurring diagnostic requests. When
 																  * a response is received for a recurring request or it times out, it is
 																  * popped from the queue and pushed onto the back. */
-	std::vector<active_diagnostic_request_t> non_recurring_requests_; /*!< nonrecurringRequests - A list of active one-time diagnostic requests. When a
+	std::vector<active_diagnostic_request_t*> non_recurring_requests_; /*!< nonrecurringRequests - A list of active one-time diagnostic requests. When a
 																	   * response is received for a non-recurring request or it times out, it is
 																	   * removed from this list and placed back in the free list.*/
-	std::vector<active_diagnostic_request_t> free_request_entries_; /*!< freeRequestEntries - A list of all available slots for active diagnostic
+	std::vector<active_diagnostic_request_t*> free_request_entries_; /*!< freeRequestEntries - A list of all available slots for active diagnostic
 																	 * requests. This free list is backed by statically allocated entries in
 																	 * the requestListEntries attribute.*/
-	std::vector<active_diagnostic_request_t> request_list_entries_; /*!< requestListEntries - Static allocation for all active diagnostic requests.*/
+	std::vector<active_diagnostic_request_t*> request_list_entries_; /*!< requestListEntries - Static allocation for all active diagnostic requests.*/
 
 	bool initialized_; /*!< * initialized - True if the DiagnosticsManager has been initialized with shims. It will interface with the uds-c lib*/
 
@@ -71,11 +71,11 @@ public:
 	void init_diagnostic_shims();
 
 	can_bus_dev_t* get_can_bus_dev();
-	active_diagnostic_request_t& get_free_entry();
+	active_diagnostic_request_t* get_free_entry();
 
-	void find_and_erase(active_diagnostic_request_t& entry, std::vector<active_diagnostic_request_t>& requests_list);
-	void cancel_request(active_diagnostic_request_t& entry);
-	void cleanup_request(active_diagnostic_request_t& entry, bool force);
+	void find_and_erase(active_diagnostic_request_t* entry, std::vector<active_diagnostic_request_t*>& requests_list);
+	void cancel_request(active_diagnostic_request_t* entry);
+	void cleanup_request(active_diagnostic_request_t* entry, bool force);
 	void cleanup_active_requests(bool force);
 	bool lookup_recurring_request(const DiagnosticRequest* request);
 

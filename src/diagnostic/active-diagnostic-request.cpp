@@ -24,18 +24,21 @@ bool active_diagnostic_request_t::operator==(const active_diagnostic_request_t& 
 
 active_diagnostic_request_t& active_diagnostic_request_t::operator=(const active_diagnostic_request_t& adr)
 {
-	bus_ = adr.bus_;
-	id_ = adr.id_;
-	handle_ = adr.handle_;
-	name_ = adr.name_;
-	decoder_ = adr.decoder_;
-	callback_ = adr.callback_;
-	recurring_ = adr.recurring_; 
-	wait_for_multiple_responses_ = adr.wait_for_multiple_responses_;
-	in_flight_ = adr.in_flight_;
-	frequency_clock_ = adr.frequency_clock_;
-	timeout_clock_ = adr.timeout_clock_;
-
+	if (this != &adr)
+	{
+		bus_ = adr.bus_;
+		id_ = adr.id_;
+		handle_ = adr.handle_;
+		name_ = adr.name_;
+		decoder_ = adr.decoder_;
+		callback_ = adr.callback_;
+		recurring_ = adr.recurring_; 
+		wait_for_multiple_responses_ = adr.wait_for_multiple_responses_;
+		in_flight_ = adr.in_flight_;
+		frequency_clock_ = adr.frequency_clock_;
+		timeout_clock_ = adr.timeout_clock_;
+	}
+	
 	return *this;
 }
 
