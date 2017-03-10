@@ -22,8 +22,8 @@ function clean {
 }
 
 function rebuild {
-	build $1 $2 $3
 	clean $1 $2
+	build $1 $2 $3
 }
 
 function printhelp {
