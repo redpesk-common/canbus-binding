@@ -41,7 +41,7 @@
 class configuration_t
 {
 	private:
-		can_bus_t can_bus_manager_ = can_bus_t(afb_daemon_rootdir_open_locale(binder_interface->daemon, "can_buses.json", O_RDONLY, NULL));
+		can_bus_t can_bus_manager_ = can_bus_t(afb_daemon_rootdir_open_locale(binder_interface->daemon, "etc/can_buses.json", O_RDONLY, NULL));
 		diagnostic_manager_t diagnostic_manager_;
 		uint8_t active_message_set_ = 0;
 		std::vector<std::string> signals_prefix_;

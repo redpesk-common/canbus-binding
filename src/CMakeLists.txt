@@ -102,9 +102,9 @@ add_custom_command(
 	OUTPUT ${PROJECT_NAME}.wgt
 	DEPENDS ${PROJECT_NAME} bitfield isotp uds openxc config.xml.in can_buses.json.in
 	COMMAND rm -rf package
-	COMMAND mkdir -p package/${PROJECT_LIBDIR} package/htdocs
+	COMMAND mkdir -p package/${PROJECT_LIBDIR} package/htdocs package/etc
 	COMMAND cp config.xml package/
-	COMMAND cp can_buses.json package/
+	COMMAND cp can_buses.json package/etc
 	COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_ICON} package/icon.png
 	COMMAND cp ${PROJECT_NAME}.so package/libs
 	COMMAND wgtpkg-pack -f -o ${PROJECT_NAME}.wgt package
