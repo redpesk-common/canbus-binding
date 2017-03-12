@@ -120,6 +120,10 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<std::string>& signals)
 {
 	int rets = 0;
+	//TODO: Implement way to dynamically call the right function no matter 
+	// how much signals types we have.
+	const std::string& can_prefix = configuration_t::instance().get_can_signals().front().get_prefix();
+	const std::string& obd2_prefix = configuration_t::instance().get_obd2_signals().front().get_prefix();
 
 	for(auto& sig : signals)
 	{
