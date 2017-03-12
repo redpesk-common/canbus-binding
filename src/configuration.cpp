@@ -89,14 +89,19 @@ std::vector<can_signal_t>& configuration_t::get_can_signals()
 	return can_signals_[active_message_set_];
 }
 
-const std::vector<can_message_definition_t>& configuration_t::get_can_message_definition()
-{
-	return can_message_definition_[active_message_set_];
-}
-
 std::vector<obd2_signal_t>& configuration_t::get_obd2_signals()
 {
 	return obd2_signals_[active_message_set_];
+}
+
+const std::vector<std::string>& configuration_t::get_signals_prefix() const
+{
+	return signals_prefix_;
+}
+
+const std::vector<can_message_definition_t>& configuration_t::get_can_message_definition()
+{
+	return can_message_definition_[active_message_set_];
 }
 
 uint32_t configuration_t::get_signal_id(obd2_signal_t& sig) const

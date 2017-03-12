@@ -88,13 +88,18 @@ public:
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
 	
+	uint32_t get_id() const;
 	std::shared_ptr<can_bus_dev_t> get_can_bus_dev();
 	DiagnosticRequestHandle* get_handle();
 	bool get_recurring() const;
 	bool get_in_flight() const;
+	frequency_clock_t& get_frequency_clock();
+	frequency_clock_t& get_timeout_clock();
 	
 	void set_handle(DiagnosticShims& shims, DiagnosticRequest* request);
 	void set_in_flight(bool val);
+
+	bool should_send();
 
 	bool timed_out();
 	bool response_received() const;

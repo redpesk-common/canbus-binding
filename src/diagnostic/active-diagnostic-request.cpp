@@ -57,6 +57,11 @@ active_diagnostic_request_t::active_diagnostic_request_t(std::shared_ptr<can_bus
 	  in_flight_{false}, frequency_clock_{frequency_clock_t(frequencyHz)}, timeout_clock_{frequency_clock_t(10)}
 {}
 
+uint32_t active_diagnostic_request_t::get_id() const
+{
+	return id_;
+}
+
 std::shared_ptr<can_bus_dev_t> active_diagnostic_request_t::get_can_bus_dev()
 {
 	return bus_;
@@ -77,6 +82,16 @@ bool active_diagnostic_request_t::get_in_flight() const
 	return in_flight_;
 }
 
+frequency_clock_t& active_diagnostic_request_t::get_frequency_clock()
+{
+	return frequency_clock_;
+}
+
+frequency_clock_t& active_diagnostic_request_t::get_timeout_clock()
+{
+	return timeout_clock_;
+}
+
 void active_diagnostic_request_t::set_handle(DiagnosticShims& shims, DiagnosticRequest* request)
 {
 	handle_ = new DiagnosticRequestHandle(generate_diagnostic_request(&shims, request, nullptr));
@@ -85,6 +100,13 @@ void active_diagnostic_request_t::set_handle(DiagnosticShims& shims, DiagnosticR
 void active_diagnostic_request_t::set_in_flight(bool val)
 {
 	in_flight_ = val;
+}
+
+bool active_diagnostic_request_t::should_send()
+{
+	return !get_in_flight() && (
+			(!get_recurring() && !request_completed()) ||
+			(get_recurring() && get_frequency_clock().elapsed(true)));
 }
 
 bool active_diagnostic_request_t::timed_out()

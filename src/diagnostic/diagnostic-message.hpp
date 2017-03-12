@@ -62,6 +62,7 @@ class obd2_signal_t {
 		const std::string& get_generic_name() const;
 		const std::string get_name() const;
 		const std::string& get_prefix() const;
+		int get_frequency() const;
 
 		void set_prefix(std::string val);
 
@@ -71,5 +72,5 @@ class obd2_signal_t {
 		bool is_obd2_request(DiagnosticRequest *request);
 		bool is_obd2_signal(const char *name);
 
-		float decode_obd2_response(const DiagnosticResponse* response, float parsedPayload);
+		static float decode_obd2_response(const DiagnosticResponse* response, float parsedPayload);
 };

@@ -261,6 +261,60 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 	return added;
 }
 
+bool diagnostic_manager_t::conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const
+{
+	return (candidate->get_in_flight() && candidate != request &&
+			candidate->get_can_bus_dev() == request->get_can_bus_dev() &&
+			candidate->get_id() == request->get_id());
+}
+
+
+/// @brief Returns true if there are no other active requests to the same arbitration ID.
+bool diagnostic_manager_t::clear_to_send(active_diagnostic_request_t* request) const
+{
+	for ( auto entry : non_recurring_requests_)
+	{
+		if(conflicting(request, entry))
+			return false;
+	}
+
+	for ( auto entry : recurring_requests_)
+	{
+		if(conflicting(request, entry))
+			return false;
+	}
+	return true;
+}
+
+int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *userdata)
+{
+	diagnostic_manager_t& dm = configuration_t::instance().get_diagnostic_manager();
+	DiagnosticRequest* request = (DiagnosticRequest*)userdata;
+	active_diagnostic_request_t* adr = dm.lookup_recurring_request(request);
+
+	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev() && adr->should_send() &&
+		dm.clear_to_send(adr))
+	{
+		DEBUG(binder_interface, "Got active_diagnostic_request from recurring_requests_ queue.");
+		adr->get_frequency_clock().tick();
+		start_diagnostic_request(&dm.get_shims(), adr->get_handle());
+		if(adr->get_handle()->completed && !adr->get_handle()->success)
+		{
+			DEBUG(binder_interface, "Fatal error sending diagnostic request");
+			return 0;
+		}
+		adr->get_timeout_clock().tick();
+		adr->set_in_flight(true);
+		return 1;
+	}
+	return -1;
+}
+
+DiagnosticShims& diagnostic_manager_t::get_shims()
+{
+	return shims_;
+}
+
 bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
 	std::shared_ptr<can_bus_dev_t> can_bus_dev = configuration_t::instance().get_diagnostic_manager().get_can_bus_dev();

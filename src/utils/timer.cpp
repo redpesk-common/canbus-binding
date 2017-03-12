@@ -71,3 +71,10 @@ bool frequency_clock_t::elapsed(bool stagger)
 
 	return frequency_ == 0 || elapsed_time >= period;
 }
+
+/// @brief Force the clock to tick, regardless of it its time has actually
+/// elapsed.
+void frequency_clock_t::tick()
+{
+	last_tick_ = get_time_function()();
+}

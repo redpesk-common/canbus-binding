@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <systemd/sd-event.h>
 #include <queue>
 #include <vector>
 
@@ -94,4 +95,8 @@ public:
 	bool add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
+	
+	bool conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const;
+	bool clear_to_send(active_diagnostic_request_t* request) const;
+	static int send_request(sd_event_source *s, uint64_t usec, void *userdata);
 };

@@ -56,4 +56,6 @@ public:
 	bool started();
 	time_function_t get_time_function();
 	bool elapsed(bool stagger);
+
+	void tick();
 };

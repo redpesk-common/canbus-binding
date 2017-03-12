@@ -58,6 +58,11 @@ const std::string& obd2_signal_t::get_prefix() const
 	return prefix_;
 }
 
+int obd2_signal_t::get_frequency() const
+{
+	return frequency_;
+}
+
 void obd2_signal_t::set_prefix(std::string val)
 {
 	prefix_ = val;
