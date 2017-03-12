@@ -56,7 +56,7 @@ typedef void (*DiagnosticResponseCallback)(const active_diagnostic_request_t* re
  */
 class active_diagnostic_request_t {
 private:
-	can_bus_dev_t* bus_; /*!< bus_ - The CAN bus this request should be made on, or is currently in flight-on*/
+	std::shared_ptr<can_bus_dev_t> bus_; /*!< bus_ - The CAN bus this request should be made on, or is currently in flight-on*/
 	uint32_t id_; /*!< id_ - The arbitration ID (aka message ID) for the request.*/
 	DiagnosticRequestHandle* handle_; /*!< handle_ - A handle for the request to keep track of it between
 										* sending the frames of the request and receiving all frames of the response.*/
@@ -83,12 +83,12 @@ public:
 	active_diagnostic_request_t();
 	active_diagnostic_request_t(active_diagnostic_request_t&&) = default;
 	//active_diagnostic_request_t(const active_diagnostic_request_t&) = default;
-	active_diagnostic_request_t(can_bus_dev_t* bus, DiagnosticRequest* request,
+	active_diagnostic_request_t(std::shared_ptr<can_bus_dev_t> bus, DiagnosticRequest* request,
 		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
 	
-	can_bus_dev_t* get_can_bus_dev();
+	std::shared_ptr<can_bus_dev_t> get_can_bus_dev();
 	DiagnosticRequestHandle* get_handle();
 	bool get_recurring() const;
 	bool get_in_flight() const;

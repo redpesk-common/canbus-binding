@@ -28,15 +28,44 @@
 
 diagnostic_manager_t::diagnostic_manager_t()
 	: request_list_entries_(MAX_REQUEST_ENTRIES), initialized_{false}
+{}
+
+bool diagnostic_manager_t::initialize(std::shared_ptr<can_bus_dev_t> cbd)
 {
+	// Mandatory to set the bus before intiliaze shims.
+	bus_ = cbd;
+
+	init_diagnostic_shims();
 	reset();
+
+	initialized_ = true;
+	DEBUG(binder_interface, "initialize: Diagnostic Manager initialized");
+	return initialized_;
 }
 
-diagnostic_manager_t::diagnostic_manager_t(can_bus_dev_t& bus)
-	: bus_(&bus), request_list_entries_(MAX_REQUEST_ENTRIES), initialized_{false}
+/**
+ * @brief initialize shims used by UDS lib and set initialized_ to true.
+ *  It is needed before used the diagnostic manager fully because shims are
+ *  required by most member functions.
+ */
+void diagnostic_manager_t::init_diagnostic_shims()
 {
-	reset();
+	shims_ = diagnostic_init_shims(shims_logger, shims_send, NULL);
+	DEBUG(binder_interface, "init_diagnostic_shims: Shims initialized");
 }
+
+void diagnostic_manager_t::reset()
+{
+	if(initialized_)
+	{
+		DEBUG(binder_interface, "Clearing existing diagnostic requests");
+		cleanup_active_requests(true);
+	}
+
+	for(int i = 0; i < MAX_SIMULTANEOUS_DIAG_REQUESTS; i++)
+		free_request_entries_.push_back(request_list_entries_[i]);
+}
+
 
 void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t* entry, std::vector<active_diagnostic_request_t*>& requests_list)
 {
@@ -126,19 +155,7 @@ bool diagnostic_manager_t::lookup_recurring_request(const DiagnosticRequest* req
 	return false;
 }
 
-void diagnostic_manager_t::reset()
-{
-	if(initialized_)
-	{
-		DEBUG(binder_interface, "Clearing existing diagnostic requests");
-		cleanup_active_requests(true);
-	}
-
-	for(int i = 0; i < MAX_SIMULTANEOUS_DIAG_REQUESTS; i++)
-		free_request_entries_.push_back(request_list_entries_[i]);
-}
-
-can_bus_dev_t* diagnostic_manager_t::get_can_bus_dev()
+std::shared_ptr<can_bus_dev_t> diagnostic_manager_t::get_can_bus_dev()
 {
 	return bus_;
 }
@@ -246,7 +263,7 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 
 bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
-	can_bus_dev_t *can_bus_dev = configuration_t::instance().get_diagnostic_manager().get_can_bus_dev();
+	std::shared_ptr<can_bus_dev_t> can_bus_dev = configuration_t::instance().get_diagnostic_manager().get_can_bus_dev();
 	return can_bus_dev->shims_send(arbitration_id, data, size);
 }
 
@@ -258,13 +275,3 @@ void diagnostic_manager_t::shims_logger(const char* m, ...)
 void diagnostic_manager_t::shims_timer()
 {}
 
-/**
- * @brief initialize shims used by UDS lib and set initialized_ to true.
- *  It is needed before used the diagnostic manager fully because shims are
- *  required by most member functions.
- */
-void diagnostic_manager_t::init_diagnostic_shims()
-{
-	shims_ = diagnostic_init_shims(shims_logger, shims_send, NULL);
-	initialized_ = true;
-}

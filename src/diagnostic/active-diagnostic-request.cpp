@@ -48,7 +48,7 @@ active_diagnostic_request_t::active_diagnostic_request_t()
 	  in_flight_{false}, frequency_clock_{frequency_clock_t()}, timeout_clock_{frequency_clock_t()}
 {}
 
-active_diagnostic_request_t::active_diagnostic_request_t(can_bus_dev_t* bus, DiagnosticRequest* request,
+active_diagnostic_request_t::active_diagnostic_request_t(std::shared_ptr<can_bus_dev_t> bus, DiagnosticRequest* request,
 		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz)
@@ -57,7 +57,7 @@ active_diagnostic_request_t::active_diagnostic_request_t(can_bus_dev_t* bus, Dia
 	  in_flight_{false}, frequency_clock_{frequency_clock_t(frequencyHz)}, timeout_clock_{frequency_clock_t(10)}
 {}
 
-can_bus_dev_t* active_diagnostic_request_t::get_can_bus_dev()
+std::shared_ptr<can_bus_dev_t> active_diagnostic_request_t::get_can_bus_dev()
 {
 	return bus_;
 }

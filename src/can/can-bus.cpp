@@ -186,13 +186,13 @@ int can_bus_t::init_can_dev()
 
 		for(const auto& device : devices_name)
 		{
-			can_devices_m_[device] = std::make_shared<can_bus_dev_t>(device, i);
-			if (can_devices_m_[device]->open() == 0)
+			can_devices_.push_back(std::make_shared<can_bus_dev_t>(device, i));
+			if (can_devices_[i]->open() == 0)
 			{
 				i++;
 				DEBUG(binder_interface, "Start reading thread");
 				NOTICE(binder_interface, "%s device opened and reading", device.c_str());
-				can_devices_m_[device]->start_reading(*this);
+				can_devices_[i]->start_reading(*this);
 			}
 			else
 				ERROR(binder_interface, "Can't open device %s", device.c_str());
@@ -349,8 +349,8 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 *
 * @return map can_bus_dev_m_ map
 */
-std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::get_can_devices()
+const std::vector<std::shared_ptr<can_bus_dev_t>>& can_bus_t::get_can_devices() const
 {
-	return can_devices_m_;
+	return can_devices_;
 }
 

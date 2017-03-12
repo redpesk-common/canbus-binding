@@ -223,12 +223,16 @@ extern "C"
 	{
 		can_bus_t& can_bus_manager = configuration_t::instance().get_can_bus_manager();
 
-		/* Open CAN socket */
+		/// Initialize CAN socket
 		if(can_bus_manager.init_can_dev() == 0)
 		{
 			can_bus_manager.start_threads();
 			return 0;
 		}
+
+		/// Initialize Diagnostic manager that will handle obd2 requests
+		diagnostic_manager_t& diag_manager = configuration_t::instance().get_diagnostic_manager();
+		diag_manager.initialize(can_bus_manager.get_can_devices().front());
 
 		ERROR(binder_interface, "There was something wrong with CAN device Initialization. Check your config file maybe");
 		return 1;
