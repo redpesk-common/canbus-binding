@@ -80,8 +80,7 @@ public:
 	void cancel_request(active_diagnostic_request_t* entry);
 	void cleanup_request(active_diagnostic_request_t* entry, bool force);
 	void cleanup_active_requests(bool force);
-	bool lookup_recurring_request(const DiagnosticRequest* request);
-
+	active_diagnostic_request_t* find_recurring_request(const DiagnosticRequest* request);
 
 	bool validate_optional_request_attributes(float frequencyHz);
 

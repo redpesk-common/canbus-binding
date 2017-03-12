@@ -138,21 +138,19 @@ void diagnostic_manager_t::cleanup_active_requests(bool force)
 
 /// @brief Note that this pops it off of whichver list it was on and returns it, so make
 /// sure to add it to some other list or it'll be lost.
-bool diagnostic_manager_t::lookup_recurring_request(const DiagnosticRequest* request)
+active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const DiagnosticRequest* request)
 {
-	active_diagnostic_request_t existingEntry;
 	for (auto& entry : recurring_requests_)
 	{
 		active_diagnostic_request_t* candidate = entry;
-		if(candidate->get_can_bus_dev()->get_device_name() == bus_->get_device_name() &&
-			diagnostic_request_equals(&candidate->get_handle()->request, request))
+		if(diagnostic_request_equals(&candidate->get_handle()->request, request))
 		{
 			find_and_erase(entry, recurring_requests_);
-			return true;
+			return entry;
 			break;
 		}
 	}
-	return false;
+	return nullptr;
 }
 
 std::shared_ptr<can_bus_dev_t> diagnostic_manager_t::get_can_bus_dev()
@@ -225,7 +223,7 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 	cleanup_active_requests(false);
 
 	bool added = true;
-	if(lookup_recurring_request(request))
+	if(find_recurring_request(request) == nullptr)
 	{
 		active_diagnostic_request_t* entry = get_free_entry();
 
@@ -290,7 +288,7 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 {
 	diagnostic_manager_t& dm = configuration_t::instance().get_diagnostic_manager();
 	DiagnosticRequest* request = (DiagnosticRequest*)userdata;
-	active_diagnostic_request_t* adr = dm.lookup_recurring_request(request);
+	active_diagnostic_request_t* adr = dm.find_recurring_request(request);
 
 	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev() && adr->should_send() &&
 		dm.clear_to_send(adr))
