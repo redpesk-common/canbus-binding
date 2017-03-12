@@ -22,6 +22,7 @@
 #include <mutex>
 #include <vector>
 #include <thread>
+#include <time.h>
 #include <linux/can.h>
 #include <json-c/json.h>
 #include <systemd/sd-event.h>
@@ -33,6 +34,7 @@
 #include "can/can-message.hpp"
 #include "utils/timer.hpp"
 #include "utils/signals.hpp"
+#include "obd2/obd2-signals.hpp"
 #include "utils/openxc-utils.hpp"
 
 extern "C"

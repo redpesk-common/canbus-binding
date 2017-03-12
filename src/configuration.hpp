@@ -69,11 +69,12 @@ class configuration_t
 
 		std::vector<can_signal_t>& get_can_signals();
 
-		const std::vector<can_message_definition_t>& get_can_message_definition();
-
 		std::vector<obd2_signal_t>& get_obd2_signals();
 
 		const std::vector<std::string>& get_signals_prefix() const;
+
+		const std::vector<can_message_definition_t>& get_can_message_definition();
+
 		uint32_t get_signal_id(obd2_signal_t& sig) const;
 
 		uint32_t get_signal_id(can_signal_t& sig) const;
@@ -90,14 +91,12 @@ class configuration_t
 		/// @param[in] bus A CanBus struct defining the bus's metadata
 		/// @param[in] writable Configure the controller in a writable mode. If false, it will be configured as "listen only" and will not allow writes or even CAN ACKs.
 		/// @param[in] buses An array of all CAN buses.
-		/// @param[in] busCount The length of the buses array.
 		void pre_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
 		/// TODO: implement this function as method into can_bus class
 		/// @brief Post-initialize actions made after CAN bus initialization
 		/// @param[in] bus A CanBus struct defining the bus's metadata
 		/// @param[in] writable Configure the controller in a writable mode. If false, it will be configured as "listen only" and will not allow writes or even CAN ACKs.
 		/// @param[in] buses An array of all CAN buses.
-		/// @param[in] busCount The length of the buses array.
 		void post_initialize(can_bus_dev_t* bus, bool writable, can_bus_dev_t* buses, const int busCount);
 		/// TODO: implement this function as method into can_bus class
 		/// @brief Check if the device is connected to an active CAN bus, i.e. it's received a message in the recent past.
@@ -106,7 +105,6 @@ class configuration_t
 		/// TODO: implement this function as method into can_bus class
 		/// @brief Log transfer statistics about all active CAN buses to the debug log.
 		/// @param[in] buses An array of active CAN buses.
-		/// @param[in] busCount The length of the buses array.
 		bool isBusActive(can_bus_dev_t* bus);
 		*/
 };
