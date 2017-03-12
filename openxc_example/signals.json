@@ -66,5 +66,30 @@
             },
             "handlers": ["handleSteeringWheelMessage"]
         }
-    }
+    },
+    "diagnostic_messages": [
+        {
+            "bus": "hs",
+            "id": 2015,
+            "mode": 1,
+            "pid": 12,
+            "frequency": 1,
+            "decoder": "handleObd2Pid"
+        },
+        {
+            "bus": "hs",
+            "id": 2016,
+            "mode": 2,
+            "pid": 12,
+            "frequency": 1
+        },
+        {
+            "bus": "hs",
+            "id": 2016,
+            "mode": 22,
+            "pid": 6,
+            "frequency": 1,
+            "decoder": "handleMyDiagRequest"
+        }
+    ]
 }
