@@ -189,13 +189,13 @@ int can_bus_t::init_can_dev()
 			can_devices_.push_back(std::make_shared<can_bus_dev_t>(device, i));
 			if (can_devices_[i]->open() == 0)
 			{
-				i++;
 				DEBUG(binder_interface, "Start reading thread");
 				NOTICE(binder_interface, "%s device opened and reading", device.c_str());
 				can_devices_[i]->start_reading(*this);
 			}
 			else
 				ERROR(binder_interface, "Can't open device %s", device.c_str());
+			i++;
 		}
 
 		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
