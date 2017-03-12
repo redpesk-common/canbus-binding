@@ -53,7 +53,7 @@ set(CMAKE_CXX_FLAGS_CCOV         "-g -O2 -std=c++11 --coverage")
 
 include(FindPkgConfig)
 
-pkg_check_modules(EXTRAS REQUIRED json-c afb-daemon)
+pkg_check_modules(EXTRAS REQUIRED json-c libsystemd afb-daemon)
 add_compile_options(${EXTRAS_CFLAGS})
 add_compile_options(${EXTRAS_CXXFLAGS})
 
@@ -66,7 +66,7 @@ add_definitions(-DPB_FIELD_16BIT)
 
 # Needed extra directories to hit the required headers files.
 include_directories(${EXTRAS_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR} ${PROJECT_LIBDIR}/openxc-message-format/gen/cpp ${PROJECT_LIBDIR}/nanopb/  ${PROJECT_LIBDIR}/uds-c/src  ${PROJECT_LIBDIR}/bitfield-c/src ${PROJECT_LIBDIR}/isotp-c/src)
-
+link_libraries(${EXTRAS_LIBRARIES})
 ###########################################################################
 # the library used by the binding : openxc, bitfield, uds, isotp
 
@@ -83,7 +83,7 @@ add_library(${PROJECT_NAME} MODULE ${PROJECT_NAME}.cpp configuration.cpp
 	can/can-bus.cpp can/can-bus-dev.cpp can/can-message.cpp can/can-signals.cpp can/can-decoder.cpp
 	obd2/obd2-signals.cpp obd2/diagnostic-manager.cpp obd2/active-diagnostic-request.cpp
 	utils/signals.cpp utils/openxc-utils.cpp utils/timer.cpp utils/socket.cpp)
-target_link_libraries(${PROJECT_NAME} ${EXTRAS_LIBRARIES} bitfield isotp uds openxc pthread)
+target_link_libraries(${PROJECT_NAME} pthread bitfield uds isotp openxc)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	PREFIX ""
