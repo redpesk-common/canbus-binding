@@ -232,15 +232,7 @@ std::vector<std::string> can_bus_t::read_conf()
 		jo = json_tokener_parse(fd_conf_content.c_str());
 
 		if (jo == NULL || !json_object_object_get_ex(jo, "canbus", &canbus))
-		{/**
-* @brief Telling if the pushing thread is running
-*  This is the boolean value on which the while loop
-*  take its condition. Set it to false will stop the
-*  according thread.
-*
-* @return true if pushing thread is running, false if not.
-*/
-
+		{
 			ERROR(binder_interface, "Can't find canbus node in the configuration file. Please review it.");
 			ret.clear();
 		}
@@ -353,4 +345,3 @@ const std::vector<std::shared_ptr<can_bus_dev_t>>& can_bus_t::get_can_devices() 
 {
 	return can_devices_;
 }
-

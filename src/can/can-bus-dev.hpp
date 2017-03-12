@@ -42,7 +42,7 @@ private:
 	struct sockaddr_can txAddress_; /// < internal member using to bind to the socket
 
 	std::thread th_reading_; /// < Thread handling read the socket can device filling can_message_q_ queue of can_bus_t
-	bool is_running_; /// < boolean telling whether or not reading is running or not
+	bool is_running_ = false; /// < boolean telling whether or not reading is running or not
 	void can_reader(can_bus_t& can_bus);
 
 public:

@@ -53,11 +53,11 @@ private:
 
 	void can_decode_message();
 	std::thread th_decoding_; /// < thread that'll handle decoding a can frame
-	bool is_decoding_; /// < boolean member controling thread while loop
+	bool is_decoding_ = false; /// < boolean member controling thread while loop
 
 	void can_event_push();
 	std::thread th_pushing_; /// < thread that'll handle pushing decoded can frame to subscribers
-	bool is_pushing_; /// < boolean member controling thread while loop
+	bool is_pushing_ = false; /// < boolean member controling thread while loop
 
 	std::condition_variable new_can_message_cv_; /// < condition_variable use to wait until there is a new CAN message to read
 	std::mutex can_message_mutex_; /// < mutex protecting the can_message_q_ queue.
