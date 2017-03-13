@@ -19,45 +19,18 @@
 
 #include "utils/signals.hpp"
 
-// Pre-defined OBD-II PIDs to query for if supported by the vehicle.
- std::vector<obd2_signal_t> OBD2_PIDS = {
-	obd2_signal_t(0x04, "engine.load", 0, 100, POURCENT, 5, false),
-	obd2_signal_t(0x05, "engine.coolant.temperature", -40, 215, DEGREES_CELSIUS, 1, false),
-	obd2_signal_t(0x0a, "fuel.pressure", 0, 765, KPA, 1, false),
-	obd2_signal_t(0x0b, "intake.manifold.pressure", 0, 255, KPA, 1, false),
-	obd2_signal_t(0x0c, "engine.speed", 0, 16383, RPM, 5, false),
-	obd2_signal_t(0x0d, "vehicle.speed", 0, 255, KM_H, 5, false),
-	obd2_signal_t(0x0f, "intake.air.temperature", -40, 215, DEGREES_CELSIUS, 1, false),
-	obd2_signal_t(0x10, "mass.airflow", 0, 655, GRAMS_SEC, 5, false),
-	obd2_signal_t(0x11, "throttle.position", 0, 100, POURCENT, 5, false),
-	obd2_signal_t(0x1f, "running.time", 0, 65535, SECONDS, 1, false),
-	obd2_signal_t(0x2d, "EGR.error", -100, 99, POURCENT, 0, false),
-	obd2_signal_t(0x2f, "fuel.level", 0, 100, POURCENT, 1, false),
-	obd2_signal_t(0x33, "barometric.pressure", 0, 255, KPA, 1, false),
-	obd2_signal_t(0x4c, "commanded.throttle.position", 0, 100, POURCENT, 1, false),
-	obd2_signal_t(0x52, "ethanol.fuel.percentage", 0, 100, POURCENT, 1, false),
-	obd2_signal_t(0x5a, "accelerator.pedal.position", 0, 100, POURCENT, 5, false),
-	obd2_signal_t(0x5b, "hybrid.battery-pack.remaining.life", 0, 100, POURCENT, 5, false),
-	obd2_signal_t(0x5c, "engine.oil.temperature",-40, 210, DEGREES_CELSIUS, 1, false),
-	obd2_signal_t(0x63, "engine.torque", 0, 65535, NM, 1, false)
-};
-
 // Dumb signals and message implementation. To get compile.
-std::vector<can_message_set_t> CAN_MESSAGE_SET;
+/*std::vector<can_message_set_t> CAN_MESSAGE_SET;
 
-std::vector<std::vector<can_message_definition_t>> CAN_MESSAGES_DEFINTION;
+std::vector<std::vector<can_message_definition_t>> CAN_MESSAGES_DEFINITION;
 
-std::vector<std::vector<can_signal_t>> SIGNALS;
+std::vector<std::vector<can_signal_t>> SIGNALS;*/
 
 configuration_t& configuration_t::instance()
 {
 	static configuration_t config;
 	return config;
 }
-
-configuration_t::configuration_t()
-	: can_message_set_{CAN_MESSAGE_SET}, can_signals_{SIGNALS}, obd2_signals_{OBD2_PIDS}, can_message_definition_{CAN_MESSAGES_DEFINTION}
-{}
 
 configuration_t& configuration_t::get_configuration()
 {
@@ -67,6 +40,11 @@ configuration_t& configuration_t::get_configuration()
 can_bus_t& configuration_t::get_can_bus_manager()
 {
 	return can_bus_manager_;
+}
+
+const std::vector<std::shared_ptr<can_bus_dev_t>>& configuration_t::get_can_bus_devices()
+{
+	return can_bus_manager_.get_can_devices();
 }
 
 diagnostic_manager_t& configuration_t::get_diagnostic_manager()

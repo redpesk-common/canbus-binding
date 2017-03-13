@@ -27,6 +27,14 @@
 
 std::string can_signal_t::prefix_ = "messages";
 
+can_signal_t::can_signal_t(can_message_definition_t& message, std::string generic_name, uint8_t bit_position, uint8_t bit_size,
+			 float factor, float offset, float min_value, float max_value, frequency_clock_t frequency, bool send_same, bool force_send_changed,
+			 std::map<int, std::string> states, bool writable, SignalDecoder decoder, SignalEncoder encoder, bool received)
+	: message_{message}, generic_name_{generic_name}, bit_position_{bit_position}, bit_size_{bit_size}, factor_{factor}, offset_{offset},
+	min_value_{min_value}, max_value_{max_value}, frequency_{frequency}, send_same_{send_same}, force_send_changed_{force_send_changed}, states_{states},
+	writable_{writable}, decoder_{decoder}, encoder_{encoder}, received_{received}, last_value_{(float)NULL}
+{}
+
 can_message_definition_t& can_signal_t::get_message()
 {
 	return message_;

@@ -51,6 +51,7 @@ private:
 public:
 	frequency_clock_t();
 	frequency_clock_t(float frequency);
+	frequency_clock_t(float frequency, unsigned long last_tick, time_function_t time_function);
 
 	static float frequency_to_period(float frequency);
 	bool started();

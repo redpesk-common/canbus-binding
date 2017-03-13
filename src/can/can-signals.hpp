@@ -27,6 +27,7 @@
 #include "../utils/timer.hpp"
 #include "can-bus.hpp"
 #include "can-message.hpp"
+#include "can-message-definition.hpp"
 #include "../obd2/obd2-signals.hpp"
 
 extern "C"
@@ -109,6 +110,10 @@ private:
 					   *	this value is undefined. */
 
 public:
+	can_signal_t(can_message_definition_t& message, std::string generic_name, uint8_t bit_position, uint8_t bit_size,
+				 float factor, float offset, float min_value, float max_value, frequency_clock_t frequency, bool send_same, bool force_send_changed,
+				 std::map<int, std::string> states, bool writable, SignalDecoder decoder, SignalEncoder encoder, bool received);
+
 	can_message_definition_t& get_message();
 	const std::string& get_generic_name() const;
 	const std::string get_name() const;

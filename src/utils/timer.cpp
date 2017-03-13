@@ -35,7 +35,7 @@ long long int system_time_ms()
 }
 
 frequency_clock_t::frequency_clock_t()
-	: frequency_{0.0}, last_tick_{0}, time_function_{nullptr}
+	: frequency_{10.0}, last_tick_{0}, time_function_{nullptr}
 {}
 
 
