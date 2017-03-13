@@ -126,7 +126,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	int rets = 0;
 	sd_event_source *source;
 
-	//TODO: Implement way to dynamically call the right function no matter 
+	//TODO: Implement way to dynamically call the right function no matter
 	// how much signals types we have.
 
 	for(const std::string& sig : signals)
@@ -236,9 +236,9 @@ extern "C"
 
 	/**
 	* @brief Initialize the binding.
-	* 
+	*
 	* @param[in] service Structure which represent the Application Framework Binder.
-	* 
+	*
 	* @return Exit code, zero if success.
 	*/
 	int afbBindingV1ServiceInit(struct afb_service service)

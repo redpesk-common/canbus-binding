@@ -53,14 +53,3 @@ typedef struct {
 	CommandHandler handler; /*!< handler - An function to process the received command's data and perform some
  							 *	action.*/
 } CanCommand;
-
-/* Public: Return an array of all OpenXC CAN commands enabled in the active
- * configuration that can write back to CAN with a custom handler.
- *
- * Commands not defined here are handled using a 1-1 mapping from the signals
- * list.
- */
-CanCommand* getCommands();
-
-/* Public: Return the length of the array returned by getCommandCount(). */
-int getCommandCount();

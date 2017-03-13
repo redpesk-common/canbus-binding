@@ -66,7 +66,7 @@ private:
 
 	std::condition_variable new_decoded_can_message_; /// < condition_variable use to wait until there is a new vehicle message to read from the queue vehicle_message_q_
 	std::mutex decoded_can_message_mutex_;  /// < mutex protecting the vehicle_message_q_ queue.
-	std::queue <openxc_VehicleMessage> vehicle_message_q_; /// < queue that'll store openxc_VehicleMessage to pushed 
+	std::queue <openxc_VehicleMessage> vehicle_message_q_; /// < queue that'll store openxc_VehicleMessage to pushed
 
 	std::vector<std::shared_ptr<can_bus_dev_t>> can_devices_; /// < Can device map containing all can_bus_dev_t objects initialized during init_can_dev function
 
@@ -93,4 +93,3 @@ public:
 
 	const std::vector<std::shared_ptr<can_bus_dev_t>>& get_can_devices() const;
 };
-

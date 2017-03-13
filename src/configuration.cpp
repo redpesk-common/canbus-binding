@@ -100,11 +100,11 @@ void configuration_t::set_active_message_set(uint8_t id)
 /**
  * @fn std::vector<std::string> find_can_signals(const openxc_DynamicField &key)
  * @brief return signals name found searching through CAN_signals and OBD2 pid
- * 
- * @param[in] key - can contain numeric or string value in order to search against 
+ *
+ * @param[in] key - can contain numeric or string value in order to search against
  *   can signals or obd2 signals name.
  *
- * @return Vector of signals name found. 
+ * @return Vector of signals name found.
  */
 void configuration_t::find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signal_t*>& found_signals)
 {
@@ -126,8 +126,8 @@ void configuration_t::find_obd2_signals(const openxc_DynamicField &key, std::vec
 /**
  * @fn void find_can_signals(const openxc_DynamicField& key, std::vector<can_signal_t*>& found_signals)
  * @brief return signals name found searching through CAN_signals and OBD2 pid
- * 
- * @param[in] key - can contain numeric or string value in order to search against 
+ *
+ * @param[in] key - can contain numeric or string value in order to search against
  *   can signals or obd2 signals name.
  * @param[out] found_signals - provided vector to fill with ponter to signals matched.
  *

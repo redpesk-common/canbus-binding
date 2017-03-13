@@ -50,7 +50,18 @@ can_bus_t::can_bus_t(int conf_file)
 {
 }
 
-
+/**
+ * @brief Will make the decoding operation on a classic CAN message. It will not
+ * handle CAN commands nor diagnostic messages that have their own method to get
+ * this happens.
+ *
+ * It will add to the vehicle_message queue the decoded message and tell the event push
+ * thread to process it.
+ *
+ * @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
+ *
+ * @return How many signals has been decoded.
+ */
 int can_bus_t::process_can_signals(can_message_t& can_message)
 {
 	int processed_signals = 0;
@@ -92,13 +103,23 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
 	return processed_signals;
 }
 
+/**
+ * @brief Will make the decoding operation on a diagnostic CAN message.It will add to
+ * the vehicle_message queue the decoded message and tell the event push thread to process it.
+ *
+ * @param[in] entry - an active_diagnostic_request_t object that made the request
+ * about that diagnostic CAN message.
+ * @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
+ *
+ * @return How many signals has been decoded.
+ */
 int can_bus_t::process_diagnostic_signals(active_diagnostic_request_t* entry, const can_message_t& can_message)
 {
 	int processed_signals = 0;
 	openxc_VehicleMessage vehicle_message;
 
 	diagnostic_manager_t& manager = configuration_t::instance().get_diagnostic_manager();
-	
+
 	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
 
@@ -141,7 +162,7 @@ int can_bus_t::process_diagnostic_signals(active_diagnostic_request_t* entry, co
 *  corresponding decoding function if there is one assigned for that signal. If not, it will be the default
 *  noopDecoder function that will operate on it.
 *
-*  Depending on the nature of message, if id match a diagnostic request corresponding id for a response 
+*  Depending on the nature of message, if id match a diagnostic request corresponding id for a response
 *  then decoding a diagnostic message else use classic CAN signals decoding functions.
 *
 *  TODO: make diagnostic messages parsing optionnal.
@@ -195,9 +216,9 @@ void can_bus_t::can_event_push()
 }
 
 /**
-	* @brief Will initialize threads that will decode
-	*  and push subscribed events.
-	*/
+* @brief Will initialize threads that will decode
+*  and push subscribed events.
+*/
 void can_bus_t::start_threads()
 {
 	is_decoding_ = true;
@@ -224,7 +245,11 @@ void can_bus_t::stop_threads()
 
 /**
 * @brief Will initialize can_bus_dev_t objects after reading
-* the configuration file passed in the constructor.
+* the configuration file passed in the constructor. All CAN buses
+* Initialized here will be added to a vector holding them for
+* inventory and later access.
+*
+* That will initialize CAN socket reading too using a new thread.
 */
 int can_bus_t::init_can_dev()
 {

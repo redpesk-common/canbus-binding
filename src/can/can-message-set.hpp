@@ -33,15 +33,15 @@ private:
 	uint16_t can_signal_count_; /// < The number of CAN signals (across all messages) defined for this message set.
 	uint16_t can_command_count_; /// < The number of CanCommmands defined for this message set.
 	uint16_t obd2_signal_count_; /// < The number of obd2 signals defined for this message set.
-	
+
 public:
-	   can_message_set_t(
-		   uint8_t index,
-		   const std::string& name,
-		   uint8_t can_bus_count,
-		   short unsigned int can_message_count,
-		   short unsigned int can_signal_count,
-		   short unsigned int can_command_count,
-		   short unsigned int obd2_signal_count);
-	
+	can_message_set_t(
+			uint8_t index,
+			const std::string& name,
+			uint8_t can_bus_count,
+			short unsigned int can_message_count,
+			short unsigned int can_signal_count,
+			short unsigned int can_command_count,
+			short unsigned int obd2_signal_count);
+
 };

@@ -204,9 +204,14 @@ int can_bus_dev_t::send(can_message_t& can_msg)
 	return 0;
 }
 
-/// @brief Send a can message from a can_message_t object.
-/// @param[in] can bus used to send the message
-/// @param[in] can_msg the can message object to send
+/// @brief Static method used to send diagnostic CAN message
+/// that follow isotp SendShimsMessage signature. This method is launched
+/// from diagnostic manager's' same name method. It will use the diagnostic
+/// manager configured CAN bus device to send the CAN message.
+///
+/// @param[in] arbitration_id - CAN arbitration id.
+/// @param[in] data - CAN message payload to send
+/// @param[in] size - size of the data to send
 bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
 	ssize_t nbytes;

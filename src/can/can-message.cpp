@@ -136,7 +136,10 @@ void can_message_t::set_format(const can_message_format_t new_format)
 *
 * This is the preferred way to initialize class members.
 *
-* @param[in] args - struct read from can bus device.
+* @param[in] frame - canfd_frame to convert coming from a read of CAN socket
+* @param[in] nbyte - bytes read from socket read operation.
+*
+* @return A can_message_t object fully initialized with canfd_frame values.
 */
 can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& frame, size_t nbytes)
 {
