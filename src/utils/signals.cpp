@@ -71,6 +71,6 @@ std::vector<std::string> find_signals(const openxc_DynamicField &key)
 			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 			break;
 	}
-	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals_name.size());
+	DEBUG(binder_interface, "find_signals: Found %d signal(s)", (int)found_signals_name.size());
 	return found_signals_name;
 }

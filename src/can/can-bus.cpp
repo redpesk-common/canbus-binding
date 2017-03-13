@@ -121,7 +121,7 @@ int can_bus_t::process_diagnostic_signals(active_diagnostic_request_t* entry, co
 					processed_signals++;
 				}
 				else
-					DEBUG(binder_interface, "Fatal error sending or receiving diagnostic request");
+					DEBUG(binder_interface, "process_diagnostic_signals: Fatal error sending or receiving diagnostic request");
 			}
 			else if(!response.completed && response.multi_frame)
 				// Reset the timeout clock while completing the multi-frame receive
