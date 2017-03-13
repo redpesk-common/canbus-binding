@@ -21,11 +21,6 @@
 
 #include "../low-can-binding.hpp"
 
-/********************************************************************************
-*
-*		CanMessage method implementation
-*
-*********************************************************************************/
 /**
 * @brief Class constructor
 *
@@ -251,19 +246,4 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 		ERROR(binder_interface, "can_message_t not correctly initialized to be sent");
 
 	return frame;
-}
-
-/********************************************************************************
-*
-*		can_message_definition_t method implementation
-*
-*********************************************************************************/
-
-can_message_definition_t::can_message_definition_t(can_bus_dev_t& cbd)
-	: bus_{cbd}, last_value_(CAN_MESSAGE_SIZE)
-{}
-
-uint32_t can_message_definition_t::get_id() const
-{
-	return id_;
 }
