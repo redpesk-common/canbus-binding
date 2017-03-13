@@ -52,8 +52,8 @@ std::vector<std::vector<can_message_definition_t>> CAN_MESSAGES_DEFINITION = {
  */
 std::vector<std::vector<can_signal_t>> SIGNALS = {
 	{
-		can_signal_t((CAN_MESSAGES_DEFINITION[MESSAGE_SET_ID][0]), "can.driver_door.open", 2, 4, 1.000000, 0.000000, 0.000000, 0.000000, frequency_clock_t(), false, true, std::map<int, std::string>(), false, decoder_t::booleanDecoder, nullptr, false),
-		can_signal_t((CAN_MESSAGES_DEFINITION[MESSAGE_SET_ID][1]), "can.driver_door.close", 0, 4, 1.000000, 0.000000, 0.000000, 0.000000, frequency_clock_t(), false, true, std::map<int, std::string>(),false, decoder_t::booleanDecoder, nullptr, false)
+		can_signal_t((CAN_MESSAGES_DEFINITION[MESSAGE_SET_ID][0]), "driver_door.open", 2, 4, 1.000000, 0.000000, 0.000000, 0.000000, frequency_clock_t(), false, true, std::vector<std::string>(), false, decoder_t::booleanDecoder, nullptr, false),
+		can_signal_t((CAN_MESSAGES_DEFINITION[MESSAGE_SET_ID][1]), "driver_door.close", 0, 4, 1.000000, 0.000000, 0.000000, 0.000000, frequency_clock_t(), false, true, std::vector<std::string>(),false, decoder_t::booleanDecoder, nullptr, false)
 	},
 };
 

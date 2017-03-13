@@ -74,7 +74,7 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
 		DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
 		DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.generic_name));
 		DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name)));*/
-		if( s.find(sig->get_name()) != s.end() && afb_event_is_valid(s[sig->get_name()]))
+		if( s.find(sig->get_generic_name()) != s.end() && afb_event_is_valid(s[sig->get_generic_name()]))
 		{
 			decoded_message = decoder_t::translateSignal(*sig, can_message, configuration_t::instance().get_can_signals());
 
