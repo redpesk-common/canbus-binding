@@ -100,7 +100,7 @@ int can_bus_dev_t::open()
 		}
 		close();
 	}
-	else ERROR(binder_interface, "socket could not be created. Error was : %s", ::strerror(errno));
+	else ERROR(binder_interface, "open: socket could not be created. Error was : %s", ::strerror(errno));
 	return -1;
 }
 
@@ -117,9 +117,9 @@ can_message_t can_bus_dev_t::read()
 	struct canfd_frame cfd;
 
 	// Test that socket is really opened
-	if (can_socket_)
+	if (!can_socket_)
 	{
-		ERROR(binder_interface, "read_can: Socket unavailable. Closing thread.");
+		ERROR(binder_interface, "read: Socket unavailable. Closing thread.");
 		is_running_ = false;
 	}
 
@@ -180,7 +180,7 @@ int can_bus_dev_t::send(can_message_t& can_msg)
 
 	f = can_msg.convert_to_canfd_frame();
 
-	if(can_socket_.socket())
+	if(can_socket_)
 	{
 		nbytes = ::sendto(can_socket_.socket(), &f, sizeof(struct canfd_frame), 0,
 			(struct sockaddr*)&txAddress_, sizeof(txAddress_));
@@ -211,7 +211,7 @@ bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* dat
 	f.len = size;
 	::memcpy(f.data, data, size);
 
-	if(can_socket_.socket())
+	if(can_socket_)
 	{
 		nbytes = ::sendto(can_socket_.socket(), &f, sizeof(struct canfd_frame), 0,
 			(struct sockaddr*)&txAddress_, sizeof(txAddress_));
