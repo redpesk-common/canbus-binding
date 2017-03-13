@@ -17,6 +17,7 @@
 
 #include "can-decoder.hpp"
 #include "canutil/read.h"
+#include "../utils/openxc-utils.hpp"
 
 float decoder_t::parseSignalBitfield(can_signal_t& signal, const can_message_t& message)
 {
@@ -28,11 +29,7 @@ float decoder_t::parseSignalBitfield(can_signal_t& signal, const can_message_t& 
 openxc_DynamicField decoder_t::noopDecoder(can_signal_t& signal,
 		const std::vector<can_signal_t>& signals, float value, bool* send)
 {
-	openxc_DynamicField decoded_value;
-	decoded_value.has_type = true;
-	decoded_value.type = openxc_DynamicField_Type_NUM;
-	decoded_value.has_numeric_value = true;
-	decoded_value.numeric_value = value;
+	openxc_DynamicField decoded_value = build_DynamicField(value);
 
 	return decoded_value;
 }
@@ -40,11 +37,7 @@ openxc_DynamicField decoder_t::noopDecoder(can_signal_t& signal,
 openxc_DynamicField decoder_t::booleanDecoder(can_signal_t& signal,
 		const std::vector<can_signal_t>& signals, float value, bool* send)
 {
-	openxc_DynamicField decoded_value;
-	decoded_value.has_type = true;
-	decoded_value.type = openxc_DynamicField_Type_BOOL;
-	decoded_value.has_boolean_value = true;
-	decoded_value.boolean_value = value == 0.0 ? false : true;
+	openxc_DynamicField decoded_value = build_DynamicField(value == 0.0 ? false : true);
 
 	return decoded_value;
 }
@@ -83,7 +76,7 @@ openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, can_message
 	}
 
 	float value = decoder_t::parseSignalBitfield(signal, message);
-	DEBUG(binder_interface, "translateSignal: Decoded message: %f", value);
+	DEBUG(binder_interface, "translateSignal: Decoded message from parseSignalBitfield: %f", value);
 
 	bool send = true;
 	// Must call the decoders every time, regardless of if we are going to
@@ -99,7 +92,7 @@ openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, can_message
 openxc_DynamicField decoder_t::decodeSignal( can_signal_t& signal,
 		float value, const std::vector<can_signal_t>& signals, bool* send)
 {
-	SignalDecoder decoder = signal.get_decoder() == NULL ?
+	SignalDecoder decoder = signal.get_decoder() == nullptr ?
 							noopDecoder : signal.get_decoder();
 	openxc_DynamicField decoded_value = decoder(signal, signals,
 			value, send);
