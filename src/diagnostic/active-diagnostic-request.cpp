@@ -17,6 +17,8 @@
 
 #include "active-diagnostic-request.hpp"
 
+std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
+
 bool active_diagnostic_request_t::operator==(const active_diagnostic_request_t& b)
 {
 	return (bus_ == b.bus_ && id_ == b.id_ && handle_ == b.handle_) ? true : false;
@@ -72,6 +74,26 @@ DiagnosticRequestHandle* active_diagnostic_request_t::get_handle()
 	return handle_;
 }
 
+std::string& active_diagnostic_request_t::get_name()
+{
+	return name_;
+}
+
+std::string& active_diagnostic_request_t::get_prefix()
+{
+	return active_diagnostic_request_t::prefix_;
+}
+
+DiagnosticResponseDecoder& active_diagnostic_request_t::get_decoder()
+{
+	return decoder_;
+}
+
+DiagnosticResponseCallback& active_diagnostic_request_t::get_callback()
+{
+	return callback_;
+}
+
 bool active_diagnostic_request_t::get_recurring() const
 {
 	return recurring_;
@@ -100,6 +122,18 @@ void active_diagnostic_request_t::set_handle(DiagnosticShims& shims, DiagnosticR
 void active_diagnostic_request_t::set_in_flight(bool val)
 {
 	in_flight_ = val;
+}
+
+/**
+* @brief Check if requested signal name is an obd2 pid
+* 
+* @return true if name began with obd2 else false.
+*/
+bool active_diagnostic_request_t::is_diagnostic_signal(const std::string& name)
+{
+	if(name.find_first_of(prefix_.c_str(), 0, prefix_.size()))
+		return true;
+	return false;
 }
 
 bool active_diagnostic_request_t::should_send()

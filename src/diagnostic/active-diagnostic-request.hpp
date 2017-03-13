@@ -62,6 +62,8 @@ private:
 										* sending the frames of the request and receiving all frames of the response.*/
 	std::string name_; /*!< name_ - An optional human readable name this response, to be used when publishing received 
 						* responses. If the name is NULL, the published output will use the raw OBD-II response format.*/
+	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
+								 * which make easier to sort message when the come in.*/
 	DiagnosticResponseDecoder decoder_; /*!< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses
 											* to this request. If the decoder is NULL, the output will include the raw payload
 											* instead of a parsed value.*/
@@ -82,7 +84,6 @@ public:
 	active_diagnostic_request_t& operator=(const active_diagnostic_request_t& adr);
 	active_diagnostic_request_t();
 	active_diagnostic_request_t(active_diagnostic_request_t&&) = default;
-	//active_diagnostic_request_t(const active_diagnostic_request_t&) = default;
 	active_diagnostic_request_t(std::shared_ptr<can_bus_dev_t> bus, DiagnosticRequest* request,
 		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
@@ -91,6 +92,10 @@ public:
 	uint32_t get_id() const;
 	std::shared_ptr<can_bus_dev_t> get_can_bus_dev();
 	DiagnosticRequestHandle* get_handle();
+	std::string& get_name();
+	static std::string& get_prefix();
+	DiagnosticResponseDecoder& get_decoder();
+	DiagnosticResponseCallback& get_callback();
 	bool get_recurring() const;
 	bool get_in_flight() const;
 	frequency_clock_t& get_frequency_clock();
@@ -98,6 +103,8 @@ public:
 	
 	void set_handle(DiagnosticShims& shims, DiagnosticRequest* request);
 	void set_in_flight(bool val);
+
+	static bool is_diagnostic_signal(const std::string& name);
 
 	bool should_send();
 

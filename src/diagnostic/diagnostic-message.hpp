@@ -46,8 +46,6 @@ class obd2_signal_t {
 	private:
 		uint8_t pid_; /*!< pid - The 1 byte PID.*/
 		std::string generic_name_; /*!< generic_name_ - A human readable name to use for this PID when published.*/
-		static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
-						  * which make easier to sort message when the come in.*/
 		int min_; /*!< min_ - Minimum value that can take this pid */
 		int max_; /*!< max_ - Maximum value that can take this pid */
 		enum UNIT unit_; /*!< unit_ : Which unit system is used by that pid. See enum UNIT above.*/
@@ -61,16 +59,12 @@ class obd2_signal_t {
 		uint32_t get_pid();
 		const std::string& get_generic_name() const;
 		const std::string get_name() const;
-		static const std::string& get_prefix();
 		int get_frequency() const;
-
-		static void set_prefix(const std::string& val);
 
 		const DiagnosticRequest build_diagnostic_request();
 
-		bool is_obd2_response(can_message_t can_message);
-		bool is_obd2_request(DiagnosticRequest *request);
-		static bool is_obd2_signal(const std::string& name);
+		bool is_obd2_response(const can_message_t& can_message);
+		bool is_obd2_request(const DiagnosticRequest *request);
 
 		static float decode_obd2_response(const DiagnosticResponse* response, float parsedPayload);
 };

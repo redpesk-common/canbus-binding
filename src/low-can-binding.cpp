@@ -132,7 +132,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	for(const std::string& sig : signals)
 	{
 		int ret;
-		if (obd2_signal_t::is_obd2_signal(sig))
+		if (active_diagnostic_request_t::is_diagnostic_signal(sig))
 		{
 			std::vector<obd2_signal_t*> found;
 			configuration_t::instance().find_obd2_signals(build_DynamicField(sig), found);
@@ -252,9 +252,10 @@ extern "C"
 			return 0;
 		}
 
-		/// Initialize Diagnostic manager that will handle obd2 requests
-		diagnostic_manager_t& diag_manager = configuration_t::instance().get_diagnostic_manager();
-		diag_manager.initialize(can_bus_manager.get_can_devices().front());
+		/// Initialize Diagnostic manager that will handle obd2 requests.
+		/// We pass by default the first CAN bus device to its Initialization.
+		/// TODO: be able to choose the CAN bus device that will be use as Diagnostic bus.
+		configuration_t::instance().get_diagnostic_manager().initialize(can_bus_manager.get_can_devices().front());
 
 		ERROR(binder_interface, "There was something wrong with CAN device Initialization. Check your config file maybe");
 		return 1;
