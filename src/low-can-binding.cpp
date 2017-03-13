@@ -128,13 +128,11 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 
 	//TODO: Implement way to dynamically call the right function no matter 
 	// how much signals types we have.
-	/// const std::string& can_prefix = configuration_t::instance().get_can_signals().front().get_prefix();
-	const std::string& obd2_prefix = configuration_t::instance().get_obd2_signals().front().get_prefix();
 
 	for(const std::string& sig : signals)
 	{
 		int ret;
-		if (sig.find_first_of(obd2_prefix.c_str(), 0, obd2_prefix.size()))
+		if (obd2_signal_t::is_obd2_signal(sig))
 		{
 			std::vector<obd2_signal_t*> found;
 			configuration_t::instance().find_obd2_signals(build_DynamicField(sig), found);

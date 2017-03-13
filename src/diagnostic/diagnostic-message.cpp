@@ -33,6 +33,8 @@ const char *UNIT_NAMES[10] = {
 	"NM"
 };
 
+std::string obd2_signal_t::prefix_ = "diagnostic_messages.";
+
 obd2_signal_t::obd2_signal_t(uint8_t pid, const char* generic_name, const int min, const int max, enum UNIT unit, int frequency, bool supported)
 	:	pid_{pid}, generic_name_{generic_name}, min_{min}, max_{max}, unit_{unit}, frequency_{frequency}, supported_{supported}
 {
@@ -53,7 +55,7 @@ const std::string obd2_signal_t::get_name() const
 	return prefix_ + "." + generic_name_;
 }
 
-const std::string& obd2_signal_t::get_prefix() const
+const std::string& obd2_signal_t::get_prefix()
 {
 	return prefix_;
 }
@@ -63,7 +65,7 @@ int obd2_signal_t::get_frequency() const
 	return frequency_;
 }
 
-void obd2_signal_t::set_prefix(std::string val)
+void obd2_signal_t::set_prefix(const std::string& val)
 {
 	prefix_ = val;
 }
@@ -144,9 +146,9 @@ bool obd2_signal_t::is_obd2_request(DiagnosticRequest* request)
 * 
 * @return true if name began with obd2 else false.
 */
-bool obd2_signal_t::is_obd2_signal(const char *name)
+bool obd2_signal_t::is_obd2_signal(const std::string& name)
 {
-	if(fnmatch("obd2.*", name, FNM_CASEFOLD) == 0)
+	if(name.find_first_of(prefix_.c_str(), 0, prefix_.size()))
 		return true;
 	return false;
 }

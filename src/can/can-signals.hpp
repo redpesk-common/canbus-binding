@@ -77,7 +77,7 @@ class can_signal_t
 private:
 	can_message_definition_t message_; /*!< message_ - The message this signal is a part of. */
 	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
-	std::string prefix_ = "messages."; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
+	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
 						  * which make easier to sort message when the come in.*/
 	uint8_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
 										*	non-inverted bit numbering, i.e. the most significant bit of

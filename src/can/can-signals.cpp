@@ -25,6 +25,8 @@
 #include "../obd2/obd2-signals.hpp"
 #include "../low-can-binding.hpp"
 
+std::string can_signal_t::prefix_ = "messages.";
+
 can_message_definition_t& can_signal_t::get_message()
 {
 	return message_;
