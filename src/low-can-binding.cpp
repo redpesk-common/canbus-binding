@@ -42,6 +42,8 @@ extern "C"
 	#include <afb/afb-service-itf.h>
 };
 
+#define MICRO 1000000
+
 // Interface between the daemon and the binding
 const struct afb_binding_interface *binder_interface;
 
@@ -141,7 +143,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			configuration_t::instance().get_diagnostic_manager().add_recurring_request(
 				diag_req, sig.c_str(), false, obd2_signal_t::decode_obd2_response, nullptr, (float)frequency);
 				//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, obd2_signal_t::decode_obd2_response, obd2_signal_t::check_ignition_status, frequency);
-			sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source, CLOCK_MONOTONIC, frequency, 0,
+			sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source, CLOCK_MONOTONIC, frequency*MICRO, 0,
 								configuration_t::instance().get_diagnostic_manager().send_request, diag_req);
 		}
 
