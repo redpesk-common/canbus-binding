@@ -68,6 +68,23 @@ void obd2_signal_t::set_prefix(std::string val)
 	prefix_ = val;
 }
 
+/**
+ * @brief Build a DiagnosticRequest struct to be passed
+ *  to diagnostic manager instance.
+ */
+const DiagnosticRequest obd2_signal_t::build_diagnostic_request()
+{
+	return {/*arbitration_id: */OBD2_FUNCTIONAL_BROADCAST_ID,
+			/*mode: */0x1,
+			/*has_pid: */true,
+			/*pid: */pid_,
+			/*pid_length: */0,
+			/*payload[]: */{0},
+			/*payload_length: */0,
+			/*no_frame_padding: */false,
+			/*DiagnosticRequestType: */DiagnosticRequestType::DIAGNOSTIC_REQUEST_TYPE_PID };
+}
+
 bool obd2_signal_t::is_obd2_response(can_message_t can_message)
 {
 	/*
@@ -111,23 +128,6 @@ bool obd2_signal_t::is_obd2_response(can_message_t can_message)
 	*/
 	return false;
 } 	
-
-/**
- * @brief Build a DiagnosticRequest struct to be passed
- *  to diagnostic manager instance.
- */
-const DiagnosticRequest obd2_signal_t::build_diagnostic_request()
-{
-	return {/*arbitration_id: */OBD2_FUNCTIONAL_BROADCAST_ID,
-			/*mode: */0x1,
-			/*has_pid: */true,
-			/*pid: */pid_,
-			/*pid_length: */0,
-			/*payload[]: */{0},
-			/*payload_length: */0,
-			/*no_frame_padding: */false,
-			/*DiagnosticRequestType: */DiagnosticRequestType::DIAGNOSTIC_REQUEST_TYPE_PID };
-}
 
 /**
 * @brief Check if a request is an OBD-II PID request.
