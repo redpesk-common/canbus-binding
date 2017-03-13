@@ -74,44 +74,6 @@ static int create_event_handle(const std::string& sig_name, std::map<std::string
 	return 1;
 }
 
-static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, const std::string& sig, DiagnosticRequest* diag_req, int frequency)
-{
-	int ret;
-	sd_event_source *source;
-
-	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-	if (s.find(sig) != s.end() && !afb_event_is_valid(s[sig]))
-	{
-		if(!subscribe)
-		{
-			NOTICE(binder_interface, "Event isn't valid, it can't be unsubscribed.");
-			ret = -1;
-		}
-		else
-		{
-			/* Event it isn't valid anymore, recreate it */
-			sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source, CLOCK_MONOTONIC, frequency, 0,
-						configuration_t::instance().get_diagnostic_manager().send_request, diag_req);
-			ret = create_event_handle(sig, s);
-		}
-	}
-	else
-	{
-		/* Event doesn't exist , so let's create it */
-		struct afb_event empty_event = {nullptr, nullptr};
-		subscribed_signals[sig] = empty_event;
-		ret = create_event_handle(sig, s);
-	}
-
-	/* Check whether or not the event handler has been correctly created and
-	 * make the subscription/unsubscription operation is so.
-	 */
-	if (ret <= 0)
-		return ret;
-	return make_subscription_unsubscription(request, sig, s, subscribe);
-}
-
 static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, const std::string& sig)
 {
 	int ret;
@@ -160,17 +122,17 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<std::string>& signals)
 {
 	int rets = 0;
+	sd_event_source *source;
+
 	//TODO: Implement way to dynamically call the right function no matter 
 	// how much signals types we have.
-	const std::string& can_prefix = configuration_t::instance().get_can_signals().front().get_prefix();
+	/// const std::string& can_prefix = configuration_t::instance().get_can_signals().front().get_prefix();
 	const std::string& obd2_prefix = configuration_t::instance().get_obd2_signals().front().get_prefix();
 
 	for(const std::string& sig : signals)
 	{
 		int ret;
-		if (sig.find_first_of(can_prefix.c_str(), 0, can_prefix.size()))
-			ret = subscribe_unsubscribe_signal(request, subscribe, sig);
-		else if (sig.find_first_of(obd2_prefix.c_str(), 0, obd2_prefix.size()))
+		if (sig.find_first_of(obd2_prefix.c_str(), 0, obd2_prefix.size()))
 		{
 			std::vector<obd2_signal_t*> found;
 			configuration_t::instance().find_obd2_signals(build_DynamicField(sig), found);
@@ -179,13 +141,14 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			configuration_t::instance().get_diagnostic_manager().add_recurring_request(
 				diag_req, sig.c_str(), false, obd2_signal_t::decode_obd2_response, nullptr, (float)frequency);
 				//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, obd2_signal_t::decode_obd2_response, obd2_signal_t::check_ignition_status, frequency);
-			ret = subscribe_unsubscribe_signal(request, subscribe, sig, diag_req,frequency);
+			sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source, CLOCK_MONOTONIC, frequency, 0,
+								configuration_t::instance().get_diagnostic_manager().send_request, diag_req);
 		}
-		else
-			ret = -1;
 
+		ret = subscribe_unsubscribe_signal(request, subscribe, sig);
 		if(ret <= 0)
 			return ret;
+
 		rets++;
 		DEBUG(binder_interface, "Signal: %s subscribed", sig.c_str());
 	}
