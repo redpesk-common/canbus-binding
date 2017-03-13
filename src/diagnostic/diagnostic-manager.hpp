@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "uds/uds.h"
+#include "openxc.pb.h"
 #include "../can/can-bus-dev.hpp"
 #include "../can/can-message.hpp"
 #include "active-diagnostic-request.hpp"
@@ -32,6 +33,7 @@
  * match the maximum CAN controller count.
  */
 #define MAX_SHIM_COUNT can_bus_t.get_can_devices().size()
+#define DIAGNOSTIC_RESPONSE_ARBITRATION_ID_OFFSET 0x8
 
 class active_diagnostic_request_t;
 
@@ -95,6 +97,11 @@ public:
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
 	
+	bool is_diagnostic_response(const active_diagnostic_request_t& adr, const can_message_t& cm) const;
+	active_diagnostic_request_t* is_diagnostic_response(const can_message_t& can_message);
+
+	openxc_VehicleMessage relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response) const;
+
 	bool conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const;
 	bool clear_to_send(active_diagnostic_request_t* request) const;
 	static int send_request(sd_event_source *s, uint64_t usec, void *userdata);

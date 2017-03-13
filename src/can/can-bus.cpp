@@ -51,6 +51,87 @@ can_bus_t::can_bus_t(int conf_file)
 }
 
 
+int can_bus_t::process_can_signals(can_message_t& can_message)
+{
+	int processed_signals = 0;
+	std::vector <can_signal_t*> signals;
+	openxc_DynamicField search_key, decoded_message;
+	openxc_VehicleMessage vehicle_message;
+
+	/* First we have to found which can_signal_t it is */
+	search_key = build_DynamicField((double)can_message.get_id());
+	signals.clear();
+	configuration_t::instance().find_can_signals(search_key, signals);
+
+	/* Decoding the message ! Don't kill the messenger ! */
+	for(auto& sig : signals)
+	{
+		std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
+		std::map<std::string, struct afb_event>& s = get_subscribed_signals();
+
+		/* DEBUG message to make easier debugger STL containers...
+		DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[sig.generic_name]));
+		DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
+		DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.generic_name));
+		DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name)));*/
+		if( s.find(sig->get_name()) != s.end() && afb_event_is_valid(s[sig->get_name()]))
+		{
+			decoded_message = decoder_t::translateSignal(*sig, can_message, configuration_t::instance().get_can_signals());
+
+			openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_generic_name(), decoded_message);
+			vehicle_message = build_VehicleMessage(s_message);
+
+			std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
+			push_new_vehicle_message(vehicle_message);
+			new_decoded_can_message_.notify_one();
+			processed_signals++;
+		}
+	}
+
+	DEBUG(binder_interface, "process_can_signals: %d/%d CAN signals processed.", processed_signals, (int)signals.size());
+	return processed_signals;
+}
+
+int can_bus_t::process_diagnostic_signals(active_diagnostic_request_t* entry, const can_message_t& can_message)
+{
+	int processed_signals = 0;
+	openxc_VehicleMessage vehicle_message;
+
+	diagnostic_manager_t& manager = configuration_t::instance().get_diagnostic_manager();
+	
+	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
+	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
+
+	if( s.find(entry->get_name()) != s.end() && afb_event_is_valid(s[entry->get_name()]))
+	{
+		if(manager.get_can_bus_dev() == entry->get_can_bus_dev() && entry->get_in_flight())
+		{
+			DiagnosticResponse response = diagnostic_receive_can_frame(
+					// TODO: openXC todo task: eek, is bus address and array index this tightly coupled?
+					&manager.get_shims(),
+					entry->get_handle(), can_message.get_id(), can_message.get_data(), can_message.get_length());
+			if(response.completed && entry->get_handle()->completed)
+			{
+				if(entry->get_handle()->success)
+				{
+					vehicle_message = manager.relay_diagnostic_response(entry, response);
+					std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
+					push_new_vehicle_message(vehicle_message);
+					new_decoded_can_message_.notify_one();
+					processed_signals++;
+				}
+				else
+					DEBUG(binder_interface, "Fatal error sending or receiving diagnostic request");
+			}
+			else if(!response.completed && response.multi_frame)
+				// Reset the timeout clock while completing the multi-frame receive
+				entry->get_timeout_clock().tick();
+		}
+	}
+
+	return processed_signals;
+}
+
 /**
 * @brief thread to decoding raw CAN messages.
 *
@@ -59,13 +140,15 @@ can_bus_t::can_bus_t(int conf_file)
 *  subscription has been made. Can message will be decoded using translateSignal that will pass it to the
 *  corresponding decoding function if there is one assigned for that signal. If not, it will be the default
 *  noopDecoder function that will operate on it.
+*
+*  Depending on the nature of message, if id match a diagnostic request corresponding id for a response 
+*  then decoding a diagnostic message else use classic CAN signals decoding functions.
+*
+*  TODO: make diagnostic messages parsing optionnal.
 */
 void can_bus_t::can_decode_message()
 {
 	can_message_t can_message;
-	std::vector <can_signal_t*> signals;
-	openxc_VehicleMessage vehicle_message;
-	openxc_DynamicField search_key, decoded_message;
 
 	while(is_decoding_)
 	{
@@ -73,34 +156,11 @@ void can_bus_t::can_decode_message()
 		new_can_message_cv_.wait(can_message_lock);
 		can_message = next_can_message();
 
-		/* First we have to found which can_signal_t it is */
-		search_key = build_DynamicField((double)can_message.get_id());
-		signals.clear();
-		configuration_t::instance().find_can_signals(search_key, signals);
-
-		/* Decoding the message ! Don't kill the messenger ! */
-		for(auto& sig : signals)
-		{
-			std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-			std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-
-			/* DEBUG message to make easier debugger STL containers...
-			DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[sig.generic_name]));
-			DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
-			DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.generic_name));
-			DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name)));*/
-			if( s.find(sig->get_name()) != s.end() && afb_event_is_valid(s[sig->get_name()]))
-			{
-				decoded_message = decoder_t::translateSignal(*sig, can_message, configuration_t::instance().get_can_signals());
-
-				openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_generic_name(), decoded_message);
-				vehicle_message = build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type::openxc_DynamicField_Type_NUM, s_message);
-
-				std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
-				push_new_vehicle_message(vehicle_message);
-				new_decoded_can_message_.notify_one();
-			}
-		}
+		active_diagnostic_request_t* adr = configuration_t::instance().get_diagnostic_manager().is_diagnostic_response(can_message);
+		if(adr != nullptr)
+			process_diagnostic_signals(adr, can_message);
+		else
+			process_can_signals(can_message);
 	}
 }
 

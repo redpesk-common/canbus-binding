@@ -20,6 +20,7 @@
 #include "diagnostic-manager.hpp"
 
 #include "uds/uds.h"
+#include "../utils/openxc-utils.hpp"
 #include "../configuration.hpp"
 
 #define MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 10
@@ -257,6 +258,62 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 		added = false;
 	}
 	return added;
+}
+
+bool diagnostic_manager_t::is_diagnostic_response(const active_diagnostic_request_t& adr, const can_message_t& cm) const
+{
+	if(cm.get_id() == adr.get_id() + DIAGNOSTIC_RESPONSE_ARBITRATION_ID_OFFSET)
+		return true;
+	DEBUG(binder_interface, "Doesn't find an active diagnostic request that matches.");
+	return false;
+}
+
+active_diagnostic_request_t* diagnostic_manager_t::is_diagnostic_response(const can_message_t& can_message)
+{
+	for (auto& entry : non_recurring_requests_)
+	{
+		if(is_diagnostic_response(*entry, can_message))
+			return entry;
+	}
+
+	for (auto& entry : recurring_requests_)
+	{
+		if(is_diagnostic_response(*entry, can_message))
+			return entry;
+	}
+	return nullptr;
+}
+
+openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response) const
+{
+	openxc_VehicleMessage message;
+	float value = (float)diagnostic_payload_to_integer(&response);
+	if(adr->get_decoder() != nullptr)
+	{
+		value = adr->get_decoder()(&response, value);
+	}
+
+	if((response.success && strnlen(adr->get_name().c_str(), adr->get_name().size())) > 0)
+	{
+		// If name, include 'value' instead of payload, and leave of response
+		// details.
+		message = build_VehicleMessage(build_SimpleMessage(adr->get_name(), build_DynamicField(value)));
+	}
+	else
+	{
+		// If no name, send full details of response but still include 'value'
+		// instead of 'payload' if they provided a decoder. The one case you
+		// can't get is the full detailed response with 'value'. We could add
+		// another parameter for that but it's onerous to carry that around.
+		message = build_VehicleMessage(adr, response, value);
+	}
+
+	if(adr->get_callback() != nullptr)
+	{
+		adr->get_callback()(adr, &response, value);
+	}
+
+	return message;
 }
 
 bool diagnostic_manager_t::conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const

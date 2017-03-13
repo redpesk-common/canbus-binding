@@ -29,6 +29,7 @@
 #include "can-signals.hpp"
 #include "can-message.hpp"
 #include "can-bus-dev.hpp"
+#include "../obd2/active-diagnostic-request.hpp"
 
 #include "../low-can-binding.hpp"
 
@@ -78,6 +79,9 @@ public:
 
 	void start_threads();
 	void stop_threads();
+
+	int process_can_signals(can_message_t& can_message);
+	int process_diagnostic_signals(active_diagnostic_request_t* adr, const can_message_t& can_message);
 
 	can_message_t next_can_message();
 	void push_new_can_message(const can_message_t& can_msg);

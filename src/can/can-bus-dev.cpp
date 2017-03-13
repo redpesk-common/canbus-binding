@@ -42,6 +42,11 @@ std::string can_bus_dev_t::get_device_name() const
 	return device_name_;
 }
 
+uint32_t can_bus_dev_t::get_address() const
+{
+	return address_;
+}
+
 /// @brief Open the can socket and returning it
 /// @return -1 if something wrong.
 int can_bus_dev_t::open()

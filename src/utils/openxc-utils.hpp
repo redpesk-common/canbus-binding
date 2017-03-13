@@ -23,19 +23,18 @@
 #include <sys/timeb.h>
 
 #include "openxc.pb.h"
+#include "../obd2/active-diagnostic-request.hpp"
 
 /**
- * @fn openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type, const openxc_SimpleMessage& message);
- *
  * @brief Build a specific VehicleMessage containing a SimpleMessage.
  *
- * @param[in] type - The type of message to build
  * @param[in] message - simple message to include into openxc_VehicleMessage
  *
  * @return a vehicle message including simple message that will be convert into 
  * a JSON object before being pushed to the subscribers
  */
-openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type, const openxc_SimpleMessage& message);
+openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value);
+openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message);
 
 /**
  * @fn openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_DynamicField& value);

@@ -18,32 +18,72 @@
 
 #include "openxc-utils.hpp"
 
-openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type, const openxc_SimpleMessage& message)
+#include "../configuration.hpp"
+
+openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value)
 {
-	struct timeb t_msec;
-	long long int timestamp_msec;
-	
-	openxc_VehicleMessage v;
-	
-	if(!::ftime(&t_msec))
+	openxc_VehicleMessage message;
+
+	message.has_type = true;
+	message.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_DIAGNOSTIC;
+	message.has_diagnostic_response = true;
+	message.diagnostic_response.has_bus = true;
+	message.diagnostic_response.bus = configuration_t::instance().get_diagnostic_manager().get_can_bus_dev()->get_address();
+	message.diagnostic_response.has_message_id = true;
+
+	if(request->get_id() != OBD2_FUNCTIONAL_BROADCAST_ID)
 	{
-		timestamp_msec = ((long long int) t_msec.time) * 1000ll + 
-							(long long int) t_msec.millitm;
-
-		v.has_type = true;
-		v.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE;
-		v.has_simple_message = true;
-		v.simple_message =  message;
-		v.has_timestamp = true;
-		v.timestamp = timestamp_msec;
-
-		return v;
+		message.diagnostic_response.message_id = response.arbitration_id
+			- DIAGNOSTIC_RESPONSE_ARBITRATION_ID_OFFSET;
+	}
+	else
+	{
+		// must preserve responding arb ID for responses to functional broadcast
+		// requests, as they are the actual module address and not just arb ID +
+		// 8.
+		message.diagnostic_response.message_id = response.arbitration_id;
 	}
 
+	message.diagnostic_response.has_mode = true;
+	message.diagnostic_response.mode = response.mode;
+	message.diagnostic_response.has_pid = response.has_pid;
+	if(message.diagnostic_response.has_pid)
+		message.diagnostic_response.pid = response.pid;
+	message.diagnostic_response.has_success = true;
+	message.diagnostic_response.success = response.success;
+	message.diagnostic_response.has_negative_response_code = !response.success;
+	message.diagnostic_response.negative_response_code =
+			response.negative_response_code;
+
+	if(response.payload_length > 0)
+	{
+		if(request->get_decoder() != nullptr)
+		{
+			message.diagnostic_response.has_value = true;
+			message.diagnostic_response.value = parsed_value;
+		}
+		else
+		{
+			message.diagnostic_response.has_payload = true;
+			::memcpy(message.diagnostic_response.payload.bytes, response.payload,
+					response.payload_length);
+			message.diagnostic_response.payload.size = response.payload_length;
+		}
+	}
+
+	return message;
+}
+
+openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message)
+{
+	openxc_VehicleMessage v;
+	
 	v.has_type = true,
 	v.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE;
 	v.has_simple_message = true;
 	v.simple_message =  message;
+	v.has_timestamp = true;
+	v.timestamp = system_time_ms();
 
 	return v;
 }

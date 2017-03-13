@@ -49,6 +49,7 @@ public:
 	can_bus_dev_t(const std::string& dev_name, int32_t address);
 
 	std::string get_device_name() const;
+	uint32_t get_address() const;
 
 	int open();
 	int close();
