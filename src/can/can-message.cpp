@@ -30,8 +30,8 @@ can_message_t::can_message_t()
 	: maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::ERROR}, rtr_flag_{false}, flags_{0}
 {}
 
-can_message_t::can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, can_message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t> data)
-	:  maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::ERROR}, rtr_flag_{false}, flags_{0}, data_{data}
+can_message_t::can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, can_message_format_t format, bool rtr_flag, uint8_t flags, std::vector<uint8_t> data)
+	:  maxdlen_{maxdlen}, id_{id}, length_{length}, format_{format}, rtr_flag_{rtr_flag}, flags_{flags}, data_{data}
 {}
 
 /**

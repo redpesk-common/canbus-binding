@@ -63,18 +63,13 @@ openxc_DynamicField decoder_t::ignoreDecoder(can_signal_t& signal,
 openxc_DynamicField decoder_t::stateDecoder(can_signal_t& signal,
 		const std::vector<can_signal_t>& signals, float value, bool* send)
 {
-	openxc_DynamicField decoded_value = {0, openxc_DynamicField_Type_BOOL, 0, "", 0, 0, 0, 0};
-	decoded_value.has_type = true;
-	decoded_value.type = openxc_DynamicField_Type_STRING;
-	decoded_value.has_string_value = true;
-
-	/* TODO: Handle SignalState 
-	const can_signal_tState* signalState = lookupSignalState(value, signal);
-	if(signalState != NULL) {
-		::strcpy(decoded_value.string_value, signalState->name);
-	} else {
+	const std::string signal_state = signal.get_states(value);
+	openxc_DynamicField decoded_value = build_DynamicField(signal_state);
+	if(signal_state.size() <= 0)
+	{
 		*send = false;
-	}*/
+		ERROR(binder_interface, "stateDecoder: No state found with index: %d", (int)value);
+	}
 	return decoded_value;
 }
 
