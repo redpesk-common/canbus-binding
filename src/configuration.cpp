@@ -120,7 +120,7 @@ void configuration_t::find_obd2_signals(const openxc_DynamicField &key, std::vec
 			ERROR(binder_interface, "find_obd2_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 			break;
 	}
-	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
+	DEBUG(binder_interface, "find_obd2_signals: Found %d signal(s)", (int)found_signals.size());
 }
 
 /**
@@ -146,5 +146,5 @@ void configuration_t::find_can_signals(const openxc_DynamicField& key, std::vect
 			ERROR(binder_interface, "find_can_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 			break;
 	}
-	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
+	DEBUG(binder_interface, "find_can_signals: Found %d signal(s)", (int)found_signals.size());
 }
