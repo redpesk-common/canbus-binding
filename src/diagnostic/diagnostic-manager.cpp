@@ -28,7 +28,7 @@
 #define MAX_REQUEST_ENTRIES 50
 
 diagnostic_manager_t::diagnostic_manager_t()
-	: request_list_entries_(MAX_REQUEST_ENTRIES), initialized_{false}
+	: request_list_entries_(MAX_REQUEST_ENTRIES, new active_diagnostic_request_t()), initialized_{false}
 {}
 
 bool diagnostic_manager_t::initialize(std::shared_ptr<can_bus_dev_t> cbd)
@@ -63,8 +63,11 @@ void diagnostic_manager_t::reset()
 		cleanup_active_requests(true);
 	}
 
-	for(int i = 0; i < MAX_SIMULTANEOUS_DIAG_REQUESTS; i++)
-		free_request_entries_.push_back(request_list_entries_[i]);
+	for(uint8_t i = 0; i < MAX_REQUEST_ENTRIES; i++)
+	{
+		free_request_entries_.push_back(request_list_entries_.back());
+		request_list_entries_.pop_back();
+	}
 }
 
 
@@ -161,11 +164,11 @@ std::shared_ptr<can_bus_dev_t> diagnostic_manager_t::get_can_bus_dev()
 
 active_diagnostic_request_t* diagnostic_manager_t::get_free_entry()
 {
-	if (request_list_entries_.empty())
+	if (free_request_entries_.empty())
 		return nullptr;
 
-	active_diagnostic_request_t* adr = request_list_entries_.back();
-	request_list_entries_.pop_back();
+	active_diagnostic_request_t* adr = free_request_entries_.back();
+	free_request_entries_.pop_back();
 	return adr;
 }
 
@@ -241,8 +244,8 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 						sizeof(request_string));
 
 				find_and_erase(entry, recurring_requests_);
-				DEBUG(binder_interface, "Added recurring diagnostic request (freq: %f) on bus %d: %s",
-						frequencyHz, bus_->get_device_name(), request_string);
+				DEBUG(binder_interface, "Added recurring diagnostic request (freq: %f) on bus %s: %s",
+						frequencyHz, bus_->get_device_name().c_str(), request_string);
 
 				recurring_requests_.push_back(entry);
 		}
