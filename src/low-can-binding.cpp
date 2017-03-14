@@ -53,9 +53,9 @@ const struct afb_binding_interface *binder_interface;
 static int make_subscription_unsubscription(struct afb_req request, const std::string& sig_name, std::map<std::string, struct afb_event>& s, bool subscribe)
 {
 	/* Make the subscription or unsubscription to the event */
-	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[sig_name.c_str()])) < 0)
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[sig_name])) < 0)
 	{
-		ERROR(binder_interface, "Operation goes wrong for signal: %s", sig_name);
+		ERROR(binder_interface, "Operation goes wrong for signal: %s", sig_name.c_str());
 		return 0;
 	}
 	return 1;
@@ -67,7 +67,7 @@ static int create_event_handle(const std::string& sig_name, std::map<std::string
 	s[sig_name] = afb_daemon_make_event(binder_interface->daemon, sig_name.c_str());
 	if (!afb_event_is_valid(s[sig_name]))
 	{
-		ERROR(binder_interface, "Can't create an event, something goes wrong.");
+		ERROR(binder_interface, "Can't create an event for %s, something goes wrong.", sig_name.c_str());
 		return 0;
 	}
 	return 1;
@@ -128,7 +128,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	for(const std::string& sig : signals)
 	{
 		int ret;
-		if (active_diagnostic_request_t::is_diagnostic_signal(sig))
+		if (active_diagnostic_request_t::is_diagnostic_signal(sig) && subscribe)
 		{
 			std::vector<obd2_signal_t*> found;
 			configuration_t::instance().find_obd2_signals(build_DynamicField(sig), found);
@@ -160,7 +160,7 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 		ret = 0;
 
 	ret = subscribe_unsubscribe_signals(request, subscribe, signals);
-	NOTICE(binder_interface, "Subscribed correctly to %d/%d signal(s).", ret, (int)signals.size());
+	NOTICE(binder_interface, "Subscribed/unsubscribe correctly to %d/%d signal(s).", ret, (int)signals.size());
 
 	return ret;
 }
