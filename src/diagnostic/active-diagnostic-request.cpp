@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <fnmatch.h>
+
 #include "active-diagnostic-request.hpp"
 
 std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
@@ -131,7 +133,8 @@ void active_diagnostic_request_t::set_in_flight(bool val)
 */
 bool active_diagnostic_request_t::is_diagnostic_signal(const std::string& name)
 {
-	if(name.find_first_of(prefix_.c_str(), 0, prefix_.size()))
+	const std::string p = active_diagnostic_request_t::prefix_ + "*";
+	if(::fnmatch(p.c_str(), name.c_str(), FNM_CASEFOLD) == 0)
 		return true;
 	return false;
 }
