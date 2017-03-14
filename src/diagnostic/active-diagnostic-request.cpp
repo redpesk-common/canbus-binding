@@ -76,9 +76,9 @@ DiagnosticRequestHandle* active_diagnostic_request_t::get_handle()
 	return handle_;
 }
 
-std::string& active_diagnostic_request_t::get_name()
+const std::string active_diagnostic_request_t::get_name() const
 {
-	return name_;
+	return active_diagnostic_request_t::prefix_ + "." + name_;
 }
 
 std::string& active_diagnostic_request_t::get_prefix()
