@@ -143,6 +143,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 				//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, obd2_signal_t::decode_obd2_response, obd2_signal_t::check_ignition_status, frequency);
 			sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source, CLOCK_MONOTONIC, frequency*MICRO, 0,
 								configuration_t::instance().get_diagnostic_manager().send_request, diag_req);
+			sd_event_source_set_enabled(source, SD_EVENT_ON);
 		}
 
 		ret = subscribe_unsubscribe_signal(request, subscribe, sig);
