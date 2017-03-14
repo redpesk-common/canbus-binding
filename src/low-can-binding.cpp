@@ -25,7 +25,6 @@
 #include <time.h>
 #include <linux/can.h>
 #include <json-c/json.h>
-#include <systemd/sd-event.h>
 
 #include "openxc.pb.h"
 #include "configuration.hpp"
@@ -41,8 +40,6 @@ extern "C"
 {
 	#include <afb/afb-service-itf.h>
 };
-
-#define MICRO 1000000
 
 // Interface between the daemon and the binding
 const struct afb_binding_interface *binder_interface;
@@ -124,7 +121,6 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<std::string>& signals)
 {
 	int rets = 0;
-	sd_event_source *source;
 
 	//TODO: Implement way to dynamically call the right function no matter
 	// how much signals types we have.
@@ -141,9 +137,6 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			configuration_t::instance().get_diagnostic_manager().add_recurring_request(
 				diag_req, sig.c_str(), false, obd2_signal_t::decode_obd2_response, nullptr, (float)frequency);
 				//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, obd2_signal_t::decode_obd2_response, obd2_signal_t::check_ignition_status, frequency);
-			sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source, CLOCK_MONOTONIC, frequency*MICRO, 0,
-								configuration_t::instance().get_diagnostic_manager().send_request, diag_req);
-			sd_event_source_set_enabled(source, SD_EVENT_ON);
 		}
 
 		ret = subscribe_unsubscribe_signal(request, subscribe, sig);

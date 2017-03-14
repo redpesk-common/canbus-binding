@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <systemd/sd-event.h>
 #include <algorithm>
 
 #include "diagnostic-manager.hpp"
@@ -26,6 +27,7 @@
 #define MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 10
 #define MAX_SIMULTANEOUS_DIAG_REQUESTS 50
 #define MAX_REQUEST_ENTRIES 50
+#define MICRO 1000000
 
 diagnostic_manager_t::diagnostic_manager_t()
 	: request_list_entries_(MAX_REQUEST_ENTRIES, new active_diagnostic_request_t()), initialized_{false}
@@ -233,6 +235,7 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 
 		if(entry != nullptr)
 		{
+			sd_event_source *source;
 			// TODO: implement Acceptance Filter
 			//if(updateRequiredAcceptanceFilters(bus, request)) {
 				entry = new active_diagnostic_request_t(bus_, request, name,
@@ -247,11 +250,29 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 				DEBUG(binder_interface, "Added recurring diagnostic request (freq: %f) on bus %s: %s",
 						frequencyHz, bus_->get_device_name().c_str(), request_string);
 
-				recurring_requests_.push_back(entry);
+				if(sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source,
+					CLOCK_MONOTONIC, (uint64_t)frequencyHz*MICRO, 0,send_request, request) >= 0)
+				{
+					if(sd_event_source_set_enabled(source, SD_EVENT_ON) >= 0)
+						recurring_requests_.push_back(entry);
+					else
+					{
+						ERROR(binder_interface, "add_reccurring_request: Request has not been enabled, it will occurs only one time");
+						free_request_entries_.push_back(entry);
+						added = false;
+					}
+				}
+				else
+				{
+					ERROR(binder_interface, "add_recurring_request: Request fails to be schedule through event loop");
+					free_request_entries_.push_back(entry);
+					added = false;
+				}
 		}
 		else
 		{
 			WARNING(binder_interface, "There isn't enough request entry. Vector exhausted %d/%d", (int)request_list_entries_.size(), (int)request_list_entries_.max_size());
+			free_request_entries_.push_back(entry);
 			added = false;
 		}
 	}
