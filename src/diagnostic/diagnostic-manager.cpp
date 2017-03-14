@@ -26,12 +26,11 @@
 
 #define MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 10
 #define MAX_SIMULTANEOUS_DIAG_REQUESTS 50
-#define MAX_REQUEST_ENTRIES 50
 #define TIMERFD_ACCURACY 0
 #define MICRO 1000000
 
 diagnostic_manager_t::diagnostic_manager_t()
-	: request_list_entries_(MAX_REQUEST_ENTRIES, new active_diagnostic_request_t()), initialized_{false}
+	: initialized_{false}
 {}
 
 bool diagnostic_manager_t::initialize(std::shared_ptr<can_bus_dev_t> cbd)
@@ -65,12 +64,6 @@ void diagnostic_manager_t::reset()
 		DEBUG(binder_interface, "Clearing existing diagnostic requests");
 		cleanup_active_requests(true);
 	}
-
-	for(uint8_t i = 0; i < MAX_REQUEST_ENTRIES; i++)
-	{
-		free_request_entries_.push_back(request_list_entries_.back());
-		request_list_entries_.pop_back();
-	}
 }
 
 
@@ -85,7 +78,7 @@ void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t* entry, st
 /// CAN filters it used.
 void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 {
-	free_request_entries_.push_back(entry);
+
 	/* TODO: implement acceptance filters.
 	if(entry.arbitration_id_ == OBD2_FUNCTIONAL_BROADCAST_ID) {
 		for(uint32_t filter = OBD2_FUNCTIONAL_RESPONSE_START;
@@ -118,43 +111,41 @@ void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, b
 			find_and_erase(entry, recurring_requests_);
 			if(force)
 				cancel_request(entry);
-			else
-			{
-				DEBUG(binder_interface, "Moving completed recurring request to the back of the queue: %s", request_string);
-				recurring_requests_.push_back(entry);
-			}
 		}
 		else
 		{
-			DEBUG(binder_interface, "Cancelling completed, non-recurring request: %s", request_string);
+			DEBUG(binder_interface, "cleanup_request: Cancelling completed, non-recurring request: %s", request_string);
 			find_and_erase(entry, non_recurring_requests_);
 			cancel_request(entry);
 		}
 	}
 }
 
-/// @brief Clean up the request list, move as many to the free list as possible
+/// @brief Clean up the request list
 void diagnostic_manager_t::cleanup_active_requests(bool force)
 {
 	for(auto& entry : non_recurring_requests_)
-		cleanup_request(entry, force);
+		if (entry != nullptr)
+			cleanup_request(entry, force);
 
 	for(auto& entry : recurring_requests_)
-		cleanup_request(entry, force);
+		if (entry != nullptr)
+			cleanup_request(entry, force);
 }
 
-/// @brief Note that this pops it off of whichver list it was on and returns it, so make
-/// sure to add it to some other list or it'll be lost.
+/// @brief Will return the active_diagnostic_request_t pointer of found request or nullptr if
+/// not found.
 active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const DiagnosticRequest* request)
 {
 	for (auto& entry : recurring_requests_)
 	{
-		active_diagnostic_request_t* candidate = entry;
-		if(diagnostic_request_equals(&candidate->get_handle()->request, request))
+		if(entry != nullptr)
 		{
-			find_and_erase(entry, recurring_requests_);
-			return entry;
-			break;
+			if(diagnostic_request_equals(&entry->get_handle()->request, request))
+			{
+				return entry;
+				break;
+			}
 		}
 	}
 	return nullptr;
@@ -165,16 +156,6 @@ std::shared_ptr<can_bus_dev_t> diagnostic_manager_t::get_can_bus_dev()
 	return bus_;
 }
 
-active_diagnostic_request_t* diagnostic_manager_t::get_free_entry()
-{
-	if (free_request_entries_.empty())
-		return nullptr;
-
-	active_diagnostic_request_t* adr = free_request_entries_.back();
-	free_request_entries_.pop_back();
-	return adr;
-}
-
 bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::string name,
 	bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 	const DiagnosticResponseCallback callback)
@@ -182,13 +163,12 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 	cleanup_active_requests(false);
 
 	bool added = true;
-	active_diagnostic_request_t* entry = get_free_entry();
 
-	if (entry != nullptr)
+	if (non_recurring_requests_.size() <= MAX_SIMULTANEOUS_DIAG_REQUESTS)
 	{
 		// TODO: implement Acceptance Filter
 		//	if(updateRequiredAcceptanceFilters(bus, request)) {
-			entry = new active_diagnostic_request_t(bus_, request, name,
+			active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request, name,
 					wait_for_multiple_responses, decoder, callback, 0);
 			entry->set_handle(shims_, request);
 
@@ -204,7 +184,8 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 	}
 	else
 	{
-		WARNING(binder_interface, "There isn't enough request entry. Vector exhausted %d/%d", (int)request_list_entries_.size(), (int)request_list_entries_.max_size());
+		WARNING(binder_interface, "There isn't enough request entry. Vector exhausted %d/%d", (int)non_recurring_requests_.size());
+		non_recurring_requests_.resize(MAX_SIMULTANEOUS_DIAG_REQUESTS);
 		added = false;
 	}
 	return added;
