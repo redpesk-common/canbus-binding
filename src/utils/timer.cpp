@@ -20,8 +20,6 @@
 
 #include "timer.hpp"
 
-#define MS_PER_SECOND 1000
-
 long long int system_time_us()
 {
 	struct timespec t_usec;
@@ -64,7 +62,7 @@ frequency_clock_t::frequency_clock_t(float frequency)
 /// @brief Return the period in ms given the frequency in hertz.
 float frequency_clock_t::frequency_to_period(float frequency)
 {
-	return 1 / frequency * MS_PER_SECOND;
+	return 1 / frequency;
 }
 
 bool frequency_clock_t::started()
