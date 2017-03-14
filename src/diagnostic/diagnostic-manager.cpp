@@ -213,47 +213,42 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 	bool added = true;
 	if(find_recurring_request(request) == nullptr)
 	{
-		active_diagnostic_request_t* entry = get_free_entry();
-
-		if(entry != nullptr)
+		if(recurring_requests_.size() <= MAX_SIMULTANEOUS_DIAG_REQUESTS)
 		{
 			sd_event_source *source;
 			// TODO: implement Acceptance Filter
 			//if(updateRequiredAcceptanceFilters(bus, request)) {
-				entry = new active_diagnostic_request_t(bus_, request, name,
-						wait_for_multiple_responses, decoder, callback, frequencyHz);
-				entry->set_handle(shims_, request);
+			active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request, name,
+					wait_for_multiple_responses, decoder, callback, frequencyHz);
+			entry->set_handle(shims_, request);
 
-				char request_string[128] = {0};
-				diagnostic_request_to_string(&entry->get_handle()->request, request_string,
-						sizeof(request_string));
+			char request_string[128] = {0};
+			diagnostic_request_to_string(&entry->get_handle()->request, request_string,
+					sizeof(request_string));
 
-				find_and_erase(entry, recurring_requests_);
-				DEBUG(binder_interface, "Added recurring diagnostic request (freq: %f) on bus %s: %s",
-						frequencyHz, bus_->get_device_name().c_str(), request_string);
+			DEBUG(binder_interface, "add_recurring_request: Added recurring diagnostic request (freq: %f) on bus %s: %s",
+					frequencyHz, bus_->get_device_name().c_str(), request_string);
 
-				uint64_t usec;
-				usec = sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_MONOTONIC, &usec) + (uint64_t)(frequency_clock_t::frequency_to_period(frequencyHz)*MICRO);
-				if(sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source,
-						CLOCK_MONOTONIC, usec, TIMERFD_ACCURACY, send_request, request) >= 0)
-					recurring_requests_.push_back(entry);
-				else
-				{
-					ERROR(binder_interface, "add_recurring_request: Request fails to be schedule through event loop");
-					free_request_entries_.push_back(entry);
-					added = false;
-				}
+			uint64_t usec;
+			sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_MONOTONIC, &usec);
+			if(sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source,
+					CLOCK_MONOTONIC, usec, TIMERFD_ACCURACY, send_request, request) < 0)
+			{
+				ERROR(binder_interface, "add_recurring_request: Request fails to be schedule through event loop");
+				added = false;
+			}
+			recurring_requests_.push_back(entry);
 		}
 		else
 		{
-			WARNING(binder_interface, "There isn't enough request entry. Vector exhausted %d/%d", (int)request_list_entries_.size(), (int)request_list_entries_.max_size());
-			free_request_entries_.push_back(entry);
+			WARNING(binder_interface, "add_recurring_request: There isn't enough request entry. Vector exhausted %d/%d", (int)recurring_requests_.size(), MAX_SIMULTANEOUS_DIAG_REQUESTS);
+			recurring_requests_.resize(MAX_SIMULTANEOUS_DIAG_REQUESTS);
 			added = false;
 		}
 	}
 	else
 	{
-		DEBUG(binder_interface, "Can't add request, one already exists with same key");
+		DEBUG(binder_interface, "add_recurring_request: Can't add request, one already exists with same key");
 		added = false;
 	}
 	return added;
@@ -360,16 +355,16 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 		adr->get_timeout_clock().tick();
 		adr->set_in_flight(true);
 
-		usec = usec + (uint64_t)(frequency_clock_t::frequency_to_period(adr->get_frequency_clock().get_frequency())*MICRO);
-		DEBUG(binder_interface, "send_request: usec: %d", usec);
-		if(sd_event_source_set_time(s, usec) >= 0)
-			if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)
-			{
-				dm.recurring_requests_.push_back(adr);
-				return 1;
-			}
+		if(adr->get_recurring())
+		{
+			usec = usec + (uint64_t)(frequency_clock_t::frequency_to_period(adr->get_frequency_clock().get_frequency())*MICRO);
+			DEBUG(binder_interface, "send_request: Event loop state: %d. usec: %ld", sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
+			if(sd_event_source_set_time(s, usec+1000000) >= 0)
+				if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)
+					return 1;
+		}
 	}
-	dm.recurring_requests_.push_back(adr);
+	sd_event_source_unref(s);
 	ERROR(binder_interface, "send_request: Something goes wrong when submitting a new request to the CAN bus");
 	return -1;
 }
