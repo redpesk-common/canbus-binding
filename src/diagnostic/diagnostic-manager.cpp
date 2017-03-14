@@ -380,11 +380,16 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 	return can_bus_dev->shims_send(arbitration_id, data, size);
 }
 
-void diagnostic_manager_t::shims_logger(const char* m, ...)
+void diagnostic_manager_t::shims_logger(const char* format, ...)
 {
-	DEBUG(binder_interface, "%s", m);
+	va_list args;
+	va_start(args, format);
+
+	char buffer[256];
+	vsnprintf(buffer, 256, format, args);
+
+	DEBUG(binder_interface, "shims_logger: %s", buffer);
 }
 
 void diagnostic_manager_t::shims_timer()
 {}
-
