@@ -22,6 +22,7 @@
 #include "uds/uds.h"
 #include "../can/can-bus.hpp"
 #include "../can/can-message.hpp"
+#include "active-diagnostic-request.hpp"
 
 #include "../low-can-binding.hpp"
 
@@ -49,7 +50,7 @@ class diagnostic_message_t {
 		int min_; /*!< min_ - Minimum value that can take this pid */
 		int max_; /*!< max_ - Maximum value that can take this pid */
 		enum UNIT unit_; /*!< unit_ : Which unit system is used by that pid. See enum UNIT above.*/
-		int frequency_; /*!< frequency - The frequency to request this PID if supported by the vehicle when automatic, recurring OBD-II requests are enabled.*/
+		float frequency_; /*!< frequency - The frequency to request this PID if supported by the vehicle when automatic, recurring OBD-II requests are enabled.*/
 		DiagnosticResponseDecoder decoder_; /*!< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses
 											 * to this request. If the decoder is NULL, the output will include the raw payload
 											 * instead of a parsed value.*/
@@ -66,7 +67,7 @@ class diagnostic_message_t {
 		uint32_t get_pid();
 		const std::string& get_generic_name() const;
 		const std::string get_name() const;
-		int get_frequency() const;
+		float get_frequency() const;
 		DiagnosticResponseDecoder get_decoder() const;
 		DiagnosticResponseCallback get_callback() const;
 
@@ -74,5 +75,4 @@ class diagnostic_message_t {
 
 		bool is_obd2_response(const can_message_t& can_message);
 		bool is_obd2_request(const DiagnosticRequest *request);
-
 };
