@@ -23,7 +23,7 @@
 #include <sys/timeb.h>
 
 #include "openxc.pb.h"
-#include "../obd2/active-diagnostic-request.hpp"
+#include "../diagnostic/active-diagnostic-request.hpp"
 
 openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value);
 openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message);

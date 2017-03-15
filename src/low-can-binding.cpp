@@ -33,7 +33,7 @@
 #include "can/can-message.hpp"
 #include "utils/timer.hpp"
 #include "utils/signals.hpp"
-#include "obd2/obd2-signals.hpp"
+#include "diagnostic/diagnostic-message.hpp"
 #include "utils/openxc-utils.hpp"
 
 extern "C"

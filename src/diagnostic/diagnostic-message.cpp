@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "obd2-signals.hpp"
+#include "diagnostic-message.hpp"
 
 #include "../configuration.hpp"
 #include "../utils/signals.hpp"

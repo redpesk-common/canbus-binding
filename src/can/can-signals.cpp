@@ -22,7 +22,7 @@
 #include "../configuration.hpp"
 #include "../utils/signals.hpp"
 #include "can-decoder.hpp"
-#include "../obd2/obd2-signals.hpp"
+#include "../diagnostic/diagnostic-message.hpp"
 #include "../low-can-binding.hpp"
 
 std::string can_signal_t::prefix_ = "messages";

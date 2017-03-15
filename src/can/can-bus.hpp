@@ -29,7 +29,7 @@
 #include "can-signals.hpp"
 #include "can-message.hpp"
 #include "can-bus-dev.hpp"
-#include "../obd2/active-diagnostic-request.hpp"
+#include "../diagnostic/active-diagnostic-request.hpp"
 
 #include "../low-can-binding.hpp"
 

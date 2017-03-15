@@ -28,7 +28,7 @@
 #include "can-bus.hpp"
 #include "can-message.hpp"
 #include "can-message-definition.hpp"
-#include "../obd2/obd2-signals.hpp"
+#include "../diagnostic/diagnostic-message.hpp"
 
 extern "C"
 {

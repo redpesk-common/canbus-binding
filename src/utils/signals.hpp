@@ -24,7 +24,7 @@
 #include "openxc.pb.h"
 #include "../configuration.hpp"
 #include "../can/can-signals.hpp"
-#include "../obd2/obd2-signals.hpp"
+#include "../diagnostic/diagnostic-message.hpp"
 
 #include "../low-can-binding.hpp"
 
