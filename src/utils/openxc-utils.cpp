@@ -109,6 +109,33 @@ openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message)
 }
 
 /**
+ * @brief Build an empty VehicleMessage that isn't usable by at least the struct
+ *  is initialized for the most part and can be use to check a false return value.
+ *
+ * @return A VehicleMessage with all boolean value to false.
+ */
+openxc_VehicleMessage build_VehicleMessage()
+{
+	openxc_VehicleMessage v;
+
+	::memset(&v, 0, sizeof(openxc_VehicleMessage));
+	return v;
+}
+
+bool is_valid(const openxc_VehicleMessage& v)
+{
+	if (v.has_type == false &&
+		v.has_can_message == false &&
+		v.has_simple_message == false &&
+		v.has_diagnostic_response == false &&
+		v.has_control_command == false &&
+		v.has_command_response == false &&
+		v.has_timestamp == false)
+			return false;
+	return true;
+}
+
+/**
  * @brief Build an openxc_SimpleMessage associating a name to an openxc_DynamicField
  *
  * @param[in] name - const string reference name to assign to the created SimpleMessage

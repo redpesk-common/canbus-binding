@@ -27,6 +27,8 @@
 
 openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value);
 openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message);
+openxc_VehicleMessage build_VehicleMessage();
+bool is_valid(const openxc_VehicleMessage& v);
 
 openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_DynamicField& value);
 openxc_DynamicField build_DynamicField(const std::string& value);
