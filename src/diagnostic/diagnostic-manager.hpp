@@ -18,6 +18,7 @@
 #pragma once
 
 #include <systemd/sd-event.h>
+#include <map>
 #include <vector>
 
 #include "uds/uds.h"
@@ -49,10 +50,10 @@ protected:
 	static void shims_timer();
 
 private:
-	DiagnosticShims shims_; /*!< shims_ - An array of shim functions for each CAN bus that plug the diagnostics
-							 * library (uds-c) into the VI's CAN peripheral.*/
-	std::shared_ptr<can_bus_dev_t> bus_; /*!< bus_ - A pointer to the CAN bus that should be used for all standard OBD-II requests, if the bus is not
-						  * explicitly spcified in the request. If NULL, all requests require an explicit bus.*/
+	DiagnosticShims shims_; /*!< shims_ - A map of shim functions for each CAN bus that plug the diagnostics
+							 						* library (uds-c) into the VI's CAN peripheral.*/
+	std::string bus_; /*!< bus_ - A pointer to the CAN bus that should be used for all standard OBD-II requests, if the bus is not
+						  * explicitly spcified in the request. Default to the first bus CAN at initialization.*/
 	std::vector<active_diagnostic_request_t*> recurring_requests_; /*!< recurringRequests - A list of active recurring diagnostic requests.*/
 	std::vector<active_diagnostic_request_t*> non_recurring_requests_; /*!< nonrecurringRequests - A list of active one-time diagnostic requests. When a
 																	   * response is received for a non-recurring request or it times out, it is removed*/
@@ -63,7 +64,7 @@ private:
 public:
 	diagnostic_manager_t();
 
-	bool initialize(std::shared_ptr<can_bus_dev_t> cbd);
+	bool initialize();
 
 	std::shared_ptr<can_bus_dev_t> get_can_bus_dev();
 	DiagnosticShims& get_shims();

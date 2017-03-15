@@ -33,10 +33,10 @@ diagnostic_manager_t::diagnostic_manager_t()
 	: initialized_{false}
 {}
 
-bool diagnostic_manager_t::initialize(std::shared_ptr<can_bus_dev_t> cbd)
+bool diagnostic_manager_t::initialize()
 {
 	// Mandatory to set the bus before intiliaze shims.
-	bus_ = cbd;
+	bus_ = configuration_t::instance().get_diagnostic_bus();
 
 	init_diagnostic_shims();
 	reset();
@@ -153,7 +153,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const 
 
 std::shared_ptr<can_bus_dev_t> diagnostic_manager_t::get_can_bus_dev()
 {
-	return bus_;
+	return can_bus_t::get_can_device(bus_);
 }
 
 bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::string name,
@@ -178,7 +178,7 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 
 			find_and_erase(entry, non_recurring_requests_);
 			DEBUG(binder_interface, "Added one-time diagnostic request on bus %s: %s",
-					bus_->get_device_name(), request_string);
+					bus_, request_string);
 
 			non_recurring_requests_.push_back(entry);
 	}
@@ -227,7 +227,7 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 					sizeof(request_string));
 
 			DEBUG(binder_interface, "add_recurring_request: Added recurring diagnostic request (freq: %f) on bus %s: %s",
-					frequencyHz, bus_->get_device_name().c_str(), request_string);
+					frequencyHz, bus_.c_str(), request_string);
 
 			uint64_t usec;
 			sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_MONOTONIC, &usec);
@@ -343,7 +343,7 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 
 //	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev() && adr->should_send() &&
 //		dm.clear_to_send(adr))
-	if(adr != nullptr && adr->get_can_bus_dev() == dm.bus_)
+	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev())
 	{
 		adr->get_frequency_clock().tick();
 		start_diagnostic_request(&dm.shims_, adr->get_handle());
@@ -376,7 +376,7 @@ DiagnosticShims& diagnostic_manager_t::get_shims()
 
 bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
-	std::shared_ptr<can_bus_dev_t> can_bus_dev = configuration_t::instance().get_diagnostic_manager().get_can_bus_dev();
+	std::shared_ptr<can_bus_dev_t> can_bus_dev = can_bus_t::get_can_device(configuration_t::instance().get_diagnostic_manager().bus_);
 	return can_bus_dev->shims_send(arbitration_id, data, size);
 }
 

@@ -16,8 +16,11 @@
  */
 
 #include <fnmatch.h>
+#include <map>
 
 #include "active-diagnostic-request.hpp"
+
+#include "../configuration.hpp"
 
 std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
 
@@ -52,9 +55,8 @@ active_diagnostic_request_t::active_diagnostic_request_t()
 	  in_flight_{false}, frequency_clock_{frequency_clock_t()}, timeout_clock_{frequency_clock_t()}
 {}
 
-active_diagnostic_request_t::active_diagnostic_request_t(std::shared_ptr<can_bus_dev_t> bus, DiagnosticRequest* request,
-		const std::string& name, bool wait_for_multiple_responses,
-		const DiagnosticResponseDecoder decoder,
+active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus, DiagnosticRequest* request,
+		const std::string& name, bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz)
 	: bus_{bus}, id_{request->arbitration_id}, handle_{nullptr}, name_{name},
 	  decoder_{decoder}, callback_{callback}, recurring_{frequencyHz ? true : false}, wait_for_multiple_responses_{wait_for_multiple_responses},
@@ -66,9 +68,9 @@ uint32_t active_diagnostic_request_t::get_id() const
 	return id_;
 }
 
-std::shared_ptr<can_bus_dev_t> active_diagnostic_request_t::get_can_bus_dev()
+const std::shared_ptr<can_bus_dev_t> active_diagnostic_request_t::get_can_bus_dev() const
 {
-	return bus_;
+	return can_bus_t::get_can_device(bus_);
 }
 
 DiagnosticRequestHandle* active_diagnostic_request_t::get_handle()

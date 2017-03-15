@@ -41,8 +41,8 @@ std::vector<can_message_set_t> CAN_MESSAGE_SET =
 
 std::vector<std::vector<can_message_definition_t>> CAN_MESSAGES_DEFINITION = {
 	{
-		can_message_definition_t(0, 0x620, can_message_format_t::STANDARD, frequency_clock_t(), false),
-		can_message_definition_t(0, 0x442, can_message_format_t::STANDARD, frequency_clock_t(), false),
+		can_message_definition_t("vcan0", 0x620, can_message_format_t::STANDARD, frequency_clock_t(), false),
+		can_message_definition_t("vcan0", 0x442, can_message_format_t::STANDARD, frequency_clock_t(), false),
 	},
 };
 
@@ -60,3 +60,8 @@ std::vector<std::vector<can_signal_t>> SIGNALS = {
 configuration_t::configuration_t()
 	: can_message_set_{CAN_MESSAGE_SET}, can_message_definition_{CAN_MESSAGES_DEFINITION}, can_signals_{SIGNALS}, obd2_signals_{OBD2_PIDS}
 {}
+
+const std::string configuration_t::get_diagnostic_bus() const
+{
+	return "vcan0";
+}

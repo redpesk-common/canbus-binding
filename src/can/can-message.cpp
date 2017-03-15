@@ -170,7 +170,7 @@ can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& 
 		format = can_message_format_t::EXTENDED;
 	else
 		format = can_message_format_t::STANDARD;
-
+		
 	switch(format)
 	{
 		case can_message_format_t::STANDARD:

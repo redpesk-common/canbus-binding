@@ -50,6 +50,8 @@ can_bus_t::can_bus_t(int conf_file)
 {
 }
 
+std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::can_devices_;
+
 /**
  * @brief Will make the decoding operation on a classic CAN message. It will not
  * handle CAN commands nor diagnostic messages that have their own method to get
@@ -254,7 +256,7 @@ void can_bus_t::stop_threads()
 int can_bus_t::init_can_dev()
 {
 	std::vector<std::string> devices_name;
-	int i;
+	int i = 0;
 	size_t t;
 
 	devices_name = read_conf();
@@ -262,20 +264,19 @@ int can_bus_t::init_can_dev()
 	if (! devices_name.empty())
 	{
 		t = devices_name.size();
-		i=0;
 
 		for(const auto& device : devices_name)
 		{
-			can_devices_.push_back(std::make_shared<can_bus_dev_t>(device, i));
-			if (can_devices_[i]->open() == 0)
+			can_bus_t::can_devices_[device] = std::make_shared<can_bus_dev_t>(device, i);
+			if (can_bus_t::can_devices_[device]->open() == 0)
 			{
 				DEBUG(binder_interface, "Start reading thread");
 				NOTICE(binder_interface, "%s device opened and reading", device.c_str());
-				can_devices_[i]->start_reading(*this);
+				can_bus_t::can_devices_[device]->start_reading(*this);
+				i++;
 			}
 			else
 				ERROR(binder_interface, "Can't open device %s", device.c_str());
-			i++;
 		}
 
 		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
@@ -421,7 +422,20 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 *
 * @return map can_bus_dev_m_ map
 */
-const std::vector<std::shared_ptr<can_bus_dev_t>>& can_bus_t::get_can_devices() const
+const std::map<std::string, std::shared_ptr<can_bus_dev_t>>& can_bus_t::get_can_devices() const
 {
-	return can_devices_;
+	return can_bus_t::can_devices_;
+}
+
+/**
+* @brief Return the shared pointer on the can_bus_dev_t initialized 
+* with device_name "bus"
+*
+* @param[in] bus - CAN bus device name to retrieve.
+*
+* @return A shared pointer on an object can_bus_dev_t
+*/
+std::shared_ptr<can_bus_dev_t> can_bus_t::get_can_device(std::string bus)
+{
+	return can_bus_t::can_devices_[bus];
 }

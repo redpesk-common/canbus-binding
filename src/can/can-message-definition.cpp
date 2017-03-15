@@ -17,11 +17,15 @@
 
 #include "can-message-definition.hpp"
 
-can_message_definition_t::can_message_definition_t(uint8_t bus)
+can_message_definition_t::can_message_definition_t(const std::string bus)
 	: bus_{bus}, last_value_(CAN_MESSAGE_SIZE)
 {}
 
-can_message_definition_t::can_message_definition_t(uint8_t bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed)
+can_message_definition_t::can_message_definition_t(const std::string bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed)
+: bus_{bus}, id_{id}, frequency_clock_{frequency_clock}, force_send_changed_{force_send_changed}, last_value_(CAN_MESSAGE_SIZE)
+{}
+
+can_message_definition_t::can_message_definition_t(const std::string bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed)
 	: bus_{bus}, id_{id}, format_{format}, frequency_clock_{frequency_clock}, force_send_changed_{force_send_changed}, last_value_(CAN_MESSAGE_SIZE)
 {}
 

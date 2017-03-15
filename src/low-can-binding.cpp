@@ -246,7 +246,7 @@ extern "C"
 		/// Initialize Diagnostic manager that will handle obd2 requests.
 		/// We pass by default the first CAN bus device to its Initialization.
 		/// TODO: be able to choose the CAN bus device that will be use as Diagnostic bus.
-		if(configuration_t::instance().get_diagnostic_manager().initialize(can_bus_manager.get_can_devices().front()))
+		if(configuration_t::instance().get_diagnostic_manager().initialize())
 			return 0;
 
 		ERROR(binder_interface, "There was something wrong with CAN device Initialization. Check your config file maybe");
