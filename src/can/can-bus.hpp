@@ -81,7 +81,7 @@ public:
 	void stop_threads();
 
 	int process_can_signals(can_message_t& can_message);
-	int process_diagnostic_signals(active_diagnostic_request_t* adr, const can_message_t& can_message);
+	int process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message);
 
 	can_message_t next_can_message();
 	void push_new_can_message(const can_message_t& can_msg);

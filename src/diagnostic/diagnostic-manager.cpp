@@ -255,38 +255,6 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 }
 
 
-openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response) const
-{
-	openxc_VehicleMessage message;
-	float value = (float)diagnostic_payload_to_integer(&response);
-	if(adr->get_decoder() != nullptr)
-	{
-		value = adr->get_decoder()(&response, value);
-	}
-
-	if((response.success && strnlen(adr->get_name().c_str(), adr->get_name().size())) > 0)
-	{
-		// If name, include 'value' instead of payload, and leave of response
-		// details.
-		message = build_VehicleMessage(build_SimpleMessage(adr->get_name(), build_DynamicField(value)));
-	}
-	else
-	{
-		// If no name, send full details of response but still include 'value'
-		// instead of 'payload' if they provided a decoder. The one case you
-		// can't get is the full detailed response with 'value'. We could add
-		// another parameter for that but it's onerous to carry that around.
-		message = build_VehicleMessage(adr, response, value);
-	}
-
-	if(adr->get_callback() != nullptr)
-	{
-		adr->get_callback()(adr, &response, value);
-	}
-
-	return message;
-}
-
 bool diagnostic_manager_t::conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const
 {
 	return (candidate->get_in_flight() && candidate != request &&
@@ -346,6 +314,90 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 	return -1;
 }
 
+openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response) const
+{
+	openxc_VehicleMessage message = build_VehicleMessage();
+	float value = (float)diagnostic_payload_to_integer(&response);
+	if(adr->get_decoder() != nullptr)
+	{
+		value = adr->get_decoder()(&response, value);
+	}
+
+	if((response.success && strnlen(adr->get_name().c_str(), adr->get_name().size())) > 0)
+	{
+		// If name, include 'value' instead of payload, and leave of response
+		// details.
+		message = build_VehicleMessage(build_SimpleMessage(adr->get_name(), build_DynamicField(value)));
+	}
+	else
+	{
+		// If no name, send full details of response but still include 'value'
+		// instead of 'payload' if they provided a decoder. The one case you
+		// can't get is the full detailed response with 'value'. We could add
+		// another parameter for that but it's onerous to carry that around.
+		message = build_VehicleMessage(adr, response, value);
+	}
+
+	if(adr->get_callback() != nullptr)
+	{
+		adr->get_callback()(adr, &response, value);
+	}
+
+	return message;
+}
+
+/// @brief Will take the CAN message and pass it to the receive functions that will process
+/// diagnostic handle for each active diagnostic request then depending on the result we will 
+/// return pass the diagnostic response to decode it.
+///
+/// @param[in] entry - A pointer to an active diagnostic request holding a valid diagnostic handle
+/// @param[in] cm - A raw CAN message.
+///
+/// @return A pointer to a filled openxc_VehicleMessage or a nullptr if nothing has been found.
+openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_handle(active_diagnostic_request_t* entry, const can_message_t& cm)
+{
+	DiagnosticResponse response = diagnostic_receive_can_frame(&shims_, entry->get_handle(), cm.get_id(), cm.get_data(), cm.get_length());
+	if(response.completed && entry->get_handle()->completed)
+	{
+		if(entry->get_handle()->success)
+			return relay_diagnostic_response(entry, response);
+	}
+	else if(!response.completed && response.multi_frame)
+	{
+		// Reset the timeout clock while completing the multi-frame receive
+		entry->get_timeout_clock().tick();
+	}
+
+	return build_VehicleMessage();
+}
+
+/// @brief Find the active diagnostic request with the correct DiagnosticRequestHandle
+/// member that will understand the CAN message using diagnostic_receive_can_frame function
+/// from UDS-C library. Then decode it with an ad-hoc method.
+///
+/// @param[in] cm - Raw CAN message received
+///
+/// @return VehicleMessage with decoded value.
+openxc_VehicleMessage diagnostic_manager_t::find_and_decode_adr(const can_message_t& cm)
+{
+	openxc_VehicleMessage vehicle_message = build_VehicleMessage();
+
+	for ( auto entry : non_recurring_requests_)
+	{
+		vehicle_message = relay_diagnostic_handle(entry, cm);
+		if (is_valid(vehicle_message))
+			return vehicle_message;
+	}
+
+	for ( auto entry : recurring_requests_)
+	{
+		vehicle_message = relay_diagnostic_handle(entry, cm);
+		if (is_valid(vehicle_message))
+			return vehicle_message;
+	}
+
+	return vehicle_message;
+}
 
 /// @brief Tell if the CAN message received is a diagnostic response.
 /// Request broadcast ID use 0x7DF and assigned ID goes from 0x7E0 to Ox7E7. That allows up to 8 ECU to respond 

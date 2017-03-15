@@ -115,41 +115,21 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
  *
  * @return How many signals has been decoded.
  */
-int can_bus_t::process_diagnostic_signals(active_diagnostic_request_t* entry, const can_message_t& can_message)
+int can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message)
 {
 	int processed_signals = 0;
-	openxc_VehicleMessage vehicle_message;
-
-	diagnostic_manager_t& manager = configuration_t::instance().get_diagnostic_manager();
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
 
-	if( s.find(entry->get_name()) != s.end() && afb_event_is_valid(s[entry->get_name()]))
+	openxc_VehicleMessage vehicle_message = manager.find_and_decode_adr(can_message);
+	if( (vehicle_message.has_simple_message && vehicle_message.simple_message.has_name) &&
+		(s.find(vehicle_message.simple_message.name) != s.end() && afb_event_is_valid(s[vehicle_message.simple_message.name])))
 	{
-		if(manager.get_can_bus_dev() == entry->get_can_bus_dev() && entry->get_in_flight())
-		{
-			DiagnosticResponse response = diagnostic_receive_can_frame(
-					// TODO: openXC todo task: eek, is bus address and array index this tightly coupled?
-					&manager.get_shims(),
-					entry->get_handle(), can_message.get_id(), can_message.get_data(), can_message.get_length());
-			if(response.completed && entry->get_handle()->completed)
-			{
-				if(entry->get_handle()->success)
-				{
-					vehicle_message = manager.relay_diagnostic_response(entry, response);
-					std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
-					push_new_vehicle_message(vehicle_message);
-					new_decoded_can_message_.notify_one();
-					processed_signals++;
-				}
-				else
-					DEBUG(binder_interface, "process_diagnostic_signals: Fatal error sending or receiving diagnostic request");
-			}
-			else if(!response.completed && response.multi_frame)
-				// Reset the timeout clock while completing the multi-frame receive
-				entry->get_timeout_clock().tick();
-		}
+		std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
+		push_new_vehicle_message(vehicle_message);
+		new_decoded_can_message_.notify_one();
+		processed_signals++;
 	}
 
 	return processed_signals;
@@ -180,8 +160,7 @@ void can_bus_t::can_decode_message()
 		can_message = next_can_message();
 
 		if(configuration_t::instance().get_diagnostic_manager().is_diagnostic_response(can_message))
-		if(adr != nullptr)
-			process_diagnostic_signals(adr, can_message);
+			process_diagnostic_signals(configuration_t::instance().get_diagnostic_manager(), can_message);
 		else
 			process_can_signals(can_message);
 	}

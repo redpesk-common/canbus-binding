@@ -80,19 +80,23 @@ public:
 	void checkSupportedPids(const active_diagnostic_request_t& request,
 		const DiagnosticResponse& response, float parsedPayload);
 
+	// Subscription parts
 	bool add_request(DiagnosticRequest* request, const std::string name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback);
-
 	bool add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
-	
 
-	openxc_VehicleMessage relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response) const;
-
+	// Sendig requests part
 	bool conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const;
 	bool clear_to_send(active_diagnostic_request_t* request) const;
 	static int send_request(sd_event_source *s, uint64_t usec, void *userdata);
+
+	// Decoding part
+	openxc_VehicleMessage relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response) const;
+	openxc_VehicleMessage relay_diagnostic_handle(active_diagnostic_request_t* entry, const can_message_t& cm);
+	openxc_VehicleMessage find_and_decode_adr(const can_message_t& cm);
 	bool is_diagnostic_response(const can_message_t& cm);
+
 };
