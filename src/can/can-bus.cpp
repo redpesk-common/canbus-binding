@@ -108,8 +108,7 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
  * @brief Will make the decoding operation on a diagnostic CAN message.It will add to
  * the vehicle_message queue the decoded message and tell the event push thread to process it.
  *
- * @param[in] entry - an active_diagnostic_request_t object that made the request
- * about that diagnostic CAN message.
+ * @param[in] manager - the diagnostic manager object that handle diagnostic communication
  * @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
  *
  * @return How many signals has been decoded.
