@@ -93,6 +93,7 @@ public:
 	uint32_t get_id() const;
 	const std::shared_ptr<can_bus_dev_t> get_can_bus_dev() const;
 	DiagnosticRequestHandle* get_handle();
+	uint16_t get_pid() const;
 	const std::string get_name() const;
 	static std::string& get_prefix();
 	DiagnosticResponseDecoder& get_decoder();

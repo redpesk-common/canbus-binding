@@ -22,6 +22,8 @@
 
 #include "../configuration.hpp"
 
+#define ERROR_PID 0xFF
+
 std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
 
 bool active_diagnostic_request_t::operator==(const active_diagnostic_request_t& b)
@@ -71,6 +73,13 @@ uint32_t active_diagnostic_request_t::get_id() const
 const std::shared_ptr<can_bus_dev_t> active_diagnostic_request_t::get_can_bus_dev() const
 {
 	return can_bus_t::get_can_device(bus_);
+}
+
+uint16_t active_diagnostic_request_t::get_pid() const
+{
+	if (handle_->request.has_pid)
+		return handle_->request.pid;
+	return ERROR_PID;
 }
 
 DiagnosticRequestHandle* active_diagnostic_request_t::get_handle()
