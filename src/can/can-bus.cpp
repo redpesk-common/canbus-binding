@@ -179,7 +179,7 @@ void can_bus_t::can_decode_message()
 		new_can_message_cv_.wait(can_message_lock);
 		can_message = next_can_message();
 
-		active_diagnostic_request_t* adr = configuration_t::instance().get_diagnostic_manager().is_diagnostic_response(can_message);
+		if(configuration_t::instance().get_diagnostic_manager().is_diagnostic_response(can_message))
 		if(adr != nullptr)
 			process_diagnostic_signals(adr, can_message);
 		else

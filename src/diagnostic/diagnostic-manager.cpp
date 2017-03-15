@@ -254,29 +254,6 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 	return added;
 }
 
-bool diagnostic_manager_t::is_diagnostic_response(const active_diagnostic_request_t& adr, const can_message_t& cm) const
-{
-	if(cm.get_id() == adr.get_id() + DIAGNOSTIC_RESPONSE_ARBITRATION_ID_OFFSET)
-		return true;
-	DEBUG(binder_interface, "Doesn't find an active diagnostic request that matches.");
-	return false;
-}
-
-active_diagnostic_request_t* diagnostic_manager_t::is_diagnostic_response(const can_message_t& can_message)
-{
-	for (auto& entry : non_recurring_requests_)
-	{
-		if(is_diagnostic_response(*entry, can_message))
-			return entry;
-	}
-
-	for (auto& entry : recurring_requests_)
-	{
-		if(is_diagnostic_response(*entry, can_message))
-			return entry;
-	}
-	return nullptr;
-}
 
 openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response) const
 {
@@ -367,6 +344,21 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 	sd_event_source_unref(s);
 	ERROR(binder_interface, "send_request: Something goes wrong when submitting a new request to the CAN bus");
 	return -1;
+}
+
+
+/// @brief Tell if the CAN message received is a diagnostic response.
+/// Request broadcast ID use 0x7DF and assigned ID goes from 0x7E0 to Ox7E7. That allows up to 8 ECU to respond 
+/// at the same time. The response is the assigned ID + 0x8, so response ID can goes from 0x7E8 to 0x7EF.
+///
+/// @param[in] cm - CAN message received from the socket.
+///
+/// @return True if the active diagnostic request match the response.
+bool diagnostic_manager_t::is_diagnostic_response(const can_message_t& cm)
+{
+	if (cm.get_id() >= 0x7e8 && cm.get_id() <= 0x7ef)
+			return true;
+	return false;
 }
 
 DiagnosticShims& diagnostic_manager_t::get_shims()
