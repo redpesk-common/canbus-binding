@@ -42,7 +42,7 @@ enum UNIT {
 /**
  * @brief - A representation of an OBD-II PID.
  */
-class obd2_signal_t {
+class diagnostic_message_t {
 	private:
 		uint8_t pid_; /*!< pid - The 1 byte PID.*/
 		std::string generic_name_; /*!< generic_name_ - A human readable name to use for this PID when published.*/
@@ -50,16 +50,25 @@ class obd2_signal_t {
 		int max_; /*!< max_ - Maximum value that can take this pid */
 		enum UNIT unit_; /*!< unit_ : Which unit system is used by that pid. See enum UNIT above.*/
 		int frequency_; /*!< frequency - The frequency to request this PID if supported by the vehicle when automatic, recurring OBD-II requests are enabled.*/
+		DiagnosticResponseDecoder decoder_; /*!< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses
+											 * to this request. If the decoder is NULL, the output will include the raw payload
+											 * instead of a parsed value.*/
+		DiagnosticResponseCallback callback_; /*!< callback_ - An optional DiagnosticResponseCallback to be notified whenever a
+											   * response is received for this request.*/
+		
 		bool supported_; /*!< supported_ - boolean indicating whether this pid is supported by the vehicle or not.*/
 
 	public:
 		const char* generic_name = generic_name_.c_str();
-		obd2_signal_t(uint8_t pid, const char* generic_name, const int min_, const int max_, enum UNIT unit, int frequency, bool supported);
+		diagnostic_message_t(uint8_t pid, const std::string generic_name, const int min, const int max, enum UNIT unit, float frequency,
+											DiagnosticResponseDecoder decoder, DiagnosticResponseCallback callback, bool supported);
 
 		uint32_t get_pid();
 		const std::string& get_generic_name() const;
 		const std::string get_name() const;
 		int get_frequency() const;
+		DiagnosticResponseDecoder get_decoder() const;
+		DiagnosticResponseCallback get_callback() const;
 
 		const DiagnosticRequest build_diagnostic_request();
 

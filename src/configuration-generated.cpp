@@ -7,31 +7,31 @@
 #include "can/can-decoder.hpp"
 
 // Pre-defined OBD-II PIDs to query for if supported by the vehicle.
- std::vector<obd2_signal_t> OBD2_PIDS = {
-	obd2_signal_t(0x04, "engine.load", 0, 100, POURCENT, 5, false),
-	obd2_signal_t(0x05, "engine.coolant.temperature", -40, 215, DEGREES_CELSIUS, 1, false),
-	obd2_signal_t(0x0a, "fuel.pressure", 0, 765, KPA, 1, false),
-	obd2_signal_t(0x0b, "intake.manifold.pressure", 0, 255, KPA, 1, false),
-	obd2_signal_t(0x0c, "engine.speed", 0, 16383, RPM, 5, false),
-	obd2_signal_t(0x0d, "vehicle.speed", 0, 255, KM_H, 5, false),
-	obd2_signal_t(0x0f, "intake.air.temperature", -40, 215, DEGREES_CELSIUS, 1, false),
-	obd2_signal_t(0x10, "mass.airflow", 0, 655, GRAMS_SEC, 5, false),
-	obd2_signal_t(0x11, "throttle.position", 0, 100, POURCENT, 5, false),
-	obd2_signal_t(0x1f, "running.time", 0, 65535, SECONDS, 1, false),
-	obd2_signal_t(0x2d, "EGR.error", -100, 99, POURCENT, 0, false),
-	obd2_signal_t(0x2f, "fuel.level", 0, 100, POURCENT, 1, false),
-	obd2_signal_t(0x33, "barometric.pressure", 0, 255, KPA, 1, false),
-	obd2_signal_t(0x4c, "commanded.throttle.position", 0, 100, POURCENT, 1, false),
-	obd2_signal_t(0x52, "ethanol.fuel.percentage", 0, 100, POURCENT, 1, false),
-	obd2_signal_t(0x5a, "accelerator.pedal.position", 0, 100, POURCENT, 5, false),
-	obd2_signal_t(0x5b, "hybrid.battery-pack.remaining.life", 0, 100, POURCENT, 5, false),
-	obd2_signal_t(0x5c, "engine.oil.temperature",-40, 210, DEGREES_CELSIUS, 1, false),
-	obd2_signal_t(0x63, "engine.torque", 0, 65535, NM, 1, false)
+ std::vector<diagnostic_message_t> DIAGNOSTIC_MESSAGES = {
+	diagnostic_message_t(0x04, "engine.load", 0, 100, POURCENT, 5, decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x05, "engine.coolant.temperature", -40, 215, DEGREES_CELSIUS, 1,  decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x0a, "fuel.pressure", 0, 765, KPA, 1, decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x0b, "intake.manifold.pressure", 0, 255, KPA, 1,  decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x0c, "engine.speed", 0, 16383, RPM, 5,  decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x0d, "vehicle.speed", 0, 255, KM_H, 5,  decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x0f, "intake.air.temperature", -40, 215, DEGREES_CELSIUS, 1,  decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x10, "mass.airflow", 0, 655, GRAMS_SEC, 5,  decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x11, "throttle.position", 0, 100, POURCENT, 5,  decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x1f, "running.time", 0, 65535, SECONDS, 1,  decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x2d, "EGR.error", -100, 99, POURCENT, 0,  decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x2f, "fuel.level", 0, 100, POURCENT, 1, decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x33, "barometric.pressure", 0, 255, KPA, 1, decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x4c, "commanded.throttle.position", 0, 100, POURCENT, 1, decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x52, "ethanol.fuel.percentage", 0, 100, POURCENT, 1, decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x5a, "accelerator.pedal.position", 0, 100, POURCENT, 5, decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x5b, "hybrid.battery-pack.remaining.life", 0, 100, POURCENT, 5, decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x5c, "engine.oil.temperature",-40, 210, DEGREES_CELSIUS, 1, decoder_t::decode_obd2_response, nullptr, false),
+	diagnostic_message_t(0x63, "engine.torque", 0, 65535, NM, 1, decoder_t::decode_obd2_response, nullptr, false)
 };
 
-std::vector<obd2_signal_t> get_predefined_obd2()
+std::vector<diagnostic_message_t> get_predefined_obd2()
 {
-	return OBD2_PIDS;
+	return DIAGNOSTIC_MESSAGES;
 }
 
 std::vector<can_message_set_t> CAN_MESSAGE_SET =
@@ -58,7 +58,7 @@ std::vector<std::vector<can_signal_t>> SIGNALS = {
 };
 
 configuration_t::configuration_t()
-	: can_message_set_{CAN_MESSAGE_SET}, can_message_definition_{CAN_MESSAGES_DEFINITION}, can_signals_{SIGNALS}, obd2_signals_{OBD2_PIDS}
+	: can_message_set_{CAN_MESSAGE_SET}, can_message_definition_{CAN_MESSAGES_DEFINITION}, can_signals_{SIGNALS}, diagnostic_messages_{DIAGNOSTIC_MESSAGES}
 {}
 
 const std::string configuration_t::get_diagnostic_bus() const

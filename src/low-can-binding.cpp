@@ -130,13 +130,13 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		int ret;
 		if (active_diagnostic_request_t::is_diagnostic_signal(sig) && subscribe)
 		{
-			std::vector<obd2_signal_t*> found;
-			configuration_t::instance().find_obd2_signals(build_DynamicField(sig), found);
-			int frequency = found.front()->get_frequency();
+			std::vector<diagnostic_message_t*> found;
+			configuration_t::instance().find_diagnostic_messages(build_DynamicField(sig), found);
+			float frequency = found.front()->get_frequency();
 			DiagnosticRequest* diag_req = new DiagnosticRequest(found.front()->build_diagnostic_request());
 			configuration_t::instance().get_diagnostic_manager().add_recurring_request(
-				diag_req, sig.c_str(), false, obd2_signal_t::decode_obd2_response, nullptr, (float)frequency);
-				//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, obd2_signal_t::decode_obd2_response, obd2_signal_t::check_ignition_status, frequency);
+				diag_req, sig.c_str(), false, found.front()->get_decoder(), found.front()->get_callback(), (float)frequency);
+				//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
 		}
 
 		ret = subscribe_unsubscribe_signal(request, subscribe, sig);

@@ -67,9 +67,9 @@ std::vector<can_signal_t>& configuration_t::get_can_signals()
 	return can_signals_[active_message_set_];
 }
 
-std::vector<obd2_signal_t>& configuration_t::get_obd2_signals()
+std::vector<diagnostic_message_t>& configuration_t::get_diagnostic_messages()
 {
-	return obd2_signals_[active_message_set_];
+	return diagnostic_messages_[active_message_set_];
 }
 
 const std::vector<std::string>& configuration_t::get_signals_prefix() const
@@ -82,7 +82,7 @@ const std::vector<can_message_definition_t>& configuration_t::get_can_message_de
 	return can_message_definition_[active_message_set_];
 }
 
-uint32_t configuration_t::get_signal_id(obd2_signal_t& sig) const
+uint32_t configuration_t::get_signal_id(diagnostic_message_t& sig) const
 {
 	return sig.get_pid();
 }
@@ -106,21 +106,21 @@ void configuration_t::set_active_message_set(uint8_t id)
  *
  * @return Vector of signals name found.
  */
-void configuration_t::find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signal_t*>& found_signals)
+void configuration_t::find_diagnostic_messages(const openxc_DynamicField &key, std::vector<diagnostic_message_t*>& found_signals)
 {
 	switch(key.type)
 	{
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-				lookup_signals_by_name(key.string_value, obd2_signals_[active_message_set_], found_signals);
+				lookup_signals_by_name(key.string_value, diagnostic_messages_[active_message_set_], found_signals);
 			break;
 		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-				lookup_signals_by_id(key.numeric_value, obd2_signals_[active_message_set_], found_signals);
+				lookup_signals_by_id(key.numeric_value, diagnostic_messages_[active_message_set_], found_signals);
 			break;
 		default:
-			ERROR(binder_interface, "find_obd2_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
+			ERROR(binder_interface, "find_diagnostic_messages: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 			break;
 	}
-	DEBUG(binder_interface, "find_obd2_signals: Found %d signal(s)", (int)found_signals.size());
+	DEBUG(binder_interface, "find_diagnostic_messages: Found %d signal(s)", (int)found_signals.size());
 }
 
 /**
