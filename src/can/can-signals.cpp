@@ -29,7 +29,7 @@ std::string can_signal_t::prefix_ = "messages";
 
 can_signal_t::can_signal_t(can_message_definition_t& message, std::string generic_name, uint8_t bit_position, uint8_t bit_size,
 			 float factor, float offset, float min_value, float max_value, frequency_clock_t frequency, bool send_same, bool force_send_changed,
-			 std::vector<std::string> states, bool writable, SignalDecoder decoder, SignalEncoder encoder, bool received)
+			 std::map<uint8_t, std::string> states, bool writable, SignalDecoder decoder, SignalEncoder encoder, bool received)
 	: message_{message}, generic_name_{generic_name}, bit_position_{bit_position}, bit_size_{bit_size}, factor_{factor}, offset_{offset},
 	min_value_{min_value}, max_value_{max_value}, frequency_{frequency}, send_same_{send_same}, force_send_changed_{force_send_changed}, states_{states},
 	writable_{writable}, decoder_{decoder}, encoder_{encoder}, received_{received}, last_value_{(float)NULL}
@@ -100,16 +100,16 @@ bool can_signal_t::get_force_send_changed() const
 	return force_send_changed_;
 }
 
-const std::vector<std::string>& can_signal_t::get_states() const
+const std::map<uint8_t, std::string>& can_signal_t::get_states() const
 {
 	return states_;
 }
 
-const std::string can_signal_t::get_states(float value) const
+const std::string can_signal_t::get_states(uint8_t value)
 {
 	if (value < states_.size())
-		return states_[(int)value];
-	return std::string("");
+		return states_[value];
+	return std::string();
 }
 
 size_t can_signal_t::get_state_count() const

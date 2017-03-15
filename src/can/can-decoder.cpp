@@ -124,7 +124,7 @@ openxc_DynamicField decoder_t::ignoreDecoder(can_signal_t& signal,
 openxc_DynamicField decoder_t::stateDecoder(can_signal_t& signal,
 		const std::vector<can_signal_t>& signals, float value, bool* send)
 {
-	const std::string signal_state = signal.get_states(value);
+	const std::string signal_state = signal.get_states((uint8_t)value);
 	openxc_DynamicField decoded_value = build_DynamicField(signal_state);
 	if(signal_state.size() <= 0)
 	{

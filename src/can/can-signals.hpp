@@ -96,7 +96,7 @@ private:
 	bool send_same_; /*!< send_same_ - If true, will re-send even if the value hasn't changed.*/
 	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send the
 							   * value if it has changed. */
-	std::vector<std::string> states_; /*!< states_ - A map of CAN signal state describing the mapping
+	std::map<uint8_t, std::string> states_; /*!< states_ - A map of CAN signal state describing the mapping
 										 * between numerical and string values for valid states. */
 	bool writable_; /*!< writable - True if the signal is allowed to be written from the USB host
 					 *	back to CAN. Defaults to false.*/
@@ -112,7 +112,7 @@ private:
 public:
 	can_signal_t(can_message_definition_t& message, std::string generic_name, uint8_t bit_position, uint8_t bit_size,
 				 float factor, float offset, float min_value, float max_value, frequency_clock_t frequency, bool send_same, bool force_send_changed,
-				 std::vector<std::string> states, bool writable, SignalDecoder decoder, SignalEncoder encoder, bool received);
+				 std::map<uint8_t, std::string> states, bool writable, SignalDecoder decoder, SignalEncoder encoder, bool received);
 
 	can_message_definition_t& get_message();
 	const std::string& get_generic_name() const;
@@ -127,8 +127,8 @@ public:
 	frequency_clock_t& get_frequency();
 	bool get_send_same() const;
 	bool get_force_send_changed() const;
-	const std::vector<std::string>& get_states() const;
-	const std::string get_states(float value) const;
+	const std::map<uint8_t, std::string>& get_states() const;
+	const std::string get_states(uint8_t value);
 	size_t get_state_count() const;
 	bool get_writable() const;
 	SignalDecoder& get_decoder();
