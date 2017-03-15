@@ -41,4 +41,7 @@ public:
 
 	static openxc_DynamicField decodeSignal(can_signal_t& signal, float value,
 		const std::vector<can_signal_t>& signals, bool* send);
+
+	static float decode_obd2_response(const DiagnosticResponse* response, float parsedPayload);
+
 };

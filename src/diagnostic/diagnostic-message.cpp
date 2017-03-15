@@ -84,21 +84,3 @@ bool obd2_signal_t::is_obd2_request(const DiagnosticRequest* request)
 {
 	return request->mode == 0x1 && request->has_pid && request->pid < 0xff;
 }
-
-/**
-* @brief Decode the payload of an OBD-II PID.
-*
-* This function matches the type signature for a DiagnosticResponseDecoder, so
-* it can be used as the decoder for a DiagnosticRequest. It returns the decoded
-* value of the PID, using the standard formulas (see
-* http://en.wikipedia.org/wiki/OBD-II_PIDs#Mode_01).
-*
-* @param[in] response - the received DiagnosticResponse (the data is in response.payload,
-*  a byte array). This is most often used when the byte order is
-*  signiticant, i.e. with many OBD-II PID formulas.
-* @param[in] parsed_payload - the entire payload of the response parsed as an int.
-*/
-float obd2_signal_t::decode_obd2_response(const DiagnosticResponse* response, float parsedPayload)
-{
-	return diagnostic_decode_obd2_pid(response);
-}

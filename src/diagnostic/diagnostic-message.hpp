@@ -66,5 +66,4 @@ class obd2_signal_t {
 		bool is_obd2_response(const can_message_t& can_message);
 		bool is_obd2_request(const DiagnosticRequest *request);
 
-		static float decode_obd2_response(const DiagnosticResponse* response, float parsedPayload);
 };
