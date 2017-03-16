@@ -78,6 +78,7 @@ class configuration_t
 		const std::vector<std::string>& get_signals_prefix() const;
 
 		const std::vector<can_message_definition_t>& get_can_message_definition();
+		const can_message_definition_t& get_can_message_definition(std::uint8_t message_set_id, std::uint8_t message_id);
 
 		uint32_t get_signal_id(diagnostic_message_t& sig) const;
 

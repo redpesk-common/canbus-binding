@@ -35,6 +35,7 @@
 class can_message_definition_t
 {
 private:
+	std::uint8_t message_set_id_;
 	std::string bus_; /*!< bus_ - Address of CAN bus device. */
 	uint32_t id_; /*!< id_ - The ID of the message.*/
 	can_message_format_t format_; /*!< format_ - the format of the message's ID.*/
@@ -48,9 +49,9 @@ private:
  										  *	needs to compare an incoming CAN message with the previous frame.*/
 	
 public:
-	can_message_definition_t(const std::string bus);
-	can_message_definition_t(const std::string bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed);
-	can_message_definition_t(const std::string bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed);
+	can_message_definition_t(std::uint8_t message_set_id, const std::string bus);
+	can_message_definition_t(std::uint8_t message_set_id, const std::string bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed);
+	can_message_definition_t(std::uint8_t message_set_id, const std::string bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed);
 
 	uint32_t get_id() const;
 };

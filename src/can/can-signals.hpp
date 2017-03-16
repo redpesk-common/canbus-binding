@@ -76,7 +76,8 @@ typedef uint64_t (*SignalEncoder)(can_signal_t* signal,
 class can_signal_t
 {
 private:
-	can_message_definition_t message_; /*!< message_ - The message this signal is a part of. */
+	std::uint8_t message_set_id_;
+	std::uint8_t message_id_;
 	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
 	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
 						  * which make easier to sort message when the come in.*/
@@ -110,11 +111,26 @@ private:
 						*	this value is undefined. */
 
 public:
-	can_signal_t(can_message_definition_t& message, std::string generic_name, uint8_t bit_position, uint8_t bit_size,
-				 float factor, float offset, float min_value, float max_value, frequency_clock_t frequency, bool send_same, bool force_send_changed,
-				 std::map<uint8_t, std::string> states, bool writable, SignalDecoder decoder, SignalEncoder encoder, bool received);
+	can_signal_t(
+		std::uint8_t message_set_id,
+		std::uint8_t message_id,
+		std::string generic_name,
+		uint8_t bit_position,
+		uint8_t bit_size,
+		float factor,
+		float offset,
+		float min_value,
+		float max_value,
+		frequency_clock_t frequency,
+		bool send_same,
+		bool force_send_changed,
+		std::map<uint8_t, std::string> states,
+		bool writable,
+		SignalDecoder decoder,
+		SignalEncoder encoder,
+		bool received);
 
-	can_message_definition_t& get_message();
+	const can_message_definition_t& get_message() const;
 	const std::string& get_generic_name() const;
 	const std::string get_name() const;
 	const std::string& get_prefix() const;
