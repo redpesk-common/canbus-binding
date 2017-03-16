@@ -365,20 +365,19 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 	DiagnosticRequest* request = (DiagnosticRequest*)userdata;
 	active_diagnostic_request_t* adr = dm.find_recurring_request(request);
 
-	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev() && adr->should_send() &&
-		dm.clear_to_send(adr))
+//	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev() && adr->should_send() &&
+//		dm.clear_to_send(adr))
+	if(adr != nullptr && adr->get_can_bus_dev() == dm.bus_)
 	{
-		DEBUG(binder_interface, "Got active_diagnostic_request from recurring_requests_ queue.");
 		adr->get_frequency_clock().tick();
-		start_diagnostic_request(&dm.get_shims(), adr->get_handle());
+		start_diagnostic_request(&dm.shims_, adr->get_handle());
 		if(adr->get_handle()->completed && !adr->get_handle()->success)
 		{
-			DEBUG(binder_interface, "Fatal error sending diagnostic request");
+			DEBUG(binder_interface, "send_request: Fatal error sending diagnostic request");
 			return 0;
 		}
 		adr->get_timeout_clock().tick();
 		adr->set_in_flight(true);
-		return 1;
 
 		usec = usec + (uint64_t)(frequency_clock_t::frequency_to_period(adr->get_frequency_clock().get_frequency())*MICRO);
 		DEBUG(binder_interface, "send_request: usec: %d", usec);
