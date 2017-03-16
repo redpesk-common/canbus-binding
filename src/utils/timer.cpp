@@ -15,23 +15,41 @@
  * limitations under the License.
  */
 
+#include <time.h>
 #include <stdlib.h> 
 
 #include "timer.hpp"
 
 #define MS_PER_SECOND 1000
 
+long long int system_time_us()
+{
+	struct timespec t_usec;
+	long long int timestamp_usec;
+	
+	if(!::clock_gettime(CLOCK_MONOTONIC, &t_usec))
+		timestamp_usec = (t_usec.tv_nsec / 1000ll) + (t_usec.tv_sec* 1000000ll);
+	return timestamp_usec;
+}
+
 long long int system_time_ms()
 {
-	struct timeb t_msec;
+	struct timespec t_msec;
 	long long int timestamp_msec;
 	
-	if(!::ftime(&t_msec))
-	{
-		timestamp_msec = (t_msec.time) * 1000ll + 
-			t_msec.millitm;
-	}
+	if(!::clock_gettime(CLOCK_MONOTONIC, &t_msec))
+		timestamp_msec = (t_msec.tv_nsec / 1000000ll) + (t_msec.tv_sec* 1000ll);
 	return timestamp_msec;
+}
+
+long long int system_time_s()
+{
+	struct timespec t_sec;
+	long long int timestamp_sec;
+	
+	if(!::clock_gettime(CLOCK_MONOTONIC, &t_sec))
+		timestamp_sec = t_sec.tv_sec;
+	return timestamp_sec;
 }
 
 frequency_clock_t::frequency_clock_t()
@@ -66,10 +84,15 @@ bool frequency_clock_t::elapsed(bool stagger)
 	if(!started() && stagger)
 		last_tick_ = get_time_function()() - (rand() % int(period));
 	else
-		// Make sure it ticks the the first call to conditionalTick(...)
+		// Make sure it ticks the the first call
 		elapsed_time = !started() ? period : get_time_function()() - last_tick_;
 
 	return frequency_ == 0 || elapsed_time >= period;
+}
+
+float frequency_clock_t::get_frequency() const
+{
+	return frequency_;
 }
 
 /// @brief Force the clock to tick, regardless of it its time has actually

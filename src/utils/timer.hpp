@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <sys/timeb.h>
-
 /*
  * @brief return epoch in milliseconds
  *
@@ -26,8 +24,9 @@
  */
 typedef long long int (*time_function_t)();
 
-
+long long int system_time_us();
 long long int system_time_ms();
+long long int system_time_s();
 
 /**
  * @class frequency_clock_t 
@@ -53,6 +52,7 @@ public:
 	frequency_clock_t(float frequency);
 	frequency_clock_t(float frequency, unsigned long last_tick, time_function_t time_function);
 
+	float get_frequency() const;
 	static float frequency_to_period(float frequency);
 	bool started();
 	time_function_t get_time_function();
