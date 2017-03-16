@@ -181,7 +181,7 @@ void generate(const std::string& header, const std::string& footer, const openxc
 	if (header.size()) out << header << "\n";
 
 	out	<< "configuration_t::configuration_t()\n"
-		<< "	: can_message_set_" << gen(message_set) << '\n'
+		<< "	: can_message_set_{" << gen(message_set) << "}\n"
 		<< "	, can_message_definition_\n"
 		<< "	{\n"
 				<< gen(message_set.messages(), "\t\t") << '\n'
