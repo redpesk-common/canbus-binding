@@ -70,6 +70,9 @@ class diagnostic_message_t {
 		float get_frequency() const;
 		DiagnosticResponseDecoder get_decoder() const;
 		DiagnosticResponseCallback get_callback() const;
+		bool get_supported() const;
+
+		void set_supported(bool value);
 
 		const DiagnosticRequest build_diagnostic_request();
 

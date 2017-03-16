@@ -94,7 +94,7 @@ public:
 	static int send_request(sd_event_source *s, uint64_t usec, void *userdata);
 
 	// Decoding part
-	openxc_VehicleMessage relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response) const;
+	openxc_VehicleMessage relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response);
 	openxc_VehicleMessage relay_diagnostic_handle(active_diagnostic_request_t* entry, const can_message_t& cm);
 	openxc_VehicleMessage find_and_decode_adr(const can_message_t& cm);
 	bool is_diagnostic_response(const can_message_t& cm);

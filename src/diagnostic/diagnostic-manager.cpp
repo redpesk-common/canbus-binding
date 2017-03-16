@@ -315,7 +315,7 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 	return -1;
 }
 
-openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response) const
+openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response)
 {
 	openxc_VehicleMessage message = build_VehicleMessage();
 	float value = (float)diagnostic_payload_to_integer(&response);
@@ -337,6 +337,16 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 		// can't get is the full detailed response with 'value'. We could add
 		// another parameter for that but it's onerous to carry that around.
 		message = build_VehicleMessage(adr, response, value);
+	}
+
+	// If not success but completed then the pid isn't supported
+	if(!response.success)
+	{
+		std::vector<diagnostic_message_t*> found_signals;
+		configuration_t::instance().find_diagnostic_messages( build_DynamicField(adr->get_name()), found_signals );
+		found_signals.front()->set_supported(false);
+		cleanup_request(adr, true);
+		NOTICE(binder_interface, "relay_diagnostic_response: PID not supported or ill formed. Please unsubscribe from it. Error code : %d", response.negative_response_code);
 	}
 
 	if(adr->get_callback() != nullptr)

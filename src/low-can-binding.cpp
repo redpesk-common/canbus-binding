@@ -133,7 +133,12 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			std::vector<diagnostic_message_t*> found;
 			configuration_t::instance().find_diagnostic_messages(build_DynamicField(sig), found);
 			DiagnosticRequest* diag_req = new DiagnosticRequest(found.front()->build_diagnostic_request());
-
+			
+			// If the requested diagnostic message isn't supported by the car then unssubcribe.
+			// no matter what we want, worse case will be a fail unsubscription but at least we don't
+			// poll a PID for nothing.
+			if(found.front()->get_supported())
+				subscribe = false;
 			if(subscribe)
 			{
 				float frequency = found.front()->get_frequency();

@@ -67,6 +67,16 @@ DiagnosticResponseCallback diagnostic_message_t::get_callback() const
 	return callback_;
 }
 
+bool diagnostic_message_t::get_supported() const
+{
+	return supported_;
+}
+
+void diagnostic_message_t::set_supported(bool value)
+{
+	supported_ = value;
+}
+
 /**
  * @brief Build a DiagnosticRequest struct to be passed
  *  to diagnostic manager instance.
