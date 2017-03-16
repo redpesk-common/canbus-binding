@@ -459,7 +459,7 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 		{
 			usec = usec + (uint64_t)(frequency_clock_t::frequency_to_period(adr->get_frequency_clock().get_frequency())*MICRO);
 			DEBUG(binder_interface, "send_request: Event loop state: %d. usec: %ld", sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
-			if(sd_event_source_set_time(s, usec+1000000) >= 0)
+			if(sd_event_source_set_time(s, usec) >= 0)
 				if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)
 					return 0;
 			sd_event_source_unref(s);
