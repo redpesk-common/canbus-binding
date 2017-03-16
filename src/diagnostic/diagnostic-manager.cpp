@@ -111,6 +111,7 @@ void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, b
 			find_and_erase(entry, recurring_requests_);
 			if(force)
 				cancel_request(entry);
+			DEBUG(binder_interface, "cleanup_request: Cancelling completed, recurring request: %s", request_string);
 		}
 		else
 		{

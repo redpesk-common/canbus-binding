@@ -55,7 +55,7 @@ static int make_subscription_unsubscription(struct afb_req request, const std::s
 	/* Make the subscription or unsubscription to the event */
 	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[sig_name])) < 0)
 	{
-		ERROR(binder_interface, "Operation goes wrong for signal: %s", sig_name.c_str());
+		ERROR(binder_interface, "make_subscription_unsubscription: Operation goes wrong for signal: %s", sig_name.c_str());
 		return 0;
 	}
 	return 1;
@@ -67,7 +67,7 @@ static int create_event_handle(const std::string& sig_name, std::map<std::string
 	s[sig_name] = afb_daemon_make_event(binder_interface->daemon, sig_name.c_str());
 	if (!afb_event_is_valid(s[sig_name]))
 	{
-		ERROR(binder_interface, "Can't create an event for %s, something goes wrong.", sig_name.c_str());
+		ERROR(binder_interface, "create_event_handle: Can't create an event for %s, something goes wrong.", sig_name.c_str());
 		return 0;
 	}
 	return 1;
