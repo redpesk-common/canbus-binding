@@ -19,22 +19,11 @@
 
 #include "utils/signals.hpp"
 
-// Dumb signals and message implementation. To get compile.
-/*std::vector<can_message_set_t> CAN_MESSAGE_SET;
-
-std::vector<std::vector<can_message_definition_t>> CAN_MESSAGES_DEFINITION;
-
-std::vector<std::vector<can_signal_t>> SIGNALS;*/
-
+/// @brief Return singleton instance of configuration object.
 configuration_t& configuration_t::instance()
 {
 	static configuration_t config;
 	return config;
-}
-
-configuration_t& configuration_t::get_configuration()
-{
-	return *this;
 }
 
 can_bus_t& configuration_t::get_can_bus_manager()
@@ -72,11 +61,6 @@ std::vector<diagnostic_message_t>& configuration_t::get_diagnostic_messages()
 	return diagnostic_messages_[active_message_set_];
 }
 
-const std::vector<std::string>& configuration_t::get_signals_prefix() const
-{
-	return signals_prefix_;
-}
-
 const std::vector<can_message_definition_t>& configuration_t::get_can_message_definition()
 {
 	return can_message_definition_[active_message_set_];
@@ -102,15 +86,12 @@ void configuration_t::set_active_message_set(uint8_t id)
 	active_message_set_ = id;
 }
 
-/**
- * @fn std::vector<std::string> find_can_signals(const openxc_DynamicField &key)
- * @brief return signals name found searching through CAN_signals and OBD2 pid
- *
- * @param[in] key - can contain numeric or string value in order to search against
- *   can signals or obd2 signals name.
- *
- * @return Vector of signals name found.
- */
+/// @brief return diagnostic messages name found searching through diagnostic messages list.
+///
+/// @param[in] key - can contain numeric or string value in order to search against
+///   can signals or obd2 signals name.
+/// @param[out] found_signals - Vector of signals name found.
+///
 void configuration_t::find_diagnostic_messages(const openxc_DynamicField &key, std::vector<diagnostic_message_t*>& found_signals)
 {
 	switch(key.type)
@@ -128,15 +109,12 @@ void configuration_t::find_diagnostic_messages(const openxc_DynamicField &key, s
 	DEBUG(binder_interface, "find_diagnostic_messages: Found %d signal(s)", (int)found_signals.size());
 }
 
-/**
- * @fn void find_can_signals(const openxc_DynamicField& key, std::vector<can_signal_t*>& found_signals)
- * @brief return signals name found searching through CAN_signals and OBD2 pid
- *
- * @param[in] key - can contain numeric or string value in order to search against
- *   can signals or obd2 signals name.
- * @param[out] found_signals - provided vector to fill with ponter to signals matched.
- *
- */
+/// @brief return signals name found searching through CAN signals list.
+///
+/// @param[in] key - can contain numeric or string value in order to search against
+///   can signals or obd2 signals name.
+/// @param[out] found_signals - provided vector to fill with pointer to matched signals.
+///
 void configuration_t::find_can_signals(const openxc_DynamicField& key, std::vector<can_signal_t*>& found_signals)
 {
 	switch(key.type)

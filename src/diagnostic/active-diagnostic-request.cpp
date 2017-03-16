@@ -24,6 +24,7 @@
 
 #define ERROR_PID 0xFF
 
+// @brief
 std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
 
 bool active_diagnostic_request_t::operator==(const active_diagnostic_request_t& b)
@@ -137,11 +138,14 @@ void active_diagnostic_request_t::set_in_flight(bool val)
 	in_flight_ = val;
 }
 
-/**
-* @brief Check if requested signal name is an obd2 pid
-* 
-* @return true if name began with obd2 else false.
-*/
+///
+/// @brief Check if requested signal name is a diagnostic message. If the name
+///  begin with the diagnostic message prefix then true else false.
+///
+/// @param[in] name - A signal name.
+///
+/// @return true if name began with the diagnostic message prefix else false.
+///
 bool active_diagnostic_request_t::is_diagnostic_signal(const std::string& name)
 {
 	const std::string p = active_diagnostic_request_t::prefix_ + "*";
@@ -150,6 +154,11 @@ bool active_diagnostic_request_t::is_diagnostic_signal(const std::string& name)
 	return false;
 }
 
+/// @brief Check is the request should be sent or not
+///
+/// @return true if the request isn't already running and not
+/// recurring nor completed, or it is recurring its clock elapsed so it's
+/// time to send another one.
 bool active_diagnostic_request_t::should_send()
 {
 	return !get_in_flight() && (
@@ -157,6 +166,9 @@ bool active_diagnostic_request_t::should_send()
 			(get_recurring() && get_frequency_clock().elapsed(true)));
 }
 
+/// @brief check if the timeout clock has elapsed
+///
+/// @return true if elapsed, so it is a timeout, else false.
 bool active_diagnostic_request_t::timed_out()
 {
 	// don't use staggered start with the timeout clock

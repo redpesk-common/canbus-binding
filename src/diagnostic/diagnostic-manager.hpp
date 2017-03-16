@@ -29,7 +29,7 @@
 
 #include "../low-can-binding.hpp"
 
-/* Private: Each CAN bus needs its own set of shim functions, so this should
+/*  Each CAN bus needs its own set of shim functions, so this should
  * match the maximum CAN controller count.
  */
 #define MAX_SHIM_COUNT can_bus_t.get_can_devices().size()
@@ -38,10 +38,10 @@
 class active_diagnostic_request_t;
 
 /**
- * @brief The core structure for running the diagnostics module on the VI.
+ * @brief The core structure for running the diagnostics module by the binding.
  *
  * @desc This stores details about the active requests and shims required to connect
- * the diagnostics library to the VI's CAN peripheral.
+ * the diagnostics library to the CAN device.
  */
 class diagnostic_manager_t {
 protected:
@@ -75,8 +75,6 @@ public:
 	void cleanup_active_requests(bool force);
 	active_diagnostic_request_t* find_recurring_request(const DiagnosticRequest* request);
 
-	bool validate_optional_request_attributes(float frequencyHz);
-
 	void checkSupportedPids(const active_diagnostic_request_t& request,
 		const DiagnosticResponse& response, float parsedPayload);
 
@@ -84,6 +82,7 @@ public:
 	bool add_request(DiagnosticRequest* request, const std::string name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback);
+	bool validate_optional_request_attributes(float frequencyHz);
 	bool add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);

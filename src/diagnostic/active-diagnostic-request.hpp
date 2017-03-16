@@ -29,56 +29,63 @@
 class active_diagnostic_request_t;
 class diagnostic_manager_t;
 
-/* Public: The signature for an optional function that can apply the neccessary
- * formula to translate the binary payload into meaningful data.
- *
- * response - the received DiagnosticResponse (the data is in response.payload,
- *      a byte array). This is most often used when the byte order is
- *      signiticant, i.e. with many OBD-II PID formulas.
- * parsed_payload - the entire payload of the response parsed as an int.
- */
+/// @brief The signature for an optional function that can apply the neccessary
+/// formula to translate the binary payload into meaningful data.
+///
+/// @param[in] response - the received DiagnosticResponse (the data is in response.payload,
+///  a byte array). This is most often used when the byte order is signiticant, i.e. with many OBD-II PID formulas.
+/// @param[in] parsed_payload - the entire payload of the response parsed as an int.
+///
+/// @return float value after decoding.
+///
 typedef float (*DiagnosticResponseDecoder)(const DiagnosticResponse* response,
 		float parsed_payload);
 
-/* Public: The signature for an optional function to handle a new diagnostic
- * response.
- *
- * manager - The DiagnosticsManager providing this response.
- * request - The original diagnostic request.
- * response - The response object that was just received.
- * parsed_payload - The payload of the response, parsed as a float.
- */
+/// @brief: The signature for an optional function to handle a new diagnostic
+/// response.
+///
+/// @param[in] request - The original diagnostic request.
+/// @param[in] response - The response object that was just received.
+/// @param[in] parsed_payload - The payload of the response, parsed as a float.
+///
 typedef void (*DiagnosticResponseCallback)(const active_diagnostic_request_t* request,
 		const DiagnosticResponse* response, float parsed_payload);
 
-/**
- * @brief An active diagnostic request, either recurring or one-time.
- */
+///
+/// @brief An active diagnostic request, either recurring or one-time.
+///
+/// @desc Will host a diagnostic_message_t class members to describe an on going
+///  diagnostic request on the CAN bus. Diagnostic message will be converted to
+///  a DiagnosticRequest using ad-hoc method build_diagnostic_request from diagnostic message.
+///  Then missing member, that can not be hosted into a DiagnosticRequest struct, will be passed
+///  as argument when adding the request to (non)-recurrent vector. Argument will be used to instanciate
+///  an active_diagnostic_request_t object before sending it.
+///
 class active_diagnostic_request_t {
 private:
-	std::string bus_; /*!< bus_ - The CAN bus this request should be made on, or is currently in flight-on*/
-	uint32_t id_; /*!< id_ - The arbitration ID (aka message ID) for the request.*/
-	DiagnosticRequestHandle* handle_; /*!< handle_ - A handle for the request to keep track of it between
-										* sending the frames of the request and receiving all frames of the response.*/
-	std::string name_; /*!< name_ - An optional human readable name this response, to be used when publishing received 
-						* responses. If the name is NULL, the published output will use the raw OBD-II response format.*/
-	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
-								 * which make easier to sort message when the come in.*/
-	DiagnosticResponseDecoder decoder_; /*!< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses
-											* to this request. If the decoder is NULL, the output will include the raw payload
-											* instead of a parsed value.*/
-	DiagnosticResponseCallback callback_; /*!< callback_ - An optional DiagnosticResponseCallback to be notified whenever a
-											* response is received for this request.*/
-	bool recurring_; /*!< bool recurring_ - If true, this is a recurring request and it will remain as active until explicitly cancelled.
-						* The frequencyClock attribute controls how often a recurrin request is made.*/
-	bool wait_for_multiple_responses_; /*!< wait_for_multiple_responses_ - False by default, when any response is received for a request
-										* it will be removed from the active list. If true, the request will remain active until the timeout
-										* clock expires, to allow it to receive multiple response (e.g. to a functional broadcast request).*/
-	bool in_flight_; /*!< in_flight_ - True if the request has been sent and we are waiting for a response.*/
-	frequency_clock_t frequency_clock_; /*!< frequency_clock_ - A frequency_clock_t object to control the send rate for a
-										* recurring request. If the request is not reecurring, this attribute is not used.*/
-	frequency_clock_t timeout_clock_; /*!< timeout_clock_ - A frequency_clock_t object to monitor how long it's been since
-									* this request was sent.*/
+	std::string bus_; ///< bus_ - The CAN bus this request should be made on, or is currently in flight-on
+	uint32_t id_; ///< id_ - The arbitration ID (aka message ID) for the request.
+	DiagnosticRequestHandle* handle_; ///< handle_ - A handle for the request to keep track of it between
+									  ///< sending the frames of the request and receiving all frames of the response.
+	std::string name_; ///< name_ - Human readable name, to be used when publishing received responses.
+					   ///< TODO: If the name is NULL, the published output will use the raw OBD-II response format.
+	static std::string prefix_; ///< prefix_ - It has to reflect the JSON object which it comes from. It makes easier sorting 
+								///< incoming CAN messages.
+	DiagnosticResponseDecoder decoder_; ///< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses
+										///< to this request. If the decoder is NULL, the output will include the raw payload
+										///< instead of a parsed value.
+	DiagnosticResponseCallback callback_; ///< callback_ - An optional DiagnosticResponseCallback to be notified whenever a
+										  ///< response is received for this request.
+	bool recurring_; ///< bool recurring_ - If true, this is a recurring request and it will remain as active until explicitly cancelled.
+					 ///< The frequencyClock attribute controls how often a recurrin request is made.
+	bool wait_for_multiple_responses_; ///< wait_for_multiple_responses_ - False by default, when any response is received for a request
+									   ///< it will be removed from the active list. If true, the request will remain active until the timeout
+									   ///< clock expires, to allow it to receive multiple response (e.g. to a functional broadcast request).
+	bool in_flight_; ///< in_flight_ - True if the request has been sent and we are waiting for a response.
+	frequency_clock_t frequency_clock_; ///< frequency_clock_ - A frequency_clock_t object to control the send rate for a
+										///< recurring request. If the request is not reecurring, this attribute is not used.
+	frequency_clock_t timeout_clock_; ///< timeout_clock_ - A frequency_clock_t object to monitor how long it's been since
+									  ///< this request was sent.
 public:
 	bool operator==(const active_diagnostic_request_t& b);
 	active_diagnostic_request_t& operator=(const active_diagnostic_request_t& adr);
@@ -89,7 +96,7 @@ public:
 		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
-	
+
 	uint32_t get_id() const;
 	const std::shared_ptr<can_bus_dev_t> get_can_bus_dev() const;
 	DiagnosticRequestHandle* get_handle();
@@ -102,7 +109,7 @@ public:
 	bool get_in_flight() const;
 	frequency_clock_t& get_frequency_clock();
 	frequency_clock_t& get_timeout_clock();
-	
+
 	void set_handle(DiagnosticShims& shims, DiagnosticRequest* request);
 	void set_in_flight(bool val);
 

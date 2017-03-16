@@ -167,4 +167,7 @@ configuration_t::configuration_t()
 {
 }
 
-
+const std::string configuration_t::get_diagnostic_bus() const
+{
+	return "vcan0";
+}

@@ -33,9 +33,11 @@ const char *UNIT_NAMES[10] = {
 	"NM"
 };
 
-diagnostic_message_t::diagnostic_message_t(uint8_t pid, const std::string generic_name, const int min, const int max, enum UNIT unit, float frequency,
-											DiagnosticResponseDecoder decoder, DiagnosticResponseCallback callback, bool supported)
-	: pid_{pid}, generic_name_{generic_name}, min_{min}, max_{max}, unit_{unit}, frequency_{frequency}, decoder_{decoder}, callback_{callback}, supported_{supported}
+diagnostic_message_t::diagnostic_message_t(uint8_t pid, const std::string generic_name, const int min,
+	const int max, enum UNIT unit, float frequency,	DiagnosticResponseDecoder decoder,
+	DiagnosticResponseCallback callback, bool supported)
+	: pid_{pid}, generic_name_{generic_name}, min_{min}, max_{max}, unit_{unit},
+	frequency_{frequency}, decoder_{decoder}, callback_{callback}, supported_{supported}
 {}
 
 uint32_t diagnostic_message_t::get_pid()

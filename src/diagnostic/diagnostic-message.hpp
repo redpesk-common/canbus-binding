@@ -56,7 +56,7 @@ class diagnostic_message_t {
 											 * instead of a parsed value.*/
 		DiagnosticResponseCallback callback_; /*!< callback_ - An optional DiagnosticResponseCallback to be notified whenever a
 											   * response is received for this request.*/
-		
+
 		bool supported_; /*!< supported_ - boolean indicating whether this pid is supported by the vehicle or not.*/
 
 	public:

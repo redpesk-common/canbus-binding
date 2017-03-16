@@ -33,9 +33,16 @@ diagnostic_manager_t::diagnostic_manager_t()
 	: initialized_{false}
 {}
 
+/// @brief Diagnostic manager isn't initialized at launch but after
+///  CAN bus devices initialization. For the moment, it is only possible
+///  to have 1 diagnostic bus which are the first bus declared in the JSON
+///  description file. Configuration instance will return it.
+///
+/// @desc this will initialize DiagnosticShims and cancel all active requests 
+///  if there are any.
 bool diagnostic_manager_t::initialize()
 {
-	// Mandatory to set the bus before intiliaze shims.
+	// Mandatory to set the bus before intialize shims.
 	bus_ = configuration_t::instance().get_diagnostic_bus();
 
 	init_diagnostic_shims();
@@ -46,27 +53,78 @@ bool diagnostic_manager_t::initialize()
 	return initialized_;
 }
 
-/**
- * @brief initialize shims used by UDS lib and set initialized_ to true.
- *  It is needed before used the diagnostic manager fully because shims are
- *  required by most member functions.
- */
+/// @brief initialize shims used by UDS lib and set initialized_ to true.
+///  It is needed before used the diagnostic manager fully because shims are
+///  required by most member functions.
 void diagnostic_manager_t::init_diagnostic_shims()
 {
 	shims_ = diagnostic_init_shims(shims_logger, shims_send, NULL);
 	DEBUG(binder_interface, "init_diagnostic_shims: Shims initialized");
 }
 
+/// @brief Force cleanup all active requests.
 void diagnostic_manager_t::reset()
 {
-	if(initialized_)
-	{
-		DEBUG(binder_interface, "Clearing existing diagnostic requests");
-		cleanup_active_requests(true);
-	}
+	DEBUG(binder_interface, "Clearing existing diagnostic requests");
+	cleanup_active_requests(true);
 }
 
+/// @brief send function use by diagnostic library. Only one bus used for now
+///  so diagnostic request is sent using the default diagnostic bus not matter of
+///  which is specified in the diagnostic message definition.
+///
+/// @param[in] arbitration_id - CAN arbitration ID to use when send message. OBD2 broadcast ID
+///  is 0x7DF by example.
+/// @param[in] data - The data payload for the message. NULL is valid if size is also 0.
+/// @param[in] size - The size of the data payload, in bytes.
+///
+/// @return true if the CAN message was sent successfully. 
+bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
+{
+	std::shared_ptr<can_bus_dev_t> can_bus_dev = can_bus_t::get_can_device(configuration_t::instance().get_diagnostic_manager().bus_);
+	return can_bus_dev->shims_send(arbitration_id, data, size);
+}
 
+/// @brief The type signature for an optional logging function, if the user
+/// wishes to provide one. It should print, store or otherwise display the
+/// message.
+///
+/// message - A format string to log using the given parameters.
+/// ... (vargs) - the parameters for the format string.
+///
+void diagnostic_manager_t::shims_logger(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+
+	char buffer[256];
+	vsnprintf(buffer, 256, format, args);
+
+	DEBUG(binder_interface, "shims_logger: %s", buffer);
+}
+
+/// @brief The type signature for a... OpenXC TODO: not used yet.
+void diagnostic_manager_t::shims_timer()
+{}
+
+std::shared_ptr<can_bus_dev_t> diagnostic_manager_t::get_can_bus_dev()
+{
+	return can_bus_t::get_can_device(bus_);
+}
+
+/// @brief Return diagnostic manager shims member.
+DiagnosticShims& diagnostic_manager_t::get_shims()
+{
+	return shims_;
+}
+
+/// @brief Search for a specific active diagnostic request in the provided requests list
+/// and erase it from the vector. This is useful at unsubscription to clean up the list otherwize
+/// all received CAN messages will be passed to DiagnosticRequestHandle of all active diagnostic request
+/// contained in the vector but no event if connected to, so we will decode uneeded request.
+///
+/// @param[in] entry - a pointer of an active_diagnostic_request instance to clean up
+/// @param[in] requests_list - a vector where to make the search and cleaning.
 void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t* entry, std::vector<active_diagnostic_request_t*>& requests_list)
 {
 	auto i = std::find(requests_list.begin(), requests_list.end(), entry);
@@ -74,8 +132,7 @@ void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t* entry, st
 		requests_list.erase(i);
 }
 
-/// Move the entry to the free list and decrement the lock count for any
-/// CAN filters it used.
+// @brief TODO: implement cancel_request if needed... Don't know.
 void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 {
 
@@ -97,6 +154,12 @@ void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 	}*/
 }
 
+/// @brief Cleanup a specific request if it isn't running and get complete. As it is almost
+/// impossible to get that state for a recurring request without waiting for that, you can 
+/// force the cleaning operation.
+///
+/// @param[in] entry - the request to clean
+/// @param[in] force - Force the cleaning or not ?
 void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, bool force)
 {
 	if(force || (entry->get_in_flight() && entry->request_completed()))
@@ -122,7 +185,10 @@ void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, b
 	}
 }
 
-/// @brief Clean up the request list
+/// @brief Clean up all requests lists, recurring and not recurring.
+///
+/// @param[in] force - Force the cleaning or not ? If true, that will do
+/// the same effect as a call to reset().
 void diagnostic_manager_t::cleanup_active_requests(bool force)
 {
 	for(auto& entry : non_recurring_requests_)
@@ -134,8 +200,11 @@ void diagnostic_manager_t::cleanup_active_requests(bool force)
 			cleanup_request(entry, force);
 }
 
-/// @brief Will return the active_diagnostic_request_t pointer of found request or nullptr if
+/// @brief Will return the active_diagnostic_request_t pointer for theDiagnosticRequest or nullptr if
 /// not found.
+///
+/// @param[in] request - Search key, method will go through recurring list to see if it find that request
+///  holded by the DiagnosticHandle member.
 active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const DiagnosticRequest* request)
 {
 	for (auto& entry : recurring_requests_)
@@ -152,11 +221,32 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const 
 	return nullptr;
 }
 
-std::shared_ptr<can_bus_dev_t> diagnostic_manager_t::get_can_bus_dev()
-{
-	return can_bus_t::get_can_device(bus_);
-}
-
+/// @brief Add and send a new one-time diagnostic request.
+///
+/// @desc A one-time (aka non-recurring) request can existing in parallel with a
+/// recurring request for the same PID or mode, that's not a problem.
+///
+/// For an example, see the docs for addRecurringRequest. This function is very
+/// similar but leaves out the frequencyHz parameter.
+///
+/// @param[in] request - The parameters for the request.
+/// @param[in] name - Human readable name this response, to be used when
+///      publishing received responses. TODO: If the name is NULL, the published output
+///      will use the raw OBD-II response format.
+/// @param[in] waitForMultipleResponses - If false, When any response is received
+///      for this request it will be removed from the active list. If true, the
+///      request will remain active until the timeout clock expires, to allow it
+///      to receive multiple response. Functional broadcast requests will always
+///      waint for the timeout, regardless of this parameter.
+/// @param[in] decoder - An optional DiagnosticResponseDecoder to parse the payload of
+///      responses to this request. If the decoder is NULL, the output will
+///      include the raw payload instead of a parsed value.
+/// @param[in] callback - An optional DiagnosticResponseCallback to be notified whenever a
+///      response is received for this request.
+///
+/// @return true if the request was added successfully. Returns false if there
+/// wasn't a free active request entry, if the frequency was too high or if the
+/// CAN acceptance filters could not be configured,
 bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::string name,
 	bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 	const DiagnosticResponseCallback callback)
@@ -202,6 +292,59 @@ bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyH
 	return true;
 }
 
+/// @brief Add and send a new recurring diagnostic request.
+///
+/// At most one recurring request can be active for the same arbitration ID, mode
+/// and (if set) PID on the same bus at one time. If you try and call
+/// addRecurringRequest with the same key, it will return an error.
+///
+/// TODO: This also adds any neccessary CAN acceptance filters so we can receive the
+/// response. If the request is to the functional broadcast ID (0x7df) filters
+/// are added for all functional addresses (0x7e8 to 0x7f0).
+///
+/// Example:
+///
+///     // Creating a functional broadcast, mode 1 request for PID 2.
+///     DiagnosticRequest request = {
+///         arbitration_id: 0x7df,
+///         mode: 1,
+///         has_pid: true,
+///         pid: 2
+///     };
+///
+///     // Add a recurring request, to be sent at 1Hz, and published with the
+///     // name "my_pid_request"
+///     addRecurringRequest(&getConfiguration()->diagnosticsManager,
+///          canBus,
+///          &request,
+///          "my_pid_request",
+///          false,
+///          NULL,
+///          NULL,
+///          1);
+///
+/// @param[in] request - The parameters for the request.
+/// @param[in] name - An optional human readable name this response, to be used when
+///      publishing received responses. If the name is NULL, the published output
+///      will use the raw OBD-II response format.
+/// @param[in] waitForMultipleResponses - If false, When any response is received
+///      for this request it will be removed from the active list. If true, the
+///      request will remain active until the timeout clock expires, to allow it
+///      to receive multiple response. Functional broadcast requests will always
+///      waint for the timeout, regardless of this parameter.
+/// @param[in] decoder - An optional DiagnosticResponseDecoder to parse the payload of
+///      responses to this request. If the decoder is NULL, the output will
+///      include the raw payload instead of a parsed value.
+/// @param[in] callback - An optional DiagnosticResponseCallback to be notified whenever a
+///      response is received for this request.
+/// @param[in] frequencyHz - The frequency (in Hz) to send the request. A frequency above
+///      MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ is not allowed, and will make this
+///      function return false.
+///
+/// @return true if the request was added successfully. Returns false if there
+/// was too much already running requests, if the frequency was too high TODO:or if the
+/// CAN acceptance filters could not be configured,
+///
 bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz)
@@ -255,7 +398,7 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 	return added;
 }
 
-
+/// @brief Returns true if there are two active requests running for the same arbitration ID.
 bool diagnostic_manager_t::conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const
 {
 	return (candidate->get_in_flight() && candidate != request &&
@@ -281,6 +424,17 @@ bool diagnostic_manager_t::clear_to_send(active_diagnostic_request_t* request) c
 	return true;
 }
 
+/// @brief Systemd timer event callback use to send CAN messages at regular interval. Depending
+/// on the diagnostic message frequency.
+///
+/// This should be called from systemd binder event loop and the event is created on add_recurring_request
+///
+/// @param[in] s - Systemd event source pointer used to reschedule the new iteration.
+/// @param[in] usec - previous call timestamp in microseconds.
+/// @param[in] userdata - the DiagnosticRequest struct, use to retrieve the active request from the list.
+///
+/// @return positive integer if sent and rescheduled or negative value if something wrong. If an error occurs
+/// event will be disabled.
 int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *userdata)
 {
 	diagnostic_manager_t& dm = configuration_t::instance().get_diagnostic_manager();
@@ -296,7 +450,8 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 		if(adr->get_handle()->completed && !adr->get_handle()->success)
 		{
 			DEBUG(binder_interface, "send_request: Fatal error sending diagnostic request");
-			return 0;
+			sd_event_source_unref(s);
+			return -1;
 		}
 		adr->get_timeout_clock().tick();
 		adr->set_in_flight(true);
@@ -307,14 +462,24 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 			DEBUG(binder_interface, "send_request: Event loop state: %d. usec: %ld", sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
 			if(sd_event_source_set_time(s, usec+1000000) >= 0)
 				if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)
-					return 1;
+				{
+					sd_event_source_unref(s);
+					return -2;
+				}
+			return 1;
 		}
 	}
 	sd_event_source_unref(s);
 	ERROR(binder_interface, "send_request: Something goes wrong when submitting a new request to the CAN bus");
-	return -1;
+	return -3;
 }
 
+/// @brief Will decode the diagnostic response and build the final openxc_VehicleMessage to return.
+///
+/// @param[in] adr - A pointer to an active diagnostic request holding a valid diagnostic handle
+/// @param[in] response - The response to decode from which the Vehicle message will be built and returned
+///
+/// @return A filled openxc_VehicleMessage or a zeroed struct if there is an error.
 openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response)
 {
 	openxc_VehicleMessage message = build_VehicleMessage();
@@ -423,28 +588,3 @@ bool diagnostic_manager_t::is_diagnostic_response(const can_message_t& cm)
 			return true;
 	return false;
 }
-
-DiagnosticShims& diagnostic_manager_t::get_shims()
-{
-	return shims_;
-}
-
-bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
-{
-	std::shared_ptr<can_bus_dev_t> can_bus_dev = can_bus_t::get_can_device(configuration_t::instance().get_diagnostic_manager().bus_);
-	return can_bus_dev->shims_send(arbitration_id, data, size);
-}
-
-void diagnostic_manager_t::shims_logger(const char* format, ...)
-{
-	va_list args;
-	va_start(args, format);
-
-	char buffer[256];
-	vsnprintf(buffer, 256, format, args);
-
-	DEBUG(binder_interface, "shims_logger: %s", buffer);
-}
-
-void diagnostic_manager_t::shims_timer()
-{}
