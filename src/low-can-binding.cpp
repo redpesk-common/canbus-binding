@@ -79,18 +79,18 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-	if (s.find(sig) != s.end() && !afb_event_is_valid(s[sig]))
+	if (s.find(sig) != s.end())
 	{
-		if(!subscribe)
+		if (!afb_event_is_valid(s[sig]) && !subscribe)
 		{
-			NOTICE(binder_interface, "Event isn't valid, it can't be unsubscribed.");
+			NOTICE(binder_interface, "subscribe_unsubscribe_signal: Event isn't valid, it can't be unsubscribed.");
 			ret = -1;
 		}
-		else
+		/*else
 		{
-			/* Event it isn't valid annymore, recreate it */
+			// Event it isn't valid annymore, recreate it 
 			ret = create_event_handle(sig, s);
-		}
+		}*/
 	}
 	else
 	{
@@ -128,15 +128,24 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	for(const std::string& sig : signals)
 	{
 		int ret;
-		if (active_diagnostic_request_t::is_diagnostic_signal(sig) && subscribe)
+		if (active_diagnostic_request_t::is_diagnostic_signal(sig))
 		{
 			std::vector<diagnostic_message_t*> found;
 			configuration_t::instance().find_diagnostic_messages(build_DynamicField(sig), found);
-			float frequency = found.front()->get_frequency();
 			DiagnosticRequest* diag_req = new DiagnosticRequest(found.front()->build_diagnostic_request());
-			configuration_t::instance().get_diagnostic_manager().add_recurring_request(
-				diag_req, sig.c_str(), false, found.front()->get_decoder(), found.front()->get_callback(), (float)frequency);
-				//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
+
+			if(subscribe)
+			{
+				float frequency = found.front()->get_frequency();
+				configuration_t::instance().get_diagnostic_manager().add_recurring_request(
+					diag_req, sig.c_str(), false, found.front()->get_decoder(), found.front()->get_callback(), (float)frequency);
+					//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
+			}
+			else
+			{
+				configuration_t::instance().get_diagnostic_manager().cleanup_request(
+					configuration_t::instance().get_diagnostic_manager().find_recurring_request(diag_req), true);
+			}
 		}
 
 		ret = subscribe_unsubscribe_signal(request, subscribe, sig);
