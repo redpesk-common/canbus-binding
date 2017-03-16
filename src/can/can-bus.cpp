@@ -91,7 +91,7 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
 		{
 			decoded_message = decoder_t::translateSignal(*sig, can_message, configuration_t::instance().get_can_signals());
 
-			openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_generic_name(), decoded_message);
+			openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
 			vehicle_message = build_VehicleMessage(s_message);
 
 			std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
