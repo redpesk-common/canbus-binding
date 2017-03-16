@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
-#include "obd2-signals.hpp"
+#include "obd2/obd2-signals.hpp"
 
-#include "signals.hpp"
+#include "utils/signals.hpp"
+
+#define OBD2_FUNCTIONAL_BROADCAST_ID 0x7df
 
 const char *UNIT_NAMES[10] = {
 	"POURCENT",
@@ -62,16 +64,9 @@ obd2_signals_t::obd2_signals_t(uint8_t pid, const char* generic_name, const int 
 {
 }
 
-void obd2_signals_t::init_diagnostic_shims(can_bus_dev_t& can_bus_dev)
+std::vector<obd2_signals_t>& get_obd2_signals()
 {
-	DiagnosticShims shims_ = diagnostic_init_shims(shims_logger, can_bus_dev.send_can_message, NULL);
-
-	int n_pids_, i_;
-
-	n_pids_ = size(Obd2Pid);
-	for(i_=0; i_<=n_pids_; i_++)
-	{
-	}
+	return OBD2_PIDS;
 }
 
 /**
@@ -83,7 +78,7 @@ void obd2_signals_t::init_diagnostic_shims(can_bus_dev_t& can_bus_dev)
  *
  * @return std::vector<std::string> Vector of signals name found. 
  */
-void obd2_signals_t::find_obd2_signals(const openxc_DynamicField &key, std::vector<Obd2Pid*>& found_signals)
+void obd2_signals_t::find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signals_t*>& found_signals)
 {
 	switch(key.type)
 	{
@@ -98,11 +93,6 @@ void obd2_signals_t::find_obd2_signals(const openxc_DynamicField &key, std::vect
 			break;
 	}
 	DEBUG(binder_interface, "Found %d signal(s)", (int)found_signals.size());
-}
-
-std::vector<Obd2Pid>& get_obd2_signals()
-{
-	return OBD2_PIDS;
 }
 
 uint32_t get_signal_id(const Obd2Pid& sig)
@@ -156,7 +146,9 @@ bool obd2_signals_t::is_obd2_response(can_message_t can_message)
 	{
 		debug("Sent message ID is outside the valid range for emulator (7DF to 7E7)");
 		status=false;
-};
+	}
+	return false;
+}
 
 void obd2_signals_t::add_request(int pid)
 {

@@ -83,7 +83,7 @@ class can_bus_t {
 		can_message_t next_can_message();
 		void push_new_can_message(const can_message_t& can_msg);		
 		std::mutex& get_can_message_mutex();
-		std::condition_variable& get_new_can_message_cv_();
+		std::condition_variable& get_new_can_message_cv();
 
 		openxc_VehicleMessage next_vehicle_message();
 		void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);

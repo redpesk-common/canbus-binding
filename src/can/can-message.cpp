@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "can-message.hpp"
+#include "can/can-message.hpp"
 
 #include <cstring>
 

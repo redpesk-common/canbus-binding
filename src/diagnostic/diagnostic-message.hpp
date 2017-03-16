@@ -76,14 +76,13 @@ class obd2_signals_t {
 		bool supported_;
 
 	public:
+		const char* generic_name = generic_name_;
 		obd2_signals_t(uint8_t pid, const char* generic_name, const int min_, const int max_, enum UNIT unit, int frequency, bool supported);
 
-		void init_diagnostic_shims(can_bus_dev_t& can_bus_dev);
 		void add_request(int pid);
-		std::vector<Obd2Pid>& get_obd2_signals();
 
 		uint32_t get_signal_id(const Obd2Pid& sig);
-		void find_obd2_signals(const openxc_DynamicField &key, std::vector<Obd2Pid*>& found_signals);
+		void find_obd2_signals(const openxc_DynamicField &key, std::vector<obd2_signals_t*>& found_signals);
 
 
 		bool is_obd2_response(can_message_t can_message);
@@ -92,3 +91,5 @@ class obd2_signals_t {
 
 		float decode_obd2_response(const DiagnosticResponse* response, float parsedPayload);
 };
+
+std::vector<obd2_signals_t>& get_obd2_signals();

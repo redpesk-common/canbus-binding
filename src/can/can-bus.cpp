@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "can-bus.hpp"
+#include "can/can-bus.hpp"
 
 #include <map>
 #include <cerrno>
@@ -29,8 +29,8 @@
 #include <json-c/json.h>
 #include <linux/can/raw.h>
 
-#include "can-decoder.hpp"
-#include "openxc-utils.hpp"
+#include "can/can-decoder.hpp"
+#include "utils/openxc-utils.hpp"
 
 extern "C"
 {
@@ -74,7 +74,7 @@ void can_bus_t::can_decode_message()
 	while(is_decoding_)
 	{
 		std::unique_lock<std::mutex> can_message_lock(can_message_mutex_);
-		new_can_message_.wait(can_message_lock);
+		new_can_message_cv_.wait(can_message_lock);
 		can_message = next_can_message();
 	
 		/* First we have to found which CanSignal it is */
@@ -144,7 +144,7 @@ void can_bus_t::can_event_push()
 	*/
 void can_bus_t::start_threads()
 {
-	v_ = true;
+	is_decoding_ = true;
 	th_decoding_ = std::thread(&can_bus_t::can_decode_message, this);
 	if(!th_decoding_.joinable())
 		is_decoding_ = false;
@@ -263,9 +263,9 @@ std::vector<std::string> can_bus_t::read_conf()
 }
 
 /**
-* @brief return new_can_message_ member
+* @brief return new_can_message_cv_ member
 *
-* @return  return new_can_message_ member
+* @return  return new_can_message_cv_ member
 */
 std::condition_variable& can_bus_t::get_new_can_message_cv()
 {
@@ -518,7 +518,7 @@ void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 			std::lock_guard<std::mutex> can_message_lock(can_bus.get_can_message_mutex());
 			can_bus.push_new_can_message(can_message);
 		}
-		can_bus.get_new_can_message_cv_().notify_one();
+		can_bus.get_new_can_message_cv().notify_one();
 	}
 }
 

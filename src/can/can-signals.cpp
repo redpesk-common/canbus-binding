@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include "can-signals.hpp"
+#include "can/can-signals.hpp"
 
 #include <fnmatch.h>
 
-#include "signals.hpp"
-#include "obd2-signals.hpp"
-#include "can-decoder.hpp"
+#include "utils/signals.hpp"
+#include "can/can-decoder.hpp"
+#include "obd2/obd2-signals.hpp"
 #include "low-can-binding.hpp"
 
 std::vector<std::vector<CanMessageDefinition>> CAN_MESSAGES = {

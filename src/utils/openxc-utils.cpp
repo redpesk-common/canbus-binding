@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "openxc-utils.hpp"
+#include "utils/openxc-utils.hpp"
 
 openxc_VehicleMessage build_VehicleMessage_with_SimpleMessage(openxc_DynamicField_Type type, const openxc_SimpleMessage& message)
 {
