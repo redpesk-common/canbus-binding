@@ -461,16 +461,14 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 			DEBUG(binder_interface, "send_request: Event loop state: %d. usec: %ld", sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
 			if(sd_event_source_set_time(s, usec+1000000) >= 0)
 				if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)
-				{
-					sd_event_source_unref(s);
-					return -2;
-				}
-			return 1;
+					return 0;
+			sd_event_source_unref(s);
+			return -1;
 		}
 	}
 	sd_event_source_unref(s);
 	ERROR(binder_interface, "send_request: Something goes wrong when submitting a new request to the CAN bus");
-	return -3;
+	return -2;
 }
 
 /// @brief Will decode the diagnostic response and build the final openxc_VehicleMessage to return.
