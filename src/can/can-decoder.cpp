@@ -16,6 +16,7 @@
  */
 
 #include "can-decoder.hpp"
+
 #include "canutil/read.h"
 #include "../utils/openxc-utils.hpp"
 

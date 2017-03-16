@@ -18,13 +18,11 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "uds/uds.h"
-#include "../can/can-bus.hpp"
 #include "../can/can-message.hpp"
 #include "active-diagnostic-request.hpp"
-
-#include "../low-can-binding.hpp"
 
 enum UNIT {
 	POURCENT,

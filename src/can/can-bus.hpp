@@ -25,8 +25,6 @@
 #include <condition_variable>
 
 #include "openxc.pb.h"
-#include "../utils/timer.hpp"
-#include "can-signals.hpp"
 #include "can-message.hpp"
 #include "can-bus-dev.hpp"
 #include "../diagnostic/active-diagnostic-request.hpp"

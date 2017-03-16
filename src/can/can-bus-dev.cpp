@@ -16,14 +16,13 @@
 * limitations under the License.
 */
 
-
+#include <map>
+#include <mutex>
 #include <unistd.h>
 #include <string.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <linux/can/raw.h>
-
-#include <mutex>
 
 #include "can-bus-dev.hpp"
 

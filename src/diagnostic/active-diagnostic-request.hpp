@@ -17,14 +17,13 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "uds/uds.h"
 #include "uds/uds_types.h"
+#include "../utils/timer.hpp"
 #include "../can/can-bus-dev.hpp"
-#include "../can/can-message.hpp"
-
-#include "../low-can-binding.hpp"
 
 class active_diagnostic_request_t;
 class diagnostic_manager_t;

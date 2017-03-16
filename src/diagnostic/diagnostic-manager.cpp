@@ -20,7 +20,6 @@
 
 #include "diagnostic-manager.hpp"
 
-#include "uds/uds.h"
 #include "../utils/openxc-utils.hpp"
 #include "../configuration.hpp"
 

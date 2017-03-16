@@ -23,11 +23,8 @@
 
 #include "uds/uds.h"
 #include "openxc.pb.h"
-#include "../can/can-bus-dev.hpp"
-#include "../can/can-message.hpp"
+#include "../can/can-bus.hpp"
 #include "active-diagnostic-request.hpp"
-
-#include "../low-can-binding.hpp"
 
 /*  Each CAN bus needs its own set of shim functions, so this should
  * match the maximum CAN controller count.
@@ -50,10 +47,10 @@ protected:
 	static void shims_timer();
 
 private:
-	DiagnosticShims shims_; /*!< shims_ - A map of shim functions for each CAN bus that plug the diagnostics
-							 						* library (uds-c) into the VI's CAN peripheral.*/
+	DiagnosticShims shims_; /*!< shims_ - Shim functions for each CAN bus that plug the diagnostics
+							 * library (uds-c) into the VI's CAN peripheral.*/
 	std::string bus_; /*!< bus_ - A pointer to the CAN bus that should be used for all standard OBD-II requests, if the bus is not
-						  * explicitly spcified in the request. Default to the first bus CAN at initialization.*/
+						* explicitly spcified in the request. Default to the first bus CAN at initialization.*/
 	std::vector<active_diagnostic_request_t*> recurring_requests_; /*!< recurringRequests - A list of active recurring diagnostic requests.*/
 	std::vector<active_diagnostic_request_t*> non_recurring_requests_; /*!< nonrecurringRequests - A list of active one-time diagnostic requests. When a
 																	   * response is received for a non-recurring request or it times out, it is removed*/

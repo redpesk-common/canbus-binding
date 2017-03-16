@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <fnmatch.h>
 #include <map>
+#include <fnmatch.h>
 
 #include "active-diagnostic-request.hpp"
 

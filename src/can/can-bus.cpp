@@ -29,6 +29,7 @@
 
 #include "can-bus.hpp"
 
+#include "can-signals.hpp"
 #include "can-decoder.hpp"
 #include "../configuration.hpp"
 #include "../utils/signals.hpp"

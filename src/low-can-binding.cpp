@@ -18,6 +18,7 @@
 
 #include "low-can-binding.hpp"
 
+#include <map>
 #include <queue>
 #include <mutex>
 #include <vector>

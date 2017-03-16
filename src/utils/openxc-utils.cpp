@@ -20,7 +20,6 @@
 
 #include "../configuration.hpp"
 
-
 /**
  * @brief Build a specific VehicleMessage containing a DiagnosticResponse.
  *

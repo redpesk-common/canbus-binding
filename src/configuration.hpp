@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include <map>
 #include <vector>
+#include <string>
 #include <fcntl.h>
 
 #include "can/can-bus.hpp"

@@ -17,7 +17,9 @@
 
 #pragma once
 
-#include "can-bus.hpp"
+#include "can-signals.hpp"
+#include "can-message.hpp"
+#include "openxc.pb.h"
 
 class decoder_t
 {
