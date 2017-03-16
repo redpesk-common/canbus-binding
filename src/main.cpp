@@ -14,6 +14,160 @@
 #define EXIT_COMMAND_LINE_ERROR		2
 #define EXIT_PROGRAM_ERROR			3
 
+template <typename T>
+struct generator
+{
+	T v_;
+	std::string line_prefix_;
+	generator(T v, std::string line_prefix = "") : v_{v}, line_prefix_{line_prefix} {}
+};
+
+template <>
+struct generator<openxc::signal>
+{
+	const openxc::signal& v_;
+	std::uint32_t index_;
+	std::string line_prefix_;
+	generator(const openxc::signal& v, std::uint32_t index, std::string line_prefix = "")
+		: v_{v}, index_{index}, line_prefix_{line_prefix}
+	{
+	}
+};
+
+template <typename T>
+generator<T> gen(const T& v, std::string line_prefix = "") { return generator<T>(v, line_prefix); }
+
+generator<openxc::signal> gen(const openxc::signal& v, std::uint32_t index, std::string line_prefix = "")
+{
+	return generator<openxc::signal>(v, index, line_prefix);
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& o, const generator<T>& v)
+{
+	o << v.line_prefix_ << v.v_;
+	return o;
+}
+
+template <>
+std::ostream& operator<<(std::ostream& o, const generator<bool>& v)
+{
+	o << v.line_prefix_ << (v.v_ ? "true" : "false");
+	return o;
+}
+
+template <>
+std::ostream& operator<<(std::ostream& o, const generator<float>& v)
+{
+	o << v.line_prefix_ << std::showpoint << v.v_ << "f";
+	return o;
+}
+
+template <>
+std::ostream& operator<<(std::ostream& o, const generator<std::string>& v)
+{
+	o << v.line_prefix_ << '\"' << v.v_ << '\"';
+	return o;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& o, const generator<std::vector<T>>& v)
+{
+	o << v.line_prefix_ << "{\n";
+	auto sz = v.v_.size();
+	for(const T& i : v.v_)
+	{
+		o << gen(i, v.line_prefix_ + '\t');
+		if (sz > 1) o << ",";
+		--sz;
+		o << '\n';
+	}
+	o << v.line_prefix_ << '}';
+	return o;
+}
+
+template <>
+std::ostream& operator<<(std::ostream& o, const generator<openxc::message_set>& v)
+{
+	o	<< v.line_prefix_
+		<< '{'
+		<< "0, "
+		<< gen(v.v_.name()) << ", "
+		<< v.v_.buses().size() << ", "
+		<< v.v_.messages().size() << ", "
+		<< std::accumulate(
+			std::begin(v.v_.messages()),
+			std::end(v.v_.messages()),
+			0,
+			[](int sum, const openxc::can_message& p) { return sum + p.signals().size(); }
+			) << ", "
+		<< v.v_.commands().size() << ", "
+		<< v.v_.diagnostic_messages().size() << "}";
+	return o;
+}
+
+template <>
+std::ostream& operator<<(std::ostream& o, const generator<openxc::can_message>& v)
+{
+	o	<< v.line_prefix_
+		<< "can_message_definition_t("
+		<< "0, "
+		<< gen(v.v_.bus()) << ", "
+		<< v.v_.id() << ", "
+		<< "can_message_format_t::STANDARD, "
+		<< "frequency_clock_t(" << gen(v.v_.max_frequency()) << "), "
+		<< gen(v.v_.force_send_changed())
+		<< ')';
+	return o;
+}
+
+template <>
+std::ostream& operator<<(std::ostream& o, const generator<std::map<std::string, std::vector<std::uint32_t>>>& v)
+{
+	o << v.line_prefix_ << "{\n";
+	std::uint32_t c1 = v.v_.size();
+	for(const auto& state : v.v_)
+	{
+		std::uint32_t c2 = state.second.size();
+		for(const auto& i : state.second)
+		{
+			o << v.line_prefix_ << "\t" << "{" << i << ", " << gen(state.first) << "}";
+			if (c1 > 1 || c2 > 1) o << ',';
+			o << '\n';
+			--c2;
+		}
+		--c1;
+	}
+	o << v.line_prefix_ << "}";
+	return o;
+}
+
+template <>
+std::ostream& operator<<(std::ostream& o, const generator<openxc::signal>& v)
+{
+	o	<< v.line_prefix_ << "{\n"
+		<< v.line_prefix_ << "\t0,\n"
+		<< v.line_prefix_ << "\t" << v.index_ << ",\n"
+		<< v.line_prefix_ << "\t" << gen(v.v_.generic_name()) << ",\n"
+		<< v.line_prefix_ << "\t" << v.v_.bit_position() << ",\n"
+		<< v.line_prefix_ << "\t" << v.v_.bit_size() << ",\n"
+		<< v.line_prefix_ << "\t" << gen(v.v_.factor()) << ", \n"
+		<< v.line_prefix_ << "\t" << v.v_.offset() << ", \n"
+		<< v.line_prefix_ << "\t" << "0,\n"
+		<< v.line_prefix_ << "\t" << "0,\n"
+		<< v.line_prefix_ << "\tfrequency_clock_t(" << gen(v.v_.max_frequency()) << "),\n"
+		<< v.line_prefix_ << "\t" << gen(v.v_.send_same()) << ",\n"
+		<< v.line_prefix_ << "\t" << gen(v.v_.force_send_changed()) << ",\n"
+		<< gen(v.v_.states(), v.line_prefix_ + '\t') << ",\n"
+		<< v.line_prefix_ << '\t' << gen(v.v_.writable()) << ",\n"
+		<< v.line_prefix_ << '\t' << (v.v_.decoder().size() ? v.v_.decoder() : "nullptr") << ",\n"
+		<< v.line_prefix_ << '\t' << (v.v_.encoder().size() ? v.v_.encoder() : "nullptr") << ",\n"
+		<< v.line_prefix_ << '\t' << "false\n"
+		<< v.line_prefix_ << "}";
+	return o;
+}
+
+
 /// @brief Generate the configuration code.
 /// @param[in] header Content to be inserted as a header.
 /// @param[in] footer Content to be inserted as a footer.
@@ -21,53 +175,41 @@
 /// @param[in] out Stream to write on.
 void generate(const std::string& header, const std::string& footer, const openxc::message_set& message_set, std::ostream& out)
 {
+	out << "#include \"configuration.hpp\"\n"
+		<< "#include \"can/can-decoder.hpp\"\n\n";
+
 	if (header.size()) out << header << "\n";
-	else out << "#pragma once\n\n";
-	
-	out << "namespace generated {\n"
-		<< "	class configuration_generated\n"
+
+	out	<< "configuration_t::configuration_t()\n"
+		<< "	: can_message_set_" << gen(message_set) << '\n'
+		<< "	, can_message_definition_\n"
 		<< "	{\n"
-		<< "	private:\n"
-		<< "		can_message_set_t can_message_set_;\n"
-		<< "		std::vector<std::vector<can_message_definition_t>> can_message_definition_;\n"
-		<< "		std::vector<std::vector<can_signal_t>> can_signals_;\n"
-		<< "		std::vector<std::vector<obd2_signal_t>> obd2_signals_;\n"
-		<< "	public:\n"
-		<< "		configuration_generated()\n"
-		<< "			: message_set_{0, \""
-											<< message_set.name() << "\", "
-											<< message_set.buses().size() << ", "
-											<< message_set.messages().size() << ", "
-											<< std::accumulate(
-													std::begin(message_set.messages()),
-													std::end(message_set.messages()),
-													0,
-													[](int sum, const std::map<std::string, openxc::can_message>::value_type& p) { return sum + p.second.signals().size(); }
-											) << ", "
-											<< message_set.commands().size() << ", "
-											<< message_set.diagnostic_messages().size() << "}\n"
-		<< "			, can_message_definition_{\n";
-
-		std::uint32_t count = message_set.messages().size();
-		for(const std::map<std::string, openxc::can_message>::value_type& m : message_set.messages())
+				<< gen(message_set.messages(), "\t\t") << '\n'
+		<< "	}\n"
+		<< "	, can_signals_\n"
+		<< "	{\n";
+		std::uint32_t message_count = message_set.messages().size();
+		std::uint32_t index = 0;
+		for(const openxc::can_message& m : message_set.messages())
 		{
-			out << "				{{\""	<< m.second.bus() << "\", "
-											<< m.first << ", "
-											<< "can_message_format_t::STANDARD, frequency_clock_t(), false}}";
-			if (count > 1) out << ",";
-			out << "\n";
-			--count;
+			out << "		{\n";
+			std::uint32_t signal_count = m.signals().size();
+			for(const openxc::signal& s : m.signals())
+			{
+				out << gen(s, index, "			");
+				if (signal_count > 1) out << ',';
+				--signal_count;
+				out << '\n';
+			}
+			out << "		}";
+			if (index + 1 < message_count) out << ',';
+			++index;
+			out << '\n';
 		}
-		out << "			}\n";
-
-		
-		out << "			, can_signals_" << "..." << "\n"
-			<< "			, obd2_signals_" << "..." << "\n"
-			<< "		{\n"
-			<< "		}\n"
-			<< "	};\n"
+		out << "	}\n"
+			<< "	//, obd2_signals_{" << "/*...*/" << "}\n"
+			<< "{\n"
 			<< "}\n\n";
-	
 	out << footer << std::endl;
 }
 
@@ -118,7 +260,7 @@ nlohmann::json read_json(const std::string& file)
 /// @return Exit code, zero if success.
 int main(int argc, char** argv)
 {
-	std::ios::sync_with_stdio(false);
+	//std::ios::sync_with_stdio(false);
 	
 	try
 	{
@@ -149,11 +291,23 @@ int main(int argc, char** argv)
 			}
 
 			bpo::notify(vm);
-			
-			std::string header = read_file(header_file);
+
+			std::stringstream header;
+			header << read_file(header_file);
+						
 			std::string footer = read_file(footer_file);
 			openxc::message_set message_set;
 			message_set.from_json(read_json(message_set_file));
+
+			boost::filesystem::path message_set_path(message_set_file);
+			message_set_path.remove_filename();
+			for(const auto& s : message_set.extra_sources())
+			{
+				boost::filesystem::path extra_source(s);
+				if (!extra_source.is_complete()) extra_source = message_set_path / extra_source;
+				header << "\n// >>>>> " << s << " >>>>>\n" << read_file(extra_source.string()) << "\n// <<<<< " << s << " <<<<<\n";
+			}
+
 			std::ofstream out;
 			if (output_file.size())
 			{
@@ -166,7 +320,7 @@ int main(int argc, char** argv)
 				}
 			}
 			
-			generate(header, footer, message_set, output_file.size() ? out : std::cout); 
+			generate(header.str(), footer, message_set, output_file.size() ? out : std::cout); 
 
 		}
 		catch (bpo::required_option& e)

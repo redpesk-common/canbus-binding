@@ -11,6 +11,7 @@ namespace openxc
 	class signal
 	{
 	private:
+		std::string											id_;
 		std::string											generic_name_;
 		std::uint32_t										bit_position_;
 		std::uint32_t										bit_size_;
@@ -20,12 +21,14 @@ namespace openxc
 		bool												ignore_;
 		bool												enabled_;
 		std::map<std::string, std::vector<std::uint32_t>>	states_;
-		std::uint32_t										max_frequency_;
+		float										max_frequency_;
 		bool												send_same_;
 		bool												force_send_changed_;
 		bool												writable_;
 		std::string											encoder_;
 	public:
+		std::string id() const;
+		void id(const std::string& id);
 		std::string generic_name() const;
 		std::uint32_t bit_position() const;
 		std::uint32_t bit_size() const;
@@ -35,7 +38,7 @@ namespace openxc
 		bool ignore() const;
 		bool enabled() const;
 		const std::map<std::string, std::vector<std::uint32_t>>& states() const;
-		std::uint32_t max_frequency() const;
+		float max_frequency() const;
 		bool send_same() const;
 		bool force_send_changed() const;
 		bool writable() const;

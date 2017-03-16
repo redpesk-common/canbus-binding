@@ -86,7 +86,7 @@
         },
         "DEF": {
           "generic_name": "def",
-          "decoder": "ignoreDecoder",
+          "decoder": "decoder_t::ignoreDecoder",
           "bit_position": 52,
           "bit_size": 12
         }

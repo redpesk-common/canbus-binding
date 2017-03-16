@@ -17,7 +17,7 @@ namespace openxc
 		return mode_;
 	}
 	
-	std::uint32_t diagnostic_message::frequency() const
+	float diagnostic_message::frequency() const
 	{
 		return frequency_;
 	}
@@ -47,7 +47,7 @@ namespace openxc
 		bus_ = j.count("bus") ? j["bus"].get<std::string>() : "";
 		id_ = j.count("id") ? j["id"].get<std::uint32_t>() : 0;
 		mode_ = j.count("mode") ? j["mode"].get<std::uint32_t>() : 1;
-		frequency_ = j.count("frequency") ? j["frequency"].get<std::uint32_t>() : 0;
+		frequency_ = j.count("frequency") ? j["frequency"].get<float>() : 0;
 		pid_ = j.count("pid") ? j["pid"].get<std::uint32_t>() : 0;
 		name_ = j.count("name") ? j["name"].get<std::string>() : "";
 		decoder_ = j.count("decoder") ? j["decoder"].get<std::string>() : "";

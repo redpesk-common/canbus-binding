@@ -22,7 +22,7 @@ namespace openxc
 		return raw_writable_;
 	}
 	
-	std::uint32_t can_bus::max_message_frequency() const
+	float can_bus::max_message_frequency() const
 	{
 		return max_message_frequency_;
 	}
@@ -38,7 +38,7 @@ namespace openxc
 		speed_ = j.count("speed") ? j["speed"].get<std::uint32_t>() : 0;
 		raw_can_mode_ = j.count("raw_can_mode") ? j["raw_can_mode"].get<can_bus_mode>() : can_bus_mode::off;
 		raw_writable_ = j.count("raw_writable") ? j["raw_writable"].get<bool>() : false;
-		max_message_frequency_ = j.count("max_message_frequency") ? j["max_message_frequency"].get<std::uint32_t>() : 0;
+		max_message_frequency_ = j.count("max_message_frequency") ? j["max_message_frequency"].get<float>() : 0;
 		force_send_changed_ = j.count("force_send_changed") ? j["force_send_changed"].get<bool>() : false;
 	}
 

@@ -30,7 +30,7 @@ namespace openxc
 		return bit_numbering_inverted_;
 	}
 	
-	std::uint32_t message_set::max_message_frequency() const
+	float message_set::max_message_frequency() const
 	{
 		return max_message_frequency_;
 	}
@@ -60,7 +60,7 @@ namespace openxc
 		return buses_;
 	}
 	
-	const std::map<std::string, can_message>& message_set::messages() const
+	const std::vector<can_message>& message_set::messages() const
 	{
 		return messages_;
 	}
@@ -84,25 +84,6 @@ namespace openxc
 	{
 		return commands_;
 	}
-	
-	std::string message_set::to_initializer() const
-	{
-		std::uint32_t signal_count = 0;
-		for(const auto& m : messages_)
-		{
-			signal_count += m.second.get_signals_count();
-		}
-		
-		std::stringstream ss;
-		ss	<< "{0, "
-			<< "\"" << name_ << "\", "
-			<< buses_.size() << ", "
-			<< messages_.size() << ", "
-			<< signal_count << ", "
-			<< commands_.size() << ", "
-			<< diagnostic_messages_.size() << "}";
-		return ss.str();
-	}
 
 	void message_set::from_json(const nlohmann::json& j)
 	{
@@ -114,13 +95,24 @@ namespace openxc
 		initializers_ = j.count("initializers") ? j["initializers"].get<std::vector<std::string>>() : std::vector<std::string>();
 		loopers_ = j.count("loopers") ? j["loopers"].get<std::vector<std::string>>() : std::vector<std::string>();
 		buses_ = j.count("buses") ? j["buses"].get<std::map<std::string, can_bus>>() : std::map<std::string, can_bus>();
-		messages_ = j.count("messages") ? j["messages"].get<std::map<std::string, can_message>>() : std::map<std::string, can_message>();
+		//messages_ = j.count("messages") ? j["messages"].get<std::map<std::string, can_message>>() : std::map<std::string, can_message>();
 		diagnostic_messages_ = j.count("diagnostic_messages") ? j["diagnostic_messages"].get<std::vector<diagnostic_message>>() : std::vector<diagnostic_message>();
 		mappings_ = j.count("mappings") ? j["mappings"].get<std::vector<mapping>>() : std::vector<mapping>();
 		extra_sources_ = j.count("extra_sources") ? j["extra_sources"].get<std::vector<std::string>>() : std::vector<std::string>();
 		commands_ = j.count("commands") ? j["commands"].get<std::vector<command>>() : std::vector<command>();
+		
+		
+		if (j.count("messages"))
+		{
+			std::map<std::string, nlohmann::json> messages = j["messages"];
+			for(const std::map<std::string, nlohmann::json>::value_type& m : messages)
+			{
+				can_message cm = m.second.get<can_message>();
+				cm.id(m.first);
+				messages_.push_back(cm);
+			}
+		}
 	}
-
 
 	nlohmann::json message_set::to_json() const
 	{

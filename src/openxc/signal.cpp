@@ -2,6 +2,18 @@
 
 namespace openxc
 {
+	std::string signal::id() const
+	{
+		return id_;
+	}
+	
+	void signal::id(const std::string& id)
+	{
+		id_ = id;
+	}
+	
+	void id(const std::string& id);
+	
 	std::string signal::generic_name() const
 	{
 		return generic_name_;
@@ -47,7 +59,7 @@ namespace openxc
 		return states_;
 	}
 	
-	std::uint32_t signal::max_frequency() const
+	float signal::max_frequency() const
 	{
 		return max_frequency_;
 	}

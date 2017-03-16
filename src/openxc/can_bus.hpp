@@ -15,20 +15,19 @@ namespace openxc
 	class can_bus
 	{
 	private:
-		std::uint32_t				controller_;
-		std::uint32_t				speed_;
-		can_bus_mode				raw_can_mode_;
-		bool						raw_writable_;
-		std::uint32_t				max_message_frequency_;
-		bool						force_send_changed_;
+		std::uint32_t	controller_;
+		std::uint32_t	speed_;
+		can_bus_mode	raw_can_mode_;
+		bool			raw_writable_;
+		float			max_message_frequency_;
+		bool			force_send_changed_;
 
 	public:
-		
 		std::uint32_t controller() const;
 		std::uint32_t speed() const;
 		can_bus_mode raw_can_mode() const;
 		bool raw_writable() const;
-		std::uint32_t max_message_frequency() const;
+		float max_message_frequency() const;
 		bool force_send_changed() const;
 		
 		void from_json(const nlohmann::json& j);

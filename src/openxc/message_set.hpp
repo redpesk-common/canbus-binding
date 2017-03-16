@@ -18,13 +18,14 @@ namespace openxc
 	private:
 		std::string							name_;
 		bool								bit_numbering_inverted_;
-		std::uint32_t						max_message_frequency_;
+		float								max_message_frequency_;
 		can_bus_mode						raw_can_mode_;
 		std::vector<std::string>			parents_;
 		std::vector<std::string>			initializers_;
 		std::vector<std::string>			loopers_;
 		std::map<std::string, can_bus>		buses_;
-		std::map<std::string, can_message>	messages_;
+		//std::map<std::string, can_message>	messages_;
+		std::vector<can_message>			messages_;
 		std::vector<diagnostic_message>		diagnostic_messages_;
 		std::vector<mapping>				mappings_;
 		std::vector<std::string>			extra_sources_;
@@ -37,20 +38,18 @@ namespace openxc
 		
 		std::string name() const;
 		bool bit_numbering_inverted() const;
-		std::uint32_t max_message_frequency() const;
+		float max_message_frequency() const;
 		can_bus_mode raw_can_mode() const;
 		const std::vector<std::string>& parents() const;
 		const std::vector<std::string>& initializers() const;
 		const std::vector<std::string>& loopers() const;
 		const std::map<std::string, can_bus>& buses() const;
-		const std::map<std::string, can_message>& messages() const;
+		const std::vector<can_message>& messages() const;
 		const std::vector<diagnostic_message>& diagnostic_messages() const;
 		const std::vector<mapping>& mappings() const;
 		const std::vector<std::string>& extra_sources() const;
 		const std::vector<command>& commands() const;
 		
-		std::string to_initializer() const;
-
 		void from_json(const nlohmann::json& j);
 		nlohmann::json to_json() const;
 	};

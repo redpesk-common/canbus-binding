@@ -11,7 +11,7 @@ namespace openxc
 		std::string		bus_;
 		std::uint32_t	id_;
 		std::uint32_t	mode_;
-		std::uint32_t	frequency_;
+		float			frequency_;
 		std::uint32_t	pid_;
 		std::string		name_;
 		std::string		decoder_;
@@ -20,7 +20,7 @@ namespace openxc
 		std::string bus() const;
 		std::uint32_t id() const;
 		std::uint32_t mode() const;
-		std::uint32_t frequency() const;
+		float frequency() const;
 		std::uint32_t pid() const;
 		std::string name() const;
 		std::string decoder() const;
