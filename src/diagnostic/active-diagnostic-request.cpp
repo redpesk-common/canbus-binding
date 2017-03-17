@@ -24,7 +24,6 @@
 
 #define ERROR_PID 0xFF
 
-// @brief
 std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
 
 bool active_diagnostic_request_t::operator==(const active_diagnostic_request_t& b)

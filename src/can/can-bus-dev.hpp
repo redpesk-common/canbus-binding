@@ -29,20 +29,20 @@ class can_bus_t;
 class can_message_t;
 
 /// @brief Object representing a can device. Handle opening, closing and reading on the
-/// socket. This is the low level object to be use by can_bus_t.
+/// socket. This is the low level object to be initialized and use by can_bus_t.
 class can_bus_dev_t
 {
 private:
-	std::string device_name_;
+	std::string device_name_; ///< a string identifier identitfying the linux CAN device.
 	utils::socket_t can_socket_;
 
-	int32_t address_; /// < an identifier used through binding that refer to that device
+	int32_t address_; ///< an identifier used through binding that refer to that device
 
-	bool is_fdmode_on_; /// < boolean telling if whether or not the can socket use fdmode.
+	bool is_fdmode_on_; ///< boolean telling if whether or not the can socket use fdmode.
 	struct sockaddr_can txAddress_; /// < internal member using to bind to the socket
 
-	std::thread th_reading_; /// < Thread handling read the socket can device filling can_message_q_ queue of can_bus_t
-	bool is_running_ = false; /// < boolean telling whether or not reading is running or not
+	std::thread th_reading_; ///< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t
+	bool is_running_ = false; ///< boolean telling whether or not reading is running or not
 	void can_reader(can_bus_t& can_bus);
 
 public:

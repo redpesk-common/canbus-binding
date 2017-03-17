@@ -40,12 +40,9 @@ extern "C"
 	#include <afb/afb-binding.h>
 }
 
-/**
-* @brief Class constructor
-*
-* @param struct afb_binding_interface *interface between daemon and binding
-* @param int file handle to the json configuration file.
-*/
+/// @brief Class constructor
+///
+/// @param[in] conf_file - handle to the json configuration file.
 can_bus_t::can_bus_t(int conf_file)
 	: conf_file_{conf_file}
 {
@@ -53,18 +50,16 @@ can_bus_t::can_bus_t(int conf_file)
 
 std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::can_devices_;
 
-/**
- * @brief Will make the decoding operation on a classic CAN message. It will not
- * handle CAN commands nor diagnostic messages that have their own method to get
- * this happens.
- *
- * It will add to the vehicle_message queue the decoded message and tell the event push
- * thread to process it.
- *
- * @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
- *
- * @return How many signals has been decoded.
- */
+/// @brief Will make the decoding operation on a classic CAN message. It will not
+/// handle CAN commands nor diagnostic messages that have their own method to get
+/// this happens.
+///
+/// It will add to the vehicle_message queue the decoded message and tell the event push
+/// thread to process it.
+///
+/// @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
+///
+/// @return How many signals has been decoded.
 int can_bus_t::process_can_signals(can_message_t& can_message)
 {
 	int processed_signals = 0;
@@ -72,21 +67,21 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
 	openxc_DynamicField search_key, decoded_message;
 	openxc_VehicleMessage vehicle_message;
 
-	/* First we have to found which can_signal_t it is */
+	// First we have to found which can_signal_t it is
 	search_key = build_DynamicField((double)can_message.get_id());
 	configuration_t::instance().find_can_signals(search_key, signals);
 
-	/* Decoding the message ! Don't kill the messenger ! */
+	// Decoding the message ! Don't kill the messenger !
 	for(auto& sig : signals)
 	{
 		std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
 		std::map<std::string, struct afb_event>& s = get_subscribed_signals();
 
-		/* DEBUG message to make easier debugger STL containers...
-		DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[sig.generic_name]));
-		DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
-		DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.generic_name));
-		DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name)));*/
+		// DEBUG message to make easier debugger STL containers...
+		//DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[sig.generic_name]));
+		//DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
+		//DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.generic_name));
+		//DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name));
 		if( s.find(sig->get_name()) != s.end() && afb_event_is_valid(s[sig->get_name()]))
 		{
 			decoded_message = decoder_t::translateSignal(*sig, can_message, configuration_t::instance().get_can_signals());
@@ -105,15 +100,14 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
 	return processed_signals;
 }
 
-/**
- * @brief Will make the decoding operation on a diagnostic CAN message.It will add to
- * the vehicle_message queue the decoded message and tell the event push thread to process it.
- *
- * @param[in] manager - the diagnostic manager object that handle diagnostic communication
- * @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
- *
- * @return How many signals has been decoded.
- */
+/// @brief Will make the decoding operation on a diagnostic CAN message.Then it find the subscribed signal
+/// corresponding and will add the vehicle_message to the queue of event to pushed before notifying
+/// the event push thread to process it.
+///
+/// @param[in] manager - the diagnostic manager object that handle diagnostic communication
+/// @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
+///
+/// @return How many signals has been decoded.
 int can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message)
 {
 	int processed_signals = 0;
@@ -134,20 +128,18 @@ int can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const c
 	return processed_signals;
 }
 
-/**
-* @brief thread to decoding raw CAN messages.
-*
-* @desc It will take from the can_message_q_ queue the next can message to process then it will search
-*  about signal subscribed if there is a valid afb_event for it. We only decode signal for which a
-*  subscription has been made. Can message will be decoded using translateSignal that will pass it to the
-*  corresponding decoding function if there is one assigned for that signal. If not, it will be the default
-*  noopDecoder function that will operate on it.
-*
-*  Depending on the nature of message, if id match a diagnostic request corresponding id for a response
-*  then decoding a diagnostic message else use classic CAN signals decoding functions.
-*
-*  TODO: make diagnostic messages parsing optionnal.
-*/
+/// @brief thread to decoding raw CAN messages.
+///
+///  Depending on the nature of message, if arbitration ID matches ID for a diagnostic response
+///  then decoding a diagnostic message else use classic CAN signals decoding functions.
+///
+/// It will take from the can_message_q_ queue the next can message to process then it search
+///  about signal subscribed if there is a valid afb_event for it. We only decode signal for which a
+///  subscription has been made. Can message will be decoded using translateSignal that will pass it to the
+///  corresponding decoding function if there is one assigned for that signal. If not, it will be the default
+///  noopDecoder function that will operate on it.
+///
+///  TODO: make diagnostic messages parsing optionnal.
 void can_bus_t::can_decode_message()
 {
 	can_message_t can_message;
@@ -165,10 +157,8 @@ void can_bus_t::can_decode_message()
 	}
 }
 
-/**
-* @brief thread to push events to suscribers. It will read subscribed_signals map to look
-* which are events that has to be pushed.
-*/
+/// @brief thread to push events to suscribers. It will read subscribed_signals map to look
+/// which are events that has to be pushed.
 void can_bus_t::can_event_push()
 {
 	openxc_VehicleMessage v_message;
@@ -195,10 +185,8 @@ void can_bus_t::can_event_push()
 	}
 }
 
-/**
-* @brief Will initialize threads that will decode
-*  and push subscribed events.
-*/
+/// @brief Will initialize threads that will decode
+///  and push subscribed events.
 void can_bus_t::start_threads()
 {
 	is_decoding_ = true;
@@ -212,25 +200,23 @@ void can_bus_t::start_threads()
 		is_pushing_ = false;
 }
 
-/**
-* @brief Will stop all threads holded by can_bus_t object
-*  which are decoding and pushing then will wait that's
-* they'll finish their job.
-*/
+/// @brief Will stop all threads holded by can_bus_t object
+///  which are decoding and pushing then will wait that's
+/// they'll finish their job.
 void can_bus_t::stop_threads()
 {
 	is_decoding_ = false;
 	is_pushing_ = false;
 }
 
-/**
-* @brief Will initialize can_bus_dev_t objects after reading
-* the configuration file passed in the constructor. All CAN buses
-* Initialized here will be added to a vector holding them for
-* inventory and later access.
-*
-* That will initialize CAN socket reading too using a new thread.
-*/
+/// @brief Will initialize can_bus_dev_t objects after reading
+/// the configuration file passed in the constructor. All CAN buses
+/// Initialized here will be added to a vector holding them for
+/// inventory and later access.
+///
+/// That will initialize CAN socket reading too using a new thread.
+///
+/// @return 0 if ok, other if not.
 int can_bus_t::init_can_dev()
 {
 	std::vector<std::string> devices_name;
@@ -264,12 +250,10 @@ int can_bus_t::init_can_dev()
 	return 1;
 }
 
-/**
-* @brief read the conf_file_ and will parse json objects
-* in it searching for canbus objects devices name.
-*
-* @return Vector of can bus device name string.
-*/
+/// @brief read the conf_file_ and will parse json objects
+/// in it searching for canbus objects devices name.
+///
+/// @return Vector of can bus device name string.
 std::vector<std::string> can_bus_t::read_conf()
 {
 	std::vector<std::string> ret;
@@ -314,31 +298,25 @@ std::vector<std::string> can_bus_t::read_conf()
 	return ret;
 }
 
-/**
-* @brief return new_can_message_cv_ member
-*
-* @return  return new_can_message_cv_ member
-*/
+/// @brief return new_can_message_cv_ member
+///
+/// @return  return new_can_message_cv_ member
 std::condition_variable& can_bus_t::get_new_can_message_cv()
 {
 	return new_can_message_cv_;
 }
 
-/**
-* @brief return can_message_mutex_ member
-*
-* @return  return can_message_mutex_ member
-*/
+/// @brief return can_message_mutex_ member
+///
+/// @return  return can_message_mutex_ member
 std::mutex& can_bus_t::get_can_message_mutex()
 {
 	return can_message_mutex_;
 }
 
-/**
-* @brief Return first can_message_t on the queue
-*
-* @return a can_message_t
-*/
+/// @brief Return first can_message_t on the queue
+///
+/// @return a can_message_t
 can_message_t can_bus_t::next_can_message()
 {
 	can_message_t can_msg;
@@ -355,21 +333,17 @@ can_message_t can_bus_t::next_can_message()
 	return can_msg;
 }
 
-/**
-* @brief Push a can_message_t into the queue
-*
-* @param the const reference can_message_t object to push into the queue
-*/
+/// @brief Push a can_message_t into the queue
+///
+/// @param[in] can_msg - the const reference can_message_t object to push into the queue
 void can_bus_t::push_new_can_message(const can_message_t& can_msg)
 {
 	can_message_q_.push(can_msg);
 }
 
-/**
-* @brief Return first openxc_VehicleMessage on the queue
-*
-* @return a openxc_VehicleMessage containing a decoded can message
-*/
+/// @brief Return first openxc_VehicleMessage on the queue
+///
+/// @return a openxc_VehicleMessage containing a decoded can message
 openxc_VehicleMessage can_bus_t::next_vehicle_message()
 {
 	openxc_VehicleMessage v_msg;
@@ -385,34 +359,28 @@ openxc_VehicleMessage can_bus_t::next_vehicle_message()
 	return v_msg;
 }
 
-/**
-* @brief Push a openxc_VehicleMessage into the queue
-*
-* @param the const reference openxc_VehicleMessage object to push into the queue
-*/
+/// @brief Push a openxc_VehicleMessage into the queue
+///
+/// @param[in] v_msg - const reference openxc_VehicleMessage object to push into the queue
 void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 {
 	vehicle_message_q_.push(v_msg);
 }
 
-/**
-* @brief Return a map with the can_bus_dev_t initialized
-*
-* @return map can_bus_dev_m_ map
-*/
+/// @brief Return a map with the can_bus_dev_t initialized
+///
+/// @return map can_bus_dev_m_ map
 const std::map<std::string, std::shared_ptr<can_bus_dev_t>>& can_bus_t::get_can_devices() const
 {
 	return can_bus_t::can_devices_;
 }
 
-/**
-* @brief Return the shared pointer on the can_bus_dev_t initialized 
-* with device_name "bus"
-*
-* @param[in] bus - CAN bus device name to retrieve.
-*
-* @return A shared pointer on an object can_bus_dev_t
-*/
+/// @brief Return the shared pointer on the can_bus_dev_t initialized 
+/// with device_name "bus"
+///
+/// @param[in] bus - CAN bus device name to retrieve.
+///
+/// @return A shared pointer on an object can_bus_dev_t
 std::shared_ptr<can_bus_dev_t> can_bus_t::get_can_device(std::string bus)
 {
 	return can_bus_t::can_devices_[bus];

@@ -31,7 +31,9 @@
 #include "../low-can-binding.hpp"
 
 /// @brief Class constructor
-/// @param dev_name String representing the device name into the linux /dev tree
+///
+/// @param[in] dev_name - String representing the device name into the linux /dev tree
+/// @param[in] address - integer identifier of the bus, set using init_can_dev from can_bus_t.
 can_bus_dev_t::can_bus_dev_t(const std::string& dev_name, int32_t address)
 	: device_name_{dev_name}, address_{address}
 {}
@@ -47,6 +49,10 @@ uint32_t can_bus_dev_t::get_address() const
 }
 
 /// @brief Open the can socket and returning it
+///
+///  We try to open CAN socket and apply the following options
+///  timestamp received messages and pass the socket to FD mode.
+///
 /// @return -1 if something wrong.
 int can_bus_dev_t::open()
 {
@@ -55,41 +61,41 @@ int can_bus_dev_t::open()
 	struct ifreq ifr;
 	struct timeval timeout;
 
-	DEBUG(binder_interface, "CAN Handler socket : %d", can_socket_.socket());
+	DEBUG(binder_interface, "open: CAN Handler socket : %d", can_socket_.socket());
 	if (can_socket_)
 		return 0;
 
 	can_socket_.open(PF_CAN, SOCK_RAW, CAN_RAW);
 	if (can_socket_)
 	{
-		DEBUG(binder_interface, "CAN Handler socket correctly initialized : %d", can_socket_.socket());
+		DEBUG(binder_interface, "open: CAN Handler socket correctly initialized : %d", can_socket_.socket());
 
 		// Set timeout for read
 		can_socket_.setopt(SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 
 		// Set timestamp for receveid frame
 		if (can_socket_.setopt(SOL_SOCKET, SO_TIMESTAMP, &timestamp_on, sizeof(timestamp_on)) < 0)
-			WARNING(binder_interface, "setsockopt SO_TIMESTAMP error: %s", ::strerror(errno));
-		DEBUG(binder_interface, "Switch CAN Handler socket to use fd mode");
+			WARNING(binder_interface, "open: setsockopt SO_TIMESTAMP error: %s", ::strerror(errno));
+		DEBUG(binder_interface, "open: Switch CAN Handler socket to use fd mode");
 
 		// try to switch the socket into CAN_FD mode
 		if (can_socket_.setopt(SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{
-			NOTICE(binder_interface, "Can not switch into CAN Extended frame format.");
+			NOTICE(binder_interface, "open: Can not switch into CAN Extended frame format.");
 			is_fdmode_on_ = false;
 		}
 		else
 		{
-			DEBUG(binder_interface, "Correctly set up CAN socket to use FD frames.");
+			DEBUG(binder_interface, "open: Correctly set up CAN socket to use FD frames.");
 			is_fdmode_on_ = true;
 		}
 
 		// Attempts to open a socket to CAN bus
 		::strcpy(ifr.ifr_name, device_name_.c_str());
-		DEBUG(binder_interface, "ifr_name is : %s", ifr.ifr_name);
+		DEBUG(binder_interface, "open: ifr_name is : %s", ifr.ifr_name);
 		if(::ioctl(can_socket_.socket(), SIOCGIFINDEX, &ifr) < 0)
 		{
-			ERROR(binder_interface, "ioctl failed. Error was : %s", strerror(errno));
+			ERROR(binder_interface, "open: ioctl failed. Error was : %s", strerror(errno));
 		}
 		else
 		{
@@ -109,12 +115,17 @@ int can_bus_dev_t::open()
 }
 
 /// @brief Close the bus.
+///
+/// @return interger return value of socket.close() function
 int can_bus_dev_t::close()
 {
 	return can_socket_.close();
 }
 
-/// @brief Read the can socket and retrieve canfd_frame
+/// @brief Read the can socket and retrieve canfd_frame.
+///
+///  Read operation are blocking and we try to read CANFD frame
+///  rather than classic CAN frame. CANFD frame are retro compatible.
 can_message_t can_bus_dev_t::read()
 {
 	ssize_t nbytes;
@@ -161,7 +172,7 @@ void can_bus_dev_t::stop_reading()
 }
 
 /// @brief Thread function used to read the can socket.
-/// @param[in] can_bus object to be used to read the can socket
+/// @param[in] can_bus - object to be used to read the can socket
 void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 {
 	while(is_running_)
@@ -176,7 +187,9 @@ void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 }
 
 /// @brief Send a can message from a can_message_t object.
-/// @param[in] can_msg the can message object to send
+/// @param[in] can_msg - the can message object to send
+///
+/// @return 0 if message snet, -1 if something wrong.
 int can_bus_dev_t::send(can_message_t& can_msg)
 {
 	ssize_t nbytes;
@@ -211,6 +224,8 @@ int can_bus_dev_t::send(can_message_t& can_msg)
 /// @param[in] arbitration_id - CAN arbitration id.
 /// @param[in] data - CAN message payload to send
 /// @param[in] size - size of the data to send
+///
+/// @return True if message sent, false if not.
 bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
 	ssize_t nbytes;
@@ -227,14 +242,14 @@ bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* dat
 		if (nbytes == -1)
 		{
 			ERROR(binder_interface, "send_can_message: Sending CAN frame failed.");
-			return -1;
+			return false;
 		}
-		return (int)nbytes;
+		return true;
 	}
 	else
 	{
 		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
 		open();
 	}
-	return 0;
+	return false;
 }

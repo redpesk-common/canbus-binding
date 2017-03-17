@@ -38,17 +38,17 @@ enum UNIT {
 	INVALID
 };
 
-/**
- * @brief - A representation of an OBD-II PID.
- */
+///
+/// @brief - A representation of an OBD-II PID.
+///
 class diagnostic_message_t {
 	private:
-		uint8_t pid_; /*!< pid - The 1 byte PID.*/
+		uint8_t pid_; /*!< pid_ - The 1 byte PID.*/
 		std::string generic_name_; /*!< generic_name_ - A human readable name to use for this PID when published.*/
 		int min_; /*!< min_ - Minimum value that can take this pid */
 		int max_; /*!< max_ - Maximum value that can take this pid */
 		enum UNIT unit_; /*!< unit_ : Which unit system is used by that pid. See enum UNIT above.*/
-		float frequency_; /*!< frequency - The frequency to request this PID if supported by the vehicle when automatic, recurring OBD-II requests are enabled.*/
+		float frequency_; /*!< frequency_ - The frequency to request this PID if supported by the vehicle when automatic, recurring OBD-II requests are enabled.*/
 		DiagnosticResponseDecoder decoder_; /*!< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses
 											 * to this request. If the decoder is NULL, the output will include the raw payload
 											 * instead of a parsed value.*/

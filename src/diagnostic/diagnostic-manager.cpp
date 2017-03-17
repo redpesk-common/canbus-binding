@@ -37,7 +37,7 @@ diagnostic_manager_t::diagnostic_manager_t()
 ///  to have 1 diagnostic bus which are the first bus declared in the JSON
 ///  description file. Configuration instance will return it.
 ///
-/// @desc this will initialize DiagnosticShims and cancel all active requests 
+/// this will initialize DiagnosticShims and cancel all active requests 
 ///  if there are any.
 bool diagnostic_manager_t::initialize()
 {
@@ -222,7 +222,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const 
 
 /// @brief Add and send a new one-time diagnostic request.
 ///
-/// @desc A one-time (aka non-recurring) request can existing in parallel with a
+/// A one-time (aka non-recurring) request can existing in parallel with a
 /// recurring request for the same PID or mode, that's not a problem.
 ///
 /// For an example, see the docs for addRecurringRequest. This function is very
@@ -232,7 +232,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const 
 /// @param[in] name - Human readable name this response, to be used when
 ///      publishing received responses. TODO: If the name is NULL, the published output
 ///      will use the raw OBD-II response format.
-/// @param[in] waitForMultipleResponses - If false, When any response is received
+/// @param[in] wait_for_multiple_responses - If false, When any response is received
 ///      for this request it will be removed from the active list. If true, the
 ///      request will remain active until the timeout clock expires, to allow it
 ///      to receive multiple response. Functional broadcast requests will always
@@ -326,7 +326,7 @@ bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyH
 /// @param[in] name - An optional human readable name this response, to be used when
 ///      publishing received responses. If the name is NULL, the published output
 ///      will use the raw OBD-II response format.
-/// @param[in] waitForMultipleResponses - If false, When any response is received
+/// @param[in] wait_for_multiple_responses - If false, When any response is received
 ///      for this request it will be removed from the active list. If true, the
 ///      request will remain active until the timeout clock expires, to allow it
 ///      to receive multiple response. Functional broadcast requests will always

@@ -17,35 +17,24 @@
 
 #pragma once
 
-/*
- * @brief return epoch in milliseconds
- *
- * @return long long int epoch in milliseconds
- */
+/// @brief return epoch in milliseconds
+///
+/// @return long long int epoch in milliseconds
 typedef long long int (*time_function_t)();
 
 long long int system_time_us();
 long long int system_time_ms();
 long long int system_time_s();
 
-/**
- * @class frequency_clock_t 
- * @brief A frequency counting clock.
- *
- * @var frequency_clock_t::frequency
- *  the clock frequency in Hz.
- * @var frequency_clock_t::last_time
- *  the last time (in milliseconds since startup) that the clock
- *	ticked.
- * @var frequency_clock_t::time_function
- *  a function returning current time
- */
+
+/// @brief A frequency counting clock.
+/// Utility class allowing some time function.
 class frequency_clock_t
 {
 private:
-	float frequency_;
-	unsigned long last_tick_;
-	time_function_t time_function_;
+	float frequency_; ///< the clock frequency in Hz.
+	unsigned long last_tick_; ///< the last time (in milliseconds since startup) that the clock ticked.
+	time_function_t time_function_; ///<  a function returning current time
 
 public:
 	frequency_clock_t();

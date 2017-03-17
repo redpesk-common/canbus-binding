@@ -29,17 +29,17 @@
 
 #include "low-can-binding.hpp"
 
-/**
- * @brief Class representing a configuration attached to the binding.
- *
- * @desc It regroups all needed objects instance from other class
- *  that will be used along the binding life. It gets a global vision 
- *  on which signals are implemented for that binding. 
- *  Here, it is only the definition of the class with predefined accessors
- *  methods used in the binding.
- *
- *  It will be the reference point to needed objects.
- */
+///
+/// @brief Class representing a configuration attached to the binding.
+///
+/// It regroups all needed objects instance from other class
+///  that will be used along the binding life. It gets a global vision 
+///  on which signals are implemented for that binding. 
+///  Here, it is only the definition of the class with predefined accessors
+///  methods used in the binding.
+///
+///  It will be the reference point to needed objects.
+///
 class configuration_t
 {
 	private:

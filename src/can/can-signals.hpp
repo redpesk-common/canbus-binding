@@ -1,19 +1,19 @@
-/*
- * Copyright (C) 2015, 2016 "IoT.bzh"
- * Author "Romain Forlot" <romain.forlot@iot.bzh>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *	 http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+///
+/// Copyright (C) 2015, 2016 "IoT.bzh"
+/// Author "Romain Forlot" <romain.forlot@iot.bzh>
+///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+///	 http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+///
 
 #pragma once
 
@@ -40,36 +40,36 @@ extern "C"
 
 class can_signal_t;
 
-/**
- * @brief The type signature for a CAN signal decoder.
- *
- * @desc A SignalDecoder transforms a raw floating point CAN signal into a number,
- * string or boolean.
- *
- * @param[in] signal - The CAN signal that we are decoding.
- * @param[in] signals - The list of all signals.
- * @param[in] signalCount - The length of the signals array.
- * @param[in] value - The CAN signal parsed from the message as a raw floating point
- *	value.
- * @param[out] send - An output parameter. If the decoding failed or the CAN signal should
- *	not send for some other reason, this should be flipped to false.
- *
- * @return a decoded value in an openxc_DynamicField struct.
- */
+///
+/// @brief The type signature for a CAN signal decoder.
+///
+/// A SignalDecoder transforms a raw floating point CAN signal into a number,
+/// string or boolean.
+///
+/// @param[in] signal - The CAN signal that we are decoding.
+/// @param[in] signals - The list of all signals.
+/// @param[in] signalCount - The length of the signals array.
+/// @param[in] value - The CAN signal parsed from the message as a raw floating point
+///	value.
+/// @param[out] send - An output parameter. If the decoding failed or the CAN signal should
+///	not send for some other reason, this should be flipped to false.
+///
+/// @return a decoded value in an openxc_DynamicField struct.
+///
 typedef openxc_DynamicField (*SignalDecoder)(can_signal_t& signal,
 		const std::vector<can_signal_t>& signals, float value, bool* send);
 
-/**
- * @brief: The type signature for a CAN signal encoder.
- *
- * @desc A SignalEncoder transforms a number, string or boolean into a raw floating
- * point value that fits in the CAN signal.
- *
- * @params[in] signal - The CAN signal to encode. 
- * @params[in] value - The dynamic field to encode.
- * @params send - An output parameter. If the encoding failed or the CAN signal should
- * not be encoded for some other reason, this will be flipped to false.
- */
+///
+/// @brief: The type signature for a CAN signal encoder.
+///
+/// A SignalEncoder transforms a number, string or boolean into a raw floating
+/// point value that fits in the CAN signal.
+///
+/// @param[in] signal - The CAN signal to encode. 
+/// @param[in] value - The dynamic field to encode.
+/// @param[out] send - An output parameter. If the encoding failed or the CAN signal should
+/// not be encoded for some other reason, this will be flipped to false.
+///
 typedef uint64_t (*SignalEncoder)(can_signal_t* signal,
 		openxc_DynamicField* value, bool* send);
 

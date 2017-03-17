@@ -21,11 +21,11 @@
 
 #include "../low-can-binding.hpp"
 
-/**
-* @brief Class constructor
-*
-* Constructor about can_message_t class.
-*/
+///
+/// @brief Class constructor
+///
+/// Constructor about can_message_t class.
+///
 can_message_t::can_message_t()
 	: maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::ERROR}, rtr_flag_{false}, flags_{0}
 {}
@@ -46,31 +46,31 @@ can_message_t::can_message_t(uint8_t maxdlen,
 	data_{data}
 {}
 
-/**
-* @brief Retrieve id_ member value.
-*
-* @return id_ class member
-*/
+///
+/// @brief Retrieve id_ member value.
+///
+/// @return id_ class member
+///
 uint32_t can_message_t::get_id() const
 {
 	return id_;
 }
 
-/**
-* @brief Retrieve RTR flag member.
-*
-* @return rtr_flags_ class member
-*/
+///
+/// @brief Retrieve RTR flag member.
+///
+/// @return rtr_flags_ class member
+///
 bool can_message_t::get_rtr_flag_() const
 {
 	return rtr_flag_;
 }
 
-/**
-* @brief Retrieve format_ member value.
-*
-* @return format_ class member
-*/
+///
+/// @brief Retrieve format_ member value.
+///
+/// @return format_ class member
+///
 can_message_format_t can_message_t::get_format() const
 {
 	if (format_ != can_message_format_t::STANDARD || format_ != can_message_format_t::EXTENDED)
@@ -78,43 +78,43 @@ can_message_format_t can_message_t::get_format() const
 	return format_;
 }
 
-/**
-* @brief Retrieve flags_ member value.
-*
-* @return flags_ class member
-*/
+///
+/// @brief Retrieve flags_ member value.
+///
+/// @return flags_ class member
+///
 uint8_t can_message_t::get_flags() const
 {
 	return flags_;
 }
 
-/**
-* @brief Retrieve data_ member value.
-*
-* @return pointer to the first element
-*  of class member data_
-*/
+///
+/// @brief Retrieve data_ member value.
+///
+/// @return pointer to the first element
+///  of class member data_
+///
 const uint8_t* can_message_t::get_data() const
 {
 	return data_.data();
 }
 
-/**
-* @brief Retrieve length_ member value.
-*
-* @return length_ class member
-*/
+///
+/// @brief Retrieve length_ member value.
+///
+/// @return length_ class member
+///
 uint8_t can_message_t::get_length() const
 {
 	return length_;
 }
 
-/**
-* @brief Control whether the object is correctly initialized
-*  to be sent over the CAN bus
-*
-* @return true if object correctly initialized and false if not.
-*/
+///
+/// @brief Control whether the object is correctly initialized
+///  to be sent over the CAN bus
+///
+/// @return true if object correctly initialized and false if not.
+///
 bool can_message_t::is_correct_to_send()
 {
 	if (id_ != 0 && length_ != 0 && format_ != can_message_format_t::ERROR)
@@ -127,14 +127,14 @@ bool can_message_t::is_correct_to_send()
 	return false;
 }
 
-/**
-* @brief Set format_ member value.
-*
-* Preferred way to initialize these members by using
-* convert_from_canfd_frame method.
-*
-* @param[in] new_format - class member
-*/
+///
+/// @brief Set format_ member value.
+///
+/// Preferred way to initialize these members by using
+/// convert_from_canfd_frame method.
+///
+/// @param[in] new_format - class member
+///
 void can_message_t::set_format(const can_message_format_t new_format)
 {
 	if(new_format == can_message_format_t::STANDARD || new_format == can_message_format_t::EXTENDED || new_format == can_message_format_t::ERROR)
@@ -143,16 +143,16 @@ void can_message_t::set_format(const can_message_format_t new_format)
 		ERROR(binder_interface, "ERROR: Can set format, wrong format chosen");
 }
 
-/**
-* @brief Take a canfd_frame struct to initialize class members
-*
-* This is the preferred way to initialize class members.
-*
-* @param[in] frame - canfd_frame to convert coming from a read of CAN socket
-* @param[in] nbyte - bytes read from socket read operation.
-*
-* @return A can_message_t object fully initialized with canfd_frame values.
-*/
+///
+/// @brief Take a canfd_frame struct to initialize class members
+///
+/// This is the preferred way to initialize class members.
+///
+/// @param[in] frame - canfd_frame to convert coming from a read of CAN socket
+/// @param[in] nbytes - bytes read from socket read operation.
+///
+/// @return A can_message_t object fully initialized with canfd_frame values.
+///
 can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& frame, size_t nbytes)
 {
 	uint8_t maxdlen, length, flags = (uint8_t)NULL;
@@ -240,13 +240,13 @@ can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& 
 	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data);
 }
 
-/**
-* @brief Take all initialized class's members and build an
-* canfd_frame struct that can be use to send a CAN message over
-* the bus.
-*
-* @return canfd_frame struct built from class members.
-*/
+///
+/// @brief Take all initialized class's members and build an
+/// canfd_frame struct that can be use to send a CAN message over
+/// the bus.
+///
+/// @return canfd_frame struct built from class members.
+///
 canfd_frame can_message_t::convert_to_canfd_frame()
 {
 	canfd_frame frame;

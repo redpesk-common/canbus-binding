@@ -17,21 +17,21 @@
 
 #include "signals.hpp"
 
-/** 
- * @brief Can signal event map making access to afb_event
- * externaly to an openxc existing structure.
- *
- * @desc Event map is making relation between can_signal_t generic name
- * and the afb_event struct used by application framework to pushed
- * to the subscriber.
- */
+/// 
+/// @brief Can signal event map making access to afb_event
+/// externaly to an openxc existing structure.
+///
+/// Event map is making relation between can_signal_t generic name
+/// and the afb_event struct used by application framework to pushed
+/// to the subscriber.
+///
 std::map<std::string, struct afb_event> subscribed_signals;
 
-/**
-* @brief Mutex allowing safe manipulation on subscribed_signals map.
-* @desc To ensure that the map object isn't modified when we read it, you
-*  have to set this mutex before use subscribed_signals map object.
-*/
+///
+/// @brief Mutex allowing safe manipulation on subscribed_signals map.
+/// To ensure that the map object isn't modified when we read it, you
+///  have to set this mutex before use subscribed_signals map object.
+///
 std::mutex subscribed_signals_mutex;
 
 std::mutex& get_subscribed_signals_mutex()
@@ -44,15 +44,15 @@ std::map<std::string, struct afb_event>& get_subscribed_signals()
 	return subscribed_signals;
 }
 
-/**
- * @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
- * @brief return signals name found searching through CAN_signals and OBD2 pid
- *
- * @param[in] const openxc_DynamicField : can contain numeric or string value in order to search against 
- *   can signals or obd2 signals name.
- *
- * @return std::vector<std::string> Vector of signals name found. 
- */
+///
+/// @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
+/// @brief return signals name found searching through CAN_signals and OBD2 pid
+///
+/// @param[in] key : can contain numeric or string value in order to search against 
+///   can signals or obd2 signals name.
+///
+/// @return Vector of signals name found. 
+///
 std::vector<std::string> find_signals(const openxc_DynamicField &key)
 {
 	std::vector<std::string> found_signals_name;

@@ -80,10 +80,10 @@ void diagnostic_message_t::set_supported(bool value)
 	supported_ = value;
 }
 
-/**
- * @brief Build a DiagnosticRequest struct to be passed
- *  to diagnostic manager instance.
- */
+///
+/// @brief Build a DiagnosticRequest struct to be passed
+///  to diagnostic manager instance.
+///
 const DiagnosticRequest diagnostic_message_t::build_diagnostic_request()
 {
 	return {/*arbitration_id: */OBD2_FUNCTIONAL_BROADCAST_ID,
@@ -97,11 +97,11 @@ const DiagnosticRequest diagnostic_message_t::build_diagnostic_request()
 			/*DiagnosticRequestType: */DiagnosticRequestType::DIAGNOSTIC_REQUEST_TYPE_PID };
 }
 
-/**
-* @brief Check if a request is an OBD-II PID request.
-*
-* @return true if the request is a mode 1 request and it has a 1 byte PID.
-*/
+///
+/// @brief Check if a request is an OBD-II PID request.
+///
+/// @return true if the request is a mode 1 request and it has a 1 byte PID.
+///
 bool diagnostic_message_t::is_obd2_request(const DiagnosticRequest* request)
 {
 	return request->mode == 0x1 && request->has_pid && request->pid < 0xff;

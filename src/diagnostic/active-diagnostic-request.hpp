@@ -53,7 +53,7 @@ typedef void (*DiagnosticResponseCallback)(const active_diagnostic_request_t* re
 ///
 /// @brief An active diagnostic request, either recurring or one-time.
 ///
-/// @desc Will host a diagnostic_message_t class members to describe an on going
+/// Will host a diagnostic_message_t class members to describe an on going
 ///  diagnostic request on the CAN bus. Diagnostic message will be converted to
 ///  a DiagnosticRequest using ad-hoc method build_diagnostic_request from diagnostic message.
 ///  Then missing member, that can not be hosted into a DiagnosticRequest struct, will be passed

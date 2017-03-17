@@ -45,11 +45,11 @@ extern "C"
 // Interface between the daemon and the binding
 const struct afb_binding_interface *binder_interface;
 
-/********************************************************************************
-*
-*		Subscription and unsubscription
-*
-*********************************************************************************/
+///******************************************************************************
+///
+///		Subscription and unsubscription
+///
+///*******************************************************************************/
 
 static int make_subscription_unsubscription(struct afb_req request, const std::string& sig_name, std::map<std::string, struct afb_event>& s, bool subscribe)
 {
@@ -109,16 +109,16 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	return make_subscription_unsubscription(request, sig, s, subscribe);
 }
 
-/**
- * @fn static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<can_signal_t>& signals)
- * @brief subscribe to all signals in the vector signals
- *
- * @param[in] afb_req request : contain original request use to subscribe or unsubscribe
- * @param[in] subscribe boolean value used to chose between a subscription operation or an unsubscription
- * @param[in] can_signal_t  vector with can_signal_t to subscribe
- *
- * @return Number of correctly subscribed signal
- */
+///
+/// @fn static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<can_signal_t>& signals)
+/// @brief subscribe to all signals in the vector signals
+///
+/// @param[in] afb_req request : contain original request use to subscribe or unsubscribe
+/// @param[in] subscribe boolean value used to chose between a subscription operation or an unsubscription
+/// @param[in] can_signal_t  vector with can_signal_t to subscribe
+///
+/// @return Number of correctly subscribed signal
+///
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<std::string>& signals)
 {
 	int rets = 0;
@@ -243,13 +243,11 @@ extern "C"
 		return &binding_desc;
 	}
 
-	/**
-	* @brief Initialize the binding.
-	*
-	* @param[in] service Structure which represent the Application Framework Binder.
-	*
-	* @return Exit code, zero if success.
-	*/
+	/// @brief Initialize the binding.
+	///
+	/// @param[in] service Structure which represent the Application Framework Binder.
+	///
+	/// @return Exit code, zero if success.
 	int afbBindingV1ServiceInit(struct afb_service service)
 	{
 		can_bus_t& can_bus_manager = configuration_t::instance().get_can_bus_manager();

@@ -26,20 +26,20 @@
 #include "../can/can-bus.hpp"
 #include "active-diagnostic-request.hpp"
 
-/*  Each CAN bus needs its own set of shim functions, so this should
- * match the maximum CAN controller count.
- */
+///  Each CAN bus needs its own set of shim functions, so this should
+/// match the maximum CAN controller count.
+///
 #define MAX_SHIM_COUNT can_bus_t.get_can_devices().size()
 #define DIAGNOSTIC_RESPONSE_ARBITRATION_ID_OFFSET 0x8
 
 class active_diagnostic_request_t;
 
-/**
- * @brief The core structure for running the diagnostics module by the binding.
- *
- * @desc This stores details about the active requests and shims required to connect
- * the diagnostics library to the CAN device.
- */
+///
+/// @brief The core structure for running the diagnostics module by the binding.
+///
+/// This stores details about the active requests and shims required to connect
+/// the diagnostics library to the CAN device.
+///
 class diagnostic_manager_t {
 protected:
 	static bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
