@@ -2,20 +2,31 @@
 
 ## Abstract
 
-Low level CAN bus binder. Based upon OpenXC vi-firmware project. Purpose of this project is to offer a low level binding to an AGL platform, idea remains the same than OpenXC project. It's meant to generate from a JSON file describing CAN messages and diagnostic message (OBD2 for now), a cpp file to integrate with the project. Once generated binding is built with it and result will be a widget file to install on an AGL target system.
+Low level CAN bus binder, based upon OpenXC vi-firmware project.
+
+Purpose of this project is to offer a low level binding to an AGL platform, idea remains the same than OpenXC project.
+
+It's meant to generate from a JSON file describing CAN messages and diagnostic message (OBD2 for now), a cpp file to integrate with the project.
+
+Once generated binding is built with it and result will be a widget file to install on an AGL target system.
 
 ![OpenXC_to_AGL][OpenXC_to_AGL]
 
 ## AGL CAN binding architecture proposal
 
-Bring CAN management into the AGL project is not simply could decode an print CAN messages, any dump tools can do that, Wireshark do that, CAN-utils do that. The goal is to provide a common API and abstraction to the CAN bus then you can bring some more high level functionnalities to the system.
+Bring CAN management into the AGL project is more than allowing decode and print CAN messages, lot of tools can do that (Wireshark, CAN-utils, ...).
+
+The goal is to provide a common API and abstraction to the CAN bus then you can bring some more high level functionnalities to the system.
 
 CAN binding will be separated in two parts:
 
 ![CAN_mapping][CAN_mapping]
 
-- High level one will be the binding from which others applications will connect to. It will provides valuable access to the CAN bus by aggregate signals or providing new signals from several originals. By example, a signal exposing whether or not a door is open, no matter which one it is. Also, we can imagine an application which supervise if there is no one in the car but moving (1m, 2m ?) then it send an event to the application which will send a phone message to the owner to alert him of an unexpected behavior.
-- The low level one will be one the bus to decode messages that transit and send event through **Application Framework** to the subscribers with human readable message. It will provide some basic access to the bus + some basic mathematical, statistical features (last_values, min, max, timestamps, averaging) as well as basic filter to get discerning signal only. This part are not implemented yet in the low level.
+- High level: Binding from which others applications will connect to.
+It will provides valuable access to the CAN bus by aggregate signals or providing new signals from several originals. For example, a signal exposing whether or not a door is open, no matter which one it is. Also, we can imagine an application which supervise if there is no one in the car but moving (1m, 2m ?) to alert the owner of an unexpected behavior. The high level binding will sends a single event representing that behavior to the application which in turn will send a phone message to.
+
+- Low level: Decode messages that transit and send event through **Application Framework** to the subscribers with human readable message. It provides some basic access to the bus + some basic mathematical, statistical features (last_values, min, max, timestamps, averaging) as well as basic filter to get discerning signal only (This part are not implemented yet in the low level).
+
 
 ![Binding_architecture][CAN_bindings_communication]
 
@@ -40,7 +51,9 @@ $ git submodule update
 
 ## Compile and install the binding
 
-With an AGL SDK environment correctly set, I encourage you to set the TARGET variable in the root CMakeLists.txt file if you have an AGL target already running in your network. Then you can directly build and install the binding and source directory on your target system.
+With an AGL SDK environment correctly set, I encourage you to set the TARGET variable in the root CMakeLists.txt file if you have an AGL target already running in your network.
+
+Then you can directly build and install the binding and source directory on your target system.
 
 Execute commands to get your binding compile :
 
@@ -72,7 +85,9 @@ It's possible that you'll see the following message :
 ```bash
 Error org.freedesktop.DBus.Error.Failed: "system error"
 ```
-It's because installation remove the binding before installing it. If it is the first time that you make the installation then you'll have this message in place of ***true***.
+It's because installation remove the binding before installing it.
+
+If it is the first time that you make the installation then you'll have this message in place of ***true***.
 
 To install it manually, you need to copy the *low-can-binding.wgt* file on your target, then from it execute the following commands :
 
@@ -89,7 +104,11 @@ On the target, assuming ***wgt*** file is in the root home directory :
 ```
 ## Install AFB Websocket CLI client to test the binding.
 
-You can test it using afb-client-demo CLI tool provided by the RPM package *libafbwsc-dev*. You can find this package in your build environment, using docker SDK recommended setup the file is */xdt/build/tmp/deploy/rpm/<your-target-arch>/*. Using Renesas RCar Gen2, porter board, you have to copy the file like this if your board is connected to your network and you know its IP address:
+You can test it using afb-client-demo CLI tool provided by the RPM package *libafbwsc-dev*.
+
+You can find this package in your build environment, using docker SDK recommended setup the file is */xdt/build/tmp/deploy/rpm/<your-target-arch>/*. 
+
+Using Renesas RCar Gen2, Porter board, you have to copy the file like this if your board is connected to your network and you know its IP address:
 
 ```bash
 $ scp /xdt/build/tmp/deploy/rpm/cortex15hf_neon/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm root@<target_IP>:~
@@ -156,7 +175,7 @@ Insert the modified SDcard in your Porter board and boot from it. Your are ready
 
 ### CAN device using the USB CAN adapter
 
-Using real connection to CAN bus of your car using the USB CAN adapter connected to the OBD2 connector. (this instruction assuming a speed of 500000kbps for your device, you can try supported bitrate like 125000, 250000 if 500000 doesn't work) :
+Using real connection to CAN bus of your car using the USB CAN adapter connected to the OBD2 connector. (This instruction assuming a speed of 500000kbps for your device, you can try supported bitrate like 125000, 250000 if 500000 doesn't work) :
 
 ```bash
 ~# modprobe can
@@ -201,7 +220,9 @@ You can run the binding using **afm-util** tool, here is the classic way to go :
 
 You can find instructions to use afm-util tool [here][afm-util], as well as documentation about Application Framework.
 
-But you can't control nor interact with it because you don't know security token that **Application Framework** gave it at launch. So, to test it, it is better to launch the binding manually. In the following example, we will use port **1234** and left empty security token for testing purpose :
+But you can't control nor interact with it because you don't know security token that **Application Framework** gave it at launch.
+
+So, to test it, it is better to launch the binding manually. In the following example, we will use port **1234** and left empty security token for testing purpose :
 
 ```bash
 ~#  afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-binding/0.1/libs/ --rootdir=/var/lib/afm/applications/low-can-binding/0.1/ --port=1234 --token=
@@ -223,7 +244,13 @@ Then connect to the binding using previously installed ***AFB Websocket CLI*** t
 ~# afb-client-demo ws://localhost:1234/api?token=
 ```
 
-You will be on an interactive session where you can pass ask directly to the binding API. Binding provide for the moment 2 verbs, subscribe and unsubscribe that can take argument by a JSON **event** object taking a CAN message name as value. To use the ***AFB Websocket CLI*** tool, a command line will be like the following :
+You will be on an interactive session where you can pass ask directly to the binding API.
+
+Binding provide at this moment 2 verbs, subscribe and unsubscribe, which can take argument by a JSON **event** object.
+
+The argument value is the CAN message name as described in the JSON file used to generate cpp file for the binding.
+
+To use the ***AFB Websocket CLI*** tool, a command line will be like the following :
 
 ```
 <api> <verb> <arguments>
@@ -235,14 +262,18 @@ Arguments : ***{ "event": "driver.doors.open" }***
 
 ### Subscription and unsubscription
 
-You can ask to subscribe to chosen CAN event with a call to *subscribe* API verb with the CAN messages name as JSON argument. Example from a websocket session:
+You can ask to subscribe to chosen CAN event with a call to *subscribe* API verb with the CAN messages name as JSON argument.
+
+For example from a websocket session:
 
 ```bash
 low-can subscribe { "event": "doors.driver.open" }
 ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"a18fd375-b6fa-4c0e-a1d4-9d3955975ae8"}}
 ```
 
-Subscription and unsubscription can take wildcard in their *event* value. To reveive all doors events :
+Subscription and unsubscription can take wildcard in their *event* value. 
+
+To reveive all doors events :
 
 ```bash
 low-can subscribe { "event" : "doors*" }
@@ -255,7 +286,11 @@ Then you will receive an event each time a CAN message is decoded for the event 
 ON-EVENT low-can/messages.doors.driver.open({"event":"low-can\/messages.doors.driver.open","data":{"name":"messages.doors.driver.open","value":true},"jtype":"afb-event"})
 ```
 
-Notice that event shows you that the CAN event is named *messages.doors.driver.open* but you ask for event about *doors.driver.open*. This is because all CAN messages or diagnostic messages are prefixed by the JSON parent node name, **messages** for CAN messages and **diagnostic_messages** for diagnostic messages like OBD2. This will let you subscribe or unsubcribe to all signals at once, not recommended, and better make filter on subscribe operation based upon their type. Examples:
+Notice that event shows you that the CAN event is named *messages.doors.driver.open* but you ask for event about *doors.driver.open*.
+
+This is because all CAN messages or diagnostic messages are prefixed by the JSON parent node name, **messages** for CAN messages and **diagnostic_messages** for diagnostic messages like OBD2.
+
+This will let you subscribe or unsubcribe to all signals at once, not recommended, and better make filter on subscribe operation based upon their type. Examples:
 
 ```
 low-can subscribe { "event" : "*speed*" } --> will subscribe to all messages with speed in their name. Search will be make without prefix for it.
