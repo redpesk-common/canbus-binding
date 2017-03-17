@@ -167,6 +167,22 @@ std::ostream& operator<<(std::ostream& o, const generator<openxc::signal>& v)
 	return o;
 }
 
+template <>
+std::ostream& operator<<(std::ostream& o, const generator<openxc::diagnostic_message>& v)
+{
+	o	<< v.line_prefix_ << "{\n"
+		<< v.line_prefix_ << "\t" << v.v_.pid() << ",\n"
+		<< v.line_prefix_ << "\t" << gen(v.v_.name()) << ",\n"
+		<< v.line_prefix_ << "\t" << 0 << ",\n"
+		<< v.line_prefix_ << "\t" << 0 << ",\n"
+		<< v.line_prefix_ << "\t" << "UNIT::INVALID" << ",\n"
+		<< v.line_prefix_ << "\t" << gen(v.v_.frequency()) << ",\n"
+		<< v.line_prefix_ << "\t" << (v.v_.decoder().size() ? v.v_.decoder() : "nullptr") << ",\n"
+		<< v.line_prefix_ << "\t" << (v.v_.callback().size() ? v.v_.callback() : "nullptr") << ",\n"
+		<< v.line_prefix_ << "\t" << "true" << "\n"
+		<< v.line_prefix_ << "}";
+	return o;
+}
 
 /// @brief Generate the configuration code.
 /// @param[in] header Content to be inserted as a header.
@@ -207,8 +223,24 @@ void generate(const std::string& header, const std::string& footer, const openxc
 			out << '\n';
 		}
 		out << "	}\n"
-			<< "	//, obd2_signals_{" << "/*...*/" << "}\n"
+			<< "	, diagnostic_messages_\n"
+			<< "	{\n"
+			<< gen(message_set.diagnostic_messages(), "		") << "\n"
+			<< "	}\n"
 			<< "{\n"
+			<< "}\n\n"
+			<< "const std::string configuration_t::get_diagnostic_bus() const\n"
+			<< "{\n";
+
+		std::string active_bus = "";
+		for (const auto& d : message_set.diagnostic_messages())
+		{
+			if (d.bus().size() == 0) std::cerr << "ERROR: The bus name should be set for each diagnostic message." << std::endl;
+			if (active_bus.size() == 0) active_bus = d.bus();
+			if (active_bus != d.bus()) std::cerr << "ERROR: The bus name should be the same for each diagnostic message." << std::endl;
+		}
+
+		out	<< "	return " << gen(active_bus) << ";\n"
 			<< "}\n\n";
 	out << footer << std::endl;
 }
