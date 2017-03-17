@@ -1,6 +1,25 @@
 # Low level CAN signaling binder
 
-Low level CAN bus binder. Based upon OpenXC vi-firmware project. Purpose of this project is to offer a low level binding to an AGL platform, idea remains the same than the vi-firmware project. It's meant to generate from a JSON file describing CAN messages and diagnostic message (OBD2 for now) present in a car, a cpp file to integrate with the project and compile all together. Result will be a widget file to install on an AGL target system.
+## Abstract
+
+Low level CAN bus binder. Based upon OpenXC vi-firmware project. Purpose of this project is to offer a low level binding to an AGL platform, idea remains the same than OpenXC project. It's meant to generate from a JSON file describing CAN messages and diagnostic message (OBD2 for now), a cpp file to integrate with the project. Once generated binding is built with it and result will be a widget file to install on an AGL target system.
+
+![OpenXC_to_AGL][OpenXC_to_AGL]
+
+## AGL CAN binding architecture proposal
+
+Bring CAN management into the AGL project is not simply could decode an print CAN messages, any dump tools can do that, Wireshark do that, CAN-utils do that. The goal is to provide a common API and abstraction to the CAN bus then you can bring some more high level functionnalities to the system.
+
+CAN binding will be separated in two parts:
+
+![CAN_mapping][CAN_mapping]
+
+- High level one will be the binding from which others applications will connect to. It will provides valuable access to the CAN bus by aggregate signals or providing new signals from several originals. By example, a signal exposing whether or not a door is open, no matter which one it is. Also, we can imagine an application which supervise if there is no one in the car but moving (1m, 2m ?) then it send an event to the application which will send a phone message to the owner to alert him of an unexpected behavior.
+- The low level one will be one the bus to decode messages that transit and send event through **Application Framework** to the subscribers with human readable message. It will provide some basic access to the bus + some basic mathematical, statistical features (last_values, min, max, timestamps, averaging) as well as basic filter to get discerning signal only. This part are not implemented yet in the low level.
+
+![Binding_architecture][CAN_bindings_communication]
+
+Last be not least, the low level binding can be shipped as binary only using OpenXC inspired [generator][generator].
 
 # Prerequirements
 
@@ -255,6 +274,10 @@ ON-REPLY 2:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"succes
 low-can unsubscribe { "event" : "doors*" }
 ON-REPLY 3:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
 ```
+
+[OpenXC_to_AGL]: images/OpenXC_to_AGL.svg "From OpenXC firmware to AGL binding"
+[CAN_bindings_communication]: images/CAN_bindings_communication.svg "Communication between CAN bindings and third applications"
+[CAN_mapping]: images/CAN_level_mapping.svg "CAN low and high level bindings mapping"
 
 [USB_CAN]: http://reference.com/ "USB CAN adapter recommended"
 [OBD2_cable]: http://foo.bar/ "OBD2<->DB9 recommended cable"
