@@ -275,9 +275,9 @@ low-can unsubscribe { "event" : "doors*" }
 ON-REPLY 3:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
 ```
 
-[OpenXC_to_AGL]: images/OpenXC_to_AGL.svg "From OpenXC firmware to AGL binding"
-[CAN_bindings_communication]: images/CAN_bindings_communication.svg "Communication between CAN bindings and third applications"
-[CAN_mapping]: images/CAN_level_mapping.svg "CAN low and high level bindings mapping"
+[OpenXC_to_AGL]: images/OpenXC_to_AGL.png "From OpenXC firmware to AGL binding"
+[CAN_bindings_communication]: images/CAN_bindings_communication.png "Communication between CAN bindings and third applications"
+[CAN_mapping]: images/CAN_level_mapping.png "CAN low and high level bindings mapping"
 
 [USB_CAN]: http://reference.com/ "USB CAN adapter recommended"
 [OBD2_cable]: http://foo.bar/ "OBD2<->DB9 recommended cable"
