@@ -343,7 +343,7 @@ int main(int argc, char** argv)
 			std::ofstream out;
 			if (output_file.size())
 			{
-				out = std::ofstream(output_file);
+				out.open(output_file);
 				if(!out)
 				{
 					std::stringstream ss;
