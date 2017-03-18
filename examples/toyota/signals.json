@@ -10,25 +10,41 @@
             "signals": {
                 "doors.driver.open": {
                     "generic_name": "doors.driver.open",
-                    "bit_position": 0,
-                    "bit_size": 4,
+                    "bit_position": 78,
+                    "bit_size": 1,
                     "factor": 0,
                     "offset": 0,
-                    "decoder": "decoder_t::booleanDecoder"}
-            }
-        },
-		"0x442": {
-			"bus": "vcan0",
-            "signals": {
+                    "decoder": "decoder_t::booleanDecoder"},
                 "doors.passenger.open": {
                     "generic_name": "doors.passenger.open",
-                    "bit_position": 0,
+                    "bit_position": 79,
+                    "bit_size": 1,
+                    "factor": 0,
+                    "offset": 0,
+                    "decoder": "decoder_t::booleanDecoder"},
+                "doors.rearleft.open": {
+                    "generic_name": "doors.rearleft.open",
+                    "bit_position": 86,
+                    "bit_size": 1,
+                    "factor": 0,
+                    "offset": 0,
+                    "decoder": "decoder_t::booleanDecoder"},
+                "doors.rearright.open": {
+                    "generic_name": "doors.rearright.open",
+                    "bit_position": 85,
                     "bit_size": 4,
                     "factor": 0,
                     "offset": 0,
+                    "decoder": "decoder_t::booleanDecoder"},
+                "doors.coffer.open": {
+                    "generic_name": "doors.coffer.open",
+                    "bit_position": 88,
+                    "bit_size": 1,
+                    "factor": 0,
+                    "offset": 0,
                     "decoder": "decoder_t::booleanDecoder"}
-            }
 		}
+	}
     },
     "diagnostic_messages": [
         {
@@ -164,6 +180,5 @@
 			"frequency": 1,
             "decoder": "decoder_t::decode_obd2_response"
         }
-
     ]
 }

@@ -2,11 +2,10 @@
 #include "can/can-decoder.hpp"
 
 configuration_t::configuration_t()
-	: can_message_set_{{0, "example", 0, 2, 2, 0, 19}}
+	: can_message_set_{{0, "example", 0, 1, 5, 0, 19}}
 	, can_message_definition_
 	{
 		{
-			can_message_definition_t(0, "vcan0", 0x442, can_message_format_t::STANDARD, frequency_clock_t(0.00000f), true),
 			can_message_definition_t(0, "vcan0", 0x620, can_message_format_t::STANDARD, frequency_clock_t(0.00000f), true)
 		}
 	}
@@ -16,9 +15,9 @@ configuration_t::configuration_t()
 			{
 				0,
 				0,
-				"doors.passenger.open",
-				0,
-				4,
+				"doors.coffer.open",
+				88,
+				1,
 				0.00000f, 
 				0, 
 				0,
@@ -32,14 +31,72 @@ configuration_t::configuration_t()
 				decoder_t::booleanDecoder,
 				nullptr,
 				false
-			}
-		},
-		{
+			},
 			{
 				0,
-				1,
-				"doors.driver.open",
 				0,
+				"doors.driver.open",
+				78,
+				1,
+				0.00000f, 
+				0, 
+				0,
+				0,
+				frequency_clock_t(0.00000f),
+				true,
+				false,
+				{
+				},
+				false,
+				decoder_t::booleanDecoder,
+				nullptr,
+				false
+			},
+			{
+				0,
+				0,
+				"doors.passenger.open",
+				79,
+				1,
+				0.00000f, 
+				0, 
+				0,
+				0,
+				frequency_clock_t(0.00000f),
+				true,
+				false,
+				{
+				},
+				false,
+				decoder_t::booleanDecoder,
+				nullptr,
+				false
+			},
+			{
+				0,
+				0,
+				"doors.rearleft.open",
+				86,
+				1,
+				0.00000f, 
+				0, 
+				0,
+				0,
+				frequency_clock_t(0.00000f),
+				true,
+				false,
+				{
+				},
+				false,
+				decoder_t::booleanDecoder,
+				nullptr,
+				false
+			},
+			{
+				0,
+				0,
+				"doors.rearright.open",
+				85,
 				4,
 				0.00000f, 
 				0, 

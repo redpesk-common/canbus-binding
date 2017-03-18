@@ -34,9 +34,17 @@ Last be not least, the low level binding can be shipped as binary only using Ope
 
 # Prerequirements
 
-- Make sure you already have set up the AGL SDK before using the following [guide][SDK_instructions].
+- An AGL system installed with a Chinook version.
 
-- This repo make use of git submodule, make sure to execute the following commands from the repository once cloned :
+- Make sure you already have set up the AGL SDK before using the following [guide][SDK_instructions]. 
+
+To get the correct SDK version installed, you **must** prepare your environment with the **chinook-next** version. To do so, run the following command in your docker image:
+
+```bash
+$ prepare_meta -f chinook-next -o /xdt -l /home/devel/mirror -p /home/devel/share/proprietary-renesas-rcar/ -t porter -e wipeconfig -e rm_work
+```
+
+- Check that you have updated git submodules, executing the following commands from the repository:
 
 ```bash
 $ git submodule init
@@ -168,20 +176,41 @@ Insert the modified SDcard in your Porter board and boot from it. Your are ready
  Connected to the target, here is how to load the virtual CAN device driver and set up a new vcan device :
 
 ```bash
- ~# modprobe vcan
- ~# ip link add vcan0 type vcan
- ~# ip link set vcan0 up
+# modprobe vcan
+# ip link add vcan0 type vcan
+# ip link set vcan0 up
  ```
 
 ### CAN device using the USB CAN adapter
 
-Using real connection to CAN bus of your car using the USB CAN adapter connected to the OBD2 connector. (This instruction assuming a speed of 500000kbps for your device, you can try supported bitrate like 125000, 250000 if 500000 doesn't work) :
+Using real connection to CAN bus of your car using the USB CAN adapter connected to the OBD2 connector.
+
+Once connected, launch ```dmesg``` command and search which device to use :
 
 ```bash
-~# modprobe can
-~# ip link set can0 type can bitrate 500000
-~# ip link set can0 up
-~# ip link show can0
+# dmesg
+[...]
+[  131.871441] usb 1-3: new full-speed USB device number 4 using ohci-pci
+[  161.860504] can: controller area network core (rev 20120528 abi 9)
+[  161.860522] NET: Registered protocol family 29
+[  177.561620] usb 1-3: USB disconnect, device number 4
+[  191.061423] usb 1-2: USB disconnect, device number 3
+[  196.095325] usb 1-2: new full-speed USB device number 5 using ohci-pci
+[  327.568882] usb 1-2: USB disconnect, device number 5
+[  428.594177] CAN device driver interface
+[ 1872.551543] usb 1-2: new full-speed USB device number 6 using ohci-pci
+[ 1872.809302] usb_8dev 1-2:1.0 can0: firmware: 1.7, hardware: 1.0
+[ 1872.809356] usbcore: registered new interface driver usb_8dev
+```
+
+Here device is named **can0**.
+
+This instruction assuming a speed of 500000kbps for your CAN bus, you can try others supported bitrate like 125000, 250000 if 500000 doesn't work:
+
+```bash
+# ip link set can0 type can bitrate 500000
+# ip link set can0 up
+# ip link show can0
   can0: <NOARP,UP,LOWER_UP,ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
     link/can 
     can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0 
@@ -201,7 +230,7 @@ Configure the binding specifying in the JSON configuration file the CAN device(s
 }
 ```
 
-If you have several specify CAN bus devices using an array:
+If you have several specify CAN bus devices use an array:
 
 ```json
 {
@@ -214,7 +243,7 @@ If you have several specify CAN bus devices using an array:
 You can run the binding using **afm-util** tool, here is the classic way to go :
 
 ```bash
-~# afm-util run low-can-binding@0.1
+# afm-util run low-can-binding@0.1
 1
 ```
 
@@ -222,10 +251,10 @@ You can find instructions to use afm-util tool [here][afm-util], as well as docu
 
 But you can't control nor interact with it because you don't know security token that **Application Framework** gave it at launch.
 
-So, to test it, it is better to launch the binding manually. In the following example, we will use port **1234** and left empty security token for testing purpose :
+So, to test it, it is better to launch the binding manually. In the following example, we will use port **1234** and left empty security token for testing purpose:
 
 ```bash
-~#  afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-binding/0.1/libs/ --rootdir=/var/lib/afm/applications/low-can-binding/0.1/ --port=1234 --token=
+#  afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-binding/0.1/libs/ --rootdir=/var/lib/afm/applications/low-can-binding/0.1/ --port=1234 --token=
 NOTICE: binding [/usr/lib/afb/afb-dbus-binding.so] calling registering function afbBindingV1Register
 NOTICE: binding /usr/lib/afb/afb-dbus-binding.so loaded with API prefix dbus
 NOTICE: binding [/usr/lib/afb/authLogin.so] calling registering function afbBindingV1Register
@@ -241,7 +270,7 @@ NOTICE: Initialized 1/1 can bus device(s) {binding low-can}
 Then connect to the binding using previously installed ***AFB Websocket CLI*** tool :
 
 ```bash
-~# afb-client-demo ws://localhost:1234/api?token=
+# afb-client-demo ws://localhost:1234/api?token=
 ```
 
 You will be on an interactive session where you can pass ask directly to the binding API.
@@ -266,7 +295,7 @@ You can ask to subscribe to chosen CAN event with a call to *subscribe* API verb
 
 For example from a websocket session:
 
-```bash
+```json
 low-can subscribe { "event": "doors.driver.open" }
 ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"a18fd375-b6fa-4c0e-a1d4-9d3955975ae8"}}
 ```
@@ -275,14 +304,14 @@ Subscription and unsubscription can take wildcard in their *event* value.
 
 To reveive all doors events :
 
-```bash
+```json
 low-can subscribe { "event" : "doors*" }
 ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"511c872e-d7f3-4f3b-89c2-aa9a3e9fbbdb"}}
 ```
 
 Then you will receive an event each time a CAN message is decoded for the event named *doors.driver.open*
 
-```
+```json
 ON-EVENT low-can/messages.doors.driver.open({"event":"low-can\/messages.doors.driver.open","data":{"name":"messages.doors.driver.open","value":true},"jtype":"afb-event"})
 ```
 
@@ -292,7 +321,7 @@ This is because all CAN messages or diagnostic messages are prefixed by the JSON
 
 This will let you subscribe or unsubcribe to all signals at once, not recommended, and better make filter on subscribe operation based upon their type. Examples:
 
-```
+```json
 low-can subscribe { "event" : "*speed*" } --> will subscribe to all messages with speed in their name. Search will be make without prefix for it.
 low-can subscribe { "event" : "speed*" } --> will subscribe to all messages begin by speed in their name. Search will be make without prefix for it.
 low-can subscribe { "event" : "messages*speed*" } --> will subscribe to all CAN messages with speed in their name. Search will be on prefixed messages here.
@@ -303,7 +332,7 @@ low-can subscribe { "event" : "diagnostic*speed" } --> will subscribe to all dia
 
 You can stop receiving event from it by unsubscribe the signal the same way you did for subscribe
 
-```bash
+```json
 low-can unsubscribe { "event": "doors.driver.open" }
 ON-REPLY 2:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
 low-can unsubscribe { "event" : "doors*" }
@@ -314,8 +343,8 @@ ON-REPLY 3:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"succes
 [CAN_bindings_communication]: images/CAN_bindings_communication.png "Communication between CAN bindings and third applications"
 [CAN_mapping]: images/CAN_level_mapping.png "CAN low and high level bindings mapping"
 
-[USB_CAN]: http://reference.com/ "USB CAN adapter recommended"
-[OBD2_cable]: http://foo.bar/ "OBD2<->DB9 recommended cable"
+[USB_CAN]: http://shop.8devices.com/usb2can "USB CAN adapter recommended"
+[OBD2_cable]: http://www.obd2cables.com/ "OBD2<->DB9 recommended cable"
 [SDK_instructions]: http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html "Setup SDK environment"
 [generator]: http://github.com/iotbzh/can-config-generator "AGL low level CAN binding Generator"
 [afm-util]: http://docs.iot.bzh/docs/apis_services/en/dev/reference/af-main/afm-daemons.html#using-afm-util "afm-util usage"
