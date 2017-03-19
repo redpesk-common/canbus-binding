@@ -139,8 +139,6 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			// no matter what we want, worse case will be a fail unsubscription but at least we don't
 			// poll a PID for nothing.
 			if(found.front()->get_supported())
-				subscribe = false;
-			if(subscribe)
 			{
 				float frequency = found.front()->get_frequency();
 				configuration_t::instance().get_diagnostic_manager().add_recurring_request(
@@ -149,8 +147,11 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			}
 			else
 			{
+				found.front()->set_supported(false);
 				configuration_t::instance().get_diagnostic_manager().cleanup_request(
 					configuration_t::instance().get_diagnostic_manager().find_recurring_request(diag_req), true);
+				DEBUG(binder_interface, "Signal: %s isn't supported. Canceling operation.", sig.c_str());
+				return -1;
 			}
 		}
 

@@ -161,7 +161,7 @@ void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 /// @param[in] force - Force the cleaning or not ?
 void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, bool force)
 {
-	if(force || (entry->get_in_flight() && entry->request_completed()))
+	if((force || (entry->get_in_flight() && entry->request_completed())) && entry != nullptr)
 	{
 		entry->set_in_flight(false);
 
