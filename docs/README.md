@@ -1,6 +1,4 @@
-# Low level CAN binding for AGL
-
-## Abstract
+# Abstract
 
 This project proposes a Low Level CAN Binding for AGL, with the following features:
 

@@ -24,8 +24,7 @@
     "hidepagefooters": [2, 3],
 
     "plugins": [
-        "regexplace",
-        "richquotes"
+        "regexplace"
     ],
     "pluginsConfig": {
         "regexplace": {

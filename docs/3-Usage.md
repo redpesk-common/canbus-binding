@@ -1,6 +1,6 @@
 # Install AFB Websocket CLI client to test the binding.
 
-You can test it using afb-client-demo CLI tool provided by the RPM package *libafbwsc-dev*.
+You can test it using afb-client-demo CLI tool provided by the RPM package _libafbwsc-dev_.
 
 You can find this package in your build environment, using docker SDK recommended setup the file is `/xdt/build/tmp/deploy/rpm/<your-target-arch>/`.
 
@@ -18,7 +18,7 @@ From the docker image copy RPM to the shared directory between docker image and 
 $ cp /xdt/build/tmp/deploy/rpm/cortex15hf_neon/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm ~/share
 ```
 
-Then plugin you SDcard in your Linux host (Windows can't read ext4 filesystem AGL runs on) and copy RPM file on it.
+Then plugin you SDcard in your Linux host \(Windows can't read ext4 filesystem AGL runs on\) and copy RPM file on it.
 
 From your host, identify SDcard block device node here it is **sdc** with the correct capacity automounted by the desktop manager:
 
@@ -48,7 +48,7 @@ sda                                                                             
 
 Copy, still from your host:
 
-> **CAUTION** Make sure to sync IO with sync command before unplug your SDcard. It could be corrupted if removed before all pending IO aren't done.
+> **CAUTION:** Make sure to sync IO with sync command before unplug your SDcard. It could be corrupted if removed before all pending IO aren't done.
 
 ```bash
 $ sudo cp ~/devel/docker/share/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm /run/media/claneys/97f418a5-612f-44e9-b968-a19505695151/home/root
@@ -61,19 +61,19 @@ Insert the modified SDcard in your Porter board and boot from it. You are ready 
 
 ### Virtual CAN device
 
- Connected to the target, here is how to load the virtual CAN device driver and set up a new vcan device :
+Connected to the target, here is how to load the virtual CAN device driver and set up a new vcan device :
 
 ```bash
 # modprobe vcan
 # ip link add vcan0 type vcan
 # ip link set vcan0 up
- ```
+```
 
 ### CAN device using the USB CAN adapter
 
 Using real connection to CAN bus of your car using the USB CAN adapter connected to the OBD2 connector.
 
-Once connected, launch ```dmesg``` command and search which device to use :
+Once connected, launch `dmesg` command and search which device to use :
 
 ```bash
 # dmesg
@@ -110,11 +110,11 @@ This instruction assuming a speed of 500000kbps for your CAN bus, you can try ot
 
 ## Configure the binding
 
-Configure the binding specifying in the JSON configuration file the CAN device(s) that it will to connect to. Edit file */var/lib/afm/applications/low-can-binding/0.1/can_buses.json* and change the CAN device name to the one you have :
+Configure the binding specifying in the JSON configuration file the CAN device\(s\) that it will to connect to. Edit file _/var/lib/afm/applications/low-can-binding/0.1/can\_buses.json_ and change the CAN device name to the one you have :
 
 ```json
 {
-	"canbus":  "can0"
+    "canbus":  "can0"
 }
 ```
 
@@ -122,11 +122,11 @@ If you have several specify CAN bus devices use an array:
 
 ```json
 {
-	"canbus": [ "vcan0", "can0" ]
+    "canbus": [ "vcan0", "can0" ]
 }
 ```
 
-> **WARNING** Make sure the CAN bus(es) you specify in your configuration file match those specified in your generated source file with the [can-config-generator](http://github.com/iotbzh/can-config-generator).
+> **WARNING:** Make sure the CAN bus\(es\) you specify in your configuration file match those specified in your generated source file with the [can-config-generator](http://github.com/iotbzh/can-config-generator).
 
 ## Run it, test it, use it !
 
@@ -157,7 +157,7 @@ NOTICE: vcan0 device opened and reading {binding low-can}
 NOTICE: Initialized 1/1 can bus device(s) {binding low-can}
 ```
 
-On another terminal, connect to the binding using previously installed ***AFB Websocket CLI*** tool:
+On another terminal, connect to the binding using previously installed _**AFB Websocket CLI**_ tool:
 
 ```bash
 # afb-client-demo ws://localhost:1234/api?token=
@@ -165,11 +165,11 @@ On another terminal, connect to the binding using previously installed ***AFB We
 
 You will be on an interactive session where you can communicate directly with the binding API.
 
-The binding provides at this moment 2 verbs, *subscribe* and *unsubscribe*, which can take argument by a JSON **event** object.
+The binding provides at this moment 2 verbs, _subscribe_ and _unsubscribe_, which can take argument by a JSON **event** object.
 
-The argument value is the CAN message **generic_name** as described in the JSON file used to generate cpp file for the binding.
+The argument value is the CAN message **generic\_name** as described in the JSON file used to generate cpp file for the binding.
 
-To use the ***AFB Websocket CLI*** tool, a command line will be like the following :
+To use the _**AFB Websocket CLI**_ tool, a command line will be like the following :
 
 ```
 <api> <verb> <arguments>
@@ -177,15 +177,15 @@ To use the ***AFB Websocket CLI*** tool, a command line will be like the followi
 
 Where:
 
-- API : ***low-can***.
-- Verb : ***subscribe*** or ***unsubscribe***
-- Arguments : ***{ "event": "driver.doors.open" }***
+* API : _**low-can**_.
+* Verb : _**subscribe**_ or _**unsubscribe**_
+* Arguments : _**{ "event": "driver.doors.open" }**_
 
 ### Subscription and unsubscription
 
-You can ask to subscribe to chosen CAN event with a call to *subscribe* API verb with the CAN messages name as JSON argument.
+You can ask to subscribe to chosen CAN event with a call to _subscribe_ API verb with the CAN messages name as JSON argument.
 
-> **Note** If no argument is provided, then you'll subscribe to all signals at once.
+> **NOTE:** If no argument is provided, then you'll subscribe to all signals at once.
 
 For example from a websocket session:
 
@@ -194,7 +194,7 @@ low-can subscribe { "event": "doors.driver.open" }
 ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"a18fd375-b6fa-4c0e-a1d4-9d3955975ae8"}}
 ```
 
-Subscription and unsubscription can take wildcard in their *event* value.
+Subscription and unsubscription can take wildcard in their _event_ value.
 
 To reveive all doors events :
 
@@ -203,15 +203,15 @@ low-can subscribe { "event" : "doors*" }
 ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"511c872e-d7f3-4f3b-89c2-aa9a3e9fbbdb"}}
 ```
 
-Then you will receive an event each time a CAN message is decoded for the event named *doors.driver.open*
+Then you will receive an event each time a CAN message is decoded for the event named _doors.driver.open_
 
 ```json
 ON-EVENT low-can/messages.doors.driver.open({"event":"low-can\/messages.doors.driver.open","data":{"name":"messages.doors.driver.open","value":true},"jtype":"afb-event"})
 ```
 
-Notice that event shows you that the CAN event is named *messages.doors.driver.open* but you ask for event about *doors.driver.open*.
+Notice that event shows you that the CAN event is named _messages.doors.driver.open_ but you ask for event about _doors.driver.open_.
 
-This is because all CAN messages or diagnostic messages are prefixed by the JSON parent node name, **messages** for CAN messages and **diagnostic_messages** for diagnostic messages like OBD2.
+This is because all CAN messages or diagnostic messages are prefixed by the JSON parent node name, **messages** for CAN messages and **diagnostic\_messages** for diagnostic messages like OBD2.
 
 This will let you subscribe or unsubcribe to all signals at once, not recommended, and better make filter on subscribe operation based upon their type. Examples:
 
@@ -248,3 +248,6 @@ Send a custom message:
 ```bash
 # cansend can0 ID#DDDDAAAATTTTAAAA
 ```
+
+
+

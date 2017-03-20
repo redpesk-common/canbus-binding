@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat cover.svg | sed -e 's/{title}/Low level CAN binder/' \
+cat cover.svg | sed -e 's/{title}/Low Level CAN binding/' \
     -e 's/font-size:87.5px/font-size:50px/g' \
     -e 's/{subtitle}//g' \
     -e 's/{version}/Version 1.0/g' \

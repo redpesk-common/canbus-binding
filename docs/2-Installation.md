@@ -1,12 +1,12 @@
 # Prerequisites
 
-- An AGL system installed with latest Chinook version (>3.0.2).
+* An AGL system installed with latest Chinook version \(&gt;3.0.2\).
 
-- Make sure you built the AGL generator else you will not be able to generate custom low-level CAN binding. Generator can be found [here](http://github.com/iotbzh/can-config-generator) with the attached instruction to install and run it.
+* Make sure you built the AGL generator else you will not be able to generate custom low-level CAN binding. Generator can be found [here](http://github.com/iotbzh/can-config-generator) with the attached instruction to install and run it.
 
-It will produce a *configuration-generated.cpp* file to paste in the source, *src/*, directory.
+It will produce a _configuration-generated.cpp_ file to paste in the source, _src/_, directory.
 
-- Make sure you already set up the AGL SDK using the following [guide](http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html).
+* Make sure you already set up the AGL SDK using the following [guide](http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html).
 
 To get the correct SDK version installed, you **must** prepare your environment with the **chinook-next** version. To do so, run the following command in your docker image:
 
@@ -14,14 +14,14 @@ To get the correct SDK version installed, you **must** prepare your environment 
 $ prepare_meta -f chinook-next -o /xdt -l /home/devel/mirror -p /home/devel/share/proprietary-renesas-rcar/ -t porter -e wipeconfig -e rm_work
 ```
 
-- Check that you updated git submodules, executing the following commands from this repository:
+* Check that you updated git submodules, executing the following commands from this repository:
 
 ```bash
 $ git submodule init
 $ git submodule update
 ```
 
-- An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to OBD2 connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)).
+* An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to OBD2 connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)\).
 
 # Getting started
 
@@ -32,9 +32,9 @@ $ git submodule update
 * CMake version 3.0 or later
 * G++, Clang++ or any C++11 complient compiler.
 * Boost
-    * filesystem
-    * program_options
-    * system
+  * filesystem
+  * program\_options
+  * system
 
 You can install any of these using your package manager. For instance, inside the iotbzh's docker image, you must enter this command :
 
@@ -54,7 +54,7 @@ remote: Compressing objects: 100% (42/42), done.
 remote: Total 74 (delta 30), reused 67 (delta 27), pack-reused 0
 Unpacking objects: 100% (74/74), done.
 Checking connectivity... done.
-	
+
 <b>devel@bsp-devkit:~/projects/$</b> cd can-config-generator
 <b>devel@bsp-devkit:~/projects/can-config-generator/(master)$</b> mkdir build
 <b>devel@bsp-devkit:~/projects/can-config-generator/build(master)$</b> cmake -G "Unix Makefiles" ..
@@ -98,21 +98,21 @@ To generate your config file you just have to run the generator using the `-m` o
 $ can-config-generator -m ../tests/basic.json -o configuration-generated.cpp
 ```
 
-If you omit the `-o` option, then code is generated on the stdout.
-You also can specify a header and a footer file.
-These files must be valid C++ fragment as long as they will be inserted as is.
+If you omit the `-o` option, then code is generated on the stdout.  
+You also can specify a header and a footer file.  
+These files must be valid C++ fragment as long as they will be inserted as is.  
 Use the `-h` option to display help.
 
-> **CAUTION** Each `diagnostic_message` must define the same `bus` as the binding will use only one bus.
+> **CAUTION:** Each `diagnostic_message` must define the same `bus` as the binding will use only one bus.
 
 ### Supported OpenXC items
 
-About now, compliance with OpenXC reference is in progress, can-config-generator and CAN_signaling will implement them soon.
+About now, compliance with OpenXC reference is in progress, can-config-generator and CAN\_signaling will implement them soon.  
 `initializers`, `loopers`, `commands` and `handlers` nodes are ignored for now.
 
 This generator will follow OpenXC support status of the low level CAN signaling binding.
 
-> **NOTE** The `buses` item will not be supported by this generator because the binding use another way to declare and configure buses. Please refer to the binding's documentation.
+> **NOTE**: The `buses` item will not be supported by this generator because the binding use another way to declare and configure buses. Please refer to the binding's documentation.
 
 ## Compile and install the binding
 
@@ -153,9 +153,9 @@ Error org.freedesktop.DBus.Error.Failed: "system error"
 
 It's because installation remove the binding before installing it.
 
-If it is the first time that you make the installation then you'll have this message in place of ***true***.
+If it is the first time that you make the installation then you'll have this message in place of _**true**_.
 
-To install it manually, you need to copy the *low-can-binding.wgt* file on your target, then from it execute the following commands :
+To install it manually, you need to copy the _low-can-binding.wgt_ file on your target, then from it execute the following commands :
 
 On your host, to copy over the network :
 
@@ -163,9 +163,12 @@ On your host, to copy over the network :
 $ scp low-can-binding.wgt root@<target_IP>:~
 ```
 
-On the target, assuming ***wgt*** file is in the root home directory :
+On the target, assuming _**wgt**_ file is in the root home directory :
 
 ```bash
 ~# afm-util install low-can-binding.wgt
 { "added": "low-can-binding@0.1" }
 ```
+
+
+
