@@ -518,6 +518,7 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 		found_signals.front()->set_supported(false);
 		cleanup_request(adr, true);
 		NOTICE(binder_interface, "relay_diagnostic_response: PID not supported or ill formed. Please unsubscribe from it. Error code : %d", response.negative_response_code);
+		message = build_VehicleMessage(build_SimpleMessage(adr->get_name(), build_DynamicField("This PID isn't supported by your vehicle.")));
 	}
 
 	if(adr->get_callback() != nullptr)

@@ -147,7 +147,6 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			}
 			else
 			{
-				found.front()->set_supported(false);
 				configuration_t::instance().get_diagnostic_manager().cleanup_request(
 					configuration_t::instance().get_diagnostic_manager().find_recurring_request(diag_req), true);
 				DEBUG(binder_interface, "Signal: %s isn't supported. Canceling operation.", sig.c_str());
