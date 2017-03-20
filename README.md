@@ -36,7 +36,9 @@ Last be not least, the low level binding can be shipped as binary only using Ope
 
 - An AGL system installed with a Chinook version.
 
-- Make sure you already have set up the AGL SDK before using the following [guide][SDK_instructions]. 
+- Make sure you built the AGL generator else you will not be able to generate custom low-level CAN binding. Generator can be found [here][generator] with the attached instruction to install and run it. It will produce a *configuration-generated.cpp* file to paste in the source, *src/*, directory.
+
+- Make sure you already set up the AGL SDK using the following [guide][SDK_instructions]. 
 
 To get the correct SDK version installed, you **must** prepare your environment with the **chinook-next** version. To do so, run the following command in your docker image:
 
@@ -44,7 +46,7 @@ To get the correct SDK version installed, you **must** prepare your environment 
 $ prepare_meta -f chinook-next -o /xdt -l /home/devel/mirror -p /home/devel/share/proprietary-renesas-rcar/ -t porter -e wipeconfig -e rm_work
 ```
 
-- Check that you have updated git submodules, executing the following commands from the repository:
+- Check that you updated git submodules, executing the following commands from this repository:
 
 ```bash
 $ git submodule init
@@ -53,17 +55,15 @@ $ git submodule update
 
 - An [USB CAN adapter][USB_CAN] connected to OBD2 connector through the [right cable][OBD2_cable].
 
-- Make sure you have installed the AGL generator else you aren't able to generate custom low-level CAN binding. Generator can be found [here][generator] with the attached instruction to install and run it. It will produce a *configuration-generated.cpp* file to paste in the source, *src/*, directory.
-
 # Getting started
 
 ## Compile and install the binding
 
-With an AGL SDK environment correctly set, I encourage you to set the TARGET variable in the root CMakeLists.txt file if you have an AGL target already running in your network.
+With an AGL SDK environment correctly configured, I suggest you to set the TARGET variable in the root CMakeLists.txt file, if you have an AGL target already running in your network.
 
 Then you can directly build and install the binding and source directory on your target system.
 
-Execute commands to get your binding compile :
+Execute these commands to get your binding compile :
 
 ```bash
 $ mkdir build
@@ -93,6 +93,7 @@ It's possible that you'll see the following message :
 ```bash
 Error org.freedesktop.DBus.Error.Failed: "system error"
 ```
+
 It's because installation remove the binding before installing it.
 
 If it is the first time that you make the installation then you'll have this message in place of ***true***.
@@ -100,6 +101,7 @@ If it is the first time that you make the installation then you'll have this mes
 To install it manually, you need to copy the *low-can-binding.wgt* file on your target, then from it execute the following commands :
 
 On your host, to copy over the network :
+
 ```bash
 $ scp low-can-binding.wgt root@<target_IP>:~
 ```
@@ -116,7 +118,7 @@ You can test it using afb-client-demo CLI tool provided by the RPM package *liba
 
 You can find this package in your build environment, using docker SDK recommended setup the file is */xdt/build/tmp/deploy/rpm/<your-target-arch>/*. 
 
-Using Renesas RCar Gen2, Porter board, you have to copy the file like this if your board is connected to your network and you know its IP address:
+After a successful bitbake build and using Renesas RCar Gen2, Porter, you have to copy the file if your board is connected to your network and you know its IP address:
 
 ```bash
 $ scp /xdt/build/tmp/deploy/rpm/cortex15hf_neon/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm root@<target_IP>:~
@@ -132,7 +134,7 @@ $ cp /xdt/build/tmp/deploy/rpm/cortex15hf_neon/libafbwsc-dev-1.0-r0.cortexa15hf_
 
 Then plugin you SDcard in your Linux host (Windows can't read ext4 filesystem AGL runs on) and copy RPM file on it.
 
-From you host, identify SDcard block device node here it is **sdc** with the correct capacity automounted by the desktop manager:
+From your host, identify SDcard block device node here it is **sdc** with the correct capacity automounted by the desktop manager:
 
 ```bash
 $ lsblk
@@ -160,14 +162,14 @@ sda                                                                             
 
 Copy, still from your host:
 
-**Careful : Make sure to sync IO with sync command before unplug your SDcard. It could be corrupted if removed before all pending IO aren't done.**
+> **Caution** Make sure to sync IO with sync command before unplug your SDcard. It could be corrupted if removed before all pending IO aren't done.
 
 ```bash
 $ sudo cp ~/devel/docker/share/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm /run/media/claneys/97f418a5-612f-44e9-b968-a19505695151/home/root
 $ sync
 ```
 
-Insert the modified SDcard in your Porter board and boot from it. Your are ready to go.
+Insert the modified SDcard in your Porter board and boot from it. You are ready to go.
 
 ## Configure the AGL system
 
@@ -238,6 +240,8 @@ If you have several specify CAN bus devices use an array:
 }
 ```
 
+> **WARNING** Make sure the CAN bus(es) you specify in your configuration file match those specified in your generated source file with the [can-config-generator][generator].
+
 ## Run it, test it, use it !
 
 You can run the binding using **afm-util** tool, here is the classic way to go :
@@ -249,12 +253,12 @@ You can run the binding using **afm-util** tool, here is the classic way to go :
 
 You can find instructions to use afm-util tool [here][afm-util], as well as documentation about Application Framework.
 
-But you can't control nor interact with it because you don't know security token that **Application Framework** gave it at launch.
+But you can't control nor interact with it because you don't know security token that **Application Framework** gaves it at launch.
 
 So, to test it, it is better to launch the binding manually. In the following example, we will use port **1234** and left empty security token for testing purpose:
 
 ```bash
-#  afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-binding/0.1/libs/ --rootdir=/var/lib/afm/applications/low-can-binding/0.1/ --port=1234 --token=
+# afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-binding/0.1/libs/ --rootdir=/var/lib/afm/applications/low-can-binding/0.1/ --port=1234 --token=
 NOTICE: binding [/usr/lib/afb/afb-dbus-binding.so] calling registering function afbBindingV1Register
 NOTICE: binding /usr/lib/afb/afb-dbus-binding.so loaded with API prefix dbus
 NOTICE: binding [/usr/lib/afb/authLogin.so] calling registering function afbBindingV1Register
@@ -273,11 +277,11 @@ Then connect to the binding using previously installed ***AFB Websocket CLI*** t
 # afb-client-demo ws://localhost:1234/api?token=
 ```
 
-You will be on an interactive session where you can pass ask directly to the binding API.
+You will be on an interactive session where you can communicate directly with the binding API.
 
-Binding provide at this moment 2 verbs, subscribe and unsubscribe, which can take argument by a JSON **event** object.
+The binding provides at this moment 2 verbs, *subscribe* and *unsubscribe*, which can take argument by a JSON **event** object.
 
-The argument value is the CAN message name as described in the JSON file used to generate cpp file for the binding.
+The argument value is the CAN message **generic_name** as described in the JSON file used to generate cpp file for the binding.
 
 To use the ***AFB Websocket CLI*** tool, a command line will be like the following :
 
@@ -285,13 +289,17 @@ To use the ***AFB Websocket CLI*** tool, a command line will be like the followi
 <api> <verb> <arguments>
 ```
 
-Where API will be : ***low-can***.
-Verb : ***subscribe*** or ***unsubscribe***
-Arguments : ***{ "event": "driver.doors.open" }***
+Where:
+
+- API : ***low-can***.
+- Verb : ***subscribe*** or ***unsubscribe***
+- Arguments : ***{ "event": "driver.doors.open" }***
 
 ### Subscription and unsubscription
 
 You can ask to subscribe to chosen CAN event with a call to *subscribe* API verb with the CAN messages name as JSON argument.
+
+> **Note** If no argument is provided, then you'll subscribe to all signals at once.
 
 For example from a websocket session:
 
