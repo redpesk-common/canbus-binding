@@ -33,17 +33,21 @@ cmake ..
 Generate a PDF version :
 
 ```bash
-make pdf
+gendocs.sh pdf
 ```
 
 Serve an HTML version, this will run a web server that will serve you locally documentation :
 
 ```bash
-make serve
+gendocs.sh serve
 ```
 
 Generate doxygen documentation:
 
 ```bash
-make doxygen
+gendocs.sh doxygen
+```
+or
+```bash
+cd build && make doxygen
 ```

@@ -20,29 +20,3 @@
 cmake_minimum_required(VERSION 3.3)
 project(low-can-binding)
 add_subdirectory(src)
-
-add_custom_command(
-	OUTPUT ${PROJECT_NAME}.pdf
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	COMMAND gitbook install
-	COMMAND gitbook pdf docs ${PROJECT_NAME}.pdf
-)
-add_custom_target(pdf
-	DEPENDS ${PROJECT_NAME}.pdf)
-
-add_custom_command(
-	OUTPUT _book
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	COMMAND gitbook install
-	COMMAND gitbook serve
-)
-add_custom_target(serve
-	DEPENDS _book)
-
-add_custom_command(
-	OUTPUT docs_doxygen
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	COMMAND doxygen CAN_signaling.doxygen
-)
-add_custom_target(doxygen
-	DEPENDS docs_doxygen)
