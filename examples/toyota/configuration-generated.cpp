@@ -6,7 +6,7 @@ configuration_t::configuration_t()
 	, can_message_definition_
 	{
 		{
-			can_message_definition_t(0, "vcan0", 0x620, can_message_format_t::STANDARD, frequency_clock_t(0.00000f), true)
+			can_message_definition_t(0, "can0", 0x620, can_message_format_t::STANDARD, frequency_clock_t(0.00000f), true)
 		}
 	}
 	, can_signals_
@@ -333,7 +333,7 @@ configuration_t::configuration_t()
 
 const std::string configuration_t::get_diagnostic_bus() const
 {
-	return "vcan0";
+	return "can0";
 }
 
 
