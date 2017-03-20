@@ -10,4 +10,6 @@
 obj
 build
 bin
-docs
+docs_doxygen
+node_modules/
+_book/
