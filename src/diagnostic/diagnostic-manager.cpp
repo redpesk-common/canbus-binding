@@ -81,7 +81,10 @@ void diagnostic_manager_t::reset()
 bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
 	std::shared_ptr<can_bus_dev_t> can_bus_dev = can_bus_t::get_can_device(configuration_t::instance().get_diagnostic_manager().bus_);
-	return can_bus_dev->shims_send(arbitration_id, data, size);
+	if(can_bus_dev != nullptr)
+		return can_bus_dev->shims_send(arbitration_id, data, size);
+	ERROR(binder_interface, "shims_send: Can not retrieve diagnostic bus: %s", configuration_t::instance().get_diagnostic_manager().bus_.c_str());
+	return false;
 }
 
 /// @brief The type signature for an optional logging function, if the user
@@ -446,12 +449,18 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 	{
 		adr->get_frequency_clock().tick();
 		start_diagnostic_request(&dm.shims_, adr->get_handle());
-		if(adr->get_handle()->completed && !adr->get_handle()->success)
+		if(adr->get_handle()->completed)
 		{
-			DEBUG(binder_interface, "send_request: Fatal error sending diagnostic request");
-			sd_event_source_unref(s);
-			return -1;
+			if(!adr->get_handle()->success)
+			{
+				ERROR(binder_interface, "send_request: Fatal error sending diagnostic request");
+				sd_event_source_unref(s);
+				return -1;
+			}
 		}
+		else
+			WARNING(binder_interface, "send_request: There was a problem sending your request using bus %s.", adr->get_can_bus_dev()->get_device_name().c_str());
+
 		adr->get_timeout_clock().tick();
 		adr->set_in_flight(true);
 

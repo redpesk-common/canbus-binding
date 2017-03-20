@@ -240,7 +240,10 @@ int can_bus_t::init_can_dev()
 				i++;
 			}
 			else
+			{
 				ERROR(binder_interface, "Can't open device %s", device.c_str());
+				return 1;
+			}
 		}
 
 		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
