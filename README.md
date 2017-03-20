@@ -84,8 +84,10 @@ Use the `-h` option to display help.
 ## Supported OpenXC items
 
 As long as the low level CAN signaling binding doesn't fully support OpenXC yet, this generator is also limited.
-For instance, `initializers`, `loopers`, `buses`, `commands` and `handlers` nodes are ignored for now.
+For instance, `initializers`, `loopers`, `commands` and `handlers` nodes are ignored for now.
 This generator will follow OpenXC support status of the low level CAN signaling binding.
+
+The `buses` item will not be supported by this generator because the binding use another way to declare and configure buses. Please refer to the binding's documentation.
 
 ## Known issues
 
