@@ -157,7 +157,7 @@ NOTICE: vcan0 device opened and reading {binding low-can}
 NOTICE: Initialized 1/1 can bus device(s) {binding low-can}
 ```
 
-Then connect to the binding using previously installed ***AFB Websocket CLI*** tool :
+On another terminal, connect to the binding using previously installed ***AFB Websocket CLI*** tool:
 
 ```bash
 # afb-client-demo ws://localhost:1234/api?token=
@@ -231,4 +231,20 @@ low-can unsubscribe { "event": "doors.driver.open" }
 ON-REPLY 2:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
 low-can unsubscribe { "event" : "doors*" }
 ON-REPLY 3:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
+```
+
+### Using CAN utils to monitor CAN activity
+
+You can watch CAN traffic and send custom CAN messages using can-utils preinstalled on AGL target.
+
+To watch watch going on a CAN bus use:
+
+```bash
+# candump can0
+```
+
+Send a custom message:
+
+```bash
+# cansend can0 ID#DDDDAAAATTTTAAAA
 ```
