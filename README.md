@@ -1,9 +1,9 @@
-#CAN Configuration Generator
+# CAN Configuration Generator
 
-##Abstract
+## Abstract
 
-This tool is used to generate a configuration source file for the Low Level CAN bus binding.
-This binding need a configuration provided as a C++ source file.
+This tool is used to generate a configuration source file for the [Low Level CAN bus binding](https://github.com/iotbzh/CAN_signaling).
+This binding needs a configuration provided as a C++ source file.
 As long this binding is based on [OpenXC vi-firmware](https://github.com/openxc/vi-firmware), this generator use the JSON format from the [python generator](https://github.com/openxc/openxc-python).
 The reference documentation of the JSON file can be found [here](https://github.com/openxc/vi-firmware/blob/master/docs/config/reference.rst).
 
