@@ -6,7 +6,7 @@
     <span class="footer-center">{{ config.published }}</span>
 </div>
 
-<!-- Allow to hide header for some pages using hidepageheaders config in book.json -->
+<!-- Allow to hide footer for some pages using hidepagefooters config in book.json -->
 <script>
     if (({% for num in config.hidepagefooters %}{{ page.num }} == {{ num }} || {% endfor %}false)) document.getElementById('pdf-footer').style.display = 'none'
 </script>
