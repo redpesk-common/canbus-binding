@@ -21,7 +21,7 @@ $ git submodule init
 $ git submodule update
 ```
 
-* An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to OBD2 connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)\).
+* An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)).
 
 # Getting started
 
@@ -45,6 +45,8 @@ $ sudo apt-get install cmake libboost-system-dev libboost-filesystem-dev libboos
 You may want to install `libboost-all-dev` to get all boost components even if it's not required.
 
 ### Compile
+
+> **CAUTION** It is **very important** that you do not source the SDK environment file to compile this project because some build requirements aren't installed in the AGL SDK for now. 
 
 ```bash
 $ git clone https://github.com/iotbzh/can-config-generator.git
@@ -90,6 +92,65 @@ Linking CXX executable can-config-generator
 [100%] Built target can-config-generator
 ```
 
+### Naming convention
+
+We choose a doted naming convention because it's a well know schema.
+
+It separates and organize names into hierarchy. From the left to right, you describe your names using the more common ancestor at the left then more you go to the right the more it will be accurate.
+
+Let's take an example, here is an example about standard PID name following this convention:
+
+```
+engine.load
+engine.coolant.temperature
+fuel.pressure
+intake.manifold.pressure
+engine.speed
+vehicle.speed
+intake.air.temperature
+mass.airflow
+throttle.position
+running.time
+EGR.error
+fuel.level
+barometric.pressure
+commanded.throttle.position
+ethanol.fuel.percentage
+accelerator.pedal.position
+hybrid.battery-pack.remaining.life
+engine.oil.temperature
+engine.torque
+```
+
+> **NOTE** It's recommended that you follow this naming convention to named your CAN signals.
+> There is only character `*` that is forbidden in names because it's used as wildcard for subscription and unsubscrition.
+> This described in the below chapter.
+
+### Generating JSON from Vector CANoe Database
+
+If you use Canoe to store your `gold standard` CAN signal definitions, you may be able to use the OpenXC  `xml_to_json.py` script to make your JSON for you. First, export the Canoe .dbc file as XML - you can do this with Vector CANdb++. Next, create a JSON file according to the format defined above, but only define:
+
+- CAN messages.
+- Name of CAN signals within messages and their generic_name.
+- Optionnaly name of diagnostic messages and their name.
+
+To install the OpenXC utilities and runs `xml_to_json.py` script:
+
+```bash
+$ sudo pip install openxc
+$ cd /usr/local/lib/python2.7/dist-packages/openxc-0.13.0-py2.7.egg/openxc/generator
+```
+
+Assuming the data exported from Vector is in `signals.xml` and your minimal mapping file is `mapping.json`, run the script:
+
+```bash
+$ ./xml_to_json.py signals.xml mapping.json signals.json
+```
+
+The script scans `mapping.json` to identify the CAN messages and signals that you want to use from the XML file. It pulls the neccessary details of the messages (bit position, bit size, offset, etc) and outputs the resulting subset as JSON into the output file, `signals.json`.
+
+The resulting file together with `mapping.json` will work as input to the code generation script.
+
 ### Generate your config file
 
 To generate your config file you just have to run the generator using the `-m` option to specify your JSON file.
@@ -116,7 +177,7 @@ This generator will follow OpenXC support status of the low level CAN signaling 
 
 ## Compile and install the binding
 
-With an AGL SDK environment correctly configured, I suggest you to set the TARGET variable in the root CMakeLists.txt file, if you have an AGL target already running in your network.
+With an AGL SDK environment correctly configured and **sourced**, I suggest you to set the TARGET variable in the root CMakeLists.txt file if you have an AGL target already running in your network.
 
 Then you can directly build and install the binding and source directory on your target system.
 
@@ -169,6 +230,3 @@ On the target, assuming _**wgt**_ file is in the root home directory :
 ~# afm-util install low-can-binding.wgt
 { "added": "low-can-binding@0.1" }
 ```
-
-
-
