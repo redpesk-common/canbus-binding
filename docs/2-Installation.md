@@ -6,7 +6,7 @@
 
 It will produce a _configuration-generated.cpp_ file to paste in the source, _src/_, directory.
 
-* Make sure you already set up the AGL SDK using the following [guide](http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html).
+* Make sure you already set up the AGL SDK using the following [SDK Quick Setup Guide](http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html). Alternatively, please refer to official guides available on [AGL Developer Site](http://docs.automotivelinux.org/docs/devguides/en/dev/#guides).
 
 To get the correct SDK version installed, you **must** prepare your environment with the **chinook-next** version. To do so, run the following command in your docker image in the step 4 in place of `... [ prepare build environment ] ...`:
 
@@ -18,6 +18,8 @@ $ /xdt/build/agl-init-build-env
 ```
 
 * An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)).
+
+<!-- pagebreak -->
 
 # Getting started
 
@@ -198,7 +200,7 @@ It's because installation remove the binding before installing it.
 
 If it is the first time that you make the installation then you'll have this message in place of _**true**_.
 
-### Installation manually
+### Manual Installation
 
 To install it manually, you need to copy the _low-can-binding.wgt_ file on your target, then from it execute the following commands :
 

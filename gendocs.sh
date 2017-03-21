@@ -57,7 +57,7 @@ if [ "$DO_ACTION" = "pdf" -o "$DO_ACTION" = "serve" ]; then
     [ "$?" = "1" ] && { echo "You must install calibre first, using: 'sudo apt install calibre' or refer to https://calibre-ebook.com/download"; exit 1; }
 
     if [ "$DO_ACTION" = "pdf" ]; then
-        $DRY $GITBOOK pdf $ROOTDIR $OUT_DIR/LowLevelCanBinder_Guide.pdf $DEBUG_FLAG
+        $DRY $GITBOOK pdf $ROOTDIR $OUT_DIR/LowLevelCanBinding_Guide.pdf $DEBUG_FLAG
     else
         $DRY $GITBOOK serve $DEBUG_FLAG
     fi
