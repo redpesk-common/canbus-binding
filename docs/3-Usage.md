@@ -196,7 +196,7 @@ ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success"
 
 Subscription and unsubscription can take wildcard in their _event_ value.
 
-To reveive all doors events :
+To receive all doors events :
 
 ```json
 low-can subscribe { "event" : "doors*" }
