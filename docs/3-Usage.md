@@ -51,8 +51,12 @@ Copy, still from your host:
 > **CAUTION:** Make sure to sync IO with sync command before unplug your SDcard. It could be corrupted if removed before all pending IO aren't done.
 
 ```bash
-$ sudo cp ~/devel/docker/share/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm /run/media/claneys/97f418a5-612f-44e9-b968-a19505695151/home/root
+$ sudo umount /dev/sdc1
+$ export SDCARD=/mnt
+$ sudo mount /dev/sdc1 $SDCARD
+$ sudo cp ~/devel/docker/share/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm $SDCARD/home/root
 $ sync
+$ sudo umount $SDCARD
 ```
 
 Insert the modified SDcard in your Porter board and boot from it. You are ready to go.
