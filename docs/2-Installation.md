@@ -16,15 +16,6 @@ To get the correct SDK version installed, you **must** prepare your environment 
 $ prepare_meta -f chinook-next -o /xdt -l /home/devel/mirror -p /home/devel/share/proprietary-renesas-rcar/ -t porter -e wipeconfig -e rm_work
 ```
 
-* Check that you updated git submodules, executing the following commands from this repository:
-
-```bash
-$ git clone https://github.com/iotbzh/CAN_signaling
-$ cd CAN_signaling
-$ git submodule init
-$ git submodule update
-```
-
 * An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)).
 
 # Getting started
@@ -55,9 +46,10 @@ You may want to install `libboost-all-dev` to get all boost components even if i
 
 ```bash
 $ export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
+$ export WD=$(pwd)
 $ git clone https://github.com/iotbzh/can-config-generator.git
 $ cd can-config-generator
-$ mkdir build
+$ mkdir -p build
 $ cd build
 $ cmake -G "Unix Makefiles" ..
 $ make
@@ -151,21 +143,33 @@ This generator will follow OpenXC support status of the low level CAN signaling 
 > **NOTE**: The `buses` item will not be supported by this generator because the binding use another way to declare and configure buses. Please refer to the binding's documentation.
 
 ## Compile and install the binding
+Clone the binding repository, copy the generated file and updated the git submodules.
+
+Execute the following commands from this repository:
+
+```bash
+$ cd $WD
+$ git clone https://github.com/iotbzh/CAN_signaling
+$ cd CAN_signaling
+$ git submodule init
+$ git submodule update
+$ cp $WD/can-config-generator/build/configuration-generated.cpp src/
+```
 
 With an AGL SDK environment correctly configured and **sourced**, I suggest you to set the TARGET variable in the root CMakeLists.txt file if you have an AGL target already running in your network.
 
 Then you can directly build and install the binding and source directory on your target system.
 
-Execute these commands to get your binding compile :
+Execute these commands to get your binding compile:
 
 ```bash
-$ mkdir build
+$ mkdir -p build
 $ cd build
 $ cmake ..
 $ make
 ```
 
-And if you have set TARGET variable, you can install it on your AGL system :
+And if you have set TARGET variable, you can install it on your AGL system:
 
 ```bash
 $ make install
