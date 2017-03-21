@@ -58,7 +58,9 @@ $ export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
 $ git clone https://github.com/iotbzh/can-config-generator.git
 $ cd can-config-generator
 $ mkdir build
+$ cd build
 $ cmake -G "Unix Makefiles" ..
+$ make
 ```
 
 ### Naming convention
@@ -92,10 +94,14 @@ engine.torque
 ```
 
 > **NOTE** It's recommended that you follow this naming convention to named your CAN signals.
+>
 > There is only character `*` that is forbidden in names because it's used as wildcard for subscription and unsubscrition.
+>
 > This described in the below chapter.
 
 ### Generating JSON from Vector CANoe Database
+
+> **CAUTION** This chapter has not been tested since we haven't necessary automotive tools for that. 
 
 If you use Canoe to store your `gold standard` CAN signal definitions, you may be able to use the OpenXC  `xml_to_json.py` script to make your JSON for you. First, export the Canoe .dbc file as XML - you can do this with Vector CANdb++. Next, create a JSON file according to the format defined above, but only define:
 
@@ -107,13 +113,13 @@ To install the OpenXC utilities and runs `xml_to_json.py` script:
 
 ```bash
 $ sudo pip install openxc
-$ cd /usr/local/lib/python2.7/dist-packages/openxc-0.13.0-py2.7.egg/openxc/generator
+$ cd /usr/local/lib/python2.7/dist-packages/openxc/generator
 ```
 
 Assuming the data exported from Vector is in `signals.xml` and your minimal mapping file is `mapping.json`, run the script:
 
 ```bash
-$ ./xml_to_json.py signals.xml mapping.json signals.json
+$ python -m openxc.utils ./xml_to_json.py signals.xml mapping.json signals.json
 ```
 
 The script scans `mapping.json` to identify the CAN messages and signals that you want to use from the XML file. It pulls the neccessary details of the messages (bit position, bit size, offset, etc) and outputs the resulting subset as JSON into the output file, `signals.json`.
@@ -125,7 +131,7 @@ The resulting file together with `mapping.json` will work as input to the code g
 To generate your config file you just have to run the generator using the `-m` option to specify your JSON file.
 
 ```bash
-$ can-config-generator -m ../tests/basic.json -o configuration-generated.cpp
+$ ./can-config-generator -m ../tests/basic.json -o configuration-generated.cpp
 ```
 
 If you omit the `-o` option, then code is generated on the stdout.  
