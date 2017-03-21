@@ -91,7 +91,7 @@
       "mode": 1,
       "pid": 12,
       "frequency": 1,
-      "decoder": "handleObd2Pid"
+      "decoder": "decoder_t::decode_obd2_response"
     },
     {
       "bus": "hs",
@@ -106,7 +106,7 @@
       "mode": 22,
       "pid": 6,
       "frequency": 1,
-      "decoder": "handleMyDiagRequest"
+      "decoder": "decoder_t::decode_obd2_response"
     }
   ]
 }
