@@ -8,12 +8,13 @@ It will produce a _configuration-generated.cpp_ file to paste in the source, _sr
 
 * Make sure you already set up the AGL SDK using the following [guide](http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html).
 
-To get the correct SDK version installed, you **must** prepare your environment with the **chinook-next** version. To do so, run the following command in your docker image:
+To get the correct SDK version installed, you **must** prepare your environment with the **chinook-next** version. To do so, run the following command in your docker image in the step 4 in place of `... [ prepare build environment ] ...`:
 
-> **NOTE** This command assume that proprietary graphic drivers for Renesas Porter board are located in `/home/devel/share/proprietary-renesas-rcar` directory.
+> **NOTE** These commands assume that proprietary graphic drivers for Renesas Porter board are located in `/home/devel/share/proprietary-renesas-rcar` directory.
 
 ```bash
 $ prepare_meta -f chinook-next -o /xdt -l /home/devel/mirror -p /home/devel/share/proprietary-renesas-rcar/ -t porter -e wipeconfig -e rm_work
+$ /xdt/build/agl-init-build-env
 ```
 
 * An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)).
@@ -95,7 +96,7 @@ engine.torque
 
 > **CAUTION** This chapter has not been tested since we haven't necessary automotive tools for that. 
 
-If you use Canoe to store your `gold standard` CAN signal definitions, you may be able to use the OpenXC  `xml_to_json.py` script to make your JSON for you. First, export the Canoe .dbc file as XML - you can do this with Vector CANdb++. Next, create a JSON file according to the format defined above, but only define:
+If you use CANoe to store your `gold standard` CAN signal definitions, you may be able to use the OpenXC `xml_to_json.py` script to make your JSON for you. First, export the Canoe .dbc file as XML - you can do this with Vector CANdb++. Next, create a JSON file according to the format defined above, but only define:
 
 - CAN messages.
 - Name of CAN signals within messages and their generic_name.
@@ -156,7 +157,9 @@ $ git submodule update
 $ cp $WD/can-config-generator/build/configuration-generated.cpp src/
 ```
 
-With an AGL SDK environment correctly configured and **sourced**, I suggest you to set the TARGET variable in the root CMakeLists.txt file if you have an AGL target already running in your network.
+### Installation using *make install*
+
+With an AGL SDK environment correctly configured and **sourced**, I suggest you to set the TARGET variable in the CMakeLists.txt file located under _src_ directory if you have an AGL target already running in your network.
 
 Then you can directly build and install the binding and source directory on your target system.
 
@@ -195,6 +198,8 @@ It's because installation remove the binding before installing it.
 
 If it is the first time that you make the installation then you'll have this message in place of _**true**_.
 
+### Installation manually
+
 To install it manually, you need to copy the _low-can-binding.wgt_ file on your target, then from it execute the following commands :
 
 On your host, to copy over the network :
@@ -203,9 +208,9 @@ On your host, to copy over the network :
 $ scp low-can-binding.wgt root@<target_IP>:~
 ```
 
-On the target, assuming _**wgt**_ file is in the root home directory :
+On the target, assuming _**wgt**_ file is in the root home directory:
 
 ```bash
-~# afm-util install low-can-binding.wgt
+# afm-util install low-can-binding.wgt
 { "added": "low-can-binding@0.1" }
 ```
