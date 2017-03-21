@@ -1,7 +1,7 @@
 {
     "title": "Low Level CAN Binding Guide",
-    "description": "Low level CAN bus binder, based upon OpenXC vi-firmware project.",
-    "keywords": "AGL, Development, CAN, binder, OpenXC",
+    "description": "Low level CAN bus binding, based upon OpenXC vi-firmware project.",
+    "keywords": "AGL, Development, CAN, binding, binder, OpenXC",
     "author": "IoT.Bzh Team",
     "website": "http://iot.bzh",
     "published": "March 2017",
