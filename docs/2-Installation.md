@@ -10,6 +10,8 @@ It will produce a _configuration-generated.cpp_ file to paste in the source, _sr
 
 To get the correct SDK version installed, you **must** prepare your environment with the **chinook-next** version. To do so, run the following command in your docker image:
 
+> **NOTE** This command assume that proprietary graphic drivers for Renesas Porter board are located in `/home/devel/share/proprietary-renesas-rcar` directory.
+
 ```bash
 $ prepare_meta -f chinook-next -o /xdt -l /home/devel/mirror -p /home/devel/share/proprietary-renesas-rcar/ -t porter -e wipeconfig -e rm_work
 ```
@@ -17,6 +19,8 @@ $ prepare_meta -f chinook-next -o /xdt -l /home/devel/mirror -p /home/devel/shar
 * Check that you updated git submodules, executing the following commands from this repository:
 
 ```bash
+$ git clone https://github.com/iotbzh/CAN_signaling
+$ cd CAN_signaling
 $ git submodule init
 $ git submodule update
 ```
@@ -39,6 +43,7 @@ $ git submodule update
 You can install any of these using your package manager. For instance, inside the iotbzh's docker image, you must enter this command :
 
 ```bash
+$ sudo apt-get update
 $ sudo apt-get install cmake libboost-system-dev libboost-filesystem-dev libboost-program-options-dev
 ```
 
