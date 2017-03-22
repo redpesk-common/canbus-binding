@@ -117,6 +117,7 @@ add_custom_target(widget ALL DEPENDS ${PROJECT_NAME}.wgt)
 #message(STATUS "Creation of ${PROJECT_NAME}.wgt package for AppFW")
 ###########################################################################
 install(CODE "execute_process(
-	COMMAND scp -r ${CMAKE_SOURCE_DIR} src/${PROJECT_NAME}.wgt ${TARGET}:/tmp
+	COMMAND scp -r src/${PROJECT_NAME}.wgt ${CMAKE_SOURCE_DIR} ${TARGET}:/tmp)"
+	CODE "execute_process(
 	COMMAND ssh ${TARGET} \"/usr/bin/afm-util remove ${PROJECT_NAME}@${PROJECT_VERSION} && /usr/bin/afm-util install /tmp/${PROJECT_NAME}.wgt\")"
 	)
