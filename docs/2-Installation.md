@@ -160,7 +160,7 @@ Execute the following commands from this repository:
 
 ```bash
 $ cd $WD
-$ git clone https://github.com/iotbzh/CAN_signaling
+$ git clone https://github.com/iotbzh/CAN_signaling -b v1.0
 $ cd CAN_signaling
 $ git submodule init
 $ git submodule update

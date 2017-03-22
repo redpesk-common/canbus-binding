@@ -411,7 +411,8 @@ bool diagnostic_manager_t::conflicting(active_diagnostic_request_t* request, act
 }
 
 
-/// @brief Returns true if there are no other active requests to the same arbitration ID.
+/// @brief Returns true if there are no other active requests to the same arbitration ID
+/// and if there aren't more than 8 requests in flight at the same time.
 bool diagnostic_manager_t::clear_to_send(active_diagnostic_request_t* request) const
 {
 	int total_in_flight = 0;
