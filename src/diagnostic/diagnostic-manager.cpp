@@ -426,6 +426,17 @@ bool diagnostic_manager_t::clear_to_send(active_diagnostic_request_t* request) c
 	return true;
 }
 
+int diagnostic_manager_t::reschedule_request(sd_event_source *s, uint64_t usec, active_diagnostic_request_t* adr)
+{
+	usec = usec + (uint64_t)(frequency_clock_t::frequency_to_period(adr->get_frequency_clock().get_frequency())*MICRO);
+	DEBUG(binder_interface, "send_request: Event loop state: %d. usec: %ld", sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
+	if(sd_event_source_set_time(s, usec) >= 0)
+		if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)
+			return 0;
+	sd_event_source_unref(s);
+	return -1;
+}
+
 /// @brief Systemd timer event callback use to send CAN messages at regular interval. Depending
 /// on the diagnostic message frequency.
 ///
@@ -443,38 +454,27 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 	DiagnosticRequest* request = (DiagnosticRequest*)userdata;
 	active_diagnostic_request_t* adr = dm.find_recurring_request(request);
 
-//	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev() && adr->should_send() &&
-//		dm.clear_to_send(adr))
-	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev())
+	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev() && adr->should_send() &&
+		dm.clear_to_send(adr))
 	{
 		adr->get_frequency_clock().tick();
 		start_diagnostic_request(&dm.shims_, adr->get_handle());
-		if(adr->get_handle()->completed)
+		if(adr->get_handle()->completed && !adr->get_handle()->success)
 		{
-			if(!adr->get_handle()->success)
-			{
 				ERROR(binder_interface, "send_request: Fatal error sending diagnostic request");
 				sd_event_source_unref(s);
 				return -1;
-			}
 		}
-		else
-			WARNING(binder_interface, "send_request: There was a problem sending your request using bus %s.", adr->get_can_bus_dev()->get_device_name().c_str());
 
 		adr->get_timeout_clock().tick();
 		adr->set_in_flight(true);
-
-		if(adr->get_recurring())
-		{
-			usec = usec + (uint64_t)(frequency_clock_t::frequency_to_period(adr->get_frequency_clock().get_frequency())*MICRO);
-			DEBUG(binder_interface, "send_request: Event loop state: %d. usec: %ld", sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
-			if(sd_event_source_set_time(s, usec) >= 0)
-				if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)
-					return 0;
-			sd_event_source_unref(s);
-			return -1;
-		}
 	}
+
+	if(adr->get_recurring())
+	{
+		return dm.reschedule_request(s, usec, adr);
+	}
+
 	sd_event_source_unref(s);
 	ERROR(binder_interface, "send_request: Something goes wrong when submitting a new request to the CAN bus");
 	return -2;

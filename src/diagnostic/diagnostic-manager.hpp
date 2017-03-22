@@ -87,6 +87,7 @@ public:
 	// Sendig requests part
 	bool conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const;
 	bool clear_to_send(active_diagnostic_request_t* request) const;
+	int reschedule_request(sd_event_source *s, uint64_t usec, active_diagnostic_request_t* adr);
 	static int send_request(sd_event_source *s, uint64_t usec, void *userdata);
 
 	// Decoding part

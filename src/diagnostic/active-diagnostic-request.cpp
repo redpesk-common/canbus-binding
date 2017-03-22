@@ -155,14 +155,13 @@ bool active_diagnostic_request_t::is_diagnostic_signal(const std::string& name)
 
 /// @brief Check is the request should be sent or not
 ///
-/// @return true if the request isn't already running and not
-/// recurring nor completed, or it is recurring its clock elapsed so it's
-/// time to send another one.
+/// @return true if the request is not running or recurring nor completed,
+/// or it's recurring, its clock elapsed, request was successful
+/// so it's time to send another one.
 bool active_diagnostic_request_t::should_send()
 {
-	return !get_in_flight() && (
-			(!get_recurring() && !request_completed()) ||
-			(get_recurring() && get_frequency_clock().elapsed(true)));
+	return !in_flight_ || (!recurring_ && !request_completed()) ||
+			(recurring_ && frequency_clock_.elapsed(true) && request_completed() && handle_->success);
 }
 
 /// @brief check if the timeout clock has elapsed

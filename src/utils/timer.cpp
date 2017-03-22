@@ -73,7 +73,7 @@ bool frequency_clock_t::started()
 
 time_function_t frequency_clock_t::get_time_function()
 {
-	return time_function_ != nullptr ? time_function_ : system_time_ms;
+	return time_function_ != nullptr ? time_function_ : system_time_us;
 }
 
 bool frequency_clock_t::elapsed(bool stagger)
@@ -82,9 +82,9 @@ bool frequency_clock_t::elapsed(bool stagger)
 	float elapsed_time = 0;
 	if(!started() && stagger)
 		last_tick_ = get_time_function()() - (rand() % int(period));
-	else
-		// Make sure it ticks the the first call
-		elapsed_time = !started() ? period : get_time_function()() - last_tick_;
+
+	// Make sure it ticks the the first call
+	elapsed_time = !started() ? period : get_time_function()() - last_tick_;
 
 	return frequency_ == 0 || elapsed_time >= period;
 }
