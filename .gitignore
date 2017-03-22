@@ -10,6 +10,7 @@
 obj
 build
 bin
+src/configuration-generated.cpp
 docs_doxygen
 node_modules/
 _book/
