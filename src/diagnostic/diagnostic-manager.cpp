@@ -25,6 +25,8 @@
 
 #define MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 10
 #define MAX_SIMULTANEOUS_DIAG_REQUESTS 50
+// There are only 8 slots of in flight diagnostic requests
+#define MAX_SIMULTANEOUS_IN_FLIGHT_REQUESTS 8
 #define TIMERFD_ACCURACY 0
 #define MICRO 1000000
 
@@ -412,17 +414,25 @@ bool diagnostic_manager_t::conflicting(active_diagnostic_request_t* request, act
 /// @brief Returns true if there are no other active requests to the same arbitration ID.
 bool diagnostic_manager_t::clear_to_send(active_diagnostic_request_t* request) const
 {
+	int total_in_flight = 0;
 	for ( auto entry : non_recurring_requests_)
 	{
 		if(conflicting(request, entry))
 			return false;
+		if(entry->get_in_flight())
+			total_in_flight++;
 	}
 
 	for ( auto entry : recurring_requests_)
 	{
 		if(conflicting(request, entry))
 			return false;
+		if(entry->get_in_flight())
+			total_in_flight++;
 	}
+
+	if(total_in_flight > MAX_SIMULTANEOUS_IN_FLIGHT_REQUESTS)
+		return false;
 	return true;
 }
 
