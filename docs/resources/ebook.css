@@ -307,6 +307,10 @@ div.nopb {
     page-break-inside: avoid;
 }
 
+/* justify text */
+p {
+    text-align: justify;
+}
 
 /* page header and footer */
 
