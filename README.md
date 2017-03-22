@@ -8,6 +8,7 @@ As long this binding is based on [OpenXC vi-firmware](https://github.com/openxc/
 The reference documentation of the JSON file can be found [here](https://github.com/openxc/vi-firmware/blob/master/docs/config/reference.rst).
 
 ## Getting started
+
 ### Build requirements
 
 * CMake version 3.0 or later
@@ -19,7 +20,7 @@ The reference documentation of the JSON file can be found [here](https://github.
 
 You can install any of these using your package manager. For instance, inside the iotbzh's docker image, you must enter this command :
 
-	devel@bsp-devkit:~/$ sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-program-options-dev
+	sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-program-options-dev
 
 You may want to install `libboost-all-dev` to get all boost components even if it's not required.
 
@@ -38,7 +39,7 @@ $ mkdir -p build
 $ cd build
 $ cmake -G "Unix Makefiles" ..
 $ make
-</pre>
+```
 
 ### Naming convention
 
@@ -70,7 +71,7 @@ engine.oil.temperature
 engine.torque
 ```
 
-> **NOTE** It's recommended that you follow this naming convention to named your CAN signals.
+> **NOTE** It's recommended that you follow this naming convention to name your CAN signals.
 >
 > There is only character `*` that is forbidden in names because it's used as wildcard for subscription and unsubscrition.
 >
@@ -87,9 +88,10 @@ You can use some basic decoder provided by default by the binding which are:
 ## Generate your config file
 
 To generate your config file you just have to run the generator using the `-m` option to specify your JSON file.
-<pre>
-<b>devel@bsp-devkit:~/projects/can-config-generator/build(master)$</b> can-config-generator -m ../tests/basic.json -o configuration-generated.cpp
-</pre>
+
+```bash
+./can-config-generator -m ../tests/basic.json -o configuration-generated.cpp
+```
 
 If you omit the `-o` option, then code is generated on the stdout.
 You also can specify a header and a footer file.
