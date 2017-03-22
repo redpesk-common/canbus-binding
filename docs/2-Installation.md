@@ -28,7 +28,7 @@ $ /xdt/build/agl-init-build-env
 ### Build requirements
 
 * CMake version 3.0 or later
-* G++, Clang++ or any C++11 complient compiler.
+* G++, Clang++ or any C++11 compliant compiler.
 * Boost
   * filesystem
   * program\_options
@@ -90,7 +90,7 @@ engine.torque
 
 > **NOTE** It's recommended that you follow this naming convention to named your CAN signals.
 >
-> There is only character `*` that is forbidden in names because it's used as wildcard for subscription and unsubscrition.
+> There is only character `*` that is forbidden in names because it's used as wildcard for subscription and unsubscription.
 >
 > This described in the below chapter.
 
@@ -104,7 +104,7 @@ You can use some basic decoder provided by default by the binding which are:
 
 ### Generating JSON from Vector CANoe Database
 
-> **CAUTION** This chapter has not been tested since we haven't necessary automotive tools for that. 
+> **CAUTION** This chapter has not been tested since we haven't necessary automotive tools for that.
 
 If you use CANoe to store your `gold standard` CAN signal definitions, you may be able to use the OpenXC `xml_to_json.py` script to make your JSON for you. First, export the Canoe .dbc file as XML - you can do this with Vector CANdb++. Next, create a JSON file according to the format defined above, but only define:
 
@@ -137,16 +137,16 @@ To generate your config file you just have to run the generator using the `-m` o
 $ ./can-config-generator -m ../tests/basic.json -o configuration-generated.cpp
 ```
 
-If you omit the `-o` option, then code is generated on the stdout.  
-You also can specify a header and a footer file.  
-These files must be valid C++ fragment as long as they will be inserted as is.  
+If you omit the `-o` option, then code is generated on the stdout.
+You also can specify a header and a footer file.
+These files must be valid C++ fragment as long as they will be inserted as is.
 Use the `-h` option to display help.
 
 > **CAUTION:** Each `diagnostic_message` must define the same `bus` as the binding will use only one bus.
 
 ### Supported OpenXC items
 
-About now, compliance with OpenXC reference is in progress, can-config-generator and CAN\_signaling will implement them soon.  
+About now, compliance with OpenXC reference is in progress, can-config-generator and CAN\_signaling will implement them soon.
 `initializers`, `loopers`, `commands` and `handlers` nodes are ignored for now.
 
 This generator will follow OpenXC support status of the low level CAN signaling binding.
