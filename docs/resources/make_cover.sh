@@ -7,8 +7,8 @@ cat cover.svg | sed -e 's/{title}/Low Level CAN binding/' \
     -e 's/{date}/March 2017/g' \
     > /tmp/cover.svg
 
-inkscape --without-gui --export-png=../cover.jpg \
-    --export-background="#ffffff" -w 1800 -h 2360 /tmp/cover.svg
+# use  imagemagick convert tool  (cover size must be 1800x2360)
+convert -resize "1600x2160!" -border 100 -bordercolor white -background white \
+    -flatten -quality 100 /tmp/cover.svg ../cover.jpg
 
-inkscape --without-gui --export-png=../cover_small.jpg \
-    --export-background="#ffffff" -w 200 -h 262 /tmp/cover.svg
+convert -resize "200x262!" ../cover.jpg ../cover_small.jpg
