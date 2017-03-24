@@ -480,7 +480,7 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 		adr->set_in_flight(true);
 	}
 
-	if(adr->get_recurring())
+	if(adr != nullptr && adr->get_recurring())
 	{
 		return dm.reschedule_request(s, usec, adr);
 	}
