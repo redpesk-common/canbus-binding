@@ -166,18 +166,17 @@ void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 /// @param[in] force - Force the cleaning or not ?
 void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, bool force)
 {
-	if((force || (entry->get_in_flight() && entry->request_completed())) && entry != nullptr)
+	if((force || (entry != nullptr && entry->get_in_flight() && entry->request_completed())))
 	{
 		entry->set_in_flight(false);
 
 		char request_string[128] = {0};
 		diagnostic_request_to_string(&entry->get_handle()->request,
 			request_string, sizeof(request_string));
-		if(entry->get_recurring())
+		if(force && entry->get_recurring())
 		{
 			find_and_erase(entry, recurring_requests_);
-			if(force)
-				cancel_request(entry);
+			cancel_request(entry);
 			DEBUG(binder_interface, "cleanup_request: Cancelling completed, recurring request: %s", request_string);
 		}
 		else
