@@ -234,7 +234,7 @@ can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& 
 			};
 
 		DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X",
-								id, format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+								id, (uint8_t)format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 	}
 
 	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data);

@@ -272,13 +272,13 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 
 			find_and_erase(entry, non_recurring_requests_);
 			DEBUG(binder_interface, "Added one-time diagnostic request on bus %s: %s",
-					bus_, request_string);
+					bus_.c_str(), request_string);
 
 			non_recurring_requests_.push_back(entry);
 	}
 	else
 	{
-		WARNING(binder_interface, "There isn't enough request entry. Vector exhausted %d/%d", (int)non_recurring_requests_.size());
+		WARNING(binder_interface, "There isn't enough request entry. Vector exhausted %d/%d", (int)non_recurring_requests_.size(), MAX_SIMULTANEOUS_DIAG_REQUESTS);
 		non_recurring_requests_.resize(MAX_SIMULTANEOUS_DIAG_REQUESTS);
 		added = false;
 	}
@@ -288,7 +288,7 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyHz)
 {
 	if(frequencyHz > MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ) {
-		DEBUG(binder_interface, "Requested recurring diagnostic frequency %d is higher than maximum of %d",
+		DEBUG(binder_interface, "Requested recurring diagnostic frequency %lf is higher than maximum of %d",
 			frequencyHz, MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ);
 		return false;
 	}

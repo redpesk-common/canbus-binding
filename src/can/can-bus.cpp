@@ -246,7 +246,7 @@ int can_bus_t::init_can_dev()
 			}
 		}
 
-		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, t);
+		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, (int)t);
 		return 0;
 	}
 	ERROR(binder_interface, "init_can_dev: Error at CAN device initialization. No devices read from configuration file. Did you specify canbus JSON object ?");
