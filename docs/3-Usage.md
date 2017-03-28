@@ -95,7 +95,7 @@ Once connected, launch `dmesg` command and search which device to use :
 [ 1872.809356] usbcore: registered new interface driver usb_8dev
 ```
 
-Here device is named **can0**.
+Here device is named `can0`.
 
 This instruction assuming a speed of 500000kbps for your CAN bus, you can try others supported bitrate like 125000, 250000 if 500000 doesn't work:
 
@@ -112,13 +112,47 @@ This instruction assuming a speed of 500000kbps for your CAN bus, you can try ot
     clock 16000000
 ```
 
+For a Porter board, you'll have your CAN device as `can1` because `can0` already exists as an embedded device.
+
+The instructions will be the same:
+
+```bash
+# ip link set can1 type can bitrate 500000
+# ip link set can1 up
+# ip link show can1
+  can0: <NOARP,UP,LOWER_UP,ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
+    link/can
+    can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
+    bitrate 500000 sample-point 0.875
+    tq 125 prop-seg 6 phase-seg1 7 phase-seg2 2 sjw 1
+    sja1000: tseg1 1..16 tseg2 1..8 sjw 1..4 brp 1..64 brp-inc 1
+    clock 16000000
+```
+
 ## Configure the binding
 
-Configure the binding specifying in the JSON configuration file the CAN device\(s\) that it will to connect to. Edit file _/var/lib/afm/applications/low-can-binding/0.1/can\_buses.json_ and change the CAN device name to the one you have :
+Configure the binding specifying in the JSON configuration file the CAN device\(s\) that it will to connect to. Edit file _/var/lib/afm/applications/low-can-binding/0.1/can\_buses.json_ and change the CAN device name to the one you will use :
 
+Using virtual CAN device as described in the previous chapter:
+```json
+{
+    "canbus":  "vcan0"
+}
+```
+
+Using real CAN device, this example assume CAN bus traffic will be on can0.
 ```json
 {
     "canbus":  "can0"
+}
+```
+
+On a Porter board there is an embedded CAN device so `can0` already exists.
+
+So you might want to use your USB CAN adapter plugged to the OBD2 connector, in this case use `can1`:
+```json
+{
+    "canbus":  "can1"
 }
 ```
 
@@ -126,11 +160,11 @@ If you have several specify CAN bus devices use an array:
 
 ```json
 {
-    "canbus": [ "vcan0", "can0" ]
+    "canbus": [ "can0", "can1" ]
 }
 ```
 
-> **WARNING:** Make sure the CAN bus\(es\) you specify in your configuration file match those specified in your generated source file with the [can-config-generator](http://github.com/iotbzh/can-config-generator).
+> **CAUTION VERY IMPORTANT:** Make sure the CAN bus\(es\) you specify in your configuration file match those specified in your generated source file with the [can-config-generator](http://github.com/iotbzh/can-config-generator).
 
 ## Run it, test it, use it !
 
@@ -247,11 +281,33 @@ To watch watch going on a CAN bus use:
 # candump can0
 ```
 
+Or for an USB CAN adapter connected to porter board:
+
+```bash
+# candump can1
+```
+
 Send a custom message:
 
 ```bash
 # cansend can0 ID#DDDDAAAATTTTAAAA
 ```
 
+You can also replay a previously dumped CAN logfiles. These logfiles can be found in _can_samples_ directory under Git repository. Following examples use a real trip from an Auris Toyota car.
 
+Trace has been recorded from a CAN device `can0` so you have to map it to the correct one you use for your tests.
 
+Replay on a virtual CAN device `vcan0`:
+```bash
+# canplayer -I trip_test_with_obd2_vehicle_speed_requests vcan0=can0
+```
+
+Replay on a CAN device `can0`:
+```bash
+# canplayer -I trip_test_with_obd2_vehicle_speed_requests can0
+```
+
+Replay on a CAN device `can1` (porter by example):
+```bash
+# canplayer -I trip_test_with_obd2_vehicle_speed_requests can1=can0
+```
