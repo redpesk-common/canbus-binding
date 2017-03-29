@@ -373,11 +373,15 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 			diagnostic_request_to_string(&entry->get_handle()->request, request_string,
 					sizeof(request_string));
 
-			DEBUG(binder_interface, "add_recurring_request: Added recurring diagnostic request (freq: %f) on bus %s: %s",
-					frequencyHz, bus_.c_str(), request_string);
-
 			uint64_t usec;
 			sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_MONOTONIC, &usec);
+
+			DEBUG(binder_interface, "add_recurring_request: Added recurring diagnostic request (freq: %f) on bus %s: (%s) at %ld",
+					frequencyHz,
+					bus_.c_str(),
+					request_string,
+					usec);
+
 			if(sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source,
 					CLOCK_MONOTONIC, usec, TIMERFD_ACCURACY, send_request, request) < 0)
 			{
