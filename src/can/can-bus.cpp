@@ -185,7 +185,8 @@ void can_bus_t::can_event_push()
 				{
 					jo = json_object_new_object();
 					jsonify_simple(s_message, jo);
-					afb_event_push(s[std::string(s_message.name)], jo);
+					if(afb_event_push(s[std::string(s_message.name)], jo) == 0)
+						on_no_clients(std::string(s_message.name));
 				}
 			}
 		}

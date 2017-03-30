@@ -19,6 +19,7 @@
 #pragma once
 
 #include <cstddef>
+#include <string>
 
 extern "C"
 {
@@ -28,3 +29,5 @@ extern "C"
 extern "C" struct afb_binding_interface;
 
 extern const struct afb_binding_interface *binder_interface;
+
+void on_no_clients(std::string message);

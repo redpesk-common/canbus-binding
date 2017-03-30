@@ -18,6 +18,7 @@
 #include "configuration.hpp"
 
 #include "utils/signals.hpp"
+#include "utils/openxc-utils.hpp"
 
 /// @brief Return singleton instance of configuration object.
 configuration_t& configuration_t::instance()
@@ -107,6 +108,23 @@ void configuration_t::find_diagnostic_messages(const openxc_DynamicField &key, s
 			break;
 	}
 	DEBUG(binder_interface, "find_diagnostic_messages: Found %d signal(s)", (int)found_signals.size());
+}
+
+diagnostic_message_t* configuration_t::get_diagnostic_message(std::string message_name) const
+{
+	std::vector<diagnostic_message_t*> found;
+	configuration_t::instance().find_diagnostic_messages(build_DynamicField(message_name), found);
+	return found.front();
+}
+
+DiagnosticRequest* configuration_t::get_request_from_diagnostic_message(diagnostic_message_t* diag_msg) const
+{
+	return new DiagnosticRequest(diag_msg->build_diagnostic_request());
+}
+
+DiagnosticRequest* configuration_t::get_request_from_diagnostic_message(std::string message_name) const
+{
+	return new DiagnosticRequest(get_diagnostic_message(message_name)->build_diagnostic_request());
 }
 
 /// @brief return signals name found searching through CAN signals list.
