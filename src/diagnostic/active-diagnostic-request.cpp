@@ -28,7 +28,7 @@ std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
 
 bool active_diagnostic_request_t::operator==(const active_diagnostic_request_t& b)
 {
-	return (bus_ == b.bus_ && id_ == b.id_ && handle_ == b.handle_) ? true : false;
+	return (bus_ == b.bus_ && id_ == b.id_ && handle_ == b.handle_);
 }
 
 active_diagnostic_request_t& active_diagnostic_request_t::operator=(const active_diagnostic_request_t& adr)
