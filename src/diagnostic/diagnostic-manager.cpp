@@ -374,7 +374,7 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 					sizeof(request_string));
 
 			uint64_t usec;
-			sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_MONOTONIC, &usec);
+			sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_BOOTTIME, &usec);
 
 			DEBUG(binder_interface, "add_recurring_request: Added recurring diagnostic request (freq: %f) on bus %s: (%s) at %ld",
 					frequencyHz,
@@ -383,7 +383,7 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 					usec);
 
 			if(sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source,
-					CLOCK_MONOTONIC, usec, TIMERFD_ACCURACY, send_request, request) < 0)
+					CLOCK_BOOTTIME, usec, TIMERFD_ACCURACY, send_request, request) < 0)
 			{
 				ERROR(binder_interface, "add_recurring_request: Request fails to be schedule through event loop");
 				added = false;
