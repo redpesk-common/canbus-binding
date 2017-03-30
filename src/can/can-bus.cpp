@@ -91,7 +91,6 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
 
 			std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 			push_new_vehicle_message(vehicle_message);
-			new_decoded_can_message_.notify_one();
 			processed_signals++;
 		}
 	}
@@ -121,7 +120,6 @@ int can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const c
 	{
 		std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 		push_new_vehicle_message(vehicle_message);
-		new_decoded_can_message_.notify_one();
 		processed_signals++;
 	}
 
@@ -146,14 +144,20 @@ void can_bus_t::can_decode_message()
 
 	while(is_decoding_)
 	{
-		std::unique_lock<std::mutex> can_message_lock(can_message_mutex_);
-		new_can_message_cv_.wait(can_message_lock);
-		can_message = next_can_message();
+		{
+			std::unique_lock<std::mutex> can_message_lock(can_message_mutex_);
+			new_can_message_cv_.wait(can_message_lock);
+			while(!can_message_q_.empty())
+			{
+				can_message = next_can_message();
 
-		if(configuration_t::instance().get_diagnostic_manager().is_diagnostic_response(can_message))
-			process_diagnostic_signals(configuration_t::instance().get_diagnostic_manager(), can_message);
-		else
-			process_can_signals(can_message);
+				if(configuration_t::instance().get_diagnostic_manager().is_diagnostic_response(can_message))
+					process_diagnostic_signals(configuration_t::instance().get_diagnostic_manager(), can_message);
+				else
+					process_can_signals(can_message);
+			}
+		}
+		new_decoded_can_message_.notify_one();
 	}
 }
 
@@ -169,17 +173,20 @@ void can_bus_t::can_event_push()
 	{
 		std::unique_lock<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 		new_decoded_can_message_.wait(decoded_can_message_lock);
-		v_message = next_vehicle_message();
-
-		s_message = get_simple_message(v_message);
+		while(!vehicle_message_q_.empty())
 		{
-			std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-			std::map<std::string, struct afb_event>& s = get_subscribed_signals();
-			if(s.find(std::string(s_message.name)) != s.end() && afb_event_is_valid(s[std::string(s_message.name)]))
+			v_message = next_vehicle_message();
+
+			s_message = get_simple_message(v_message);
 			{
-				jo = json_object_new_object();
-				jsonify_simple(s_message, jo);
-				afb_event_push(s[std::string(s_message.name)], jo);
+				std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
+				std::map<std::string, struct afb_event>& s = get_subscribed_signals();
+				if(s.find(std::string(s_message.name)) != s.end() && afb_event_is_valid(s[std::string(s_message.name)]))
+				{
+					jo = json_object_new_object();
+					jsonify_simple(s_message, jo);
+					afb_event_push(s[std::string(s_message.name)], jo);
+				}
 			}
 		}
 	}
