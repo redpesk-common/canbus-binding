@@ -369,18 +369,24 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 					wait_for_multiple_responses, decoder, callback, frequencyHz);
 			entry->set_handle(shims_, request);
 
-			char request_string[128] = {0};
-			diagnostic_request_to_string(&entry->get_handle()->request, request_string,
-					sizeof(request_string));
+			//start_diagnostic_request(&shims_, entry->get_handle());
+			//char request_string[128] = {0};
+			//diagnostic_request_to_string(&entry->get_handle()->request, request_string,
+			//		sizeof(request_string));
 
 			uint64_t usec;
 			sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_BOOTTIME, &usec);
+			if(recurring_requests_.size() > 0)
+			{
+				DEBUG(binder_interface, "add_recurring_request: Added 100ms to usec to stagger sending requests");
+				usec += 100000;
+			}
 
-			DEBUG(binder_interface, "add_recurring_request: Added recurring diagnostic request (freq: %f) on bus %s: (%s) at %ld",
+			DEBUG(binder_interface, "add_recurring_request: Added recurring diagnostic request (freq: %f) on bus %s at %ld. Event loop state: %d",
 					frequencyHz,
 					bus_.c_str(),
-					request_string,
-					usec);
+					usec,
+					sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)));
 
 			if(sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source,
 					CLOCK_BOOTTIME, usec, TIMERFD_ACCURACY, send_request, request) < 0)
@@ -468,6 +474,7 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 	DiagnosticRequest* request = (DiagnosticRequest*)userdata;
 	active_diagnostic_request_t* adr = dm.find_recurring_request(request);
 
+	dm.cleanup_active_requests(false);
 	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev() && adr->should_send() &&
 		dm.clear_to_send(adr))
 	{
