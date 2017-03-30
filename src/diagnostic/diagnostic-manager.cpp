@@ -490,7 +490,7 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 	}
 
 	sd_event_source_unref(s);
-	ERROR(binder_interface, "send_request: Something goes wrong when submitting a new request to the CAN bus");
+	NOTICE(binder_interface, "send_request: Request doesn't exist anymore. Canceling.'");
 	return -2;
 }
 

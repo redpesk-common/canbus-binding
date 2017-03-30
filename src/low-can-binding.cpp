@@ -140,16 +140,24 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			// poll a PID for nothing.
 			if(found.front()->get_supported())
 			{
-				float frequency = found.front()->get_frequency();
-				configuration_t::instance().get_diagnostic_manager().add_recurring_request(
-					diag_req, sig.c_str(), false, found.front()->get_decoder(), found.front()->get_callback(), (float)frequency);
-					//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
+				if(subscribe)
+				{
+					float frequency = found.front()->get_frequency();
+					configuration_t::instance().get_diagnostic_manager().add_recurring_request(
+						diag_req, sig.c_str(), false, found.front()->get_decoder(), found.front()->get_callback(), (float)frequency);
+						//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
+				}
+				else
+				{
+					active_diagnostic_request_t* adr = configuration_t::instance().get_diagnostic_manager().find_recurring_request(diag_req);
+					configuration_t::instance().get_diagnostic_manager().cleanup_request(adr, true);
+				}
 			}
 			else
 			{
 				configuration_t::instance().get_diagnostic_manager().cleanup_request(
 					configuration_t::instance().get_diagnostic_manager().find_recurring_request(diag_req), true);
-				DEBUG(binder_interface, "Signal: %s isn't supported. Canceling operation.", sig.c_str());
+				WARNING(binder_interface, "Signal: %s isn't supported. Canceling operation.", sig.c_str());
 				return -1;
 			}
 		}
