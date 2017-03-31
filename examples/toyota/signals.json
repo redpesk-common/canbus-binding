@@ -140,6 +140,13 @@
         },
 		{
             "bus": "can0",
+			"pid": 70,
+			"name": "ambient.air.temperature",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "can0",
 			"pid": 76,
 			"name": "commanded.throttle.position",
 			"frequency": 1,
@@ -170,6 +177,13 @@
             "bus": "can0",
 			"pid": 92,
 			"name": "engine.oil.temperature",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "can0",
+			"pid": 94,
+			"name": "engine.fuel.rate",
 			"frequency": 1,
             "decoder": "decoder_t::decode_obd2_response"
         },
