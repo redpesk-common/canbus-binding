@@ -18,7 +18,7 @@ sudo apt-get install calibre
 To generate Doxygen documentation, you'll need doxygen and graphviz:
 
 ```bash
-sudo apt-get doxygen graphviz
+sudo apt-get install doxygen graphviz
 ```
 
 Prepare your build environment:
