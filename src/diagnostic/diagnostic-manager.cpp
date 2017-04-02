@@ -448,7 +448,7 @@ bool diagnostic_manager_t::clear_to_send(active_diagnostic_request_t* request) c
 
 int diagnostic_manager_t::reschedule_request(sd_event_source *s, uint64_t usec, active_diagnostic_request_t* adr)
 {
-	usec = usec + (uint64_t)(frequency_clock_t::frequency_to_period(adr->get_frequency_clock().get_frequency())*MICRO);
+	usec = usec + (uint64_t)(adr->get_frequency_clock().frequency_to_period());
 	DEBUG(binder_interface, "send_request: Event loop state: %d. usec: %ld", sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
 	if(sd_event_source_set_time(s, usec) >= 0)
 		if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)

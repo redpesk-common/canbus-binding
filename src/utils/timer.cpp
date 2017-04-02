@@ -51,19 +51,19 @@ long long int system_time_s()
 }
 
 frequency_clock_t::frequency_clock_t()
-	: frequency_{10.0}, last_tick_{0}, time_function_{nullptr}
+	: unit_{1000000}, frequency_{10.0}, last_tick_{0}, time_function_{nullptr}
 {}
 
 
 frequency_clock_t::frequency_clock_t(float frequency)
-	: frequency_{frequency}, last_tick_{0}, time_function_{nullptr}
+	: unit_{1000000}, frequency_{frequency}, last_tick_{0}, time_function_{nullptr}
 {}
 
 /// @brief Return the period in ms given the frequency in hertz.
-/// @param[in] frequency - Frequency to convert, in Hertz
-float frequency_clock_t::frequency_to_period(float frequency)
+/// @param[in] frequency - Frequency to convert, in hertz
+float frequency_clock_t::frequency_to_period()
 {
-	return 1 / frequency;
+	return 1 / frequency_ * unit_;
 }
 
 bool frequency_clock_t::started()
@@ -78,7 +78,7 @@ time_function_t frequency_clock_t::get_time_function()
 
 bool frequency_clock_t::elapsed(bool stagger)
 {
-	float period = frequency_to_period(frequency_);
+	float period = frequency_to_period();
 	float elapsed_time = 0;
 	if(!started() && stagger)
 		last_tick_ = get_time_function()() - (rand() % int(period));
