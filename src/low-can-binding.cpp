@@ -139,7 +139,6 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	for(const std::string& sig : signals)
 	{
 		int ret;
-		bool to_subscribe = false;
 		if (active_diagnostic_request_t::is_diagnostic_signal(sig))
 		{
 			diagnostic_message_t* diag_msg = configuration_t::instance().get_diagnostic_message(sig);
@@ -151,7 +150,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			if(diag_msg->get_supported() && subscribe)
 			{
 					float frequency = diag_msg->get_frequency();
-					to_subscribe = configuration_t::instance().get_diagnostic_manager().add_recurring_request(
+					subscribe = configuration_t::instance().get_diagnostic_manager().add_recurring_request(
 						diag_req, sig.c_str(), false, diag_msg->get_decoder(), diag_msg->get_callback(), (float)frequency);
 						//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
 			}
@@ -164,13 +163,11 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			}
 		}
 
-		if(to_subscribe)
-		{
-			ret = subscribe_unsubscribe_signal(request, subscribe, sig);
-			if(ret <= 0)
-				return ret;
-			rets++;
-		}
+		ret = subscribe_unsubscribe_signal(request, subscribe, sig);
+		if(ret <= 0)
+			return ret;
+		rets++;
+
 		DEBUG(binder_interface, "Signal: %s subscribed", sig.c_str());
 	}
 	return rets;
