@@ -48,8 +48,12 @@ const struct afb_binding_interface *binder_interface;
 void on_no_clients(std::string message)
 {
 	DiagnosticRequest* diag_req = configuration_t::instance().get_request_from_diagnostic_message(message);
-	active_diagnostic_request_t* adr = configuration_t::instance().get_diagnostic_manager().find_recurring_request(diag_req);
-	configuration_t::instance().get_diagnostic_manager().cleanup_request(adr, true);
+	if(diag_req != nullptr)
+	{
+		active_diagnostic_request_t* adr = configuration_t::instance().get_diagnostic_manager().find_recurring_request(diag_req);
+		if( adr != nullptr)
+			configuration_t::instance().get_diagnostic_manager().cleanup_request(adr, true);
+	}
 }
 
 ///******************************************************************************

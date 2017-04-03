@@ -114,7 +114,9 @@ diagnostic_message_t* configuration_t::get_diagnostic_message(std::string messag
 {
 	std::vector<diagnostic_message_t*> found;
 	configuration_t::instance().find_diagnostic_messages(build_DynamicField(message_name), found);
-	return found.front();
+	if(! found.empty())
+		return found.front();
+	return nullptr;
 }
 
 DiagnosticRequest* configuration_t::get_request_from_diagnostic_message(diagnostic_message_t* diag_msg) const
@@ -124,7 +126,10 @@ DiagnosticRequest* configuration_t::get_request_from_diagnostic_message(diagnost
 
 DiagnosticRequest* configuration_t::get_request_from_diagnostic_message(std::string message_name) const
 {
-	return new DiagnosticRequest(get_diagnostic_message(message_name)->build_diagnostic_request());
+	diagnostic_message_t* diag_msg = get_diagnostic_message(message_name);
+	if( diag_msg != nullptr)
+		return new DiagnosticRequest(diag_msg->build_diagnostic_request());
+	return nullptr;
 }
 
 /// @brief return signals name found searching through CAN signals list.
