@@ -54,11 +54,11 @@ setc(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Optional dependencies order
 # ---------------------------
-#set(EXTRA_DEPENDENCIES_ORDER target1 target2 ...)
+set(EXTRA_DEPENDENCIES_ORDER can-config-generator low-can-binding)
 
 # Optional Extra global include path
 # -----------------------------------
-#set(EXTRA_INCLUDE_DIRS incdir1 incdir2 ...)
+set(EXTRA_INCLUDE_DIRS can-config-generator/3rdparty/json)
 
 # Optional extra libraries
 # -------------------------
