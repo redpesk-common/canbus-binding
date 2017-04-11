@@ -30,31 +30,31 @@ PROJECT_TARGET_ADD(low-can-binding)
 			add_library(${shortname} STATIC ${sources_files})
 		endif(IS_DIRECTORY ${filename})
 	endforeach()
-	
-	add_library(${PROJECT_NAME} MODULE ${PROJECT_NAME}.cpp configuration.cpp configuration-generated.cpp
+
+	add_library(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp configuration.cpp configuration-generated.cpp
 		can/can-bus.cpp can/can-bus-dev.cpp can/can-message-set.cpp can/can-message-definition.cpp can/can-message.cpp can/can-signals.cpp can/can-decoder.cpp
 		diagnostic/diagnostic-message.cpp diagnostic/diagnostic-manager.cpp diagnostic/active-diagnostic-request.cpp
 		utils/signals.cpp utils/openxc-utils.cpp utils/timer.cpp utils/socket.cpp)
 
 	# Binder exposes a unique public entry point
-	SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES
+	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 	PREFIX ""
 	LINK_FLAGS ${BINDINGS_LINK_FLAG}
-		OUTPUT_NAME ${PROJECT_NAME}
+		OUTPUT_NAME ${TARGET_NAME}
 	)
 
 	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+	TARGET_LINK_LIBRARIES(${TARGET_NAME}
 		${EXTRA_LINK_LIBRARIES}
 		${link_libraries}
 	)
 
 	# installation directory
-	INSTALL(TARGETS ${PROJECT_NAME}
+	INSTALL(TARGETS ${TARGET_NAME}
 		LIBRARY DESTINATION ${BINDINGS_INSTALL_DIR})
 
 	# WGT packaging
-	message(STATUS "Creation of ${PROJECT_NAME}.wgt package for AppFW")
+	message(STATUS "Creation of ${TARGET_NAME}.wgt package for AppFW")
 
 	configure_file(${PROJECT_WGT_DIR}/config.xml config.xml)
 
@@ -68,14 +68,14 @@ PROJECT_TARGET_ADD(low-can-binding)
 	endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_WGT_DIR}/etc")
 
 	add_custom_command(
-		OUTPUT ${PROJECT_NAME}.wgt
-		DEPENDS ${PROJECT_NAME} ${EXTRA_LINK_LIBRARIES} ${conf_files} ${PROJECT_WGT_DIR}/config.xml
+		OUTPUT ${TARGET_NAME}.wgt
+		DEPENDS ${TARGET_NAME} ${EXTRA_LINK_LIBRARIES} ${conf_files} ${PROJECT_WGT_DIR}/config.xml
 		COMMAND rm -rf package
 		COMMAND mkdir -p package/lib package/htdocs package/etc
 		COMMAND cp config.xml package/
 		COMMAND cp ${conf_files} package/etc
 		COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/packaging/wgt/${PROJECT_ICON} package/icon.png
-		COMMAND cp ${PROJECT_NAME}.so package/lib
-		COMMAND wgtpkg-pack -f -o ${PROJECT_NAME}.wgt package
+		COMMAND cp ${TARGET_NAME}.so package/lib
+		COMMAND wgtpkg-pack -f -o ${TARGET_NAME}.wgt package
 	)
-	add_custom_target(widget ALL DEPENDS ${PROJECT_NAME}.wgt)
+	add_custom_target(widget ALL DEPENDS ${TARGET_NAME}.wgt)
