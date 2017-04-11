@@ -1,15 +1,15 @@
-[submodule "src/libs/openxc-message-format"]
-	path = src/libs/openxc-message-format
-	url = https://github.com/openxc/openxc-message-format.git
-[submodule "src/libs/nanopb"]
-	path = src/libs/nanopb
+[submodule "low-can-binding/libs/openxc-message-format"]
+	path = low-can-binding/libs/openxc-message-format
+	url = https://github.com/openxc/openxc-message-format
+[submodule "low-can-binding/libs/nanopb"]
+	path = low-can-binding/libs/nanopb
 	url = https://github.com/nanopb/nanopb.git
-[submodule "src/libs/uds-c"]
-	path = src/libs/uds-c
+[submodule "low-can-binding/libs/uds-c"]
+	path = low-can-binding/libs/uds-c
 	url = https://github.com/openxc/uds-c.git
-[submodule "src/libs/bitfield-c"]
-	path = src/libs/bitfield-c
+[submodule "low-can-binding/libs/bitfield-c"]
+	path = low-can-binding/libs/bitfield-c
 	url = https://github.com/openxc/bitfield-c.git
-[submodule "src/libs/isotp-c"]
-	path = src/libs/isotp-c
-	url = https://github.com/openxc/isotp-c.git
+[submodule "low-can-binding/libs/isotp-c"]
+	path = low-can-binding/libs/isotp-c
+	url = https://github.com/openxc/isotp-c
