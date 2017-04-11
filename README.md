@@ -13,16 +13,6 @@ The reference documentation of the JSON file can be found [here](https://github.
 
 * CMake version 3.0 or later
 * G++, Clang++ or any C++11 complient compiler.
-* Boost
-    * filesystem
-    * program_options
-    * system
-
-You can install any of these using your package manager. For instance, inside the iotbzh's docker image, you must enter this command :
-
-	sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-program-options-dev
-
-You may want to install `libboost-all-dev` to get all boost components even if it's not required.
 
 * Make sure you already set up the AGL SDK using the following [SDK Quick Setup Guide](http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html). Alternatively, please refer to official guides available on [AGL Developer Site](http://docs.automotivelinux.org/docs/devguides/en/dev/#guides).
 

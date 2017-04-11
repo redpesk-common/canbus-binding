@@ -1,11 +1,30 @@
+/*
+ * Copyright (C) 2015, 2016 "IoT.bzh"
+ * Author "Loïc Collignon" <loic.collignon@iot.bzh>
+ * Author "Romain Forlot" <romain.forlot@iot.bzh>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	 http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <libgen.h>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <numeric>
 #include <iterator>
-#include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
 #include <json.hpp>
 #include "openxc/message_set.hpp"
 
@@ -286,98 +305,94 @@ nlohmann::json read_json(const std::string& file)
 	throw std::runtime_error(ss.str());
 }
 
+// function that show the help information
+void showhelpinfo(char *s)
+{
+std::cout<<"Usage:   "<<s<<" <-m inpout.json> [-o configuration-generated.cpp]"<< std::endl;
+std::cout<<"option:  "<<"-m  input.json : JSON file describing CAN messages and signals"<< std::endl;
+std::cout<<"         "<<"-h header.cpp : header source file insert at the beginning of generated file"<< std::endl;
+std::cout<<"         "<<"-f footer.cpp : footer source file append to generated file."<< std::endl;
+std::cout<<"         "<<"-o configuration-generated.cpp : output source file. Name has to be configuration-generated.cpp"<< std::endl;
+}
+
 /// @brief Entry point.
 /// @param[in] argc Argument's count.
 /// @param[in] argv Argument's array.
 /// @return Exit code, zero if success.
-int main(int argc, char** argv)
+int main(int argc, char *argv[])
 {
-	//std::ios::sync_with_stdio(false);
-	
 	try
 	{
-		std::string appName = boost::filesystem::basename(argv[0]);
+		std::string appName = argv[0];
 		std::string message_set_file;
 		std::string output_file;
 		std::string header_file;
 		std::string footer_file;
 
-		namespace bpo = boost::program_options;
-		bpo::options_description desc("Options");
-		desc.add_options()
-			("help,h", "Display this help.")
-			("message-set,m", bpo::value<std::string>(&message_set_file)->required(), "The message set definition file.")
-			("output,o", bpo::value<std::string>(&output_file), "An output file, if not specified stdout is used.")
-			("header,h", bpo::value<std::string>(&header_file), "A file to copy at the top of the generated output.")
-			("footer,f", bpo::value<std::string>(&footer_file), "A file to copy at the end of the generated output.");
-
-		bpo::variables_map vm;
-		try
+		char tmp;
+		/*if the program is ran witout options ,it will show the usgage and exit*/
+		if(argc == 1)
 		{
-			bpo::store(bpo::parse_command_line(argc, argv, desc), vm);
-
-			if (vm.count("help"))
+			showhelpinfo(argv[0]);
+			exit(1);
+		}
+		/*use function getopt to get the arguments with option."hu:p:s:v" indicate 
+		that option h,v are the options without arguments while u,p,s are the
+		options with arguments*/
+		while((tmp=getopt(argc,argv,"m:h:f:o:"))!=-1)
+		{
+			switch(tmp)
 			{
-				std::cout << desc << std::endl;
-				return EXIT_SUCCESS;
+			case 'h':
+				header_file = optarg;
+				break;
+			case 'f':
+				footer_file = optarg;
+				break;
+			case 'm':
+				message_set_file = optarg;
+				break;
+			case 'o':
+				output_file = optarg;
+				break;
+			default:
+				showhelpinfo(argv[0]);
+			break;
 			}
+		}
 
-			bpo::notify(vm);
+		std::stringstream header;
+		header << read_file(header_file);
 
-			std::stringstream header;
-			header << read_file(header_file);
-						
-			std::string footer = read_file(footer_file);
-			openxc::message_set message_set;
-			message_set.from_json(read_json(message_set_file));
+		std::string footer = read_file(footer_file);
+		openxc::message_set message_set;
+		message_set.from_json(read_json(message_set_file));
 
-			boost::filesystem::path message_set_path(message_set_file);
-			message_set_path.remove_filename();
-			for(const auto& s : message_set.extra_sources())
+		std::string message_set_path = dirname(strdup(message_set_file.c_str()));
+		for(const auto& s : message_set.extra_sources())
+		{
+			std::string extra_source = s;
+			extra_source = message_set_path + "/" + extra_source;
+			header << "\n// >>>>> " << s << " >>>>>\n" << read_file(extra_source) << "\n// <<<<< " << s << " <<<<<\n";
+		}
+
+		std::ofstream out;
+		if (output_file.size())
+		{
+			out.open(output_file);
+			if(!out)
 			{
-				boost::filesystem::path extra_source(s);
-				if (!extra_source.is_complete()) extra_source = message_set_path / extra_source;
-				header << "\n// >>>>> " << s << " >>>>>\n" << read_file(extra_source.string()) << "\n// <<<<< " << s << " <<<<<\n";
+				std::stringstream ss;
+				ss << "Can't open the ouput file (" << output_file << ") for writing!";
+				throw std::runtime_error(ss.str());
 			}
-
-			std::ofstream out;
-			if (output_file.size())
-			{
-				out.open(output_file);
-				if(!out)
-				{
-					std::stringstream ss;
-					ss << "Can't open the ouput file (" << output_file << ") for writing!";
-					throw std::runtime_error(ss.str());
-				}
-			}
-			
-			generate(header.str(), footer, message_set, output_file.size() ? out : std::cout); 
-
 		}
-		catch (bpo::required_option& e)
-		{
-			std::cerr << "ERROR: Argument required - " << e.what() << std::endl;
-			std::cout << desc << std::endl;
-			return EXIT_COMMAND_LINE_ERROR;
-		}
-		catch (bpo::error& e)
-		{
-			std::cerr << "ERROR: Command line error - " << e.what() << std::endl;
-			std::cout << desc << std::endl;
-			return EXIT_COMMAND_LINE_ERROR;
-		}
-		catch(std::exception& e)
-		{
-			std::cerr << "ERROR: " << e.what() << std::endl;
-			return EXIT_PROGRAM_ERROR;
-		}
+		generate(header.str(), footer, message_set, output_file.size() ? out : std::cout); 
 	}
 	catch (std::exception& e)
 	{
 		std::cerr << "ERROR: Unhandled exception - " << e.what() << std::endl;
 		return EXIT_UNKNOWN_ERROR;
 	}
-
 	return EXIT_SUCCESS;
 }
