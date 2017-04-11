@@ -1,0 +1,8 @@
+.vs/
+.vscode/
+.kdev4/
+build*/
+*.kdev4
+bin/
+*.vcxproj.user
+obj/

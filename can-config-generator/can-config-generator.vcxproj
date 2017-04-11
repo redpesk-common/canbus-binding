@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="build.sh" />
+    <None Include="LICENSE" />
+    <None Include="README.md" />
+    <None Include="tests\basic.json" />
+    <None Include="tests\signals.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="3rdparty\json\json.hpp" />
+    <ClInclude Include="src\openxc\can_bus.hpp" />
+    <ClInclude Include="src\openxc\can_message.hpp" />
+    <ClInclude Include="src\openxc\command.hpp" />
+    <ClInclude Include="src\openxc\diagnostic_message.hpp" />
+    <ClInclude Include="src\openxc\mapping.hpp" />
+    <ClInclude Include="src\openxc\message_set.hpp" />
+    <ClInclude Include="src\openxc\signal.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\openxc\can_bus.cpp" />
+    <ClCompile Include="src\openxc\can_message.cpp" />
+    <ClCompile Include="src\openxc\command.cpp" />
+    <ClCompile Include="src\openxc\diagnostic_message.cpp" />
+    <ClCompile Include="src\openxc\mapping.cpp" />
+    <ClCompile Include="src\openxc\message_set.cpp" />
+    <ClCompile Include="src\openxc\signal.cpp" />
+    <ClCompile Include="tests\generated.cpp" />
+    <ClCompile Include="tests\handlers.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9dcc61fb-6e10-4d4c-a66d-d694238d4169}</ProjectGuid>
+    <Keyword>Linux</Keyword>
+    <RootNamespace>can_config_generator</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ApplicationType>Linux</ApplicationType>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <TargetLinuxPlatform>Generic</TargetLinuxPlatform>
+    <LinuxProjectType>{FC1A4D80-50E9-41DA-9192-61C0DBAA00D2}</LinuxProjectType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+    <RemoteRootDir>~/agl/projects</RemoteRootDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <ConfigurationType>Makefile</ConfigurationType>
+    <RemoteRootDir>~/agl/projects</RemoteRootDir>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalRemoteCopySources>false</LocalRemoteCopySources>
+    <NMakeIncludeSearchPath>D:\home\ctxnop\agl\sdk\porter\sysroots\cortexa15hf-neon-agl-linux-gnueabi\usr\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <RemoteBuildCommandLine>$(RemoteProjectDir)/build.sh build bin/$(PlatformTarget)/$(Configuration) $(Configuration)</RemoteBuildCommandLine>
+    <RemoteReBuildCommandLine>$(RemoteProjectDir)/build.sh rebuild bin/$(PlatformTarget)/$(Configuration) $(Configuration)</RemoteReBuildCommandLine>
+    <RemoteCleanCommandLine>$(RemoteProjectDir)/build.sh clean bin/$(PlatformTarget)/$(Configuration)</RemoteCleanCommandLine>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalRemoteCopySources>false</LocalRemoteCopySources>
+    <NMakeIncludeSearchPath>D:\home\ctxnop\agl\sdk\porter\sysroots\cortexa15hf-neon-agl-linux-gnueabi\usr\include;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <RemoteBuildCommandLine>$(RemoteProjectDir)/build.sh build bin/$(PlatformTarget)/$(Configuration) $(Configuration)</RemoteBuildCommandLine>
+    <RemoteReBuildCommandLine>$(RemoteProjectDir)/build.sh rebuild bin/$(PlatformTarget)/$(Configuration) $(Configuration)</RemoteReBuildCommandLine>
+    <RemoteCleanCommandLine>$(RemoteProjectDir)/build.sh clean bin/$(PlatformTarget)/$(Configuration)</RemoteCleanCommandLine>
+  </PropertyGroup>
+  <ItemDefinitionGroup />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
