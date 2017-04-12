@@ -39,7 +39,7 @@ set (PKG_REQUIRED_LIST
 
 # Static constante definition
 # -----------------------------
-add_compile_options(-D_REENTRANT)
+add_compile_options(-D_REENTRANT -std=c++11)
 add_compile_options(-DPB_FIELD_16BIT)
 
 # LANG Specific compile flags set for all build types
