@@ -200,6 +200,12 @@ setc(CMAKE_C_FLAGS_PROFILING   "-g -O2 -pg -Wp,-U_FORTIFY_SOURCE")
 setc(CMAKE_C_FLAGS_DEBUG       "-g -O2 -ggdb -Wp,-U_FORTIFY_SOURCE")
 setc(CMAKE_C_FLAGS_RELEASE     "-O2")
 setc(CMAKE_C_FLAGS_CCOV        "-g -O2 --coverage")
+
+set(CMAKE_CXX_FLAGS_PROFILING    "-g -O0 -std=c++11 -pg -Wp,-U_FORTIFY_SOURCE")
+set(CMAKE_CXX_FLAGS_DEBUG        "-g -O0 -std=c++11 -ggdb -Wp,-U_FORTIFY_SOURCE")
+set(CMAKE_CXX_FLAGS_RELEASE      "-g -O2 -std=c++11")
+set(CMAKE_CXX_FLAGS_CCOV "-g -O2 -std=c++11 --coverage")
+
 setc(CMAKE_INSTALL_PREFIX      "${CMAKE_SOURCE_DIR}/Install")
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be en env variable]
