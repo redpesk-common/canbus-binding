@@ -225,9 +225,9 @@ void generate(const std::string& header, const std::string& footer, const openxc
 		<< "	{\n";
 		std::uint32_t message_count = message_set.messages().size();
 		std::uint32_t index = 0;
+		out << "		{\n";
 		for(const openxc::can_message& m : message_set.messages())
 		{
-			out << "		{\n";
 			std::uint32_t signal_count = m.signals().size();
 			for(const openxc::signal& s : m.signals())
 			{
@@ -236,11 +236,10 @@ void generate(const std::string& header, const std::string& footer, const openxc
 				--signal_count;
 				out << '\n';
 			}
-			out << "		}";
 			if (index + 1 < message_count) out << ',';
 			++index;
-			out << '\n';
 		}
+		out << "		}\n";
 		out << "	}\n"
 			<< "	, diagnostic_messages_\n"
 			<< "	{\n"
