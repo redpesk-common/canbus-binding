@@ -1,8 +1,22 @@
-# Low level CAN signaling binder
+# CAN signaling binder
 
-Low level CAN bus binder, based upon OpenXC vi-firmware project.
+CAN bus binder, based upon OpenXC vi-firmware project.
+
+There are 2 separated projects here, one with the CAN-binder that is installed
+on an AGL target and the CAN config generator used to generate a source file for
+the low level binding.
 
 Full document can be found under `docs` directory.
+
+# Fast build procedure
+
+Just use build.sh script:
+
+```bash
+./build.sh
+```
+
+This will build both projects under build directory for each of them.
 
 # Generate documentation
 

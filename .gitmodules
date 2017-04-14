@@ -1,15 +1,15 @@
 [submodule "low-can-binding/libs/openxc-message-format"]
-	path = libs/openxc-message-format
+	path = CAN-binder/libs/openxc-message-format
 	url = https://github.com/openxc/openxc-message-format
 [submodule "low-can-binding/libs/nanopb"]
-	path = libs/nanopb
+	path = CAN-binder/libs/nanopb
 	url = https://github.com/nanopb/nanopb.git
 [submodule "low-can-binding/libs/uds-c"]
-	path = libs/uds-c
+	path = CAN-binder/libs/uds-c
 	url = https://github.com/openxc/uds-c.git
 [submodule "low-can-binding/libs/bitfield-c"]
-	path = libs/bitfield-c
+	path = CAN-binder/libs/bitfield-c
 	url = https://github.com/openxc/bitfield-c.git
 [submodule "low-can-binding/libs/isotp-c"]
-	path = libs/isotp-c
+	path = CAN-binder/libs/isotp-c
 	url = https://github.com/openxc/isotp-c

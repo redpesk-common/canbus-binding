@@ -22,14 +22,14 @@ PROJECT_TARGET_ADD(can-config-generator)
 
 	# Define project Targets
 	add_executable(can-config-generator
-		src/main.cpp
-		src/openxc/message_set.cpp
-		src/openxc/can_bus.cpp
-		src/openxc/can_message.cpp
-		src/openxc/command.cpp
-		src/openxc/diagnostic_message.cpp
-		src/openxc/mapping.cpp
-		src/openxc/signal.cpp)
+		main.cpp
+		openxc/message_set.cpp
+		openxc/can_bus.cpp
+		openxc/can_message.cpp
+		openxc/command.cpp
+		openxc/diagnostic_message.cpp
+		openxc/mapping.cpp
+		openxc/signal.cpp)
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(can-config-generator
@@ -38,4 +38,4 @@ PROJECT_TARGET_ADD(can-config-generator)
 
 	# installation directory
 	INSTALL(TARGETS can-config-generator
-		RUNTIME DESTINATION ${BINDINGS_INSTALL_DIR})
+RUNTIME DESTINATION ${BINDINGS_INSTALL_DIR})
