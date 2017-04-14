@@ -17,15 +17,13 @@
 ###########################################################################
 
 # Add target to project dependency list
-
-
-	fill_include_dir(${CMAKE_CURRENT_SOURCE_DIR})
-	file(GLOB filelist "${CMAKE_CURRENT_SOURCE_DIR}/*")
-	foreach(filename ${filelist})
-		if(IS_DIRECTORY ${filename})
-			STRING(REGEX REPLACE "^.*\/(.*)$" "\\1" shortname ${filename})
-			find_source_files(${filename})
-			PROJECT_TARGET_ADD(${shortname})
-			add_library(${shortname} STATIC ${sources_files})
-		endif(IS_DIRECTORY ${filename})
-	endforeach()
+fill_include_dir(${CMAKE_CURRENT_SOURCE_DIR})
+file(GLOB filelist "${CMAKE_CURRENT_SOURCE_DIR}/*")
+foreach(filename ${filelist})
+	if(IS_DIRECTORY ${filename})
+		STRING(REGEX REPLACE "^.*\/(.*)$" "\\1" shortname ${filename})
+		find_source_files(${filename})
+		PROJECT_TARGET_ADD(${shortname})
+		add_library(${shortname} STATIC ${sources_files})
+	endif(IS_DIRECTORY ${filename})
+endforeach()

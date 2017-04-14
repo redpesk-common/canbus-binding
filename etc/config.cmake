@@ -42,8 +42,12 @@ set (PKG_REQUIRED_LIST
 add_compile_options(-D_REENTRANT)
 add_compile_options(-DPB_FIELD_16BIT)
 
+# LANG Specific compile flags set for all build types
+set(CMAKE_C_FLAGS "")
+set(CMAKE_CXX_FLAGS "-std=c++11")
+
 # Print a helper message when every thing is finished
-setc(CLOSING_MESSAGE "Test with: afb-daemon --ldpaths=\$\$(pwd)/package/lib --port=1234 --roothttp=\$\$(pwd)/package/htdocs --tracereq=common --token=\"\" --verbose")
+setc(CLOSING_MESSAGE "Test with: afb-daemon --ldpaths=\$\$(pwd)/low-can-binding/package/lib --port=1234 --roothttp=\$\$(pwd)/package/htdocs --tracereq=common --token=\"\" --verbose")
 # ----------------------------------------------------
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
@@ -54,7 +58,7 @@ setc(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Optional dependencies order
 # ---------------------------
-set(EXTRA_DEPENDENCIES_ORDER can-config-generator openxc-libs low-can-binding)
+set(EXTRA_DEPENDENCIES_ORDER can-config-generator low-can-binding)
 
 # Optional Extra global include path
 # -----------------------------------
