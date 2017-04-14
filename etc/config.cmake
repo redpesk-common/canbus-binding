@@ -18,7 +18,7 @@
 
 # Project Info
 # ------------------
-set(NAME low-can-binding)
+set(NAME low-can-project)
 set(VERSION "1.0")
 set(PRETTY_NAME "Low level CAN binding")
 set(DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
@@ -54,15 +54,15 @@ setc(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Optional dependencies order
 # ---------------------------
-set(EXTRA_DEPENDENCIES_ORDER can-config-generator low-can-binding)
+set(EXTRA_DEPENDENCIES_ORDER can-config-generator openxc-libs low-can-binding)
 
 # Optional Extra global include path
 # -----------------------------------
-set(EXTRA_INCLUDE_DIRS can-config-generator/3rdparty/json)
+#set(EXTRA_INCLUDE_DIRS can-config-generator/3rdparty/json libs/openxc-message-format/gen/cpp libs/nanopb libs/uds-c/src libs/isotp-c/src libs/bitfield-c/src)
 
 # Optional extra libraries
 # -------------------------
-set(EXTRA_LINK_LIBRARIES nanopb bitfield-c isotp-c uds-c openxc-message-format)
+#set(EXTRA_LINK_LIBRARIES)
 
 # Optional force binding installation
 # ------------------------------------

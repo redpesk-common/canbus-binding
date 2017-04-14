@@ -2,6 +2,7 @@
 # Copyright 2015, 2016, 2017 IoT.bzh
 #
 # author: Fulup Ar Foll <fulup@iot.bzh>
+# contrib: Romain Forlot <romain.forlot@iot.bzh>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,6 +42,7 @@ macro(setc name value)
 	endif(NOT DEFINED ${name})
 endmacro(setc)
 
+# Dumb macro to add each directory under a path. Make sure we grab all header files!
 macro(fill_include_dir path)
 	file(GLOB_RECURSE dirlist LIST_DIRECTORIES true "${path}/*")
 	foreach(filename ${dirlist})
@@ -50,6 +52,7 @@ macro(fill_include_dir path)
 	endforeach()
 endmacro(fill_include_dir)
 
+# Helper function to retrieve source files from a library repo.
 function(find_source_files path)
 	file(GLOB_RECURSE filelist "${path}/*.[cpx]")
 	foreach(filename ${filelist})
@@ -59,6 +62,90 @@ function(find_source_files path)
 	endforeach()
 	set(sources_files ${sources} PARENT_SCOPE)
 endfunction(find_source_files)
+
+# WGT packaging function. TYPE can be HTML5, NATIVE, HTML5-HYBRID or BINDING
+macro(build_widget type)
+	message(STATUS "Creation of ${TARGET_NAME}.wgt package for AppFW")
+
+	configure_file(${PROJECT_WGT_DIR}/config.xml config.xml)
+
+	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_WGT_DIR}/etc")
+		file(GLOB conf_files "${PROJECT_WGT_DIR}/etc/*")
+		foreach(filename ${conf_files})
+			STRING(REGEX REPLACE "^.*/(.*)$" "\\1" shortname ${filename})
+			message(STATUS "Copying config file ${shortname}")
+			configure_file(${filename} ${shortname})
+		endforeach()
+	endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_WGT_DIR}/etc")
+
+	# Include HTML5 files to be packaged
+	if(${type} STREQUAL "HTML5")
+		file(GLOB_RECURSE HTML5FILES app/*)
+
+		if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/gulpfile.js")
+			set(HTML5FILES ${HTML5FILES} "${CMAKE_CURRENT_SOURCE_DIR}/gulpfile.js")
+		endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/gulpfile.js")
+
+		if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/bower.json")
+			set(HTML5FILES ${HTML5FILES} "${CMAKE_CURRENT_SOURCE_DIR}/bower.json")
+		endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/bower.json")
+
+		if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/package.json")
+			set(HTML5FILES ${HTML5FILES} "${CMAKE_CURRENT_SOURCE_DIR}/package.json")
+		endif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/package.json")
+	endif(${type} STREQUAL "HTML5")
+
+	if(${type} STREQUAL "HTML5")
+		add_custom_command(
+			OUTPUT ${TARGET_NAME}.wgt
+			DEPENDS ${HTML5FILES} ${PROJECT_WGT_DIR}/config.xml
+			COMMAND rm -rf package
+			COMMAND mkdir -p package/lib package/htdocs package/etc package/bin
+			COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && gulp widget-config-prod
+			COMMAND cp -a dist.prod/* ${CMAKE_CURRENT_BINARY_DIR}/package/htdocs
+		)
+	endif(${type} STREQUAL "HTML5")
+
+	if(${type} STREQUAL "HTML5-HYBRID")
+		add_custom_command(
+			OUTPUT ${TARGET_NAME}.wgt
+			DEPENDS ${HTML5FILES} ${PROJECT_WGT_DIR}/config.xml 
+			COMMAND rm -rf package
+			COMMAND mkdir -p package/lib package/htdocs package/etc package/bin
+			COMMAND cp ${TARGET_NAME}.so package/lib
+		)
+	endif(${type} STREQUAL "HTML5-HYBRID")
+
+	if(${type} STREQUAL "BINDING")
+		add_custom_command(
+			OUTPUT ${TARGET_NAME}.wgt
+			DEPENDS ${PROJECT_WGT_DIR}/config.xml
+			COMMAND rm -rf package
+			COMMAND mkdir -p package/lib package/htdocs package/etc package/bin
+			COMMAND cp ${TARGET_NAME}.so package/lib
+		)
+	endif(${type} STREQUAL "BINDING")
+
+	if(${type} STREQUAL "NATIVE")
+		add_custom_command(
+			OUTPUT ${TARGET_NAME}.wgt
+			DEPENDS ${PROJECT_WGT_DIR}/config.xml
+			COMMAND rm -rf package
+			COMMAND mkdir -p package/lib package/htdocs package/etc package/bin
+			COMMAND cp ${TARGET_NAME} package/bin
+		)
+	endif(${type} STREQUAL "NATIVE")
+
+	add_custom_command(
+		OUTPUT ${TARGET_NAME}.wgt
+		COMMAND cp config.xml package/
+		COMMAND cp ${conf_files} package/etc
+		COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/packaging/wgt/${PROJECT_ICON} package/icon.png
+		COMMAND wgtpkg-pack -f -o ${TARGET_NAME}.wgt package
+		APPEND
+	)
+	add_custom_target(widget ALL DEPENDS ${TARGET_NAME}.wgt)
+endmacro()
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 setc(CMAKE_BUILD_TYPE Debug)
@@ -138,7 +225,9 @@ ENDIF(HAVE_LIBEFENCE)
 ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
 # set default include directories
-INCLUDE_DIRECTORIES(${EXTRA_INCLUDE_DIRS})
+#INCLUDE_DIRECTORIES(${EXTRA_INCLUDE_DIRS})
+# Brutal but efficace:
+fill_include_dir(${CMAKE_CURRENT_SOURCE_DIR})
 
 # If no install dir try to guest some smart default
 if(BINDINGS_INSTALL_PREFIX)
@@ -154,7 +243,7 @@ endif()
 
 # Bindings to compile
 # --------------------
-file(GLOB filelist "[A-z]*")
+file(GLOB filelist "*")
 foreach(filename ${filelist})
 if(EXISTS "${filename}/CMakeLists.txt")
 	add_subdirectory(${filename})
