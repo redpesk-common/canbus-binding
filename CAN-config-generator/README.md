@@ -99,6 +99,7 @@ The `buses` item will not be supported by this generator because the binding use
 ## Known issues
 
 * Each `diagnostic_message` must define the same `bus` as the binding will use only one bus.
+* Only 1 messages_set is used
 
 ## Dependencies
 
