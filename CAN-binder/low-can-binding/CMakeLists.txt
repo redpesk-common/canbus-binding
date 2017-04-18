@@ -24,7 +24,7 @@ PROJECT_TARGET_ADD(low-can-binding)
 	add_library(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp configuration.cpp configuration-generated.cpp
 		can/can-bus.cpp can/can-bus-dev.cpp can/can-message-set.cpp can/can-message-definition.cpp can/can-message.cpp can/can-signals.cpp can/can-decoder.cpp
 		diagnostic/diagnostic-message.cpp diagnostic/diagnostic-manager.cpp diagnostic/active-diagnostic-request.cpp
-		utils/signals.cpp utils/openxc-utils.cpp utils/timer.cpp utils/socket.cpp)
+		utils/signals.cpp utils/openxc-utils.cpp utils/timer.cpp utils/socket.cpp utils/config-parser.cpp)
 
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
@@ -40,6 +40,7 @@ PROJECT_TARGET_ADD(low-can-binding)
 		uds-c
 		isotp-c
 		bitfield-c
+		inih
 		${link_libraries}
 	)
 

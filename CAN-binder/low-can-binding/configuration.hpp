@@ -43,10 +43,7 @@
 class configuration_t
 {
 	private:
-		can_bus_t can_bus_manager_ = can_bus_t(
-			afb_daemon_rootdir_open_locale(
-				binder_interface->daemon, "etc/can_buses.json", O_RDONLY, NULL)); ///< instanciate the CAN bus
-				///< This will read the configuration file and initialize all CAN devices specified in it.
+		can_bus_t can_bus_manager_; ///< instanciate the CAN bus manager. It's the one in charge of initialize the CAN bus devices.
 		diagnostic_manager_t diagnostic_manager_; ///< Diagnostic manager use to manage diagnostic message communication.
 		uint8_t active_message_set_ = 0; ///< Which is the active message set ? Default to 0.
 

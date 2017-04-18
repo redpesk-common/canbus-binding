@@ -27,6 +27,7 @@
 #include "openxc.pb.h"
 #include "can-message.hpp"
 #include "can-bus-dev.hpp"
+#include "../utils/config-parser.hpp"
 #include "../diagnostic/active-diagnostic-request.hpp"
 
 #include "../low-can-binding.hpp"
@@ -48,7 +49,7 @@
 class can_bus_t
 {
 private:
-	int conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
+	utils::config_parser_t& conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
 
 	void can_decode_message();
 	std::thread th_decoding_; ///< thread that'll handle decoding a can frame
@@ -69,7 +70,7 @@ private:
 	static std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_devices_; ///< Can device map containing all can_bus_dev_t objects initialized during init_can_dev function
 
 public:
-	can_bus_t(int conf_file);
+	can_bus_t(utils::config_parser_t conf_file);
 	can_bus_t(can_bus_t&&);
 
 	int init_can_dev();

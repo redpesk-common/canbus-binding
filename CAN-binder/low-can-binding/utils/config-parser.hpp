@@ -23,21 +23,23 @@
 #include <json-c/json.h>
 
 #include <string>
+#include <vector>
+#include "INIReader.h"
 
 namespace utils
 {
+	/// @brief A configuration file parser that handle INI configuration
+	/// file format.
 	class config_parser_t
 	{
 	private:
-		int conf_file_; /*!< conf_file_ - file that handle the binding configuration file */
-		std::string config_content_; /*!< config_content_ - String that contains the content of config file */
-		std::vector<std::string> devices_name_; /*!< devices_name - Found devices name after reading configuration file */
+		INIReader config_content_; /*!< config_content_ - Parsed content of INI file.*/
 
-		void parse_devices_name();
 	public:
 		config_parser_t(int conf_file);
+		config_parser_t(std::string conf_file);
 
-		void read_conf();
-		std::vector<std::string> get_devices_name();
+		bool check_conf();
+		const std::vector<std::string> get_devices_name();
 	};
 }

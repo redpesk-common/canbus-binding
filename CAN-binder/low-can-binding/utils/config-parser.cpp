@@ -15,57 +15,37 @@
  * limitations under the License.
  */
 
+#include "config-parser.hpp"
+
+#include "../low-can-binding.hpp"
+
 namespace utils
 {
-	config_parser_t::config_parser_t(int conf_file)
-		: conf_file_{conf_file}, devices_name{}
-	{}
-
-	/// @brief read the conf_file_ and will parse json objects
-	/// in it searching for canbus objects devices name.
+	/// @brief constructor using a POSIX file handle as input.
 	///
-	/// @return Vector of can bus device name string.
-	void can_bus_t::read_conf()
+	/// @param conf_file - a POSIX file handle to the INI configuration file
+	config_parser_t::config_parser_t(int conf_file)
+		: config_content_(fdopen(conf_file, "r"))
 	{
-		FILE *fd = fdopen(conf_file_, "r");
-		if (fd)
-		{
-			std::fseek(fd, 0, SEEK_END);
-			config_content_.resize(std::ftell(fd));
-			std::rewind(fd);
-			std::fread(&config_content_[0], 1, config_content_.size(), fd);
-			std::fclose(fd);
-
-			DEBUG(binder_interface, "Configuration file content : %s", config_content_.c_str());
-		}
-		ERROR(binder_interface, "Problem at reading the conf file");
+		::close(conf_file);
 	}
 
-	void parse_devices_name()
+	/// @brief constructor using path to file
+	config_parser_t::config_parser_t(std::string conf_file)
+		: config_content_{INIReader(conf_file)}
+	{}
+
+	/// @brief read the conf_file_ and parse it into an INIReader object
+	/// to search into later.
+	bool config_parser_t::check_conf()
 	{
-		json_object *jo, *canbus;
-		const char* taxi;
-
-		jo = json_tokener_parse(config_content_.c_str());
-
-			if (jo == NULL || !json_object_object_get_ex(jo, "canbus", &canbus))
-			{
-				ERROR(binder_interface, "Can't find canbus node in the configuration file. Please review it.");
-				devices_name_.clear();
-			}
-			else if (json_object_get_type(canbus) != json_type_array)
-			{
-				taxi = json_object_get_string(canbus);
-				DEBUG(binder_interface, "Can bus found: %s", taxi);
-				devices_name_.push_back(std::string(taxi));
-			}
-			else
-			{
-				int n, i;
-				n = json_object_array_length(canbus);
-				for (i = 0 ; i < n ; i++)
-					devices_name_.push_back(json_object_get_string(json_object_array_get_idx(canbus, i)));
-			}
+		if (config_content_.ParseError() < 0)
+		{
+			ERROR(binder_interface, "read_conf: Can't load the INI config file.");
+			return false;
+		}
+			DEBUG(binder_interface, "read_conf: Configuration file parsed");
+			return true;
 	}
 
 	/// @brief Public method to access devices_name_ vector. If vector size equal 0
@@ -74,11 +54,24 @@ namespace utils
 	/// have to test the returned value.
 	///
 	/// @return A const vector with string of linux CAN devices.
-	const std::vector<std::string>& get_devices_name()
+	const std::vector<std::string> config_parser_t::get_devices_name()
 	{
-		if(devices_name_.empty())
-			parse_devices_name();
+		std::vector<std::string> devices_name;
 
-		return devices_name_;
+		std::set<std::string> sections = config_content_.GetSections();
+		for(const auto& sectionsIt : sections)
+		{
+			if(sectionsIt == "CANbus-mapping")
+			{
+				std::set<std::string> fields = config_content_.GetFields(sectionsIt);
+				for(const auto& fieldsIt : fields)
+				{
+					std::string val = config_content_.Get(sectionsIt, fieldsIt, "INVALID");
+					devices_name.push_back(val);
+				}	
+			}
+		}
+
+		return devices_name;
 	}
 }

@@ -13,3 +13,6 @@
 [submodule "low-can-binding/libs/isotp-c"]
 	path = CAN-binder/libs/isotp-c
 	url = https://github.com/openxc/isotp-c
+[submodule "CAN-binder/libs/inih"]
+	path = CAN-binder/libs/inih
+	url = git@github.com:claneys/inih.git

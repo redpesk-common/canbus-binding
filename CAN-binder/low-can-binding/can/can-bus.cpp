@@ -43,10 +43,9 @@ extern "C"
 /// @brief Class constructor
 ///
 /// @param[in] conf_file - handle to the json configuration file.
-can_bus_t::can_bus_t(int conf_file)
+can_bus_t::can_bus_t(utils::config_parser_t conf_file)
 	: conf_file_{conf_file}
-{
-}
+{}
 
 std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::can_devices_;
 
@@ -231,82 +230,37 @@ int can_bus_t::init_can_dev()
 	int i = 0;
 	size_t t;
 
-	devices_name = read_conf();
-
-	if (! devices_name.empty())
+	if(conf_file_.check_conf())
 	{
-		t = devices_name.size();
-
-		for(const auto& device : devices_name)
+		devices_name = conf_file_.get_devices_name();
+		if (! devices_name.empty())
 		{
-			can_bus_t::can_devices_[device] = std::make_shared<can_bus_dev_t>(device, i);
-			if (can_bus_t::can_devices_[device]->open() == 0)
+			t = devices_name.size();
+
+			for(const auto& device : devices_name)
 			{
-				DEBUG(binder_interface, "Start reading thread");
-				NOTICE(binder_interface, "%s device opened and reading", device.c_str());
-				can_bus_t::can_devices_[device]->start_reading(*this);
-				i++;
+				can_bus_t::can_devices_[device] = std::make_shared<can_bus_dev_t>(device, i);
+				if (can_bus_t::can_devices_[device]->open() == 0)
+				{
+					DEBUG(binder_interface, "Start reading thread");
+					NOTICE(binder_interface, "%s device opened and reading", device.c_str());
+					can_bus_t::can_devices_[device]->start_reading(*this);
+					i++;
+				}
+				else
+				{
+					ERROR(binder_interface, "Can't open device %s", device.c_str());
+					return 1;
+				}
 			}
-			else
-			{
-				ERROR(binder_interface, "Can't open device %s", device.c_str());
-				return 1;
-			}
+			NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, (int)t);
+			return 0;
 		}
-
-		NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, (int)t);
-		return 0;
+		ERROR(binder_interface, "init_can_dev: Error at CAN device initialization. No devices read from configuration file");
+		return 1;
 	}
-	ERROR(binder_interface, "init_can_dev: Error at CAN device initialization. No devices read from configuration file. Did you specify canbus JSON object ?");
-	return 1;
-}
-
-/// @brief read the conf_file_ and will parse json objects
-/// in it searching for canbus objects devices name.
-///
-/// @return Vector of can bus device name string.
-std::vector<std::string> can_bus_t::read_conf()
-{
-	std::vector<std::string> ret;
-	json_object *jo, *canbus;
-	int n, i;
-	const char* taxi;
-
-	FILE *fd = fdopen(conf_file_, "r");
-	if (fd)
-	{
-		std::string fd_conf_content;
-		std::fseek(fd, 0, SEEK_END);
-		fd_conf_content.resize(std::ftell(fd));
-		std::rewind(fd);
-		std::fread(&fd_conf_content[0], 1, fd_conf_content.size(), fd);
-		std::fclose(fd);
-
-		DEBUG(binder_interface, "Configuration file content : %s", fd_conf_content.c_str());
-		jo = json_tokener_parse(fd_conf_content.c_str());
-
-		if (jo == NULL || !json_object_object_get_ex(jo, "canbus", &canbus))
-		{
-			ERROR(binder_interface, "Can't find canbus node in the configuration file. Please review it.");
-			ret.clear();
-		}
-		else if (json_object_get_type(canbus) != json_type_array)
-		{
-			taxi = json_object_get_string(canbus);
-			DEBUG(binder_interface, "Can bus found: %s", taxi);
-			ret.push_back(std::string(taxi));
-		}
-		else
-		{
-			n = json_object_array_length(canbus);
-			for (i = 0 ; i < n ; i++)
-				ret.push_back(json_object_get_string(json_object_array_get_idx(canbus, i)));
-		}
-		return ret;
-	}
-	ERROR(binder_interface, "Problem at reading the conf file");
-	ret.clear();
-	return ret;
+	ERROR(binder_interface, "init_can_dev: Can't read INI configuration file");
+	return 2;
 }
 
 /// @brief return new_can_message_cv_ member
