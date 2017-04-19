@@ -2,7 +2,7 @@
 #include "can/can-decoder.hpp"
 
 configuration_t::configuration_t()
-	: can_bus_manager_(utils::config_parser_t("/etc/dev-mapping.conf"))
+	:can_bus_manager_{utils::config_parser_t{"/etc/dev-mapping.conf"}}
 	, can_message_set_{{0, "example", 0, 1, 5, 0, 20}}
 	, can_message_definition_
 	{
