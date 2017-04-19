@@ -17,11 +17,6 @@
 
 #pragma once
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <json-c/json.h>
-
 #include <string>
 #include <vector>
 #include "ini-config.hpp"

@@ -19,10 +19,7 @@
 #include <cerrno>
 #include <vector>
 #include <string>
-#include <fcntl.h>
-#include <unistd.h>
 #include <net/if.h>
-#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <json-c/json.h>
 #include <linux/can/raw.h>
