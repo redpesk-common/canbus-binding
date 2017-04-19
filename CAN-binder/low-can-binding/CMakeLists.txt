@@ -35,12 +35,12 @@ PROJECT_TARGET_ADD(low-can-binding)
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
+		ini-config
 		openxc-message-format
 		nanopb
 		uds-c
 		isotp-c
 		bitfield-c
-		inih
 		${link_libraries}
 	)
 

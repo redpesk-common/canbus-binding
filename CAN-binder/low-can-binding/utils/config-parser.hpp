@@ -24,7 +24,7 @@
 
 #include <string>
 #include <vector>
-#include "INIReader.h"
+#include "ini-config.hpp"
 
 namespace utils
 {
@@ -33,10 +33,9 @@ namespace utils
 	class config_parser_t
 	{
 	private:
-		INIReader config_content_; /*!< config_content_ - Parsed content of INI file.*/
+		ini_config config_content_; /*!< config_content_ - Parsed content of INI file.*/
 
 	public:
-		config_parser_t(int conf_file);
 		config_parser_t(std::string conf_file);
 
 		bool check_conf();

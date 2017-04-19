@@ -21,25 +21,18 @@
 
 namespace utils
 {
-	/// @brief constructor using a POSIX file handle as input.
-	///
-	/// @param conf_file - a POSIX file handle to the INI configuration file
-	config_parser_t::config_parser_t(int conf_file)
-		: config_content_(fdopen(conf_file, "r"))
-	{
-		::close(conf_file);
-	}
-
 	/// @brief constructor using path to file
 	config_parser_t::config_parser_t(std::string conf_file)
-		: config_content_{INIReader(conf_file)}
-	{}
+		: config_content_{}
+	{
+		config_content_.read_file(conf_file);
+	}
 
 	/// @brief read the conf_file_ and parse it into an INIReader object
 	/// to search into later.
 	bool config_parser_t::check_conf()
 	{
-		if (config_content_.ParseError() < 0)
+		if (config_content_.size() <= 0)
 		{
 			ERROR(binder_interface, "read_conf: Can't load the INI config file.");
 			return false;
@@ -58,18 +51,10 @@ namespace utils
 	{
 		std::vector<std::string> devices_name;
 
-		std::set<std::string> sections = config_content_.GetSections();
-		for(const auto& sectionsIt : sections)
+		std::map<std::string, std::string> bus_mapping = config_content_.get_keys("CANbus-mapping");
+		for(const auto& busIt : bus_mapping )
 		{
-			if(sectionsIt == "CANbus-mapping")
-			{
-				std::set<std::string> fields = config_content_.GetFields(sectionsIt);
-				for(const auto& fieldsIt : fields)
-				{
-					std::string val = config_content_.Get(sectionsIt, fieldsIt, "INVALID");
-					devices_name.push_back(val);
-				}	
-			}
+			devices_name.push_back(busIt.second);
 		}
 
 		return devices_name;
