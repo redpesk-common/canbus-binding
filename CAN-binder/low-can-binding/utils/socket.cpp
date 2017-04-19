@@ -23,8 +23,7 @@ namespace utils
 	/// @brief Construct a default, invalid, socket.
 	socket_t::socket_t()
 		: socket_{INVALID_SOCKET}
-	{
-	}
+	{}
 
 	/// @brief Construct a socket by moving an existing one.
 	socket_t::socket_t(socket_t&& s)
