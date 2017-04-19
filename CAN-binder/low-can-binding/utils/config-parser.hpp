@@ -31,6 +31,8 @@ namespace utils
 		ini_config config_content_; /*!< config_content_ - Parsed content of INI file.*/
 
 	public:
+		config_parser_t(config_parser_t&&) = default;
+		config_parser_t(const config_parser_t&) = default;
 		config_parser_t(std::string conf_file);
 
 		bool check_conf();
