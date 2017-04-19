@@ -19,9 +19,6 @@
 #include <map>
 #include <mutex>
 #include <unistd.h>
-#include <string.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
 #include <linux/can/raw.h>
 
 #include "can-bus-dev.hpp"
@@ -54,63 +51,42 @@ uint32_t can_bus_dev_t::get_address() const
 ///  timestamp received messages and pass the socket to FD mode.
 ///
 /// @return -1 if something wrong.
-int can_bus_dev_t::open()
+int can_bus_dev_t::open_raw()
 {
 	const int canfd_on = 1;
 	const int timestamp_on = 1;
-	struct ifreq ifr;
 	struct timeval timeout;
 
-	DEBUG(binder_interface, "open: CAN Handler socket : %d", can_socket_.socket());
-	if (can_socket_)
-		return 0;
+	DEBUG(binder_interface, "open_raw: CAN Handler socket : %d", can_socket_.socket());
+	can_socket_.open(device_name_);
 
-	can_socket_.open(PF_CAN, SOCK_RAW, CAN_RAW);
+	// Set some option on the socket : timeout, timestamp and canfd frame usage.
 	if (can_socket_)
 	{
-		DEBUG(binder_interface, "open: CAN Handler socket correctly initialized : %d", can_socket_.socket());
+		DEBUG(binder_interface, "open_raw: CAN Handler socket correctly initialized : %d", can_socket_.socket());
 
 		// Set timeout for read
 		can_socket_.setopt(SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 
 		// Set timestamp for receveid frame
 		if (can_socket_.setopt(SOL_SOCKET, SO_TIMESTAMP, &timestamp_on, sizeof(timestamp_on)) < 0)
-			WARNING(binder_interface, "open: setsockopt SO_TIMESTAMP error: %s", ::strerror(errno));
-		DEBUG(binder_interface, "open: Switch CAN Handler socket to use fd mode");
+			WARNING(binder_interface, "open_raw: setsockopt SO_TIMESTAMP error: %s", ::strerror(errno));
+		DEBUG(binder_interface, "open_raw: Switch CAN Handler socket to use fd mode");
 
 		// try to switch the socket into CAN_FD mode
 		if (can_socket_.setopt(SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{
-			NOTICE(binder_interface, "open: Can not switch into CAN Extended frame format.");
+			NOTICE(binder_interface, "open_raw: Can not switch into CAN Extended frame format.");
 			is_fdmode_on_ = false;
 		}
 		else
 		{
-			DEBUG(binder_interface, "open: Correctly set up CAN socket to use FD frames.");
+			DEBUG(binder_interface, "open_raw: Correctly set up CAN socket to use FD frames.");
 			is_fdmode_on_ = true;
 		}
-
-		// Attempts to open a socket to CAN bus
-		::strcpy(ifr.ifr_name, device_name_.c_str());
-		DEBUG(binder_interface, "open: ifr_name is : %s", ifr.ifr_name);
-		if(::ioctl(can_socket_.socket(), SIOCGIFINDEX, &ifr) < 0)
-		{
-			ERROR(binder_interface, "open: ioctl failed. Error was : %s", strerror(errno));
-		}
-		else
-		{
-			txAddress_.can_family = AF_CAN;
-			txAddress_.can_ifindex = ifr.ifr_ifindex;
-
-			// And bind it to txAddress
-			DEBUG(binder_interface, "Bind the socket");
-			if (can_socket_.bind((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
-				ERROR(binder_interface, "Bind failed. %s", strerror(errno));
-			else return 0;
-		}
-		close();
 	}
-	else ERROR(binder_interface, "open: socket could not be created. Error was : %s", ::strerror(errno));
+	else
+		ERROR(binder_interface, "open_raw: socket could not be created. Error was : %s", ::strerror(errno));
 	return -1;
 }
 
@@ -199,8 +175,7 @@ int can_bus_dev_t::send(can_message_t& can_msg)
 
 	if(can_socket_)
 	{
-		nbytes = ::sendto(can_socket_.socket(), &f, sizeof(struct canfd_frame), 0,
-			(struct sockaddr*)&txAddress_, sizeof(txAddress_));
+		nbytes = can_socket_.send(f);
 		if (nbytes == -1)
 		{
 			ERROR(binder_interface, "send_can_message: Sending CAN frame failed.");
@@ -211,7 +186,8 @@ int can_bus_dev_t::send(can_message_t& can_msg)
 	else
 	{
 		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
-		open();
+		open_raw();
+		return -1;
 	}
 	return 0;
 }
@@ -237,8 +213,7 @@ bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* dat
 
 	if(can_socket_)
 	{
-		nbytes = ::sendto(can_socket_.socket(), &f, sizeof(struct canfd_frame), 0,
-			(struct sockaddr*)&txAddress_, sizeof(txAddress_));
+		nbytes = can_socket_.send(f);
 		if (nbytes == -1)
 		{
 			ERROR(binder_interface, "send_can_message: Sending CAN frame failed.");
@@ -249,7 +224,7 @@ bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* dat
 	else
 	{
 		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
-		open();
+		open_raw();
 	}
 	return false;
 }

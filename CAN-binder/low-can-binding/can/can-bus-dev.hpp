@@ -34,12 +34,11 @@ class can_bus_dev_t
 {
 private:
 	std::string device_name_; ///< a string identifier identitfying the linux CAN device.
-	utils::socket_t can_socket_;
+	utils::socketcan_t can_socket_;
 
 	int32_t address_; ///< an identifier used through binding that refer to that device
 
 	bool is_fdmode_on_; ///< boolean telling if whether or not the can socket use fdmode.
-	struct sockaddr_can txAddress_; /// < internal member using to bind to the socket
 
 	std::thread th_reading_; ///< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t
 	bool is_running_ = false; ///< boolean telling whether or not reading is running or not
@@ -51,7 +50,7 @@ public:
 	std::string get_device_name() const;
 	uint32_t get_address() const;
 
-	int open();
+	int open_raw();
 	int close();
 
 	void start_reading(can_bus_t& can_bus);

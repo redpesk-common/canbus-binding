@@ -16,24 +16,31 @@
  */
 
 #include <unistd.h>
+#include <string>
+#include <string.h>
+#include <linux/can/raw.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
+
 #include "socket.hpp"
+#include "low-can-binding.hpp"
 
 namespace utils
 {
 	/// @brief Construct a default, invalid, socket.
-	socket_t::socket_t()
+	socketcan_t::socketcan_t()
 		: socket_{INVALID_SOCKET}
 	{}
 
 	/// @brief Construct a socket by moving an existing one.
-	socket_t::socket_t(socket_t&& s)
+	socketcan_t::socketcan_t(socketcan_t&& s)
 		: socket_{s.socket_}
 	{
 		s.socket_ = INVALID_SOCKET;
 	}
 
 	/// @brief Destruct the socket.
-	socket_t::~socket_t()
+	socketcan_t::~socketcan_t()
 	{
 		if(socket_ != INVALID_SOCKET)
 			::close(socket_);
@@ -41,7 +48,7 @@ namespace utils
 
 	/// @brief Test if socket is valid.
 	/// @return true if valid, false otherwise.
-	socket_t::operator bool() const
+	socketcan_t::operator bool() const
 	{
 		return socket_ != INVALID_SOCKET;
 	}
@@ -51,7 +58,7 @@ namespace utils
 	/// @param[in] type Specifies the type of socket to be created.
 	/// @param[in] protocol Specifies a particular protocol to be used with the socket. Specifying a protocol of 0 causes socket() to use an unspecified default protocol appropriate for the requested socket type.
 	/// @return Upon successful completion, shall return a non-negative integer, the socket file descriptor. Otherwise, a value of -1 shall be returned and errno set to indicate the error.
-	int socket_t::open(int domain, int type, int protocol)
+	int socketcan_t::open(int domain, int type, int protocol)
 	{
 		close();
 		socket_ = ::socket(domain, type, protocol);
@@ -60,29 +67,89 @@ namespace utils
 
 	/// @brief Close the socket.
 	/// @return 0 if success.
-	int socket_t::close()
+	int socketcan_t::close()
 	{
 		return socket_ != INVALID_SOCKET ? ::close(socket_) : 0;
 	}
 
 	/// @brief Set socket option.
 	/// @return 0 if success.
-	int socket_t::setopt(int level, int optname, const void* optval, socklen_t optlen)
+	int socketcan_t::setopt(int level, int optname, const void* optval, socklen_t optlen)
 	{
 		return socket_ != INVALID_SOCKET ? ::setsockopt(socket_, level, optname, optval, optlen) : 0;
 	}
 
 	/// @brief Bind the socket.
 	/// @return 0 if success.
-	int socket_t::bind(const struct sockaddr* addr, socklen_t len)
+	int socketcan_t::bind(const struct sockaddr* addr, socklen_t len)
 	{
 		return socket_ != INVALID_SOCKET ? ::bind(socket_, addr, len) : 0;
 	}
 
+	/// @brief Connect the socket.
+	/// @return 0 if success.
+	int socketcan_t::connect(const struct sockaddr* addr, socklen_t len)
+	{
+		return socket_ != INVALID_SOCKET ? ::connect(socket_, addr, len) : 0;
+	}
+
 	/// @brief Get the file descriptor.
 	/// @return The socket's file descriptor
-	int socket_t::socket() const
+	int socketcan_t::socket() const
 	{
 		return socket_;
+	}
+
+	/// @brief Open a raw socket CAN.
+	/// @param[in] device_name is the kernel network device name of the CAN interface.
+	///
+	/// @return Upon successful completion, shall return a non-negative integer, the socket file descriptor. Otherwise, a value of -1 shall be returned and errno set to indicate the error.
+	int socketcan_t::open(std::string device_name, bool bcm)
+	{
+		close();
+		
+		struct ifreq ifr;
+		if(bcm)
+			socket_ = ::socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
+		else
+			socket_ = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
+
+		// Attempts to open a socket to CAN bus
+		::strcpy(ifr.ifr_name, device_name.c_str());
+		DEBUG(binder_interface, "open: ifr_name is : %s", ifr.ifr_name);
+		if(::ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
+		{
+			ERROR(binder_interface, "open: ioctl failed. Error was : %s", strerror(errno));
+			close();
+		}
+		else
+		{
+			txAddress_.can_family = AF_CAN;
+			txAddress_.can_ifindex = ifr.ifr_ifindex;
+
+			if(bcm && connect((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
+			{
+				ERROR(binder_interface, "Connect failed. %s", strerror(errno));
+				close();
+			}
+			// It's a RAW socket request, bind it to txAddress
+			else if(bind((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
+			{
+				ERROR(binder_interface, "Bind failed. %s", strerror(errno));
+				close();
+			}
+		}
+		return socket_;
+	}
+
+	/// @brief Send a CAN message through the socket.
+	///
+	/// @param[in] f - the CAN FD frame to send
+	///
+	/// @return number of sent bytes if message sent, 0 on invalid socket and -1 if something wrong.
+	ssize_t socketcan_t::send(const struct canfd_frame& f)
+	{
+		return socket_ != INVALID_SOCKET ? ::sendto(socket_, &f, sizeof(struct canfd_frame), 0,
+			(struct sockaddr*)&txAddress_, sizeof(txAddress_)) : 0;
 	}
 }

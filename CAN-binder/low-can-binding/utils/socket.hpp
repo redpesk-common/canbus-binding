@@ -23,24 +23,27 @@
 
 namespace utils
 {
-	class socket_t
+	class socketcan_t
 	{
 	public:
-		socket_t();
-		socket_t(const socket_t&) = delete;
-		socket_t(socket_t&&);
-		~socket_t();
+		socketcan_t();
+		socketcan_t(const socketcan_t&) = delete;
+		socketcan_t(socketcan_t&&);
+		~socketcan_t();
 
 		explicit operator bool() const;
 
-		int open(int domain, int type, int protocol);
-		int close();
-		int setopt(int level, int optname, const void* optval, socklen_t optlen);
 		int socket() const;
-		int bind(const struct sockaddr* addr, socklen_t len);
-
+		int open(std::string device_name, bool bcm=false);
+		int setopt(int level, int optname, const void* optval, socklen_t optlen);
+		ssize_t send(const struct canfd_frame& f);
+		int close();
 	private:
 		int socket_;
+		struct sockaddr_can txAddress_; /// < internal member using to bind to the socket
+
+		int open(int domain, int type, int protocol);
+		int bind(const struct sockaddr* addr, socklen_t len);
+		int connect(const struct sockaddr* addr, socklen_t len);
 	};
 }
-
