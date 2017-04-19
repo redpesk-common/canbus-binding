@@ -49,7 +49,7 @@
 class can_bus_t
 {
 private:
-	utils::config_parser_t& conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
+	utils::config_parser_t conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
 
 	void can_decode_message();
 	std::thread th_decoding_; ///< thread that'll handle decoding a can frame
