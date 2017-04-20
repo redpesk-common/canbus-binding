@@ -53,20 +53,21 @@ uint32_t can_bus_dev_t::get_address() const
 /// @return -1 if something wrong.
 int can_bus_dev_t::open(bool bcm)
 {
-	const int canfd_on = 1;
-	const int timestamp_on = 1;
-	struct timeval timeout;
-
 	DEBUG(binder_interface, "open_raw: CAN Handler socket : %d", can_socket_.socket());
 	return can_socket_.open(device_name_, bcm);
+}
 
 	// Set some option on the socket : timeout, timestamp and canfd frame usage.
+void can_bus_dev_t::configure()
+{
 	if (can_socket_)
 	{
-		DEBUG(binder_interface, "open_raw: CAN Handler socket correctly initialized : %d", can_socket_.socket());
+		const int timestamp_on = 1;
+		const int canfd_on = 1;
 
 		// Set timeout for read
 		can_socket_.setopt(SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+		DEBUG(binder_interface, "open_raw: CAN Handler socket correctly initialized : %d", can_socket_.socket());
 
 		// Set timestamp for receveid frame
 		if (can_socket_.setopt(SOL_SOCKET, SO_TIMESTAMP, &timestamp_on, sizeof(timestamp_on)) < 0)
@@ -86,8 +87,9 @@ int can_bus_dev_t::open(bool bcm)
 		}
 	}
 	else
+	{
 		ERROR(binder_interface, "open_raw: socket could not be created. Error was : %s", ::strerror(errno));
-	return -1;
+	}
 }
 
 /// @brief Close the bus.

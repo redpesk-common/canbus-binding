@@ -51,6 +51,7 @@ public:
 	uint32_t get_address() const;
 
 	int open(bool bcm=false);
+	void configure();
 	int close();
 
 	void start_reading(can_bus_t& can_bus);
