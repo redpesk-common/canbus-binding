@@ -65,8 +65,6 @@ void can_bus_dev_t::configure()
 		const int timestamp_on = 1;
 		const int canfd_on = 1;
 
-		// Set timeout for read
-		can_socket_.setopt(SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 		DEBUG(binder_interface, "open_raw: CAN Handler socket correctly initialized : %d", can_socket_.socket());
 
 		// Set timestamp for receveid frame
