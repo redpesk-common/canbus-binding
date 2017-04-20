@@ -50,14 +50,16 @@ uint32_t can_bus_dev_t::get_address() const
 ///  We try to open CAN socket and apply the following options
 ///  timestamp received messages and pass the socket to FD mode.
 ///
-/// @return -1 if something wrong.
+/// @param[in] bcm boolean value indicating wether or not we initialize a Broadcast CAN Manager socket.
+///
+/// @return socket value or -1 if something wrong.
 int can_bus_dev_t::open(bool bcm)
 {
 	DEBUG(binder_interface, "open_raw: CAN Handler socket : %d", can_socket_.socket());
 	return can_socket_.open(device_name_, bcm);
 }
 
-	// Set some option on the socket : timeout, timestamp and canfd frame usage.
+/// @brief Set some option on the socket, timestamp and canfd frame usage.
 void can_bus_dev_t::configure()
 {
 	if (can_socket_)
