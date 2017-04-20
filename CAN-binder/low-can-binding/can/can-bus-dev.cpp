@@ -51,14 +51,14 @@ uint32_t can_bus_dev_t::get_address() const
 ///  timestamp received messages and pass the socket to FD mode.
 ///
 /// @return -1 if something wrong.
-int can_bus_dev_t::open_raw()
+int can_bus_dev_t::open(bool bcm)
 {
 	const int canfd_on = 1;
 	const int timestamp_on = 1;
 	struct timeval timeout;
 
 	DEBUG(binder_interface, "open_raw: CAN Handler socket : %d", can_socket_.socket());
-	can_socket_.open(device_name_);
+	return can_socket_.open(device_name_, bcm);
 
 	// Set some option on the socket : timeout, timestamp and canfd frame usage.
 	if (can_socket_)
@@ -186,7 +186,7 @@ int can_bus_dev_t::send(can_message_t& can_msg)
 	else
 	{
 		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
-		open_raw();
+		open(true);
 		return -1;
 	}
 	return 0;
@@ -224,7 +224,7 @@ bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* dat
 	else
 	{
 		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
-		open_raw();
+		open(true);
 	}
 	return false;
 }
