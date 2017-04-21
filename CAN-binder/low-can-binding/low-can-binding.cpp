@@ -141,13 +141,12 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		int ret;
 		if (active_diagnostic_request_t::is_diagnostic_signal(sig))
 		{
-			diagnostic_message_t* diag_msg = configuration_t::instance().get_diagnostic_message(sig);
-			DiagnosticRequest* diag_req = configuration_t::instance().get_request_from_diagnostic_message(diag_msg);
+			DiagnosticRequest* diag_req = configuration_t::instance().get_request_from_diagnostic_message(sig);
 
 			// If the requested diagnostic message isn't supported by the car then unssubcribe.
 			// no matter what we want, worse case will be a fail unsubscription but at least we don't
 			// poll a PID for nothing.
-			if(diag_msg->get_supported() && subscribe)
+			if(diag_req != nullptr && subscribe)
 			{
 					float frequency = diag_msg->get_frequency();
 					subscribe = configuration_t::instance().get_diagnostic_manager().add_recurring_request(

@@ -87,6 +87,24 @@ void configuration_t::set_active_message_set(uint8_t id)
 	active_message_set_ = id;
 }
 
+
+diagnostic_message_t* configuration_t::get_diagnostic_message(std::string message_name) const
+{
+	std::vector<diagnostic_message_t*> found;
+	configuration_t::instance().find_diagnostic_messages(build_DynamicField(message_name), found);
+	if(! found.empty())
+		return found.front();
+	return nullptr;
+}
+
+DiagnosticRequest* configuration_t::get_request_from_diagnostic_message(std::string message_name) const
+{
+	diagnostic_message_t* diag_msg = get_diagnostic_message(message_name);
+	if( diag_msg != nullptr && diag_msg->get_supported())
+		return new DiagnosticRequest(diag_msg->build_diagnostic_request());
+	return nullptr;
+}
+
 /// @brief return diagnostic messages name found searching through diagnostic messages list.
 ///
 /// @param[in] key - can contain numeric or string value in order to search against
@@ -108,28 +126,6 @@ void configuration_t::find_diagnostic_messages(const openxc_DynamicField &key, s
 			break;
 	}
 	DEBUG(binder_interface, "find_diagnostic_messages: Found %d signal(s)", (int)found_signals.size());
-}
-
-diagnostic_message_t* configuration_t::get_diagnostic_message(std::string message_name) const
-{
-	std::vector<diagnostic_message_t*> found;
-	configuration_t::instance().find_diagnostic_messages(build_DynamicField(message_name), found);
-	if(! found.empty())
-		return found.front();
-	return nullptr;
-}
-
-DiagnosticRequest* configuration_t::get_request_from_diagnostic_message(diagnostic_message_t* diag_msg) const
-{
-	return new DiagnosticRequest(diag_msg->build_diagnostic_request());
-}
-
-DiagnosticRequest* configuration_t::get_request_from_diagnostic_message(std::string message_name) const
-{
-	diagnostic_message_t* diag_msg = get_diagnostic_message(message_name);
-	if( diag_msg != nullptr)
-		return new DiagnosticRequest(diag_msg->build_diagnostic_request());
-	return nullptr;
 }
 
 /// @brief return signals name found searching through CAN signals list.
