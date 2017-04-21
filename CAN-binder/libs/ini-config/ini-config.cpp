@@ -51,6 +51,8 @@ void ini_config::read_file(const std::string& filename)
 					config_[key] = (mr.size() >= 3 && mr[2].matched) ? mr[2].str() : "";
 				}
 				break;
+			case line_type::ignore:
+				break;
 			}
 		}
 	}
