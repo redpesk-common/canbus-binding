@@ -17,60 +17,58 @@
 
 #include "signals.hpp"
 
-/// 
-/// @brief Can signal event map making access to afb_event
-/// externaly to an openxc existing structure.
-///
-/// Event map is making relation between can_signal_t generic name
-/// and the afb_event struct used by application framework to pushed
-/// to the subscriber.
-///
-std::map<std::string, struct afb_event> subscribed_signals;
-
-///
-/// @brief Mutex allowing safe manipulation on subscribed_signals map.
-/// To ensure that the map object isn't modified when we read it, you
-///  have to set this mutex before use subscribed_signals map object.
-///
-std::mutex subscribed_signals_mutex;
-
-std::mutex& get_subscribed_signals_mutex()
+namespace utils
 {
-	return subscribed_signals_mutex;
-}
-
-std::map<std::string, struct afb_event>& get_subscribed_signals()
-{
-	return subscribed_signals;
-}
-
-///
-/// @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
-/// @brief return signals name found searching through CAN_signals and OBD2 pid
-///
-/// @param[in] key : can contain numeric or string value in order to search against 
-///   can signals or obd2 signals name.
-///
-/// @return Vector of signals name found. 
-///
-std::vector<std::string> find_signals(const openxc_DynamicField &key)
-{
-	std::vector<std::string> found_signals_name;
-
-	switch(key.type)
+	/// @brief Return singleton instance of configuration object.
+	signals_manager_t& signals_manager_t::instance()
 	{
-		case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-				lookup_signals_by_name(key.string_value, configuration_t::instance().get_can_signals(), found_signals_name);
-				lookup_signals_by_name(key.string_value, configuration_t::instance().get_diagnostic_messages(), found_signals_name);
-			break;
-		case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-				lookup_signals_by_id(key.numeric_value, configuration_t::instance().get_can_signals(), found_signals_name);
-				lookup_signals_by_id(key.numeric_value, configuration_t::instance().get_diagnostic_messages(), found_signals_name);
-			break;
-		default:
-			ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
-			break;
+		static signals_manager_t sm;
+		return sm;
 	}
-	DEBUG(binder_interface, "find_signals: Found %d signal(s)", (int)found_signals_name.size());
-	return found_signals_name;
+
+	/// @brief Return Subscribed signals map mutex.
+	std::mutex& signals_manager_t::get_subscribed_signals_mutex()
+	{
+		return subscribed_signals_mutex_;
+	}
+
+	///
+	/// @brief return the subscribed_signals map.
+	/// 
+	/// @return Map of subscribed signals.
+	std::map<std::string, struct afb_event>& signals_manager_t::get_subscribed_signals()
+	{
+		return subscribed_signals_;
+	}
+
+	///
+	/// @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
+	/// @brief return signals name found searching through CAN_signals and OBD2 pid
+	///
+	/// @param[in] key : can contain numeric or string value in order to search against 
+	///   can signals or obd2 signals name.
+	///
+	/// @return Vector of signals name found. 
+	///
+	struct signals_found signals_manager_t::find_signals(const openxc_DynamicField &key)
+	{
+		struct signals_found sf;
+
+		switch(key.type)
+		{
+			case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
+					lookup_signals_by_name(key.string_value, configuration_t::instance().get_can_signals(), sf.can_signals);
+					lookup_signals_by_name(key.string_value, configuration_t::instance().get_diagnostic_messages(), sf.diagnostic_messages);
+				break;
+			case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
+					lookup_signals_by_id(key.numeric_value, configuration_t::instance().get_can_signals(), sf.can_signals);
+					lookup_signals_by_id(key.numeric_value, configuration_t::instance().get_diagnostic_messages(), sf.diagnostic_messages);
+				break;
+			default:
+				ERROR(binder_interface, "find_signals: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
+				break;
+		}
+		DEBUG(binder_interface, "find_signals: Found %d signal(s)", (int)(sf.can_signals.size() + sf.diagnostic_messages.size()));
+		return sf;
+	}
 }

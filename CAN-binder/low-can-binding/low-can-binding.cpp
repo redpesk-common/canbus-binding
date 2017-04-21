@@ -88,8 +88,10 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 {
 	int ret;
 
-	std::lock_guard<std::mutex> subscribed_signals_lock(get_subscribed_signals_mutex());
-	std::map<std::string, struct afb_event>& s = get_subscribed_signals();
+	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
+
+	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
+	std::map<std::string, struct afb_event>& s = sm.get_subscribed_signals();
 	if (s.find(sig) != s.end())
 	{
 		if (!afb_event_is_valid(s[sig]) && !subscribe)
@@ -107,7 +109,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	{
 		/* Event doesn't exist , so let's create it */
 		struct afb_event empty_event = {nullptr, nullptr};
-		subscribed_signals[sig] = empty_event;
+		s[sig] = empty_event;
 		ret = create_event_handle(sig, s);
 	}
 
@@ -129,61 +131,66 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 ///
 /// @return Number of correctly subscribed signal
 ///
-static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<std::string>& signals)
+static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const struct utils::signals_found& signals)
 {
-	int rets = 0;
+	int ret,  rets = 0;
 
 	//TODO: Implement way to dynamically call the right function no matter
 	// how much signals types we have.
+	configuration_t& conf = configuration_t::instance();
 
-	for(const std::string& sig : signals)
+	for(const auto& sig : signals.diagnostic_messages)
 	{
-		int ret;
-		if (active_diagnostic_request_t::is_diagnostic_signal(sig))
-		{
-			DiagnosticRequest* diag_req = configuration_t::instance().get_request_from_diagnostic_message(sig);
+		DiagnosticRequest* diag_req = conf.get_request_from_diagnostic_message(sig->get_name());
 
-			// If the requested diagnostic message isn't supported by the car then unssubcribe.
-			// no matter what we want, worse case will be a fail unsubscription but at least we don't
-			// poll a PID for nothing.
-			if(diag_req != nullptr && subscribe)
-			{
-					float frequency = diag_msg->get_frequency();
-					subscribe = configuration_t::instance().get_diagnostic_manager().add_recurring_request(
-						diag_req, sig.c_str(), false, diag_msg->get_decoder(), diag_msg->get_callback(), (float)frequency);
-						//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
-			}
-			else
-			{
-				configuration_t::instance().get_diagnostic_manager().cleanup_request(
-					configuration_t::instance().get_diagnostic_manager().find_recurring_request(diag_req), true);
-				WARNING(binder_interface, "Signal: %s isn't supported. Canceling operation.", sig.c_str());
-				return -1;
-			}
+		// If the requested diagnostic message isn't supported by the car then unssubcribe.
+		// no matter what we want, worse case will be a fail unsubscription but at least we don't
+		// poll a PID for nothing.
+		if(sig->get_supported() && subscribe)
+		{
+				float frequency = sig->get_frequency();
+				subscribe = conf.get_diagnostic_manager().add_recurring_request(
+					diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), (float)frequency);
+					//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
+		}
+		else
+		{
+			conf.get_diagnostic_manager().cleanup_request(
+				conf.get_diagnostic_manager().find_recurring_request(diag_req), true);
+			WARNING(binder_interface, "Signal: %s isn't supported. Canceling operation.", sig->get_name().c_str());
+			return -1;
 		}
 
-		ret = subscribe_unsubscribe_signal(request, subscribe, sig);
+		ret = subscribe_unsubscribe_signal(request, subscribe, sig->get_name());
 		if(ret <= 0)
 			return ret;
 		rets++;
+		DEBUG(binder_interface, "Signal: %s subscribed", sig->get_name().c_str());
+	}
 
-		DEBUG(binder_interface, "Signal: %s subscribed", sig.c_str());
+	for(const auto& sig: signals.can_signals)
+	{
+		ret = subscribe_unsubscribe_signal(request, subscribe, sig->get_name());
+		if(ret <= 0)
+			return ret;
+		rets++;
+		DEBUG(binder_interface, "Signal: %s subscribed", sig->get_name().c_str());
 	}
 	return rets;
 }
 
 static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, const char *name)
 {
-	std::vector<std::string> signals;
+	struct utils::signals_found signals;
 	int ret = 0;
 
 	openxc_DynamicField search_key = build_DynamicField(std::string(name));
-	signals = find_signals(search_key);
-	if (signals.empty())
+	signals = utils::signals_manager_t::instance().find_signals(search_key);
+	if (signals.can_signals.empty() && signals.diagnostic_messages.empty())
 		ret = 0;
 
 	ret = subscribe_unsubscribe_signals(request, subscribe, signals);
-	NOTICE(binder_interface, "Subscribed/unsubscribe correctly to %d/%d signal(s).", ret, (int)signals.size());
+	NOTICE(binder_interface, "Subscribed/unsubscribe correctly to %d/%d signal(s).", ret, (int)(signals.can_signals.size() + signals.diagnostic_messages.size())  );
 
 	return ret;
 }

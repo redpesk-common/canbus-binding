@@ -28,63 +28,54 @@
 
 #include "../low-can-binding.hpp"
 
-extern std::mutex subscribed_signals_mutex;
-std::mutex& get_subscribed_signals_mutex();
-
-/**
- * @brief return the subscribed_signals map.
- * 
- * return Map of subscribed signals.
- */
-extern std::map<std::string, struct afb_event> subscribed_signals;
-std::map<std::string, struct afb_event>& get_subscribed_signals();
-
-template <typename T>
-void lookup_signals_by_name(const std::string& key, std::vector<T>& signals, std::vector<T*>& found_signals)
+namespace utils
 {
-	for(T& s : signals)
+	struct signals_found
 	{
-		if(::fnmatch(key.c_str(), s.get_generic_name().c_str(), FNM_CASEFOLD) == 0)
-			found_signals.push_back(&s);
-		if(::fnmatch(key.c_str(), s.get_name().c_str(), FNM_CASEFOLD) == 0)
-			found_signals.push_back(&s);
-	}
-}
+		std::vector<can_signal_t*> can_signals;
+		std::vector<diagnostic_message_t*> diagnostic_messages;
+	};
 
-template <typename T>
-void lookup_signals_by_name(const std::string& key, std::vector<T>& signals, std::vector<std::string>& found_signals_name)
-{
-	for(T& s : signals)
+	class signals_manager_t
 	{
-		if(::fnmatch(key.c_str(), s.get_generic_name().c_str(), FNM_CASEFOLD) == 0)
-			found_signals_name.push_back(s.get_name());
-		if(::fnmatch(key.c_str(), s.get_name().c_str(), FNM_CASEFOLD) == 0)
-			found_signals_name.push_back(s.get_name());
-	}
-}
+	private:
+		std::mutex subscribed_signals_mutex_;
+		std::map<std::string, struct afb_event> subscribed_signals_;
 
-template <typename T>
-void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector<T*>& found_signals)
-{
-	for(T& s : signals)
-	{
-		if(configuration_t::instance().get_signal_id(s) == key)
+		signals_manager_t(); ///< Private constructor to make singleton class.
+
+	public:
+		static signals_manager_t& instance();
+
+		std::mutex& get_subscribed_signals_mutex();
+		std::map<std::string, struct afb_event>& get_subscribed_signals();
+
+		struct signals_found find_signals(const openxc_DynamicField &key);
+		void find_diagnostic_messages(const openxc_DynamicField &key, std::vector<diagnostic_message_t*>& found_signals);
+		void find_can_signals(const openxc_DynamicField &key, std::vector<can_signal_t*>& found_signals);
+
+		template <typename T>
+		void lookup_signals_by_name(const std::string& key, std::vector<T>& signals, std::vector<T*>& found_signals)
 		{
-			found_signals.push_back(&s);
+			for(T& s : signals)
+			{
+				if(::fnmatch(key.c_str(), s.get_generic_name().c_str(), FNM_CASEFOLD) == 0)
+					found_signals.push_back(&s);
+				if(::fnmatch(key.c_str(), s.get_name().c_str(), FNM_CASEFOLD) == 0)
+					found_signals.push_back(&s);
+			}
 		}
-	}
-}
 
-template <typename T>
-void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector<std::string>& found_signals_name)
-{
-	for(T& s : signals)
-	{
-		if(configuration_t::instance().get_signal_id(s) == key)
+		template <typename T>
+		void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector<T*>& found_signals)
 		{
-			found_signals_name.push_back(s.get_name());
+			for(T& s : signals)
+			{
+				if(configuration_t::instance().get_signal_id(s) == key)
+				{
+					found_signals.push_back(&s);
+				}
+			}
 		}
-	}
+	};
 }
-
-std::vector<std::string> find_signals(const openxc_DynamicField &key);

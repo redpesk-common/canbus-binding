@@ -84,12 +84,8 @@ class configuration_t
 
 		void set_active_message_set(uint8_t id);
 
-		void find_diagnostic_messages(const openxc_DynamicField &key, std::vector<diagnostic_message_t*>& found_signals);
 		diagnostic_message_t* get_diagnostic_message(std::string message_name) const;
 		DiagnosticRequest* get_request_from_diagnostic_message(std::string message_name) const;
-
-		void find_can_signals(const openxc_DynamicField &key, std::vector<can_signal_t*>& found_signals);
-
 /*
 		/// TODO: implement this function as method into can_bus class
 		/// @brief Pre initialize actions made before CAN bus initialization

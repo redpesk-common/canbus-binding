@@ -21,6 +21,7 @@
 #include "diagnostic-manager.hpp"
 
 #include "../utils/openxc-utils.hpp"
+#include "../utils/signals.hpp"
 #include "../configuration.hpp"
 
 #define MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 10
@@ -534,9 +535,9 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 	// If not success but completed then the pid isn't supported
 	if(!response.success)
 	{
-		std::vector<diagnostic_message_t*> found_signals;
-		configuration_t::instance().find_diagnostic_messages( build_DynamicField(adr->get_name()), found_signals );
-		found_signals.front()->set_supported(false);
+		struct utils::signals_found found_signals;
+		found_signals = utils::signals_manager_t::instance().find_signals(build_DynamicField(adr->get_name()));
+		found_signals.diagnostic_messages.front()->set_supported(false);
 		cleanup_request(adr, true);
 		NOTICE(binder_interface, "relay_diagnostic_response: PID not supported or ill formed. Please unsubscribe from it. Error code : %d", response.negative_response_code);
 		message = build_VehicleMessage(build_SimpleMessage(adr->get_name(), build_DynamicField("This PID isn't supported by your vehicle.")));
