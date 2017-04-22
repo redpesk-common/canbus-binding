@@ -84,6 +84,9 @@ static int create_event_handle(const std::string& sig_name, std::map<std::string
 	return 1;
 }
 
+/// @brief Will determine if it is needed or not to create the event handle and checks it to be sure that
+/// we got a valid afb_event to get subscribe or unsubscribe. Then launch the subscription or unsubscription
+/// against the application framework using that event handle.
 static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, const std::string& sig)
 {
 	int ret;
@@ -96,14 +99,14 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	{
 		if (!afb_event_is_valid(s[sig]) && !subscribe)
 		{
-			NOTICE(binder_interface, "%s: Event isn't valid, it can't be unsubscribed.", __FUNCTION__);
+			NOTICE(binder_interface, "%s: Event isn't valid, no need to unsubscribed.", __FUNCTION__);
 			ret = -1;
 		}
-		/*else
+		else
 		{
 			// Event it isn't valid annymore, recreate it
 			ret = create_event_handle(sig, s);
-		}*/
+		}
 	}
 	else
 	{
@@ -113,9 +116,8 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 		ret = create_event_handle(sig, s);
 	}
 
-	/* Check whether or not the event handler has been correctly created and
-	 * make the subscription/unsubscription operation is so.
-	 */
+	// Check whether or not the event handler has been correctly created and
+	// make the subscription/unsubscription operation is so.
 	if (ret <= 0)
 		return ret;
 	return make_subscription_unsubscription(request, sig, s, subscribe);
@@ -179,61 +181,67 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	return rets;
 }
 
-static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, const char *name)
+static const std::vector<std::string> parse_signals_from_request(struct afb_req request, bool subscribe)
 {
-	struct utils::signals_found signals;
-	int ret = 0;
-
-	openxc_DynamicField search_key = build_DynamicField(std::string(name));
-	signals = utils::signals_manager_t::instance().find_signals(search_key);
-	if (signals.can_signals.empty() && signals.diagnostic_messages.empty())
-		ret = 0;
-
-	ret = subscribe_unsubscribe_signals(request, subscribe, signals);
-	NOTICE(binder_interface, "%s: Subscribed/unsubscribe correctly to %d/%d signal(s).", __FUNCTION__, ret, (int)(signals.can_signals.size() + signals.diagnostic_messages.size())  );
-
-	return ret;
-}
-
-static void subscribe_unsubscribe(struct afb_req request, bool subscribe)
-{
-	int ok, i, n;
+	int i, n;
+	std::vector<std::string> ret;
 	struct json_object *args, *a, *x;
 
-	/* makes the subscription/unsubscription */
+	/* retrieve signals to subscribe */
 	args = afb_req_json(request);
-	if (args == NULL || !json_object_object_get_ex(args, "event", &a)) {
-		ok = subscribe_unsubscribe_name(request, subscribe, "*");
-	} else if (json_object_get_type(a) != json_type_array) {
-		ok = subscribe_unsubscribe_name(request, subscribe, json_object_get_string(a));
-	} else {
+	if (args == NULL || !json_object_object_get_ex(args, "event", &a))
+	{
+		ret.push_back("*");
+	}
+	else if (json_object_get_type(a) != json_type_array)
+	{
+		ret.push_back(json_object_get_string(a));
+	}
+	else
+	{
 		n = json_object_array_length(a);
-		ok = 0;
-		for (i = 0 ; i < n ; i++) {
+		for (i = 0 ; i < n ; i++)
+		{
 			x = json_object_array_get_idx(a, i);
-			if (subscribe_unsubscribe_name(request, subscribe, json_object_get_string(x)))
-				ok++;
+			ret.push_back(json_object_get_string(x));
 		}
-		ok = (ok == n);
 	}
 
-	/* send the report */
-	if (ok)
-		afb_req_success(request, NULL, NULL);
-	else
-		afb_req_fail(request, "error", NULL);
+	return ret;
 }
 
 extern "C"
 {
 	static void subscribe(struct afb_req request)
 	{
-		subscribe_unsubscribe(request, true);
+		std::vector<std::string> signals;
+		struct utils::signals_found sf;
+		int ok = 0, total = 0;
+
+		signals = parse_signals_from_request(request, true);
+
+		for(const auto& sig: signals)
+		{
+			openxc_DynamicField search_key = build_DynamicField(sig);
+			sf = utils::signals_manager_t::instance().find_signals(search_key);
+			total = (int)sf.can_signals.size() + (int)sf.diagnostic_messages.size();
+
+			if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
+				NOTICE(binder_interface, "%s: No signal(s) found for %s.", __FUNCTION__, sig.c_str());
+			else
+				ok = subscribe_unsubscribe_signals(request, subscribe, sf);
+		}
+
+		NOTICE(binder_interface, "%s: Subscribed/unsubscribe correctly to %d/%d signal(s).", __FUNCTION__, ok, total);
+		if (ok)
+			afb_req_success(request, NULL, NULL);
+		else
+			afb_req_fail(request, "error", NULL);
 	}
 
 	static void unsubscribe(struct afb_req request)
 	{
-		subscribe_unsubscribe(request, false);
+		parse_signals_from_request(request, false);
 	}
 
 	static const struct afb_verb_desc_v1 verbs[]=
