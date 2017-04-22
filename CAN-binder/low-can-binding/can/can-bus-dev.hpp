@@ -38,8 +38,6 @@ private:
 
 	int32_t address_; ///< an identifier used through binding that refer to that device
 
-	bool is_fdmode_on_; ///< boolean telling if whether or not the can socket use fdmode.
-
 	std::thread th_reading_; ///< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t
 	bool is_running_ = false; ///< boolean telling whether or not reading is running or not
 	void can_reader(can_bus_t& can_bus);
@@ -50,7 +48,7 @@ public:
 	std::string get_device_name() const;
 	uint32_t get_address() const;
 
-	int open(bool bcm=false);
+	int open();
 	void configure();
 	int close();
 

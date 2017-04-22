@@ -50,13 +50,10 @@ uint32_t can_bus_dev_t::get_address() const
 ///  We try to open CAN socket and apply the following options
 ///  timestamp received messages and pass the socket to FD mode.
 ///
-/// @param[in] bcm boolean value indicating wether or not we initialize a Broadcast CAN Manager socket.
-///
 /// @return socket value or -1 if something wrong.
-int can_bus_dev_t::open(bool bcm)
+int can_bus_dev_t::open()
 {
-	DEBUG(binder_interface, "%s: CAN Handler using BCM socket ? %s", __FUNCTION__, bcm ? "true" : "false");
-	return can_socket_.open(device_name_, bcm);
+	return can_socket_.open(device_name_);
 }
 
 /// @brief Set some option on the socket, timestamp and canfd frame usage.
@@ -65,26 +62,10 @@ void can_bus_dev_t::configure()
 	if (can_socket_)
 	{
 		const int timestamp_on = 1;
-		const int canfd_on = 1;
 
 		DEBUG(binder_interface, "%s: CAN Handler socket correctly initialized : %d", __FUNCTION__, can_socket_.socket());
-
-		// Set timestamp for receveid frame
 		if (can_socket_.setopt(SOL_SOCKET, SO_TIMESTAMP, &timestamp_on, sizeof(timestamp_on)) < 0)
 			WARNING(binder_interface, "%s: setsockopt SO_TIMESTAMP error: %s", __FUNCTION__, ::strerror(errno));
-		DEBUG(binder_interface, "%s: Switch CAN Handler socket to use fd mode", __FUNCTION__);
-
-		// try to switch the socket into CAN_FD mode
-		if (can_socket_.setopt(SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
-		{
-			NOTICE(binder_interface, "%s: Can not switch into CAN Extended frame format.", __FUNCTION__);
-			is_fdmode_on_ = false;
-		}
-		else
-		{
-			DEBUG(binder_interface, "%s: Correctly set up CAN socket to use FD frames.", __FUNCTION__);
-			is_fdmode_on_ = true;
-		}
 	}
 	else
 	{
@@ -188,7 +169,7 @@ int can_bus_dev_t::send(can_message_t& can_msg)
 	else
 	{
 		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
-		open(true);
+		open();
 		return -1;
 	}
 	return 0;
@@ -226,7 +207,7 @@ bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* dat
 	else
 	{
 		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
-		open(true);
+		open();
 	}
 	return false;
 }

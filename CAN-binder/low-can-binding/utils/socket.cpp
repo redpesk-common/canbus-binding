@@ -104,15 +104,12 @@ namespace utils
 	/// @param[in] device_name is the kernel network device name of the CAN interface.
 	///
 	/// @return Upon successful completion, shall return a non-negative integer, the socket file descriptor. Otherwise, a value of -1 shall be returned and errno set to indicate the error.
-	int socketcan_t::open(std::string device_name, bool bcm)
+	int socketcan_t::open(std::string device_name)
 	{
 		close();
 		
 		struct ifreq ifr;
-		if(bcm)
-			socket_ = ::socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
-		else
-			socket_ = ::socket(PF_CAN, SOCK_RAW, CAN_RAW);
+		socket_ = ::socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
 
 		// Attempts to open a socket to CAN bus
 		::strcpy(ifr.ifr_name, device_name.c_str());
@@ -127,18 +124,9 @@ namespace utils
 			txAddress_.can_family = AF_CAN;
 			txAddress_.can_ifindex = ifr.ifr_ifindex;
 
-			if(bcm)
+			if(connect((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
 			{
-				if(connect((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
-				{
-					ERROR(binder_interface, "%s: Connect failed. %s", __FUNCTION__, strerror(errno));
-					close();
-				}
-			}
-			// It's a RAW socket request, bind it to txAddress
-			else if(bind((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
-			{
-				ERROR(binder_interface, "%s: Bind failed. %s", __FUNCTION__, strerror(errno));
+				ERROR(binder_interface, "%s: Connect failed. %s", __FUNCTION__, strerror(errno));
 				close();
 			}
 		}

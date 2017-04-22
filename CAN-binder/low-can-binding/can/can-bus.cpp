@@ -242,7 +242,7 @@ int can_bus_t::init_can_dev()
 			for(const auto& device : devices_name)
 			{
 				can_bus_t::can_devices_[device] = std::make_shared<can_bus_dev_t>(device, i);
-				if (can_bus_t::can_devices_[device]->open(true) >= 0)
+				if (can_bus_t::can_devices_[device]->open() >= 0)
 				{
 					can_bus_t::can_devices_[device]->configure();
 					DEBUG(binder_interface, "%s: Start reading thread", __FUNCTION__);

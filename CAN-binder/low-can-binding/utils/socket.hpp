@@ -34,7 +34,7 @@ namespace utils
 		explicit operator bool() const;
 
 		int socket() const;
-		int open(std::string device_name, bool bcm=false);
+		int open(std::string device_name);
 		int setopt(int level, int optname, const void* optval, socklen_t optlen);
 		ssize_t send(const struct canfd_frame& f);
 		int close();
