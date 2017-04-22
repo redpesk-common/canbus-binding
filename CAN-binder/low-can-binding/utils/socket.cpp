@@ -127,10 +127,13 @@ namespace utils
 			txAddress_.can_family = AF_CAN;
 			txAddress_.can_ifindex = ifr.ifr_ifindex;
 
-			if(bcm && connect((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
+			if(bcm)
 			{
-				ERROR(binder_interface, "%s: Connect failed. %s", __FUNCTION__, strerror(errno));
-				close();
+				if(connect((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
+				{
+					ERROR(binder_interface, "%s: Connect failed. %s", __FUNCTION__, strerror(errno));
+					close();
+				}
 			}
 			// It's a RAW socket request, bind it to txAddress
 			else if(bind((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
