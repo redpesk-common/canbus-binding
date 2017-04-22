@@ -67,7 +67,7 @@ static int make_subscription_unsubscription(struct afb_req request, const std::s
 	/* Make the subscription or unsubscription to the event */
 	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[sig_name])) < 0)
 	{
-		ERROR(binder_interface, "make_subscription_unsubscription: Operation goes wrong for signal: %s", sig_name.c_str());
+		ERROR(binder_interface, "%s: Operation goes wrong for signal: %s", __FUNCTION__, sig_name.c_str());
 		return 0;
 	}
 	return 1;
@@ -78,7 +78,7 @@ static int create_event_handle(const std::string& sig_name, std::map<std::string
 	s[sig_name] = afb_daemon_make_event(binder_interface->daemon, sig_name.c_str());
 	if (!afb_event_is_valid(s[sig_name]))
 	{
-		ERROR(binder_interface, "create_event_handle: Can't create an event for %s, something goes wrong.", sig_name.c_str());
+		ERROR(binder_interface, "%s: Can't create an event for %s, something goes wrong.", __FUNCTION__, sig_name.c_str());
 		return 0;
 	}
 	return 1;
@@ -96,7 +96,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	{
 		if (!afb_event_is_valid(s[sig]) && !subscribe)
 		{
-			NOTICE(binder_interface, "subscribe_unsubscribe_signal: Event isn't valid, it can't be unsubscribed.");
+			NOTICE(binder_interface, "%s: Event isn't valid, it can't be unsubscribed.", __FUNCTION__);
 			ret = -1;
 		}
 		/*else
@@ -157,7 +157,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		{
 			conf.get_diagnostic_manager().cleanup_request(
 				conf.get_diagnostic_manager().find_recurring_request(diag_req), true);
-			WARNING(binder_interface, "Signal: %s isn't supported. Canceling operation.", sig->get_name().c_str());
+			WARNING(binder_interface, "%s: signal: %s isn't supported. Canceling operation.", __FUNCTION__, sig->get_name().c_str());
 			return -1;
 		}
 
@@ -165,7 +165,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		if(ret <= 0)
 			return ret;
 		rets++;
-		DEBUG(binder_interface, "Signal: %s subscribed", sig->get_name().c_str());
+		DEBUG(binder_interface, "%s: Signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}
 
 	for(const auto& sig: signals.can_signals)
@@ -174,7 +174,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		if(ret <= 0)
 			return ret;
 		rets++;
-		DEBUG(binder_interface, "Signal: %s subscribed", sig->get_name().c_str());
+		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}
 	return rets;
 }
@@ -190,7 +190,7 @@ static int subscribe_unsubscribe_name(struct afb_req request, bool subscribe, co
 		ret = 0;
 
 	ret = subscribe_unsubscribe_signals(request, subscribe, signals);
-	NOTICE(binder_interface, "Subscribed/unsubscribe correctly to %d/%d signal(s).", ret, (int)(signals.can_signals.size() + signals.diagnostic_messages.size())  );
+	NOTICE(binder_interface, "%s: Subscribed/unsubscribe correctly to %d/%d signal(s).", __FUNCTION__, ret, (int)(signals.can_signals.size() + signals.diagnostic_messages.size())  );
 
 	return ret;
 }
@@ -279,7 +279,7 @@ extern "C"
 				return 0;
 		}
 
-		ERROR(binder_interface, "There was something wrong with CAN device Initialization. Check your config file maybe");
+		ERROR(binder_interface, "%s: There was something wrong with CAN device Initialization. Check your config file maybe", __FUNCTION__);
 		return 1;
 	}
 };

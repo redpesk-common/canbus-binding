@@ -55,7 +55,7 @@ uint32_t can_bus_dev_t::get_address() const
 /// @return socket value or -1 if something wrong.
 int can_bus_dev_t::open(bool bcm)
 {
-	DEBUG(binder_interface, "open_raw: CAN Handler socket : %d", can_socket_.socket());
+	DEBUG(binder_interface, "%s: CAN Handler using BCM socket ? %s", __FUNCTION__, bcm ? "true" : "false");
 	return can_socket_.open(device_name_, bcm);
 }
 
@@ -67,22 +67,22 @@ void can_bus_dev_t::configure()
 		const int timestamp_on = 1;
 		const int canfd_on = 1;
 
-		DEBUG(binder_interface, "open_raw: CAN Handler socket correctly initialized : %d", can_socket_.socket());
+		DEBUG(binder_interface, "%s: CAN Handler socket correctly initialized : %d", __FUNCTION__, can_socket_.socket());
 
 		// Set timestamp for receveid frame
 		if (can_socket_.setopt(SOL_SOCKET, SO_TIMESTAMP, &timestamp_on, sizeof(timestamp_on)) < 0)
-			WARNING(binder_interface, "open_raw: setsockopt SO_TIMESTAMP error: %s", ::strerror(errno));
-		DEBUG(binder_interface, "open_raw: Switch CAN Handler socket to use fd mode");
+			WARNING(binder_interface, "%s: setsockopt SO_TIMESTAMP error: %s", __FUNCTION__, ::strerror(errno));
+		DEBUG(binder_interface, "%s: Switch CAN Handler socket to use fd mode", __FUNCTION__);
 
 		// try to switch the socket into CAN_FD mode
 		if (can_socket_.setopt(SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
 		{
-			NOTICE(binder_interface, "open_raw: Can not switch into CAN Extended frame format.");
+			NOTICE(binder_interface, "%s: Can not switch into CAN Extended frame format.", __FUNCTION__);
 			is_fdmode_on_ = false;
 		}
 		else
 		{
-			DEBUG(binder_interface, "open_raw: Correctly set up CAN socket to use FD frames.");
+			DEBUG(binder_interface, "%s: Correctly set up CAN socket to use FD frames.", __FUNCTION__);
 			is_fdmode_on_ = true;
 		}
 	}
@@ -127,7 +127,7 @@ can_message_t can_bus_dev_t::read()
 		::memset(&cfd, 0, sizeof(cfd));
 	}
 
-	DEBUG(binder_interface, "read: Found id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", cfd.can_id, cfd.len,
+	DEBUG(binder_interface, "%s: Found id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", __FUNCTION__, cfd.can_id, cfd.len,
 							cfd.data[0], cfd.data[1], cfd.data[2], cfd.data[3], cfd.data[4], cfd.data[5], cfd.data[6], cfd.data[7]);
 	return can_message_t::convert_from_canfd_frame(cfd, nbytes);
 }
@@ -136,7 +136,7 @@ can_message_t can_bus_dev_t::read()
 /// @param[in] can_bus reference can_bus_t. it will be passed to the thread to allow using can_bus_t queue.
 void can_bus_dev_t::start_reading(can_bus_t& can_bus)
 {
-	DEBUG(binder_interface, "Launching reading thread");
+	DEBUG(binder_interface, "%s: Launching reading thread", __FUNCTION__);
 	is_running_ = true;
 	th_reading_ = std::thread(&can_bus_dev_t::can_reader, this, std::ref(can_bus));
 	if(!th_reading_.joinable())

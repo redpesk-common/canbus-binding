@@ -140,7 +140,7 @@ void can_message_t::set_format(const can_message_format_t new_format)
 	if(new_format == can_message_format_t::STANDARD || new_format == can_message_format_t::EXTENDED || new_format == can_message_format_t::ERROR)
 		format_ = new_format;
 	else
-		ERROR(binder_interface, "ERROR: Can set format, wrong format chosen");
+		ERROR(binder_interface, "%s: Can set format, wrong format chosen", __FUNCTION__);
 }
 
 ///
@@ -164,15 +164,15 @@ can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& 
 	switch(nbytes)
 	{
 		case CANFD_MTU:
-			DEBUG(binder_interface, "set_max_data_length: Got an CAN FD frame");
+			DEBUG(binder_interface, "%s: Got an CAN FD frame", __FUNCTION__);
 			maxdlen = CANFD_MAX_DLEN;
 			break;
 		case CAN_MTU:
-			DEBUG(binder_interface, "set_max_data_length: Got a legacy CAN frame");
+			DEBUG(binder_interface, "%s: Got a legacy CAN frame", __FUNCTION__);
 			maxdlen = CAN_MAX_DLEN;
 			break;
 		default:
-			ERROR(binder_interface, "set_max_data_length: unsupported CAN frame");
+			ERROR(binder_interface, "%s: unsupported CAN frame", __FUNCTION__);
 			break;
 	}
 
@@ -195,7 +195,7 @@ can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& 
 			id = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
 			break;
 		default:
-			ERROR(binder_interface, "ERROR: Can set id, not a compatible format or format not set prior to set id.");
+			ERROR(binder_interface, "%s: Can set id, not a compatible format or format not set prior to set id.", __FUNCTION__);
 			break;
 	}
 
@@ -233,7 +233,7 @@ can_message_t can_message_t::convert_from_canfd_frame(const struct canfd_frame& 
 				data.push_back(frame.data[i]);
 			};
 
-		DEBUG(binder_interface, "convert_from_canfd_frame: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X",
+		DEBUG(binder_interface, "%s: Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", __FUNCTION__,
 								id, (uint8_t)format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 	}
 
@@ -258,7 +258,7 @@ canfd_frame can_message_t::convert_to_canfd_frame()
 		::memcpy(frame.data, get_data(), length_);
 	}
 	else
-		ERROR(binder_interface, "can_message_t not correctly initialized to be sent");
+		ERROR(binder_interface, "%s: can_message_t not correctly initialized to be sent", __FUNCTION__);
 
 	return frame;
 }

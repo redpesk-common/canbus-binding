@@ -93,7 +93,7 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
 		}
 	}
 
-	DEBUG(binder_interface, "process_can_signals: %d/%d CAN signals processed.", processed_signals, (int)signals.can_signals.size());
+	DEBUG(binder_interface, "%s: %d/%d CAN signals processed.", __FUNCTION__, processed_signals, (int)signals.can_signals.size());
 	return processed_signals;
 }
 
@@ -245,24 +245,24 @@ int can_bus_t::init_can_dev()
 				if (can_bus_t::can_devices_[device]->open(true) >= 0)
 				{
 					can_bus_t::can_devices_[device]->configure();
-					DEBUG(binder_interface, "Start reading thread");
-					NOTICE(binder_interface, "%s device opened and reading", device.c_str());
+					DEBUG(binder_interface, "%s: Start reading thread", __FUNCTION__);
+					NOTICE(binder_interface, "%s: %s device opened and reading", __FUNCTION__, device.c_str());
 					can_bus_t::can_devices_[device]->start_reading(*this);
 					i++;
 				}
 				else
 				{
-					ERROR(binder_interface, "Can't open device %s", device.c_str());
+					ERROR(binder_interface, "%s: Can't open device %s", __FUNCTION__, device.c_str());
 					return 1;
 				}
 			}
-			NOTICE(binder_interface, "Initialized %d/%d can bus device(s)", i, (int)t);
+			NOTICE(binder_interface, "%s: Initialized %d/%d can bus device(s)", __FUNCTION__, i, (int)t);
 			return 0;
 		}
-		ERROR(binder_interface, "init_can_dev: Error at CAN device initialization. No devices read from configuration file");
+		ERROR(binder_interface, "%s: Error at CAN device initialization. No devices read from configuration file", __FUNCTION__);
 		return 1;
 	}
-	ERROR(binder_interface, "init_can_dev: Can't read INI configuration file");
+	ERROR(binder_interface, "%s: Can't read INI configuration file", __FUNCTION__);
 	return 2;
 }
 
@@ -293,7 +293,7 @@ can_message_t can_bus_t::next_can_message()
 	{
 		can_msg = can_message_q_.front();
 		can_message_q_.pop();
-		DEBUG(binder_interface, "next_can_message: Here is the next can message : id %X, length %X, data %02X%02X%02X%02X%02X%02X%02X%02X", can_msg.get_id(), can_msg.get_length(),
+		DEBUG(binder_interface, "%s: Here is the next can message : id %X, length %X, data %02X%02X%02X%02X%02X%02X%02X%02X", __FUNCTION__, can_msg.get_id(), can_msg.get_length(),
 			can_msg.get_data()[0], can_msg.get_data()[1], can_msg.get_data()[2], can_msg.get_data()[3], can_msg.get_data()[4], can_msg.get_data()[5], can_msg.get_data()[6], can_msg.get_data()[7]);
 		return can_msg;
 	}
@@ -320,7 +320,7 @@ openxc_VehicleMessage can_bus_t::next_vehicle_message()
 	{
 		v_msg = vehicle_message_q_.front();
 		vehicle_message_q_.pop();
-		DEBUG(binder_interface, "next_vehicle_message: next vehicle message poped");
+		DEBUG(binder_interface, "%s: next vehicle message poped", __FUNCTION__);
 		return v_msg;
 	}
 

@@ -51,7 +51,7 @@ bool diagnostic_manager_t::initialize()
 	reset();
 
 	initialized_ = true;
-	DEBUG(binder_interface, "initialize: Diagnostic Manager initialized");
+	DEBUG(binder_interface, "%s: Diagnostic Manager initialized", __FUNCTION__);
 	return initialized_;
 }
 
@@ -61,13 +61,13 @@ bool diagnostic_manager_t::initialize()
 void diagnostic_manager_t::init_diagnostic_shims()
 {
 	shims_ = diagnostic_init_shims(shims_logger, shims_send, NULL);
-	DEBUG(binder_interface, "init_diagnostic_shims: Shims initialized");
+	DEBUG(binder_interface, "%s: Shims initialized", __FUNCTION__);
 }
 
 /// @brief Force cleanup all active requests.
 void diagnostic_manager_t::reset()
 {
-	DEBUG(binder_interface, "Clearing existing diagnostic requests");
+	DEBUG(binder_interface, "%s: Clearing existing diagnostic requests", __FUNCTION__);
 	cleanup_active_requests(true);
 }
 
@@ -86,7 +86,7 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 	std::shared_ptr<can_bus_dev_t> can_bus_dev = can_bus_t::get_can_device(configuration_t::instance().get_diagnostic_manager().bus_);
 	if(can_bus_dev != nullptr)
 		return can_bus_dev->shims_send(arbitration_id, data, size);
-	ERROR(binder_interface, "shims_send: Can not retrieve diagnostic bus: %s", configuration_t::instance().get_diagnostic_manager().bus_.c_str());
+	ERROR(binder_interface, "%s: Can not retrieve diagnostic bus: %s", __FUNCTION__, configuration_t::instance().get_diagnostic_manager().bus_.c_str());
 	return false;
 }
 
@@ -105,7 +105,7 @@ void diagnostic_manager_t::shims_logger(const char* format, ...)
 	char buffer[256];
 	vsnprintf(buffer, 256, format, args);
 
-	DEBUG(binder_interface, "shims_logger: %s", buffer);
+	DEBUG(binder_interface, "%S: %s", __FUNCTION__, buffer);
 }
 
 /// @brief The type signature for a... OpenXC TODO: not used yet.
@@ -178,11 +178,11 @@ void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, b
 		{
 			find_and_erase(entry, recurring_requests_);
 			cancel_request(entry);
-			DEBUG(binder_interface, "cleanup_request: Cancelling completed, recurring request: %s", request_string);
+			DEBUG(binder_interface, "%s: Cancelling completed, recurring request: %s", __FUNCTION__, request_string);
 		}
 		else
 		{
-			DEBUG(binder_interface, "cleanup_request: Cancelling completed, non-recurring request: %s", request_string);
+			DEBUG(binder_interface, "%s: Cancelling completed, non-recurring request: %s", __FUNCTION__, request_string);
 			find_and_erase(entry, non_recurring_requests_);
 			cancel_request(entry);
 		}
@@ -272,14 +272,14 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 					sizeof(request_string));
 
 			find_and_erase(entry, non_recurring_requests_);
-			DEBUG(binder_interface, "Added one-time diagnostic request on bus %s: %s",
+			DEBUG(binder_interface, "%s: Added one-time diagnostic request on bus %s: %s", __FUNCTION__,
 					bus_.c_str(), request_string);
 
 			non_recurring_requests_.push_back(entry);
 	}
 	else
 	{
-		WARNING(binder_interface, "There isn't enough request entry. Vector exhausted %d/%d", (int)non_recurring_requests_.size(), MAX_SIMULTANEOUS_DIAG_REQUESTS);
+		WARNING(binder_interface, "%s: There isn't enough request entry. Vector exhausted %d/%d", __FUNCTION__, (int)non_recurring_requests_.size(), MAX_SIMULTANEOUS_DIAG_REQUESTS);
 		non_recurring_requests_.resize(MAX_SIMULTANEOUS_DIAG_REQUESTS);
 		added = false;
 	}
@@ -289,7 +289,7 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyHz)
 {
 	if(frequencyHz > MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ) {
-		DEBUG(binder_interface, "Requested recurring diagnostic frequency %lf is higher than maximum of %d",
+		DEBUG(binder_interface, "%s: Requested recurring diagnostic frequency %lf is higher than maximum of %d", __FUNCTION__,
 			frequencyHz, MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ);
 		return false;
 	}
@@ -379,11 +379,11 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 			sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_BOOTTIME, &usec);
 			if(recurring_requests_.size() > 0)
 			{
-				DEBUG(binder_interface, "add_recurring_request: Added 100ms to usec to stagger sending requests");
+				DEBUG(binder_interface, "%s: Added 100ms to usec to stagger sending requests", __FUNCTION__);
 				usec += 100000;
 			}
 
-			DEBUG(binder_interface, "add_recurring_request: Added recurring diagnostic request (freq: %f) on bus %s at %ld. Event loop state: %d",
+			DEBUG(binder_interface, "%s: Added recurring diagnostic request (freq: %f) on bus %s at %ld. Event loop state: %d", __FUNCTION__,
 					frequencyHz,
 					bus_.c_str(),
 					usec,
@@ -392,21 +392,21 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 			if(sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source,
 					CLOCK_BOOTTIME, usec, TIMERFD_ACCURACY, send_request, request) < 0)
 			{
-				ERROR(binder_interface, "add_recurring_request: Request fails to be schedule through event loop");
+				ERROR(binder_interface, "%s: Request fails to be schedule through event loop", __FUNCTION__);
 				added = false;
 			}
 			recurring_requests_.push_back(entry);
 		}
 		else
 		{
-			WARNING(binder_interface, "add_recurring_request: There isn't enough request entry. Vector exhausted %d/%d", (int)recurring_requests_.size(), MAX_SIMULTANEOUS_DIAG_REQUESTS);
+			WARNING(binder_interface, "%s: There isn't enough request entry. Vector exhausted %d/%d", __FUNCTION__, (int)recurring_requests_.size(), MAX_SIMULTANEOUS_DIAG_REQUESTS);
 			recurring_requests_.resize(MAX_SIMULTANEOUS_DIAG_REQUESTS);
 			added = false;
 		}
 	}
 	else
 	{
-		DEBUG(binder_interface, "add_recurring_request: Can't add request, one already exists with same key");
+		DEBUG(binder_interface, "%s: Can't add request, one already exists with same key", __FUNCTION__);
 		added = false;
 	}
 	return added;
@@ -450,7 +450,7 @@ bool diagnostic_manager_t::clear_to_send(active_diagnostic_request_t* request) c
 int diagnostic_manager_t::reschedule_request(sd_event_source *s, uint64_t usec, active_diagnostic_request_t* adr)
 {
 	usec = usec + (uint64_t)(adr->get_frequency_clock().frequency_to_period());
-	DEBUG(binder_interface, "send_request: Event loop state: %d. usec: %ld", sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
+	DEBUG(binder_interface, "%s: Event loop state: %d. usec: %ld", __FUNCTION__, sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
 	if(sd_event_source_set_time(s, usec) >= 0)
 		if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)
 			return 0;
@@ -483,7 +483,7 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 		start_diagnostic_request(&dm.shims_, adr->get_handle());
 		if(adr->get_handle()->completed && !adr->get_handle()->success)
 		{
-				ERROR(binder_interface, "send_request: Fatal error sending diagnostic request");
+				ERROR(binder_interface, "%s: Fatal error sending diagnostic request", __FUNCTION__);
 				sd_event_source_unref(s);
 				return -1;
 		}
@@ -498,7 +498,7 @@ int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *
 	}
 
 	sd_event_source_unref(s);
-	NOTICE(binder_interface, "send_request: Request doesn't exist anymore. Canceling.'");
+	NOTICE(binder_interface, "%s: Request doesn't exist anymore. Canceling.'", __FUNCTION__);
 	return -2;
 }
 
@@ -539,7 +539,7 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 		found_signals = utils::signals_manager_t::instance().find_signals(build_DynamicField(adr->get_name()));
 		found_signals.diagnostic_messages.front()->set_supported(false);
 		cleanup_request(adr, true);
-		NOTICE(binder_interface, "relay_diagnostic_response: PID not supported or ill formed. Please unsubscribe from it. Error code : %d", response.negative_response_code);
+		NOTICE(binder_interface, "%s: PID not supported or ill formed. Please unsubscribe from it. Error code : %d", __FUNCTION__, response.negative_response_code);
 		message = build_VehicleMessage(build_SimpleMessage(adr->get_name(), build_DynamicField("This PID isn't supported by your vehicle.")));
 	}
 

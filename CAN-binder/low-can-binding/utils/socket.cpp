@@ -116,10 +116,10 @@ namespace utils
 
 		// Attempts to open a socket to CAN bus
 		::strcpy(ifr.ifr_name, device_name.c_str());
-		DEBUG(binder_interface, "open: ifr_name is : %s", ifr.ifr_name);
+		DEBUG(binder_interface, "%s: ifr_name is : %s", __FUNCTION__, ifr.ifr_name);
 		if(::ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
 		{
-			ERROR(binder_interface, "open: ioctl failed. Error was : %s", strerror(errno));
+			ERROR(binder_interface, "%s: ioctl failed. Error was : %s", __FUNCTION__, strerror(errno));
 			close();
 		}
 		else
@@ -129,13 +129,13 @@ namespace utils
 
 			if(bcm && connect((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
 			{
-				ERROR(binder_interface, "Connect failed. %s", strerror(errno));
+				ERROR(binder_interface, "%s: Connect failed. %s", __FUNCTION__, strerror(errno));
 				close();
 			}
 			// It's a RAW socket request, bind it to txAddress
 			else if(bind((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
 			{
-				ERROR(binder_interface, "Bind failed. %s", strerror(errno));
+				ERROR(binder_interface, "%s: Bind failed. %s", __FUNCTION__, strerror(errno));
 				close();
 			}
 		}
