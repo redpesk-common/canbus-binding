@@ -216,8 +216,9 @@ extern "C"
 		std::vector<std::string> signals;
 		struct utils::signals_found sf;
 		int ok = 0, total = 0;
+		bool subscribe = true;
 
-		signals = parse_signals_from_request(request, true);
+		signals = parse_signals_from_request(request, subscribe);
 
 		for(const auto& sig: signals)
 		{
