@@ -124,12 +124,11 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 }
 
 ///
-/// @fn static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const std::vector<can_signal_t>& signals)
 /// @brief subscribe to all signals in the vector signals
 ///
 /// @param[in] afb_req request : contain original request use to subscribe or unsubscribe
 /// @param[in] subscribe boolean value used to chose between a subscription operation or an unsubscription
-/// @param[in] can_signal_t  vector with can_signal_t to subscribe
+/// @param[in] signals -  struct containing vectors with can_signal_t and diagnostic_messages to subscribe
 ///
 /// @return Number of correctly subscribed signal
 ///
@@ -145,7 +144,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	{
 		DiagnosticRequest* diag_req = conf.get_request_from_diagnostic_message(sig->get_name());
 
-		// If the requested diagnostic message isn't supported by the car then unssubcribe.
+		// If the requested diagnostic message isn't supported by the car then unsubcribe it
 		// no matter what we want, worse case will be a fail unsubscription but at least we don't
 		// poll a PID for nothing.
 		if(sig->get_supported() && subscribe)

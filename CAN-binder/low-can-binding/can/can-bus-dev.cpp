@@ -21,8 +21,6 @@
 #include <unistd.h>
 #include <linux/can/raw.h>
 #include <linux/can/bcm.h>
-
-#include "can-bus-dev.hpp"
 #include <cmath>
 
 #include "can-bus.hpp"
@@ -31,6 +29,7 @@
 #include "canutil/write.h"
 
 #define U64_DATA(p) (*(unsigned long long*)(p)->data)
+
 /// @brief Class constructor
 ///
 /// @param[in] dev_name - String representing the device name into the linux /dev tree

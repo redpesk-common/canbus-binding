@@ -41,7 +41,8 @@ enum UNIT {
 ///
 /// @brief - A representation of an OBD-II PID.
 ///
-class diagnostic_message_t {
+class diagnostic_message_t
+{
 	private:
 		uint8_t pid_; /*!< pid_ - The 1 byte PID.*/
 		std::string generic_name_; /*!< generic_name_ - A human readable name to use for this PID when published.*/

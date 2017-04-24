@@ -28,7 +28,6 @@
 #include <vector>
 #include <memory>
 
-#include "can-bus-dev.hpp"
 #include "can-message.hpp"
 #include "../utils/timer.hpp"
 

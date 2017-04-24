@@ -105,7 +105,7 @@ void diagnostic_manager_t::shims_logger(const char* format, ...)
 	char buffer[256];
 	vsnprintf(buffer, 256, format, args);
 
-	DEBUG(binder_interface, "%S: %s", __FUNCTION__, buffer);
+	DEBUG(binder_interface, "%s: %s", __FUNCTION__, buffer);
 }
 
 /// @brief The type signature for a... OpenXC TODO: not used yet.
@@ -369,11 +369,6 @@ bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, con
 			active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request, name,
 					wait_for_multiple_responses, decoder, callback, frequencyHz);
 			entry->set_handle(shims_, request);
-
-			//start_diagnostic_request(&shims_, entry->get_handle());
-			//char request_string[128] = {0};
-			//diagnostic_request_to_string(&entry->get_handle()->request, request_string,
-			//		sizeof(request_string));
 
 			uint64_t usec;
 			sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_BOOTTIME, &usec);

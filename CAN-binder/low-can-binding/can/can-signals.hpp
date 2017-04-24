@@ -25,7 +25,6 @@
 
 #include "openxc.pb.h"
 #include "../utils/timer.hpp"
-#include "can-bus.hpp"
 #include "can-message.hpp"
 #include "can-message-definition.hpp"
 #include "../diagnostic/diagnostic-message.hpp"

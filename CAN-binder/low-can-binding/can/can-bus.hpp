@@ -29,8 +29,7 @@
 #include "can-bus-dev.hpp"
 #include "can-signals.hpp"
 #include "../utils/config-parser.hpp"
-#include "../diagnostic/active-diagnostic-request.hpp"
-
+#include "../diagnostic/diagnostic-manager.hpp"
 #include "../low-can-binding.hpp"
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
@@ -51,6 +50,9 @@ class can_bus_t
 {
 private:
 	utils::config_parser_t conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
+
+	int process_can_signals(can_message_t& can_message);
+	int process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message);
 
 	void can_decode_message();
 	std::thread th_decoding_; ///< thread that'll handle decoding a can frame
@@ -79,9 +81,6 @@ public:
 
 	void start_threads();
 	void stop_threads();
-
-	int process_can_signals(can_message_t& can_message);
-	int process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message);
 
 	can_message_t next_can_message();
 	void push_new_can_message(const can_message_t& can_msg);
