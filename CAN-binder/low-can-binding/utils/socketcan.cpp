@@ -22,11 +22,12 @@
 #include <net/if.h>
 #include <sys/ioctl.h>
 
-#include "socket.hpp"
+#include "socketcan.hpp"
 #include "low-can-binding.hpp"
 
 namespace utils
 {
+
 	/// @brief Construct a default, invalid, socket.
 	socketcan_t::socketcan_t()
 		: socket_{INVALID_SOCKET}
@@ -44,6 +45,11 @@ namespace utils
 	{
 		if(socket_ != INVALID_SOCKET)
 			::close(socket_);
+	}
+
+	const struct sockaddr_can& socketcan_t::get_tx_address() const
+	{
+		return tx_address_;
 	}
 
 	/// @brief Test if socket is valid.
@@ -121,10 +127,10 @@ namespace utils
 		}
 		else
 		{
-			txAddress_.can_family = AF_CAN;
-			txAddress_.can_ifindex = ifr.ifr_ifindex;
+			tx_address_.can_family = AF_CAN;
+			tx_address_.can_ifindex = ifr.ifr_ifindex;
 
-			if(connect((struct sockaddr *)&txAddress_, sizeof(txAddress_)) < 0)
+			if(connect((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
 			{
 				ERROR(binder_interface, "%s: Connect failed. %s", __FUNCTION__, strerror(errno));
 				close();
@@ -133,14 +139,38 @@ namespace utils
 		return socket_;
 	}
 
-	/// @brief Send a CAN message through the socket.
-	///
-	/// @param[in] f - the CAN FD frame to send
-	///
-	/// @return number of sent bytes if message sent, 0 on invalid socket and -1 if something wrong.
-	ssize_t socketcan_t::send(const struct canfd_frame& f)
+	socketcan_t& operator<<(socketcan_t& s, const struct bcm_msg_head& obj)
 	{
-		return socket_ != INVALID_SOCKET ? ::sendto(socket_, &f, sizeof(struct canfd_frame), 0,
-			(struct sockaddr*)&txAddress_, sizeof(txAddress_)) : 0;
+		struct sockaddr_can addr = s.get_tx_address();
+		::sendto(s.socket(), &obj, sizeof(bcm_msg_head), 0, (struct sockaddr*)&addr, sizeof(addr));
+		return s;
+	}
+
+	socketcan_t& operator<<(socketcan_t& s, const struct canfd_frame& obj)
+	{
+		struct sockaddr_can addr = s.get_tx_address();
+		::sendto(s.socket(), &obj, sizeof(canfd_frame), 0, (struct sockaddr*)&addr, sizeof(addr));
+		return s;
+	}
+
+	socketcan_t& operator<<(socketcan_t& s, const struct can_frame& obj)
+	{
+		struct sockaddr_can addr = s.get_tx_address();
+		::sendto(s.socket(), &obj, sizeof(can_frame), 0, (struct sockaddr*)&addr, sizeof(addr));
+		return s;
+	}
+
+	socketcan_t& operator<<(socketcan_t& s, const struct basic_bcm_msg<struct can_frame>& obj)
+	{
+		s << obj.msg_head;
+		s << obj.frames;
+		return s;
+	}
+
+	socketcan_t& operator<<(socketcan_t& s, const struct canfd_bcm_msg& obj)
+	{
+		s << obj.msg_head;
+		s << obj.frames;
+		return s;
 	}
 }

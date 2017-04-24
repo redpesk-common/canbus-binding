@@ -18,11 +18,27 @@
  */
 
 #include <sys/socket.h>
+#include <linux/can/bcm.h>
+
+#include <vector>
 
 #define INVALID_SOCKET -1
 
 namespace utils
 {
+
+	template <typename T>
+	struct basic_bcm_msg
+	{
+		bcm_msg_head msg_head;
+		std::vector<T> frames;
+	};
+
+	struct canfd_bcm_msg : public basic_bcm_msg<canfd_frame>
+	{
+	canfd_bcm_msg() { msg_head.flags |= CAN_FD_FRAME; }
+	};
+
 	class socketcan_t
 	{
 	public:
@@ -31,19 +47,34 @@ namespace utils
 		socketcan_t(socketcan_t&&);
 		~socketcan_t();
 
+		const struct sockaddr_can& get_tx_address() const;
 		explicit operator bool() const;
 
 		int socket() const;
 		int open(std::string device_name);
 		int setopt(int level, int optname, const void* optval, socklen_t optlen);
-		ssize_t send(const struct canfd_frame& f);
 		int close();
+
 	private:
 		int socket_;
-		struct sockaddr_can txAddress_; /// < internal member using to bind to the socket
+		struct sockaddr_can tx_address_;
 
 		int open(int domain, int type, int protocol);
 		int bind(const struct sockaddr* addr, socklen_t len);
 		int connect(const struct sockaddr* addr, socklen_t len);
 	};
+
+	template <typename T>
+	socketcan_t& operator<<(socketcan_t& s, const std::vector<T>& vobj)
+	{
+		for(const auto& obj : vobj)
+			s << obj;
+		return s;
+	}
+
+	socketcan_t& operator<<(socketcan_t& s, const canfd_frame& frame);
+	socketcan_t& operator<<(socketcan_t& s, const can_frame& frame);
+	socketcan_t& operator<<(socketcan_t& s, const struct basic_bcm_msg<can_frame>& obj);
+	socketcan_t& operator<<(socketcan_t& s, const struct canfd_bcm_msg& obj);
+	socketcan_t& operator<<(socketcan_t& s, const struct bcm_msg_head& obj);
 }

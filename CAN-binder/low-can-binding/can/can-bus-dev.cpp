@@ -151,24 +151,21 @@ void can_bus_dev_t::can_reader(can_bus_t& can_bus)
 /// @return 0 if message snet, -1 if something wrong.
 int can_bus_dev_t::send(can_message_t& can_msg)
 {
-	ssize_t nbytes;
 	canfd_frame f;
-
 	f = can_msg.convert_to_canfd_frame();
 
 	if(can_socket_)
 	{
-		nbytes = can_socket_.send(f);
-		if (nbytes == -1)
+		can_socket_ << f;
+		if(!can_socket_)
 		{
-			ERROR(binder_interface, "send_can_message: Sending CAN frame failed.");
+			ERROR(binder_interface, "%s: Sending CAN frame failed.", __FUNCTION__);
 			return -1;
 		}
-		return (int)nbytes;
 	}
 	else
 	{
-		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
+		ERROR(binder_interface, "%s: socket not initialized. Attempt to reopen can device socket.", __FUNCTION__);
 		open();
 		return -1;
 	}
@@ -187,7 +184,6 @@ int can_bus_dev_t::send(can_message_t& can_msg)
 /// @return True if message sent, false if not.
 bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
-	ssize_t nbytes;
 	canfd_frame f;
 
 	f.can_id = arbitration_id;
@@ -196,18 +192,18 @@ bool can_bus_dev_t::shims_send(const uint32_t arbitration_id, const uint8_t* dat
 
 	if(can_socket_)
 	{
-		nbytes = can_socket_.send(f);
-		if (nbytes == -1)
+		can_socket_ << f;
+		if (!can_socket_)
 		{
 			ERROR(binder_interface, "send_can_message: Sending CAN frame failed.");
 			return false;
 		}
-		return true;
 	}
 	else
 	{
 		ERROR(binder_interface, "send_can_message: socket not initialized. Attempt to reopen can device socket.");
 		open();
+		return false;
 	}
-	return false;
+	return true;
 }
