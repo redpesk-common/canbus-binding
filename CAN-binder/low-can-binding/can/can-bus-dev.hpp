@@ -23,10 +23,11 @@
 #include <string>
 #include <thread>
 
-#include "../utils/socket.hpp"
+#include "../utils/socketcan.hpp"
 
 class can_bus_t;
 class can_message_t;
+class can_signal_t;
 
 /// @brief Object representing a can device. Handle opening, closing and reading on the
 /// socket. This is the low level object to be initialized and use by can_bus_t.
@@ -57,6 +58,7 @@ public:
 	void stop_reading();
 
 	can_message_t read();
+	int create_rx_filter(const can_signal_t& s);
 
 	int send(can_message_t& can_msg);
 	bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);

@@ -27,6 +27,7 @@
 #include "openxc.pb.h"
 #include "can-message.hpp"
 #include "can-bus-dev.hpp"
+#include "can-signals.hpp"
 #include "../utils/config-parser.hpp"
 #include "../diagnostic/active-diagnostic-request.hpp"
 
@@ -89,6 +90,8 @@ public:
 
 	openxc_VehicleMessage next_vehicle_message();
 	void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
+
+	int create_rx_filter(const can_signal_t& signal);
 
 	const std::map<std::string, std::shared_ptr<can_bus_dev_t>>& get_can_devices() const;
 	static std::shared_ptr<can_bus_dev_t> get_can_device(std::string bus);

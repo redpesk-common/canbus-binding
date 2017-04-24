@@ -49,6 +49,11 @@ can_message_definition_t::can_message_definition_t(std::uint8_t message_set_id,
 	last_value_{CAN_MESSAGE_SIZE}
 {}
 
+const std::string& can_message_definition_t::get_bus_name() const
+{
+	return bus_;
+}
+
 uint32_t can_message_definition_t::get_id() const
 {
 	return id_;

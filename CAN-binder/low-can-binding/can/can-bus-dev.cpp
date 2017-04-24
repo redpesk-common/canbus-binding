@@ -20,13 +20,17 @@
 #include <mutex>
 #include <unistd.h>
 #include <linux/can/raw.h>
+#include <linux/can/bcm.h>
 
 #include "can-bus-dev.hpp"
+#include <cmath>
 
 #include "can-bus.hpp"
 #include "can-message.hpp"
 #include "../low-can-binding.hpp"
+#include "canutil/write.h"
 
+#define U64_DATA(p) (*(unsigned long long*)(p)->data)
 /// @brief Class constructor
 ///
 /// @param[in] dev_name - String representing the device name into the linux /dev tree
@@ -111,6 +115,29 @@ can_message_t can_bus_dev_t::read()
 	DEBUG(binder_interface, "%s: Found id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", __FUNCTION__, cfd.can_id, cfd.len,
 							cfd.data[0], cfd.data[1], cfd.data[2], cfd.data[3], cfd.data[4], cfd.data[5], cfd.data[6], cfd.data[7]);
 	return can_message_t::convert_from_canfd_frame(cfd, nbytes);
+}
+
+/// @brief Create a RX_SETUP receive job using the BCM socket.
+///
+/// @return 0 if ok else -1
+int can_bus_dev_t::create_rx_filter(const can_signal_t& s)
+{
+	uint32_t can_id  = s.get_message().get_id();
+
+	struct utils::canfd_bcm_msg bcm_msg;
+
+	uint8_t bit_size = s.get_bit_size();
+	float val = (float)exp2(bit_size);
+	uint64_t filter = eightbyte_encode_float(val, s.get_bit_position(), bit_size, s.get_factor(), s.get_offset());
+
+	bcm_msg.msg_head.opcode  = RX_SETUP;
+	bcm_msg.msg_head.can_id  = can_id;
+	bcm_msg.msg_head.nframes = 1;
+	U64_DATA(&bcm_msg.frames[0]) = filter;
+
+	if(can_socket_ << bcm_msg)
+		return 0;
+	return -1;
 }
 
 /// @brief start reading threads and set flag is_running_
