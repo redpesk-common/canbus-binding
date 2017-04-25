@@ -17,10 +17,12 @@
  * limitations under the License.
  */
 
+#include <vector>
+
 #include <sys/socket.h>
 #include <linux/can/bcm.h>
 
-#include <vector>
+#include "../can/can-message.hpp"
 
 #define INVALID_SOCKET -1
 
@@ -71,10 +73,11 @@ namespace utils
 			s << obj;
 		return s;
 	}
-
 	socketcan_t& operator<<(socketcan_t& s, const canfd_frame& frame);
 	socketcan_t& operator<<(socketcan_t& s, const can_frame& frame);
 	socketcan_t& operator<<(socketcan_t& s, const struct basic_bcm_msg<can_frame>& obj);
 	socketcan_t& operator<<(socketcan_t& s, const struct canfd_bcm_msg& obj);
 	socketcan_t& operator<<(socketcan_t& s, const struct bcm_msg_head& obj);
+
+	socketcan_t& operator>>(socketcan_t& s, const can_message_t& cm);
 }
