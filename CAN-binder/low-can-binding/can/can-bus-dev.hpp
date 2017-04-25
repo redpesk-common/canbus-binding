@@ -36,7 +36,7 @@ private:
 	std::string device_name_; ///< a string identifier identitfying the linux CAN device.
 	utils::socketcan_t can_socket_;
 
-	int32_t address_; ///< an identifier used through binding that refer to that device
+	int index_;
 
 	std::thread th_reading_; ///< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t
 	bool is_running_ = false; ///< boolean telling whether or not reading is running or not
@@ -46,7 +46,7 @@ public:
 	can_bus_dev_t(const std::string& dev_name, int32_t address);
 
 	std::string get_device_name() const;
-	uint32_t get_address() const;
+	int get_index() const;
 
 	int open();
 	void configure();

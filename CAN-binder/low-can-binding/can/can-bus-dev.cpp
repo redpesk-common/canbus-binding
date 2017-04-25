@@ -33,9 +33,9 @@
 /// @brief Class constructor
 ///
 /// @param[in] dev_name - String representing the device name into the linux /dev tree
-/// @param[in] address - integer identifier of the bus, set using init_can_dev from can_bus_t.
-can_bus_dev_t::can_bus_dev_t(const std::string& dev_name, int32_t address)
-	: device_name_{dev_name}, address_{address}
+/// @param[in] index - integer identifier of the bus, set using init_can_dev from can_bus_t.
+can_bus_dev_t::can_bus_dev_t(const std::string& dev_name, int index)
+	: device_name_{dev_name}, index_{index}
 {}
 
 std::string can_bus_dev_t::get_device_name() const
@@ -43,9 +43,10 @@ std::string can_bus_dev_t::get_device_name() const
 	return device_name_;
 }
 
-uint32_t can_bus_dev_t::get_address() const
+int can_bus_dev_t::get_index() const
 {
-	return address_;
+	return index_;
+}
 }
 
 /// @brief Open the can socket and returning it
