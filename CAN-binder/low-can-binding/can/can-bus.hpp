@@ -54,6 +54,10 @@ private:
 	int process_can_signals(can_message_t& can_message);
 	int process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message);
 
+	int can_reader();
+	std::thread th_reading_; ///< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t
+	bool is_reading_ = false; ///< boolean telling whether or not reading is running or not
+
 	void can_decode_message();
 	std::thread th_decoding_; ///< thread that'll handle decoding a can frame
 	bool is_decoding_ = false; ///< boolean member controling thread while loop

@@ -43,10 +43,11 @@ private:
 	void can_reader(can_bus_t& can_bus);
 
 public:
-	can_bus_dev_t(const std::string& dev_name, int32_t address);
+	can_bus_dev_t(const std::string& dev_name, int index);
 
 	std::string get_device_name() const;
 	int get_index() const;
+	utils::socketcan_t& get_socket();
 
 	int open();
 	void configure();

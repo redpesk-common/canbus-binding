@@ -47,6 +47,49 @@ can_bus_t::can_bus_t(utils::config_parser_t conf_file)
 
 std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::can_devices_;
 
+/// @brief Listen for all device sockets and fill can_messages_queue with them.
+/// Reading blocks until message arrive on listened sockets.
+///
+/// @return 0 if ok -1 if not
+int can_bus_t::can_reader()
+{
+	fd_set rfds;
+	int sock_max = INVALID_SOCKET;
+
+	FD_ZERO(&rfds);
+
+	for(auto& can_dev : can_devices_)
+	{
+		FD_SET(can_dev.second->get_socket().socket(), &rfds);
+		if (sock_max < can_dev.second->get_socket().socket())
+			sock_max = can_dev.second->get_socket().socket();
+	}
+
+	int ret;
+	while(is_reading_)
+	{
+		ret = select(sock_max + 1, &rfds, nullptr, nullptr, nullptr);
+
+		if(ret == -1)
+			perror("select()");
+		else if(ret > 0)
+		{
+			for(const auto& s: can_devices_)
+			{
+				if(FD_ISSET(s.second->get_socket().socket(), &rfds))
+				{
+					can_message_t msg;
+					s.second->get_socket() >> msg;
+					push_new_can_message(msg);
+					}
+				}
+		}
+		else
+			printf("Timeout\n");
+	}
+	return 0;
+}
+
 /// @brief Will make the decoding operation on a classic CAN message. It will not
 /// handle CAN commands nor diagnostic messages that have their own method to get
 /// this happens.
@@ -199,6 +242,11 @@ void can_bus_t::can_event_push()
 ///  and push subscribed events.
 void can_bus_t::start_threads()
 {
+	is_reading_ = true;
+	th_reading_ = std::thread(&can_bus_t::can_reader, this);
+	if(!th_reading_.joinable())
+		is_reading_ = false;
+
 	is_decoding_ = true;
 	th_decoding_ = std::thread(&can_bus_t::can_decode_message, this);
 	if(!th_decoding_.joinable())
@@ -215,6 +263,7 @@ void can_bus_t::start_threads()
 /// they'll finish their job.
 void can_bus_t::stop_threads()
 {
+	is_reading_ = false;
 	is_decoding_ = false;
 	is_pushing_ = false;
 }
@@ -248,7 +297,7 @@ int can_bus_t::init_can_dev()
 					can_bus_t::can_devices_[device]->configure();
 					DEBUG(binder_interface, "%s: Start reading thread", __FUNCTION__);
 					NOTICE(binder_interface, "%s: %s device opened and reading", __FUNCTION__, device.c_str());
-					can_bus_t::can_devices_[device]->start_reading(*this);
+					//can_bus_t::can_devices_[device]->start_reading(*this);
 					i++;
 				}
 				else

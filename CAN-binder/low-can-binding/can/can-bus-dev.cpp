@@ -27,6 +27,7 @@
 #include "can-message.hpp"
 #include "../low-can-binding.hpp"
 #include "canutil/write.h"
+#include "../bitfield/bitfield.h"
 
 /// @brief Class constructor
 ///
@@ -45,6 +46,9 @@ int can_bus_dev_t::get_index() const
 {
 	return index_;
 }
+utils::socketcan_t& can_bus_dev_t::get_socket()
+{
+	return can_socket_;
 }
 
 /// @brief Open the can socket and returning it
@@ -125,13 +129,12 @@ int can_bus_dev_t::create_rx_filter(const can_signal_t& s)
 	struct utils::canfd_bcm_msg bcm_msg;
 
 	uint8_t bit_size = s.get_bit_size();
-	float val = (float)exp2(bit_size);
-	uint64_t filter = eightbyte_encode_float(val, s.get_bit_position(), bit_size, s.get_factor(), s.get_offset());
+	float val = (float)exp2(bit_size)-1;
 
 	bcm_msg.msg_head.opcode  = RX_SETUP;
 	bcm_msg.msg_head.can_id  = can_id;
 	bcm_msg.msg_head.nframes = 1;
-	U64_DATA(&bcm_msg.frames[0]) = filter;
+	bitfield_encode_float(val, s.get_bit_position(), bit_size, s.get_factor(), s.get_offset(), bcm_msg.frames[0].data, CANFD_MAX_DLEN);
 
 	if(can_socket_ << bcm_msg)
 		return 0;
