@@ -39,7 +39,7 @@ set (PKG_REQUIRED_LIST
 
 # Static constante definition
 # -----------------------------
-add_compile_options(-D_REENTRANT -std=c++11)
+add_compile_options(-D_REENTRANT)
 add_compile_options(-DPB_FIELD_16BIT)
 
 # LANG Specific compile flags set for all build types
@@ -47,7 +47,7 @@ set(CMAKE_C_FLAGS "")
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
 # Print a helper message when every thing is finished
-setc(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/low-can-binding/package --ldpaths=\$\$(pwd)/low-can-binding/package/lib --port=1234 --roothttp=\$\$(pwd)/package/htdocs --tracereq=common --token=\"\" --verbose")
+setc(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/low-can-binding/package --ldpaths=\$\$(pwd)/low-can-binding/package/lib --port=1234 --roothttp=\$\$(pwd)/low-can-binding/package/htdocs --tracereq=common --token=\"\" --verbose")
 # ----------------------------------------------------
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
