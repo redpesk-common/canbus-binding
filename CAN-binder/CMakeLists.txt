@@ -287,3 +287,5 @@ if(CLOSING_MESSAGE AND GLOBAL_TARGET_LIST)
 		COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan "++ ${CLOSING_MESSAGE}"
 	)
 endif()
+
+set(ADDITIONAL_MAKE_CLEAN_FILES, "low-can-binding/low-can-binding.wgt")
