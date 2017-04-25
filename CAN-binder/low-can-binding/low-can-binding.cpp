@@ -172,16 +172,18 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 
 	for(const auto& sig: signals.can_signals)
 	{
-		ret = subscribe_unsubscribe_signal(request, subscribe, sig->get_name());
-		if(ret <= 0)
-			return ret;
-		rets++;
-		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
+		if(conf.get_can_bus_manager().create_rx_filter(*sig) <= 0 && 
+		subscribe_unsubscribe_signal(request, subscribe, sig->get_name()) <= 0)
+		{
+			return -1;
+			rets++;
+			DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
+		}
 	}
 	return rets;
 }
 
-static const std::vector<std::string> parse_signals_from_request(struct afb_req request, bool subscribe)
+static const std::vector<std::string> parse_args_from_request(struct afb_req request, bool subscribe)
 {
 	int i, n;
 	std::vector<std::string> ret;
