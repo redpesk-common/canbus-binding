@@ -78,5 +78,5 @@ namespace utils
 	socketcan_t& operator<<(socketcan_t& s, const struct basic_bcm_msg<can_frame>& obj);
 	socketcan_t& operator<<(socketcan_t& s, const struct canfd_bcm_msg& obj);
 
-	socketcan_t& operator>>(socketcan_t& s, const can_message_t& cm);
+	socketcan_t& operator>>(socketcan_t& s, can_message_t& cm);
 }

@@ -138,7 +138,7 @@ namespace utils
 		return socket_;
 	}
 
-	socketcan_t& operator>>(socketcan_t& s, const can_message_t& cm)
+	socketcan_t& operator>>(socketcan_t& s, can_message_t& cm)
 	{
 		struct {
 			struct bcm_msg_head msg_head;
