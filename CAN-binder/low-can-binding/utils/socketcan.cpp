@@ -17,13 +17,11 @@
 
 #include <unistd.h>
 #include <string>
-#include <string.h>
 #include <linux/can/raw.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
 
 #include "socketcan.hpp"
-#include "low-can-binding.hpp"
 #include "can-message.hpp"
 
 namespace utils
@@ -144,7 +142,7 @@ namespace utils
 	{
 		struct {
 			struct bcm_msg_head msg_head;
-			struct canfd_frame frames;
+			struct can_frame frames;
 		} msg;
 
 		struct sockaddr_can addr = s.get_tx_address();
@@ -158,27 +156,8 @@ namespace utils
 		printf("Data available: %i bytes read\n", (int)nbytes);
 		printf("read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X\n", ifr.ifr_name, msg.msg_head.can_id, msg.frames.len,
 			msg.frames.data[0], msg.frames.data[1], msg.frames.data[2], msg.frames.data[3], msg.frames.data[4], msg.frames.data[5], msg.frames.data[6], msg.frames.data[7]);
-		return s;
-	}
 
-	socketcan_t& operator<<(socketcan_t& s, const struct bcm_msg_head& obj)
-	{
-		struct sockaddr_can addr = s.get_tx_address();
-		::sendto(s.socket(), &obj, sizeof(bcm_msg_head), 0, (struct sockaddr*)&addr, sizeof(addr));
-		return s;
-	}
-
-	socketcan_t& operator<<(socketcan_t& s, const struct canfd_frame& obj)
-	{
-		struct sockaddr_can addr = s.get_tx_address();
-		::sendto(s.socket(), &obj, sizeof(canfd_frame), 0, (struct sockaddr*)&addr, sizeof(addr));
-		return s;
-	}
-
-	socketcan_t& operator<<(socketcan_t& s, const struct can_frame& obj)
-	{
-		struct sockaddr_can addr = s.get_tx_address();
-		::sendto(s.socket(), &obj, sizeof(can_frame), 0, (struct sockaddr*)&addr, sizeof(addr));
+		
 		return s;
 	}
 

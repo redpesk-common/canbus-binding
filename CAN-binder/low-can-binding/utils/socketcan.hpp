@@ -21,18 +21,20 @@
 
 #include <sys/socket.h>
 #include <linux/can/bcm.h>
+#include <string.h>
 
 #include "../can/can-message.hpp"
+#include "low-can-binding.hpp"
 
 #define INVALID_SOCKET -1
-
+#define U64_DATA(p) (*(unsigned long long*)(p)->data)
 namespace utils
 {
 
 	template <typename T>
 	struct basic_bcm_msg
 	{
-		bcm_msg_head msg_head;
+		struct bcm_msg_head msg_head;
 		std::vector<T> frames;
 	};
 
@@ -73,11 +75,8 @@ namespace utils
 			s << obj;
 		return s;
 	}
-	socketcan_t& operator<<(socketcan_t& s, const canfd_frame& frame);
-	socketcan_t& operator<<(socketcan_t& s, const can_frame& frame);
 	socketcan_t& operator<<(socketcan_t& s, const struct basic_bcm_msg<can_frame>& obj);
 	socketcan_t& operator<<(socketcan_t& s, const struct canfd_bcm_msg& obj);
-	socketcan_t& operator<<(socketcan_t& s, const struct bcm_msg_head& obj);
 
 	socketcan_t& operator>>(socketcan_t& s, const can_message_t& cm);
 }
