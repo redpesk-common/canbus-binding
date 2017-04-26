@@ -21,7 +21,6 @@
 #include <unistd.h>
 #include <linux/can/raw.h>
 #include <linux/can/bcm.h>
-#include <cmath>
 
 #include "can-bus.hpp"
 #include "can-message.hpp"
@@ -132,7 +131,7 @@ int can_bus_dev_t::create_rx_filter(const can_signal_t& s)
 	memset(&cfd, 0, sizeof(cfd));
 	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
 	uint8_t bit_size = s.get_bit_size();
-	float val = (float)exp2(bit_size)-1;
+	float val = (float)(1 << bit_size)-1;
 
 	bcm_msg.msg_head.opcode  = RX_SETUP;
 	bcm_msg.msg_head.can_id  = can_id;
