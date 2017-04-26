@@ -126,15 +126,27 @@ int can_bus_dev_t::create_rx_filter(const can_signal_t& s)
 {
 	uint32_t can_id  = s.get_message().get_id();
 
-	struct utils::canfd_bcm_msg bcm_msg;
+	struct utils::basic_bcm_msg<struct can_frame> bcm_msg;
+	struct can_frame cfd;
 
+	memset(&cfd, 0, sizeof(cfd));
+	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
 	uint8_t bit_size = s.get_bit_size();
 	float val = (float)exp2(bit_size)-1;
 
 	bcm_msg.msg_head.opcode  = RX_SETUP;
 	bcm_msg.msg_head.can_id  = can_id;
+	bcm_msg.msg_head.flags = 0;
 	bcm_msg.msg_head.nframes = 1;
-	bitfield_encode_float(val, s.get_bit_position(), bit_size, s.get_factor(), s.get_offset(), bcm_msg.frames[0].data, CANFD_MAX_DLEN);
+	bitfield_encode_float(val,
+										s.get_bit_position(),
+										bit_size,
+										s.get_factor(),
+										s.get_offset(),
+										cfd.data,
+										CAN_MAX_DLEN);
+
+	bcm_msg.frames.push_back(cfd);
 
 	if(can_socket_ << bcm_msg)
 		return 0;
