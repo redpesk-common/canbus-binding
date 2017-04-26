@@ -80,7 +80,9 @@ int can_bus_t::can_reader()
 				{
 					can_message_t msg;
 					s.second->get_socket() >> msg;
-					push_new_can_message(msg);
+					std::lock_guard<std::mutex> can_message_lock(get_can_message_mutex());
+					{ push_new_can_message(msg); }
+					get_new_can_message_cv().notify_one();
 					}
 				}
 		}
