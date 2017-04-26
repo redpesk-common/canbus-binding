@@ -24,7 +24,7 @@ configuration_t::configuration_t()
 				0,
 				0,
 				frequency_clock_t(0.00000f),
-				true,
+				false,
 				false,
 				{
 				},
@@ -44,7 +44,7 @@ configuration_t::configuration_t()
 				0,
 				0,
 				frequency_clock_t(0.00000f),
-				true,
+				false,
 				false,
 				{
 				},
@@ -64,7 +64,7 @@ configuration_t::configuration_t()
 				0,
 				0,
 				frequency_clock_t(0.00000f),
-				true,
+				false,
 				false,
 				{
 				},
@@ -84,7 +84,7 @@ configuration_t::configuration_t()
 				0,
 				0,
 				frequency_clock_t(0.00000f),
-				true,
+				false,
 				false,
 				{
 				},
@@ -104,7 +104,7 @@ configuration_t::configuration_t()
 				0,
 				0,
 				frequency_clock_t(0.00000f),
-				true,
+				false,
 				false,
 				{
 				},
