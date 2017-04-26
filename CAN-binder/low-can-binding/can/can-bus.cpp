@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-#include <map>
-#include <cerrno>
-#include <vector>
-#include <string>
 #include <net/if.h>
 #include <sys/socket.h>
 #include <json-c/json.h>
 #include <linux/can/raw.h>
+#include <map>
+#include <cerrno>
+#include <vector>
+#include <string>
+#include <algorithm>
 
 #include "can-bus.hpp"
 
@@ -337,7 +338,7 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 
 /// @brief Create a RX_SETUP receive job for the BCM socket of a CAN signal.
 ///
-/// @return 0 if ok.
+/// @return 0 if ok -1 if not.
 	int can_bus_t::create_rx_filter(const can_signal_t& s)
 	{
 		const std::string& bus  = s.get_message().get_bus_name();

@@ -142,6 +142,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 
 	for(const auto& sig : signals.diagnostic_messages)
 	{
+		diagnostic_manager_t& diag_m = conf.get_diagnostic_manager();
 		DiagnosticRequest* diag_req = conf.get_request_from_diagnostic_message(sig->get_name());
 
 		// If the requested diagnostic message isn't supported by the car then unsubcribe it
@@ -150,14 +151,14 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		if(sig->get_supported() && subscribe)
 		{
 				float frequency = sig->get_frequency();
-				subscribe = conf.get_diagnostic_manager().add_recurring_request(
+				subscribe = diag_m.add_recurring_request(
 					diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), (float)frequency);
 					//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
 		}
 		else
 		{
-			conf.get_diagnostic_manager().cleanup_request(
-				conf.get_diagnostic_manager().find_recurring_request(diag_req), true);
+			diag_m.cleanup_request(
+				diag_m.find_recurring_request(diag_req), true);
 			WARNING(binder_interface, "%s: signal: %s isn't supported. Canceling operation.", __FUNCTION__, sig->get_name().c_str());
 			return -1;
 		}
@@ -213,14 +214,14 @@ extern "C"
 {
 	static void subscribe(struct afb_req request)
 	{
-		std::vector<std::string> signals;
+		std::vector<std::string> args;
 		struct utils::signals_found sf;
 		int ok = 0, total = 0;
 		bool subscribe = true;
 
-		signals = parse_signals_from_request(request, subscribe);
+		args = parse_args_from_request(request, subscribe);
 
-		for(const auto& sig: signals)
+		for(const auto& sig: args)
 		{
 			openxc_DynamicField search_key = build_DynamicField(sig);
 			sf = utils::signals_manager_t::instance().find_signals(search_key);
@@ -241,7 +242,7 @@ extern "C"
 
 	static void unsubscribe(struct afb_req request)
 	{
-		parse_signals_from_request(request, false);
+		parse_args_from_request(request, false);
 	}
 
 	static const struct afb_verb_desc_v1 verbs[]=

@@ -28,8 +28,6 @@
 #include "../low-can-binding.hpp"
 #include "canutil/write.h"
 
-#define U64_DATA(p) (*(unsigned long long*)(p)->data)
-
 /// @brief Class constructor
 ///
 /// @param[in] dev_name - String representing the device name into the linux /dev tree
