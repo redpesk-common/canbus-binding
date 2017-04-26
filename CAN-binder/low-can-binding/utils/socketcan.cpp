@@ -161,18 +161,4 @@ namespace utils
 
 		return s;
 	}
-
-	socketcan_t& operator<<(socketcan_t& s, const struct basic_bcm_msg<struct can_frame>& obj)
-	{
-		s << obj.msg_head;
-		s << obj.frames;
-		return s;
-	}
-
-	socketcan_t& operator<<(socketcan_t& s, const struct canfd_bcm_msg& obj)
-	{
-		s << obj.msg_head;
-		s << obj.frames;
-		return s;
-	}
 }

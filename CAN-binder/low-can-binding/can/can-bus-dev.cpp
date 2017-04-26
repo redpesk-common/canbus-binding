@@ -125,7 +125,7 @@ int can_bus_dev_t::create_rx_filter(const can_signal_t& s)
 {
 	uint32_t can_id  = s.get_message().get_id();
 
-	struct utils::basic_bcm_msg<struct can_frame> bcm_msg;
+	struct utils::simple_bcm_msg bcm_msg;
 	struct can_frame cfd;
 
 	memset(&cfd, 0, sizeof(cfd));
@@ -145,7 +145,7 @@ int can_bus_dev_t::create_rx_filter(const can_signal_t& s)
 										cfd.data,
 										CAN_MAX_DLEN);
 
-	bcm_msg.frames.push_back(cfd);
+	bcm_msg.frames = cfd;
 
 	if(can_socket_ << bcm_msg)
 		return 0;

@@ -27,20 +27,20 @@
 #include "low-can-binding.hpp"
 
 #define INVALID_SOCKET -1
-#define U64_DATA(p) (*(unsigned long long*)(p)->data)
+
 namespace utils
 {
-
-	template <typename T>
-	struct basic_bcm_msg
+	struct simple_bcm_msg
 	{
 		struct bcm_msg_head msg_head;
-		std::vector<T> frames;
+		struct can_frame frames;
 	};
 
-	struct canfd_bcm_msg : public basic_bcm_msg<canfd_frame>
+	struct canfd_bcm_msg
 	{
-	canfd_bcm_msg() { msg_head.flags |= CAN_FD_FRAME; }
+		struct bcm_msg_head msg_head;
+		struct canfd_frame frames;
+		canfd_bcm_msg() { msg_head.flags |= CAN_FD_FRAME; }
 	};
 
 	class socketcan_t
@@ -75,7 +75,16 @@ namespace utils
 			s << obj;
 		return s;
 	}
-	socketcan_t& operator<<(socketcan_t& s, const struct basic_bcm_msg<can_frame>& obj);
+
+	template <typename T>
+	socketcan_t& operator<<(socketcan_t& s, const T& obj)
+	{
+		if (::sendto(s.socket(), &obj, sizeof(obj), 0, (const struct sockaddr*)&s.get_tx_address(), sizeof(s.get_tx_address())) < 0)
+			ERROR(binder_interface, "%s: Error sending : %i %s", __FUNCTION__, errno, ::strerror(errno));
+		return s;
+	}
+	
+	socketcan_t& operator<<(socketcan_t& s, const struct simple_bcm_msg& obj);
 	socketcan_t& operator<<(socketcan_t& s, const struct canfd_bcm_msg& obj);
 
 	socketcan_t& operator>>(socketcan_t& s, can_message_t& cm);
