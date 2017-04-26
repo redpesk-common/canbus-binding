@@ -116,7 +116,7 @@ can_message_t can_bus_dev_t::read()
 
 	DEBUG(binder_interface, "%s: Found id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", __FUNCTION__, cfd.can_id, cfd.len,
 							cfd.data[0], cfd.data[1], cfd.data[2], cfd.data[3], cfd.data[4], cfd.data[5], cfd.data[6], cfd.data[7]);
-	return can_message_t::convert_from_canfd_frame(cfd, nbytes);
+	return can_message_t::convert_from_frame(cfd, nbytes);
 }
 
 /// @brief Create a RX_SETUP receive job using the BCM socket.

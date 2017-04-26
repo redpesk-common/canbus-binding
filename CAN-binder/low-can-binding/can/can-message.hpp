@@ -70,6 +70,9 @@ public:
 
 	bool is_correct_to_send();
 
-	static can_message_t convert_from_canfd_frame(const struct canfd_frame& frame, size_t nbytes);
-	canfd_frame convert_to_canfd_frame();
+	static can_message_t convert_from_frame(const canfd_frame& frame, size_t nbytes);
+	static can_message_t convert_from_frame(const can_frame& frame, size_t nbytes);
+
+	struct canfd_frame convert_to_canfd_frame();
+	struct can_frame convert_to_can_frame();
 };
