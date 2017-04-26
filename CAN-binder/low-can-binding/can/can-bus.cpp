@@ -126,13 +126,17 @@ int can_bus_t::process_can_signals(can_message_t& can_message)
 		//DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name));
 		if( s.find(sig->get_name()) != s.end() && afb_event_is_valid(s[sig->get_name()]))
 		{
-			decoded_message = decoder_t::translateSignal(*sig, can_message, conf.get_can_signals());
+			bool send = true;
+			decoded_message = decoder_t::translateSignal(*sig, can_message, conf.get_can_signals(), &send);
 
-			openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
-			vehicle_message = build_VehicleMessage(s_message);
+			if(send)
+			{
+				openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
+				vehicle_message = build_VehicleMessage(s_message);
 
-			std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
-			push_new_vehicle_message(vehicle_message);
+				std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
+				push_new_vehicle_message(vehicle_message);
+			}
 			processed_signals++;
 		}
 	}

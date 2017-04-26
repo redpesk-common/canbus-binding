@@ -147,23 +147,30 @@ openxc_DynamicField decoder_t::stateDecoder(can_signal_t& signal,
 /// @param[in] signal - The details of the signal to decode and forward.
 /// @param[in] message - The received CAN message that should contain this signal.
 /// @param[in] signals - an array of all active signals.
+/// @param[out] send - An output parameter that will be flipped to false if the value could
+///      not be decoded.
 ///
 /// The decoder returns an openxc_DynamicField, which may contain a number,
 /// string or boolean.
 ///
 openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, can_message_t& message,
-	const std::vector<can_signal_t>& signals)
+	const std::vector<can_signal_t>& signals, bool* send)
 {
 	float value = decoder_t::parseSignalBitfield(signal, message);
 	DEBUG(binder_interface, "%s: Decoded message from parseSignalBitfield: %f", __FUNCTION__, value);
 
-	bool send = true;
 	// Must call the decoders every time, regardless of if we are going to
 	// decide to send the signal or not.
 	openxc_DynamicField decoded_value = decoder_t::decodeSignal(signal,
-			value, signals, &send);
+			value, signals, send);
 
 	signal.set_received(true);
+
+	// Don't send if they is no changes
+	if ((signal.get_last_value() == value && !signal.get_send_same()) || !send )
+	{
+		*send = false;
+	}
 	signal.set_last_value(value);
 	return decoded_value;
 }
