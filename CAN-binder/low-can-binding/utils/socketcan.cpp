@@ -22,7 +22,6 @@
 #include <sys/ioctl.h>
 
 #include "socketcan.hpp"
-#include "can-message.hpp"
 
 namespace utils
 {
