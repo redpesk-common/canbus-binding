@@ -173,12 +173,12 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	for(const auto& sig: signals.can_signals)
 	{
 		if(conf.get_can_bus_manager().create_rx_filter(*sig) <= 0 && 
-		subscribe_unsubscribe_signal(request, subscribe, sig->get_name()) <= 0)
+		subscribe_unsubscribe_signal(request, subscribe, sig->get_name()) <=0 )
 		{
 			return -1;
-			rets++;
-			DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 		}
+		rets++;
+		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}
 	return rets;
 }
@@ -236,7 +236,7 @@ extern "C"
 		}
 
 		NOTICE(binder_interface, "%s: Subscribed/unsubscribe correctly to %d/%d signal(s).", __FUNCTION__, ok, total);
-		if (ok)
+		if (ok > 0)
 			afb_req_success(request, NULL, NULL);
 		else
 			afb_req_fail(request, "error", NULL);
