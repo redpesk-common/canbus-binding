@@ -1,3 +1,4 @@
+#!/usr/bin/make -f
 # Copyright (C) 2015, 2016 "IoT.bzh"
 # Author "Romain Forlot" <romain.forlot@iot.bzh>
 #
@@ -14,10 +15,15 @@
 # limitations under the License.
 
 BUILD_DIR   := build
+PACKAGING_DIR := packaging/wgt
+PACKAGING_FILE := $(PACKAGING_DIR)/package.in
+PKG_FILELIST := $(shell cat $(PACKAGING_FILE))
 
-.PHONY: all clean mrproper ${BUILD_DIR}/Makefile
+VPATH = etc:$(PACKAGING_DIR):$(PACKAGING_DIR)/etc:$(BUILD_DIR)
 
-all: build package
+.PHONY: all clean mrproper package
+
+all: build
 
 clean:
 	@([ -d ${BUILD_DIR} ] && make -C ${BUILD_DIR} clean) || echo Nothing to clean
@@ -28,9 +34,10 @@ mrproper:
 build:  ${BUILD_DIR}/Makefile
 	cmake --build ${BUILD_DIR} --clean-first
 
-
-package:
-	cmake --build ${BUILD_DIR} --target widget
+package: config.xml icon.png | $(PKG_FILELIST)
+	mkdir -p ${BUILD_DIR}/$@/{bin,etc,lib,htdocs,data}
+	cp -r $(filter %.so, $|) ${BUILD_DIR}/$@/lib
+	cp -r $(filter %.cfg %.conf %.cnf %.ini, $|) ${BUILD_DIR}/$@/etc
 
 ${BUILD_DIR}/Makefile:
 	@[ -d ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
