@@ -29,6 +29,11 @@ set(PROJECT_ICON "icon.png")
 # ----------------------------------
 setc(CMAKE_BUILD_TYPE "DEBUG")
 
+# Compiler selection if needed. Overload the detected compiler.
+# -----------------------------------------------
+#set(CMAKE_C_COMPILER "gcc")
+#set(CMAKE_CXX_COMPILER "g++")
+
 # PKG_CONFIG required packages
 # -----------------------------
 set (PKG_REQUIRED_LIST 
@@ -47,8 +52,9 @@ set(CMAKE_C_FLAGS "")
 set(CMAKE_CXX_FLAGS "-std=c++11")
 
 # Print a helper message when every thing is finished
-setc(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/low-can-binding/package --ldpaths=\$\$(pwd)/low-can-binding/package/lib --port=1234 --roothttp=\$\$(pwd)/low-can-binding/package/htdocs --tracereq=common --token=\"\" --verbose")
 # ----------------------------------------------------
+setc(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/low-can-binding/package --ldpaths=\$\$(pwd)/low-can-binding/package/lib --port=1234 --roothttp=\$\$(pwd)/low-can-binding/package/htdocs --tracereq=common --token=\"\" --verbose")
+
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
 # ---------------------------------------------------------------------
@@ -58,11 +64,11 @@ setc(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Optional dependencies order
 # ---------------------------
-set(EXTRA_DEPENDENCIES_ORDER can-config-generator low-can-binding)
+#set(EXTRA_DEPENDENCIES_ORDER)
 
 # Optional Extra global include path
 # -----------------------------------
-#set(EXTRA_INCLUDE_DIRS can-config-generator/3rdparty/json libs/openxc-message-format/gen/cpp libs/nanopb libs/uds-c/src libs/isotp-c/src libs/bitfield-c/src)
+set(EXTRA_INCLUDE_DIRS libs/openxc-message-format/gen/cpp libs/nanopb libs/uds-c/src libs/isotp-c/src libs/bitfield-c/src libs/ini-config)
 
 # Optional extra libraries
 # -------------------------
@@ -70,7 +76,8 @@ set(EXTRA_DEPENDENCIES_ORDER can-config-generator low-can-binding)
 
 # Optional force binding installation
 # ------------------------------------
-# set(BINDINGS_INSTALL_PREFIX DestinationPath )
+set(BINDINGS_INSTALL_PREFIX /opt )
+# set(WIDGET_PREFIX DestinationPath)
 
 # Optional force binding Linking flag
 # ------------------------------------

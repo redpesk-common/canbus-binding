@@ -29,8 +29,9 @@ PROJECT_TARGET_ADD(low-can-binding)
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 	PREFIX ""
+	LABELS "BINDING"
 	LINK_FLAGS ${BINDINGS_LINK_FLAG}
-		OUTPUT_NAME ${TARGET_NAME}
+	OUTPUT_NAME ${TARGET_NAME}
 	)
 
 	# Library dependencies (include updates automatically)
@@ -41,11 +42,10 @@ PROJECT_TARGET_ADD(low-can-binding)
 		uds-c
 		isotp-c
 		bitfield-c
-		${link_libraries}
-	)
+		${link_libraries})
+
+	populate_widget()
 
 	# installation directory
 	INSTALL(TARGETS ${TARGET_NAME}
 		LIBRARY DESTINATION ${BINDINGS_INSTALL_DIR})
-
-	build_widget("BINDING")
