@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" id="@@APPNAME@@" version="@@APPVER@@">
+  <name>App Framework - @@APPNAME@@</name>
+  <icon src="icon.png"/>
+  <content src="@@CONTENT@@" type="application/vnd.agl.html.hybrid"/>
+  <description>This is a demo using OpenXC trace</description>
+  <author>Jose Bollo &lt;jobol@iot.bzh&gt; / Stephane Desneux &lt;sdx@iot.bzh&gt;</author>
+  <license>APL 2.0</license>
+</widget>
+
+

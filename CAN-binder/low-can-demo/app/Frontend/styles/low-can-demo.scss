@@ -1,0 +1,187 @@
+html,body {
+	padding:0;
+	margin: 0 auto;
+	width:100%;
+	height:100%;
+	min-height:100%;
+	color: black;
+	background: #FFF;
+}
+
+/* http://stackoverflow.com/questions/18474564/bootstrap-3-navbar-with-logo */
+.navbar-brand {
+	padding: 0px;
+}
+.navbar-brand>img {
+	height: 100%;
+	padding: 5px;
+	width: auto;
+}
+.navbar-right {
+	margin-right: 0;
+}
+
+/* used in navbar to show/hide items depending on connection status */
+.not-connected .if-connecting    { display: none; }
+.not-connected .if-connected     { display: none; }
+.not-connected .if-started       { display: none; }
+.connecting    .if-not-connected { display: none; }
+.connecting    .if-connected     { display: none; }
+.connecting    .if-started       { display: none; }
+.connected     .if-not-connected { display: none; }
+.connected     .if-connecting    { display: none; }
+.connected     .if-started       { display: none; }
+.started       .if-not-connected { display: none; }
+.started       .if-connecting    { display: none; }
+.started       .if-connected     { display: none; }
+
+.content{
+	position: absolute;
+	left:0;
+	right:0;
+	bottom:0;
+	top: 50px;
+	padding:0;
+	overflow: hidden;
+}
+
+.quad {
+	position: relative;
+	overflow: hidden;
+	width:100%;
+	height:50%;
+	padding:0;
+	margin: 0;
+	box-sizing:border-box;
+	-moz-box-sizing:border-box;
+	-webkit-box-sizing:border-box;
+	border: 4px ridge silver;
+	border-radius: 15px;
+	text-align: left;
+}
+
+.center {
+	display: table-cell;
+	width:100%;
+	height:100%;
+	vertical-align: middle;
+}
+
+#quad1 { border-bottom-right-radius: 0;}
+#quad2 { border-bottom-left-radius: 0; }
+#quad3 { border-top-right-radius: 0; overflow: auto; }
+#quad4 { border-top-left-radius: 0; }
+
+/* in quad 1 */
+#view1,#view2 {
+	position: relative;
+	width: auto !important;
+	height: auto !important;
+	min-width: 100%;
+	min-height: 100%;
+	display: block;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	-webkit-transform: translate(-50%,-50%);
+}
+
+.number { text-align: center; vertical-align: middle; font: italic bold 12px monospace; }
+
+/*
+#espan { position: absolute; left: 1em; bottom: 1em; }
+#espeed { position: absolute; top: 30px; width: 100px; color: green; font-size: 28px; }
+
+#vspan { position: absolute; right: 1em; bottom: 1em; }
+#vspeed { position: absolute; top: 16px; width: 100px; color: cyan; font-size: 42px; }
+*/
+
+#cluster {
+	position: absolute;
+	bottom:0;
+	left:0;
+	right:0;
+	background: rgba(50,50,50,.4);
+	height: 43%;
+	border-top: 2px outset silver;
+	border-top-left-radius: 50%;
+	border-top-right-radius: 50%;
+}
+
+#torqueGauge	{ position: absolute; bottom: -2%; left: 1%; width: 14%; }
+#rpmGauge		{ position: absolute; bottom: -4%; left: 16%; width: 21%; }
+#speedGauge		{ position: absolute; bottom: -3%; left: 38%; width: 24%; }
+#MAFGauge		{ position: absolute; bottom: -4%; right: 16%; width: 21%; }
+#IATempGauge	{ position: absolute; bottom: -2%;  right: 1%; width: 14%; }
+
+/* in quad 2 */
+#mapstreet {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+#car {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	z-index: 2000;
+
+}
+
+#gaspan { position: absolute; bottom:0; left:0; right:0; background: rgba(200,200,200,.3); padding: 1em; z-index: 2000;}
+
+#gas { position: relative; float: right; width: 69px; height: 92px; }
+#gas div { position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; overflow: hidden; }
+
+#copan { overflow: hidden; min-height: 50px; position: relative; height: 92px;}
+#copan div { 
+	display:inline;
+	position: absolute;
+	bottom: 0;
+	width: 10%;
+	height: 0%;
+	font-size: 10px;
+	color: black;
+	background: yellow; 
+	border: 1px solid grey;
+	padding: 0;
+}
+#copan div p {
+	text-align: center;
+	position: absolute;
+	bottom: 2px;
+	margin: 0;
+	width: 100%;
+}
+
+#con1 { left: 0%; }
+#con2 { left: 11%; }
+#con3 { left: 22%; }
+#con4 { left: 33%; }
+#con5 { left: 44%; }
+#con6 { left: 55%; }
+#con7 { left: 66%; }
+#con8 { left: 77%; }
+#con9 { left: 88%; }
+
+#gpblack { background: url(/images/gas-pump-black.png); }
+#gpgreen { background: url(/images/gas-pump-green.png); }
+#gpred { background: url(/images/gas-pump-red.png); visibility: hidden; }
+
+/* quad 3 */
+#xcdata {
+	text-align: left;
+}
+
+.leaflet-control-layers-toggle {
+    background-image: url(/images/layers.png);
+}
+
+/* quad 4 */
+#mapsat {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
