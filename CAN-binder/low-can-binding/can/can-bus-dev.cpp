@@ -26,7 +26,7 @@
 #include "can-message.hpp"
 #include "../low-can-binding.hpp"
 #include "canutil/write.h"
-#include "../bitfield/bitfield.h"
+#include "bitfield/bitfield.h"
 
 /// @brief Class constructor
 ///
