@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "../can/can-message.hpp"
-#include "low-can-binding.hpp"
+#include "../low-can-binding.hpp"
 
 #define INVALID_SOCKET -1
 
