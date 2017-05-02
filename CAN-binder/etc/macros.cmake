@@ -73,6 +73,7 @@ endfunction(find_source_files)
 macro(populate_widget)
 	# Declaration of a custom command that will populate widget tree with the target
 	set(POPULE_WIDGET_TARGET "populate_${TARGET_NAME}")
+
 	get_target_property(T ${TARGET_NAME} LABELS)
 	if(${T} STREQUAL "BINDING")
 		add_custom_command(OUTPUT ${WIDGET_LIBDIR}/${TARGET_NAME}.so
@@ -81,44 +82,51 @@ macro(populate_widget)
 			COMMAND cp ${TARGET_NAME}.so ${WIDGET_LIBDIR}
 		)
 		add_custom_target(${POPULE_WIDGET_TARGET} ALL DEPENDS ${WIDGET_LIBDIR}/${TARGET_NAME}.so)
-	endif(${T} STREQUAL "BINDING")
-
-	if(${T} STREQUAL "EXECUTABLE")
+	elseif(${T} STREQUAL "EXECUTABLE")
 		add_custom_command(OUTPUT ${WIDGET_BINDIR}/${TARGET_NAME}
 			DEPENDS ${TARGET_NAME}
 			COMMAND mkdir -p ${WIDGET_BINDIR}
 			COMMAND cp ${TARGET_NAME} ${WIDGET_BINDIR}
 		)
 		add_custom_target(${POPULE_WIDGET_TARGET} ALL DEPENDS ${WIDGET_BINDIR}/${TARGET_NAME})
-	endif(${T} STREQUAL "EXECUTABLE")
-
-	if(${T} STREQUAL "HTDOCS")
+	elseif(${T} STREQUAL "HTDOCS")
 		get_target_property(OUT ${TARGET_NAME} OUTPUT_NAME)
-		MESSAGE(STATUS "${OUT}")
 		add_custom_command(OUTPUT ${WIDGET_HTTPDIR}
 			DEPENDS ${TARGET_NAME}
 			COMMAND cp -r ${OUT} ${WIDGET_HTTPDIR}
 			)
 			add_custom_target(${POPULE_WIDGET_TARGET} ALL DEPENDS ${WIDGET_HTTPDIR})
-	endif(${T} STREQUAL "HTDOCS")
-
-	if(${T} STREQUAL "DATA")
+	elseif(${T} STREQUAL "DATA")
 		get_target_property(OUT ${TARGET_NAME} OUTPUT_NAME)
-		MESSAGE(STATUS "${OUT}")
 		add_custom_command(OUTPUT ${WIDGET_DATADIR}
 			DEPENDS ${TARGET_NAME}
 			COMMAND cp -r ${OUT} ${WIDGET_DATADIR}
 			)
 			add_custom_target(${POPULE_WIDGET_TARGET} ALL DEPENDS ${WIDGET_HTTPDIR})
-	endif(${T} STREQUAL "DATA")
-
+	endif(${T} STREQUAL "BINDING")
+	PROJECT_TARGET_ADD(${POPULE_WIDGET_TARGET})
 endmacro(populate_widget)
 
 macro(build_widget)
-	if(NOT EXISTS ${WIDGET_DIR}/config.xml OR NOT EXISTS ${WIDGET_DIR}/icon.png)
-		configure_file(${PROJECT_WGT_DIR}/config.xml.in ${WIDGET_DIR}/config.xml)
-		#file(COPY ${PROJECT_WGT_DIR}/icon.png.in ${WIDGET_DIR}/icon.png)
-	endif(NOT EXISTS ${WIDGET_DIR}/config.xml OR NOT EXISTS ${WIDGET_DIR}/icon.png)
+	if("${PROJECT_TARGETS}" MATCHES "populate_")
+		if(NOT EXISTS ${WIDGET_DIR}/config.xml.in OR NOT EXISTS ${WIDGET_DIR}/${PROJECT_ICON}.in)
+			configure_file(${PROJECT_WGT_DIR}/config.xml.in ${WIDGET_DIR}/config.xml)
+			file(COPY ${PROJECT_WGT_DIR}/${PROJECT_ICON}.in DESTINATION ${WIDGET_DIR}/${PROJECT_ICON})
+		endif(NOT EXISTS ${WIDGET_DIR}/config.xml.in OR NOT EXISTS ${WIDGET_DIR}/${PROJECT_ICON}.in)
+
+		file(GLOB PROJECT_CONF_FILES "${PROJECT_WGT_DIR}/etc/*")
+		if(${PROJECT_CONF_FILES})
+			file(COPY "${PROJECT_WGT_DIR}/etc/*" DESTINATION ${WIDGET_ETCDIR}/)
+		endif(${PROJECT_CONF_FILES})
+
+		add_custom_command(OUTPUT ${PROJECT_NAME}.wgt
+		DEPENDS ${PROJECT_TARGETS}
+		COMMAND wgtpkg-pack -f -o ${PROJECT_NAME}.wgt ${WIDGET_DIR}
+		)
+		add_custom_target(widget DEPENDS ${PROJECT_NAME}.wgt)
+	else()
+		MESSAGE(FATAL_ERROR "Widget tree empty, please populate it by calling  populate_widget() macro with target you want to include into it.")
+	endif("${PROJECT_TARGETS}" MATCHES "populate_")
 endmacro(build_widget)
 
 macro(search_targets)
@@ -130,25 +138,16 @@ macro(search_targets)
 	endforeach()
 endmacro()
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 setc(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMP0048 1)
 
 # Include project configuration
 # ------------------------------
-include(${CMAKE_CURRENT_SOURCE_DIR}/etc/config.cmake)
 project(${NAME} VERSION ${VERSION})
-setc(PROJECT_PRETTY_NAME "${PRETTY_NAME}")
-setc(PROJECT_DESCRIPTION "${DESCRIPTION}")
 setc(PROJECT_WGT_DIR "packaging/wgt")
 setc(PROJECT_LIBDIR "libs")
 setc(PROJECT_RESOURCES "data")
-
-message(STATUS "")
-message(STATUS "Project=${PROJECT_NAME}/${VERSION}[${PRETTY_NAME} ${DESCRIPTION}]")
-message(STATUS "")
-message(STATUS "gcc/g++ version-${CMAKE_C_VERSION}.x selected")
 
 INCLUDE(FindPkgConfig)
 INCLUDE(CheckIncludeFiles)
@@ -229,10 +228,6 @@ set(WIDGET_DATADIR ${WIDGET_DIR}/data)
 if(NOT BINDINGS_LINK_FLAG)
 	set(BINDINGS_LINK_FLAG "-Wl,--version-script=${CMAKE_SOURCE_DIR}/etc/export.map")
 endif()
-
-# Bindings to compile
-# --------------------
-search_targets()
 
 # Add a dummy target to enable global dependency order
 # -----------------------------------------------------

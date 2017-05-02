@@ -2,7 +2,7 @@
 # Copyright 2015, 2016, 2017 IoT.bzh
 #
 # author: Fulup Ar Foll <fulup@iot.bzh>
-# contrib: Romain Forlot <romain.forlot@iot.bzh>
+# contrib: Romain Forlot <romain.forlot@iot.bzh>w
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,50 +17,29 @@
 # limitations under the License.
 ###########################################################################
 
+# Add subdir targets
+search_targets()
+
 # Add target to project dependency list
-PROJECT_TARGET_ADD(low-can-binding)
+PROJECT_TARGET_ADD(low-can-demo)
 
 	# Define project Targets
-	add_library(${TARGET_NAME} MODULE
-		${TARGET_NAME}.cpp
-		configuration.cpp
-		configuration-generated.cpp
-		can/can-bus.cpp
-		can/can-bus-dev.cpp
-		can/can-message-set.cpp
-		can/can-message-definition.cpp
-		can/can-message.cpp
-		can/can-signals.cpp
-		can/can-decoder.cpp
-		diagnostic/diagnostic-message.cpp
-		diagnostic/diagnostic-manager.cpp
-		diagnostic/active-diagnostic-request.cpp
-		utils/signals.cpp
-		utils/openxc-utils.cpp
-		utils/timer.cpp
-		utils/socketcan.cpp
-		utils/config-parser.cpp)
+	add_custom_command(OUTPUT dist.prod
+	DEPENDS ${TARGET_NAME}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	COMMAND npm install
+	COMMAND gulp build-app-prod
+	COMMAND cp -r dist.prod ${CMAKE_CURRENT_BINARY_DIR})
 
+	add_custom_target(${TARGET_NAME} ALL DEPENDS dist.prod)
+ 
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 		PREFIX ""
-		LABELS "BINDING"
-		LINK_FLAGS ${BINDINGS_LINK_FLAG}
-		OUTPUT_NAME ${TARGET_NAME}
-	)
-
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		ini-config
-		openxc-message-format
-		nanopb
-		uds-c
-		isotp-c
-		bitfield-c
-		${link_libraries})
+		LABELS "HTDOCS"
+		OUTPUT_NAME dist.prod)
 
 	# installation directory
-	INSTALL(TARGETS ${TARGET_NAME}
-		LIBRARY DESTINATION ${BINDINGS_INSTALL_DIR})
+	INSTALL(DIRECTORY dist.prod/ DESTINATION ${BINDINGS_INSTALL_DIR})
 
 	populate_widget()

@@ -3,7 +3,7 @@
   <name>@PROJECT_NAME@</name>
   <icon src="icon.png"/>
   <content src="htdocs/index.html" type="application/vnd.agl.html.hybrid"/>
-  <description>This is a demo application used with low-can binding.</description>
+  <description>@PROJECT_DESCRIPTION@</description>
   <author>Romain Forlot &lt;romain.forlot@iot.bzh&gt;</author>
   <license>APL 2.0</license>
 </widget>
