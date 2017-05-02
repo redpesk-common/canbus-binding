@@ -16,8 +16,6 @@
 
 BUILD_DIR   := build
 PACKAGING_DIR := packaging/wgt
-PACKAGING_FILE := $(PACKAGING_DIR)/package.in
-PKG_FILELIST := $(shell cat $(PACKAGING_FILE))
 
 VPATH = etc:$(PACKAGING_DIR):$(PACKAGING_DIR)/etc:$(BUILD_DIR)
 
@@ -32,12 +30,11 @@ mrproper:
 	rm -rf ${BUILD_DIR}
 
 build:  ${BUILD_DIR}/Makefile
-	cmake --build ${BUILD_DIR} --clean-first
+	cmake --build ${BUILD_DIR} --target all
 
-package: config.xml icon.png | $(PKG_FILELIST)
+package: config.xml.in icon.png.in build | $(PKG_FILELIST)
 	mkdir -p ${BUILD_DIR}/$@/{bin,etc,lib,htdocs,data}
-	cp -r $(filter %.so, $|) ${BUILD_DIR}/$@/lib
-	cp -r $(filter %.cfg %.conf %.cnf %.ini, $|) ${BUILD_DIR}/$@/etc
+	cmake --build ${BUILD_DIR} --target widget
 
 ${BUILD_DIR}/Makefile:
 	@[ -d ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
