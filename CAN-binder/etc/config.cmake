@@ -68,7 +68,7 @@ set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Optional Extra global include path
 # -----------------------------------
-set(EXTRA_INCLUDE_DIRS libs/openxc-message-format/gen/cpp libs/nanopb libs/uds-c/src libs/isotp-c/src libs/bitfield-c/src libs/ini-config)
+#set(EXTRA_INCLUDE_DIRS)
 
 # Optional extra libraries
 # -------------------------
@@ -82,5 +82,3 @@ set(BINDINGS_INSTALL_PREFIX /opt )
 # Optional force binding Linking flag
 # ------------------------------------
 # set(BINDINGS_LINK_FLAG LinkOptions )
-
-

@@ -18,48 +18,26 @@
 ###########################################################################
 
 # Add target to project dependency list
-PROJECT_TARGET_ADD(low-can-binding)
+PROJECT_TARGET_ADD(bitfield-c)
 
-	# Define project Targets
-	add_library(${TARGET_NAME} MODULE
-		${TARGET_NAME}.cpp
-		configuration.cpp
-		configuration-generated.cpp
-		can/can-bus.cpp
-		can/can-bus-dev.cpp
-		can/can-message-set.cpp
-		can/can-message-definition.cpp
-		can/can-message.cpp
-		can/can-signals.cpp
-		can/can-decoder.cpp
-		diagnostic/diagnostic-message.cpp
-		diagnostic/diagnostic-manager.cpp
-		diagnostic/active-diagnostic-request.cpp
-		utils/signals.cpp
-		utils/openxc-utils.cpp
-		utils/timer.cpp
-		utils/socketcan.cpp
-		utils/config-parser.cpp)
+	# Define project Target
+	add_library(${TARGET_NAME} STATIC
+		src/bitfield/8byte.c
+		src/bitfield/bitarray.c 
+		src/bitfield/bitfield.c
+		src/canutil/read.c
+		src/canutil/write.c)
 
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-		PREFIX ""
-		LABELS "BINDING"
-		LINK_FLAGS ${BINDINGS_LINK_FLAG}
 		OUTPUT_NAME ${TARGET_NAME}
+	)
+
+	# Define target includes
+	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
+		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
 	)
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		ini-config
-		openxc-message-format
-		uds-c
-		isotp-c
-		bitfield-c
 		${link_libraries})
-
-	# installation directory
-	INSTALL(TARGETS ${TARGET_NAME}
-		LIBRARY DESTINATION ${BINDINGS_INSTALL_DIR})
-
-	populate_widget()
