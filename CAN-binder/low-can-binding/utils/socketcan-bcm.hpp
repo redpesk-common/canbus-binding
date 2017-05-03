@@ -38,7 +38,7 @@ namespace utils
 	{
 	public:
 		socketcan_bcm_t();
-		socketcan_bcm_t(const socketcan_bcm_t&) = delete;
+		socketcan_bcm_t(const socketcan_bcm_t&);
 		socketcan_bcm_t(socketcan_bcm_t&&);
 		virtual ~socketcan_bcm_t();
 

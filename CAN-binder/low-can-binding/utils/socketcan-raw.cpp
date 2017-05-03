@@ -17,25 +17,25 @@
 
 #include "socketcan-raw.hpp"
 
+#include <net/if.h>
+#include <sys/ioctl.h>
+
 namespace utils
 {
 	/// @brief Construct a default, invalid, socket.
 	socketcan_raw_t::socketcan_raw_t()
-		: socketcan_t{}, socket_{INVALID_SOCKET}
+		: socketcan_t{}
 	{}
-
-	/// @brief Construct a socket by moving an existing one.
-	socketcan_raw_t::socketcan_raw_t(socketcan_raw_t&& s)
-		: socket_{s.socket_}
-	{
-		s.socket_ = INVALID_SOCKET;
-	}
 
 	/// @brief Destruct the socket.
 	socketcan_raw_t::~socketcan_raw_t()
+	{}
+
+	/// @brief Bind the socket.
+	/// @return 0 if success.
+	int socketcan_raw_t::bind(const struct sockaddr* addr, socklen_t len)
 	{
-		if(socket_ != INVALID_SOCKET)
-			::close(socket_);
+		return socket_ != INVALID_SOCKET ? ::bind(socket_, addr, len) : 0;
 	}
 
  	/// @brief Open a raw socket CAN.
@@ -47,7 +47,7 @@ namespace utils
 		close();
 		
 		struct ifreq ifr;
-		socket_ = open(PF_CAN, SOCK_RAW, CAN_RAW);
+		socket_ = socketcan_t::open(PF_CAN, SOCK_RAW, CAN_RAW);
 
 		// Attempts to open a socket to CAN bus
 		::strcpy(ifr.ifr_name, device_name.c_str());

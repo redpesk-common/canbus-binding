@@ -34,7 +34,7 @@ namespace utils
 	{
 	public:
 		socketcan_t();
-		socketcan_t(const socketcan_t&) = delete;
+		socketcan_t(const socketcan_t&);
 		socketcan_t(socketcan_t&&);
 		virtual ~socketcan_t();
 

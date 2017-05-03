@@ -83,20 +83,6 @@ namespace utils
 		return socket_ != INVALID_SOCKET ? ::setsockopt(socket_, level, optname, optval, optlen) : 0;
 	}
 
-	/// @brief Bind the socket.
-	/// @return 0 if success.
-	int socketcan_t::bind(const struct sockaddr* addr, socklen_t len)
-	{
-		return socket_ != INVALID_SOCKET ? ::bind(socket_, addr, len) : 0;
-	}
-
-	/// @brief Connect the socket.
-	/// @return 0 if success.
-	int socketcan_t::connect(const struct sockaddr* addr, socklen_t len)
-	{
-		return socket_ != INVALID_SOCKET ? ::connect(socket_, addr, len) : 0;
-	}
-
 	/// @brief Get the file descriptor.
 	/// @return The socket's file descriptor
 	int socketcan_t::socket() const

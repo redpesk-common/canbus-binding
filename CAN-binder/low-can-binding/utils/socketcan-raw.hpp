@@ -24,7 +24,7 @@ namespace utils
 	{
 	public:
 		socketcan_raw_t();
-		socketcan_raw_t(const socketcan_raw_t&) = delete;
+		socketcan_raw_t(const socketcan_raw_t&);
 		socketcan_raw_t(socketcan_raw_t&&);
 		virtual ~socketcan_raw_t();
 
