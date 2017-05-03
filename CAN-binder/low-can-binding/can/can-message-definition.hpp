@@ -42,11 +42,11 @@ private:
 							*      message, if sent raw, or simply to mark the max frequency for custom
 							*      handlers to retrieve.*/
 	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send CAN
- 							 *	message if it has changed when using raw passthrough.*/
+							*	message if it has changed when using raw passthrough.*/
 	std::vector<uint8_t> last_value_; /*!< last_value_ - The last received value of the message. Defaults to undefined.
- 										  *	This is required for the forceSendChanged functionality, as the stack
- 										  *	needs to compare an incoming CAN message with the previous frame.*/
-	
+										*	This is required for the forceSendChanged functionality, as the stack
+										*	needs to compare an incoming CAN message with the previous frame.*/
+
 public:
 	can_message_definition_t(std::uint8_t message_set_id, const std::string bus);
 	can_message_definition_t(std::uint8_t message_set_id, const std::string bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed);
