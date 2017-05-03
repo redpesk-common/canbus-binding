@@ -113,7 +113,7 @@ namespace utils
 		close();
 		
 		struct ifreq ifr;
-		socket_ = ::socket(PF_CAN, SOCK_DGRAM, CAN_BCM);
+		socket_ = open(PF_CAN, SOCK_DGRAM, CAN_BCM);
 
 		// Attempts to open a socket to CAN bus
 		::strcpy(ifr.ifr_name, device_name.c_str());
