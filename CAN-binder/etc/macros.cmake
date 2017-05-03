@@ -124,6 +124,7 @@ macro(build_widget)
 		COMMAND wgtpkg-pack -f -o ${PROJECT_NAME}.wgt ${WIDGET_DIR}
 		)
 		add_custom_target(widget DEPENDS ${PROJECT_NAME}.wgt)
+		set(ADDITIONAL_MAKE_CLEAN_FILES, "${PROJECT_NAME}.wgt")
 	else()
 		MESSAGE(FATAL_ERROR "Widget tree empty, please populate it by calling  populate_widget() macro with target you want to include into it.")
 	endif("${PROJECT_TARGETS}" MATCHES "populate_")
@@ -196,7 +197,7 @@ CHECK_LIBRARY_EXISTS(efence malloc "" HAVE_LIBEFENCE)
 IF(HAVE_LIBEFENCE)
 	MESSAGE(STATUS "Linking with ElectricFence for debugging purposes...")
 	SET(libefence_LIBRARIES "-lefence")
-	list (APPEND link_libraries libefence_LIBRARIES})
+	list (APPEND link_libraries ${libefence_LIBRARIES})
 ENDIF(HAVE_LIBEFENCE)
 ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
 
@@ -254,5 +255,3 @@ if(CLOSING_MESSAGE AND GLOBAL_TARGET_LIST)
 		COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan "++ ${CLOSING_MESSAGE}"
 	)
 endif()
-
-set(ADDITIONAL_MAKE_CLEAN_FILES, "low-can-binding/low-can-binding.wgt")
