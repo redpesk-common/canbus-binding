@@ -7,7 +7,7 @@ configuration_t::configuration_t()
 	, can_message_definition_
 	{
 		{
-			can_message_definition_t(0, "can0", 0x620, can_message_format_t::STANDARD, frequency_clock_t(0.00000f), true)
+			can_message_definition_t{0, "can0", 0x620, can_message_format_t::STANDARD, frequency_clock_t(0.00000f), true}
 		}
 	}
 	, can_signals_
