@@ -67,8 +67,16 @@ void can_bus_dev_t::configure()
 	if (can_socket_)
 	{
 		const int timestamp_on = 1;
+		const int canfd_on = 1;
 
 		DEBUG(binder_interface, "%s: CAN Handler socket correctly initialized : %d", __FUNCTION__, can_socket_.socket());
+
+		// try to switch the socket into CAN_FD mode
+		if (can_socket_.setopt(SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &canfd_on, sizeof(canfd_on)) < 0)
+		{
+			NOTICE(binder_interface, "%s: Can not switch into CAN Extended frame format: %s", __FUNCTION__, ::strerror(errno));
+		}
+
 		if (can_socket_.setopt(SOL_SOCKET, SO_TIMESTAMP, &timestamp_on, sizeof(timestamp_on)) < 0)
 			WARNING(binder_interface, "%s: setsockopt SO_TIMESTAMP error: %s", __FUNCTION__, ::strerror(errno));
 	}

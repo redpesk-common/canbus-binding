@@ -22,7 +22,7 @@
 #include <string>
 #include <thread>
 
-#include "../utils/socketcan.hpp"
+#include "../utils/socketcan-raw.hpp"
 
 class can_bus_t;
 class can_message_t;
@@ -34,7 +34,7 @@ class can_bus_dev_t
 {
 private:
 	std::string device_name_; ///< a string identifier identitfying the linux CAN device.
-	utils::socketcan_t can_socket_;
+	utils::socketcan_raw_t can_socket_;
 
 	int index_;
 
