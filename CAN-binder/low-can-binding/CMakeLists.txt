@@ -39,6 +39,8 @@ PROJECT_TARGET_ADD(low-can-binding)
 		utils/openxc-utils.cpp
 		utils/timer.cpp
 		utils/socketcan.cpp
+		utils/socketcan-raw.cpp
+		utils/socketcan-bcm.cpp
 		utils/config-parser.cpp)
 
 	# Binder exposes a unique public entry point
