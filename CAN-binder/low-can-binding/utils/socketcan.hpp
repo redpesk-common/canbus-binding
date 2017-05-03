@@ -30,42 +30,27 @@
 
 namespace utils
 {
-	struct simple_bcm_msg
-	{
-		struct bcm_msg_head msg_head;
-		struct can_frame frames;
-	};
-
-	struct canfd_bcm_msg
-	{
-		struct bcm_msg_head msg_head;
-		struct canfd_frame frames;
-		canfd_bcm_msg() { msg_head.flags |= CAN_FD_FRAME; }
-	};
-
 	class socketcan_t
 	{
 	public:
 		socketcan_t();
 		socketcan_t(const socketcan_t&) = delete;
 		socketcan_t(socketcan_t&&);
-		~socketcan_t();
+		virtual ~socketcan_t();
 
 		const struct sockaddr_can& get_tx_address() const;
 		explicit operator bool() const;
 
 		int socket() const;
-		int open(std::string device_name);
+		virtual int open(std::string device_name) = 0;
 		int setopt(int level, int optname, const void* optval, socklen_t optlen);
 		int close();
 
-	private:
+	protected:
 		int socket_;
 		struct sockaddr_can tx_address_;
 
 		int open(int domain, int type, int protocol);
-		int bind(const struct sockaddr* addr, socklen_t len);
-		int connect(const struct sockaddr* addr, socklen_t len);
 	};
 
 	template <typename T>
@@ -83,9 +68,6 @@ namespace utils
 			ERROR(binder_interface, "%s: Error sending : %i %s", __FUNCTION__, errno, ::strerror(errno));
 		return s;
 	}
-	
-	socketcan_t& operator<<(socketcan_t& s, const struct simple_bcm_msg& obj);
-	socketcan_t& operator<<(socketcan_t& s, const struct canfd_bcm_msg& obj);
 
 	socketcan_t& operator>>(socketcan_t& s, can_message_t& cm);
 }

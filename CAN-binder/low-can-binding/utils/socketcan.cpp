@@ -104,39 +104,6 @@ namespace utils
 		return socket_;
 	}
 
-	/// @brief Open a raw socket CAN.
-	/// @param[in] device_name is the kernel network device name of the CAN interface.
-	///
-	/// @return Upon successful completion, shall return a non-negative integer, the socket file descriptor. Otherwise, a value of -1 shall be returned and errno set to indicate the error.
-	int socketcan_t::open(std::string device_name)
-	{
-		close();
-		
-		struct ifreq ifr;
-		socket_ = open(PF_CAN, SOCK_DGRAM, CAN_BCM);
-
-		// Attempts to open a socket to CAN bus
-		::strcpy(ifr.ifr_name, device_name.c_str());
-		DEBUG(binder_interface, "%s: ifr_name is : %s", __FUNCTION__, ifr.ifr_name);
-		if(::ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
-		{
-			ERROR(binder_interface, "%s: ioctl failed. Error was : %s", __FUNCTION__, strerror(errno));
-			close();
-		}
-		else
-		{
-			tx_address_.can_family = AF_CAN;
-			tx_address_.can_ifindex = ifr.ifr_ifindex;
-
-			if(connect((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
-			{
-				ERROR(binder_interface, "%s: Connect failed. %s", __FUNCTION__, strerror(errno));
-				close();
-			}
-		}
-		return socket_;
-	}
-
 	socketcan_t& operator>>(socketcan_t& s, can_message_t& cm)
 	{
 		struct {

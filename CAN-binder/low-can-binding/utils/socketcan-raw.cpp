@@ -1,0 +1,73 @@
+/*
+ * Copyright (C) 2015, 2016 ,2017 "IoT.bzh"
+ * Author "Romain Forlot" <romain.forlot@iot.bzh>
+ * Author "Loïc Collignon" <loic.collignon@iot.bzh>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	 http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "socketcan-raw.hpp"
+
+namespace utils
+{
+	/// @brief Construct a default, invalid, socket.
+	socketcan_raw_t::socketcan_raw_t()
+		: socketcan_t{}, socket_{INVALID_SOCKET}
+	{}
+
+	/// @brief Construct a socket by moving an existing one.
+	socketcan_raw_t::socketcan_raw_t(socketcan_raw_t&& s)
+		: socket_{s.socket_}
+	{
+		s.socket_ = INVALID_SOCKET;
+	}
+
+	/// @brief Destruct the socket.
+	socketcan_raw_t::~socketcan_raw_t()
+	{
+		if(socket_ != INVALID_SOCKET)
+			::close(socket_);
+	}
+
+ 	/// @brief Open a raw socket CAN.
+	/// @param[in] device_name is the kernel network device name of the CAN interface.
+	///
+	/// @return Upon successful completion, shall return a non-negative integer, the socket file descriptor. Otherwise, a value of -1 shall be returned and errno set to indicate the error.
+	int socketcan_raw_t::open(std::string device_name)
+	{
+		close();
+		
+		struct ifreq ifr;
+		socket_ = open(PF_CAN, SOCK_RAW, CAN_RAW);
+
+		// Attempts to open a socket to CAN bus
+		::strcpy(ifr.ifr_name, device_name.c_str());
+		DEBUG(binder_interface, "%s: ifr_name is : %s", __FUNCTION__, ifr.ifr_name);
+		if(::ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
+		{
+			ERROR(binder_interface, "%s: ioctl failed. Error was : %s", __FUNCTION__, strerror(errno));
+			close();
+		}
+		else
+		{
+			tx_address_.can_family = AF_CAN;
+			tx_address_.can_ifindex = ifr.ifr_ifindex;
+
+			if(bind((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
+			{
+				ERROR(binder_interface, "%s: Bind failed. %s", __FUNCTION__, strerror(errno));
+				close();
+			}
+		}
+		return socket_;
+	}
+}
