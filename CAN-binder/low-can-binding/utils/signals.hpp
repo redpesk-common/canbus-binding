@@ -22,11 +22,11 @@
 #include <fnmatch.h>
 
 #include "openxc.pb.h"
-#include "../configuration.hpp"
+#include "../binding/configuration.hpp"
 #include "../can/can-signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 
-#include "../low-can-binding.hpp"
+#include "../binding/low-can-binding.hpp"
 
 namespace utils
 {

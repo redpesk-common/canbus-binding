@@ -22,9 +22,9 @@ PROJECT_TARGET_ADD(low-can-binding)
 
 	# Define project Targets
 	add_library(${TARGET_NAME} MODULE
-		${TARGET_NAME}.cpp
-		configuration.cpp
-		configuration-generated.cpp
+		binding/${TARGET_NAME}.cpp
+		binding/configuration.cpp
+		binding/configuration-generated.cpp
 		can/can-bus.cpp
 		can/can-bus-dev.cpp
 		can/can-message-set.cpp

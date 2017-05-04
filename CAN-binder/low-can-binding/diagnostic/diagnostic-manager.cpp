@@ -22,7 +22,7 @@
 
 #include "../utils/openxc-utils.hpp"
 #include "../utils/signals.hpp"
-#include "../configuration.hpp"
+#include "../binding/configuration.hpp"
 
 #define MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 10
 #define MAX_SIMULTANEOUS_DIAG_REQUESTS 50

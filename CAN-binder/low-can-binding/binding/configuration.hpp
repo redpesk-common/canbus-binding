@@ -22,10 +22,10 @@
 #include <string>
 #include <fcntl.h>
 
-#include "can/can-bus.hpp"
-#include "can/can-signals.hpp"
-#include "can/can-message.hpp"
-#include "diagnostic/diagnostic-manager.hpp"
+#include "../can/can-bus.hpp"
+#include "../can/can-signals.hpp"
+#include "../can/can-message.hpp"
+#include "../diagnostic/diagnostic-manager.hpp"
 
 #include "low-can-binding.hpp"
 

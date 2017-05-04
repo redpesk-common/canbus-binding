@@ -29,7 +29,7 @@
 
 #include "can-signals.hpp"
 #include "can-decoder.hpp"
-#include "../configuration.hpp"
+#include "../binding/configuration.hpp"
 #include "../utils/signals.hpp"
 #include "../utils/openxc-utils.hpp"
 

@@ -1,5 +1,5 @@
 #include "configuration.hpp"
-#include "can/can-decoder.hpp"
+#include "../can/can-decoder.hpp"
 
 configuration_t::configuration_t()
 	:can_bus_manager_{utils::config_parser_t{"/etc/dev-mapping.conf"}}

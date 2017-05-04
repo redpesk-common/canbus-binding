@@ -18,7 +18,7 @@
 
 #include "openxc-utils.hpp"
 
-#include "../configuration.hpp"
+#include "../binding/configuration.hpp"
 
 ///
 /// @brief Build a specific VehicleMessage containing a DiagnosticResponse.

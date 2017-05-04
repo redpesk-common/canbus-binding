@@ -24,7 +24,7 @@
 
 #include "can-bus.hpp"
 #include "can-message.hpp"
-#include "../low-can-binding.hpp"
+#include "../binding/low-can-binding.hpp"
 #include "canutil/write.h"
 #include "bitfield/bitfield.h"
 

@@ -29,13 +29,13 @@
 
 #include "openxc.pb.h"
 #include "configuration.hpp"
-#include "can/can-bus.hpp"
-#include "can/can-signals.hpp"
-#include "can/can-message.hpp"
-#include "utils/timer.hpp"
-#include "utils/signals.hpp"
-#include "diagnostic/diagnostic-message.hpp"
-#include "utils/openxc-utils.hpp"
+#include "../can/can-bus.hpp"
+#include "../can/can-signals.hpp"
+#include "../can/can-message.hpp"
+#include "../utils/timer.hpp"
+#include "../utils/signals.hpp"
+#include "../diagnostic/diagnostic-message.hpp"
+#include "../utils/openxc-utils.hpp"
 
 extern "C"
 {

@@ -17,8 +17,8 @@
 
 #include "configuration.hpp"
 
-#include "utils/signals.hpp"
-#include "utils/openxc-utils.hpp"
+#include "../utils/signals.hpp"
+#include "../utils/openxc-utils.hpp"
 
 /// @brief Return singleton instance of configuration object.
 configuration_t& configuration_t::instance()

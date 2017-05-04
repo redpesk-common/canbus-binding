@@ -18,7 +18,7 @@
 
 #include "diagnostic-message.hpp"
 
-#include "../configuration.hpp"
+#include "../binding/configuration.hpp"
 #include "../utils/signals.hpp"
 
 const char *UNIT_NAMES[10] = {

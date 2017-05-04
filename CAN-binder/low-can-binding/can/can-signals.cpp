@@ -19,7 +19,7 @@
 
 #include "can-signals.hpp"
 
-#include "../configuration.hpp"
+#include "../binding/configuration.hpp"
 #include "../utils/signals.hpp"
 #include "can-decoder.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
