@@ -75,29 +75,28 @@ macro(populate_widget)
 	set(POPULE_WIDGET_TARGET "populate_${TARGET_NAME}")
 
 	get_target_property(T ${TARGET_NAME} LABELS)
+	get_target_property(OUT ${TARGET_NAME} OUTPUT_NAME)
 	if(${T} STREQUAL "BINDING")
 		add_custom_command(OUTPUT ${WIDGET_LIBDIR}/${TARGET_NAME}.so
 			DEPENDS ${TARGET_NAME}
 			COMMAND mkdir -p ${WIDGET_LIBDIR}
-			COMMAND cp ${TARGET_NAME}.so ${WIDGET_LIBDIR}
+			COMMAND cp ${OUT}.so ${WIDGET_LIBDIR}
 		)
 		add_custom_target(${POPULE_WIDGET_TARGET} ALL DEPENDS ${WIDGET_LIBDIR}/${TARGET_NAME}.so)
 	elseif(${T} STREQUAL "EXECUTABLE")
 		add_custom_command(OUTPUT ${WIDGET_BINDIR}/${TARGET_NAME}
 			DEPENDS ${TARGET_NAME}
 			COMMAND mkdir -p ${WIDGET_BINDIR}
-			COMMAND cp ${TARGET_NAME} ${WIDGET_BINDIR}
+			COMMAND cp ${OUT} ${WIDGET_BINDIR}
 		)
 		add_custom_target(${POPULE_WIDGET_TARGET} ALL DEPENDS ${WIDGET_BINDIR}/${TARGET_NAME})
 	elseif(${T} STREQUAL "HTDOCS")
-		get_target_property(OUT ${TARGET_NAME} OUTPUT_NAME)
 		add_custom_command(OUTPUT ${WIDGET_HTTPDIR}
 			DEPENDS ${TARGET_NAME}
 			COMMAND cp -r ${OUT} ${WIDGET_HTTPDIR}
 			)
 			add_custom_target(${POPULE_WIDGET_TARGET} ALL DEPENDS ${WIDGET_HTTPDIR})
 	elseif(${T} STREQUAL "DATA")
-		get_target_property(OUT ${TARGET_NAME} OUTPUT_NAME)
 		add_custom_command(OUTPUT ${WIDGET_DATADIR}
 			DEPENDS ${TARGET_NAME}
 			COMMAND cp -r ${OUT} ${WIDGET_DATADIR}
