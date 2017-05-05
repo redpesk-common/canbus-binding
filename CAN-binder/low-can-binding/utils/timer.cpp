@@ -63,7 +63,7 @@ frequency_clock_t::frequency_clock_t(float frequency)
 /// @param[in] frequency - Frequency to convert, in hertz
 float frequency_clock_t::frequency_to_period()
 {
-	return 1 / frequency_ * unit_;
+	return frequency_ == 0 ? 0 : 1 / frequency_ * unit_;
 }
 
 bool frequency_clock_t::started()
