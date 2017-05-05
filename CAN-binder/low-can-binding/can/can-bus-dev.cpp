@@ -24,9 +24,7 @@
 
 #include "can-bus.hpp"
 #include "can-message.hpp"
-#include "../binding/low-can-binding.hpp"
-#include "canutil/write.h"
-#include "bitfield/bitfield.h"
+#include "../binding/low-can-hat.hpp"
 
 /// @brief Class constructor
 ///

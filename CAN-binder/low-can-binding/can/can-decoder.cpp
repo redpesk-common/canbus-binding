@@ -20,7 +20,7 @@
 #include "canutil/read.h"
 #include "../utils/openxc-utils.hpp"
 
-#include "../binding/low-can-binding.hpp"
+#include "../binding/low-can-hat.hpp"
 
 /// @brief Parse the signal's bitfield from the given data and return the raw
 /// value.

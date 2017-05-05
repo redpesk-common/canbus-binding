@@ -17,7 +17,7 @@
 
 #include "config-parser.hpp"
 
-#include "../binding/low-can-binding.hpp"
+#include "../binding/low-can-hat.hpp"
 
 namespace utils
 {

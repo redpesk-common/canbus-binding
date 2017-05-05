@@ -30,7 +30,7 @@
 #include "can-signals.hpp"
 #include "../utils/config-parser.hpp"
 #include "../diagnostic/diagnostic-manager.hpp"
-#include "../binding/low-can-binding.hpp"
+#include "../binding/low-can-hat.hpp"
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
 #define MAX_ACCEPTANCE_FILTERS 24

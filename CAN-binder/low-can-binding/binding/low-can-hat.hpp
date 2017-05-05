@@ -31,3 +31,6 @@ extern "C" struct afb_binding_interface;
 extern const struct afb_binding_interface *binder_interface;
 
 void on_no_clients(std::string message);
+
+void subscribe(struct afb_req request);
+void unsubscribe(struct afb_req request);

@@ -19,7 +19,7 @@
 
 #include <cstring>
 
-#include "../binding/low-can-binding.hpp"
+#include "../binding/low-can-hat.hpp"
 
 ///
 /// @brief Class constructor
