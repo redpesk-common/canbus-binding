@@ -31,6 +31,11 @@ namespace utils
 		: socket_{INVALID_SOCKET}
 	{}
 
+	/// @brief Construct a socket by copying an existing one.
+	socketcan_t::socketcan_t(const socketcan_t& s)
+		: socket_{s.socket_}
+	{}
+
 	/// @brief Construct a socket by moving an existing one.
 	socketcan_t::socketcan_t(socketcan_t&& s)
 		: socket_{s.socket_}
@@ -38,12 +43,8 @@ namespace utils
 		s.socket_ = INVALID_SOCKET;
 	}
 
-	/// @brief Destruct the socket.
 	socketcan_t::~socketcan_t()
-	{
-		if(socket_ != INVALID_SOCKET)
-			::close(socket_);
-	}
+	{}
 
 	const struct sockaddr_can& socketcan_t::get_tx_address() const
 	{

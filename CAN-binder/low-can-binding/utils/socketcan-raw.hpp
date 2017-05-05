@@ -23,11 +23,7 @@ namespace utils
 	class socketcan_raw_t : public socketcan_t
 	{
 	public:
-		socketcan_raw_t();
-		socketcan_raw_t(const socketcan_raw_t&);
-		socketcan_raw_t(socketcan_raw_t&&);
-		virtual ~socketcan_raw_t();
-
+		using socketcan_t::socketcan_t;
 		virtual int open(std::string device_name);
 
 	private:

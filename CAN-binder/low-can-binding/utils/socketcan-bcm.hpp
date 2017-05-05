@@ -37,10 +37,7 @@ namespace utils
 	class socketcan_bcm_t : public socketcan_t
 	{
 	public:
-		socketcan_bcm_t();
-		socketcan_bcm_t(const socketcan_bcm_t&);
-		socketcan_bcm_t(socketcan_bcm_t&&);
-		virtual ~socketcan_bcm_t();
+		using socketcan_t::socketcan_t;
 
 		virtual int open(std::string device_name);
 

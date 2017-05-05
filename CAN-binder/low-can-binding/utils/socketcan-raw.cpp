@@ -22,15 +22,6 @@
 
 namespace utils
 {
-	/// @brief Construct a default, invalid, socket.
-	socketcan_raw_t::socketcan_raw_t()
-		: socketcan_t{}
-	{}
-
-	/// @brief Destruct the socket.
-	socketcan_raw_t::~socketcan_raw_t()
-	{}
-
 	/// @brief Bind the socket.
 	/// @return 0 if success.
 	int socketcan_raw_t::bind(const struct sockaddr* addr, socklen_t len)

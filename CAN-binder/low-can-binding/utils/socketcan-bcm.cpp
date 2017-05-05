@@ -22,15 +22,6 @@
 
 namespace utils
 {
-	/// @brief Construct a default, invalid, socket.
-	socketcan_bcm_t::socketcan_bcm_t()
-		: socketcan_t{}
-	{}
-
-	/// @brief Destruct the socket.
-	socketcan_bcm_t::~socketcan_bcm_t()
-	{}
-
 	/// @brief Connect the socket.
 	/// @return 0 if success.
 	int socketcan_bcm_t::connect(const struct sockaddr* addr, socklen_t len)
