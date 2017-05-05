@@ -25,6 +25,7 @@
 
 #include "openxc.pb.h"
 #include "../utils/timer.hpp"
+#include "../utils/socketcan-bcm.hpp"
 #include "can-message.hpp"
 #include "can-message-definition.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
@@ -75,15 +76,16 @@ typedef uint64_t (*SignalEncoder)(can_signal_t* signal,
 class can_signal_t
 {
 private:
-	std::uint8_t message_set_id_;
-	std::uint8_t message_id_;
+	utils::socketcan_bcm_t	socket_; /*!< socket_ - Specific BCM socket that filter the signal read from CAN device */
+	std::uint8_t message_set_id_; ///< message_set_id_ - Index number to the message_set_id container object
+	std::uint8_t message_id_; ///< message_id_ - Index number to the message_definition_t container object
 	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
 	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
 						  * which make easier to sort message when the come in.*/
 	uint8_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
 										*	non-inverted bit numbering, i.e. the most significant bit of
 										*	each byte is 0) */
-	uint8_t bit_size_; /*!< bitSize_ - The width of the bit field in the CAN message. */
+	uint8_t bit_size_; /*!< bit_size_ - The width of the bit field in the CAN message. */
 	float factor_; /*!< factor_ - The final value will be multiplied by this factor. Use 1 if you
 							*	don't need a factor. */
 	float offset_; /*!< offset_ - The final value will be added to this offset. Use 0 if you
@@ -129,6 +131,7 @@ public:
 		SignalEncoder encoder,
 		bool received);
 
+	utils::socketcan_bcm_t get_socket() const;
 	const can_message_definition_t& get_message() const;
 	const std::string& get_generic_name() const;
 	const std::string get_name() const;
@@ -154,4 +157,5 @@ public:
 	void set_prefix(std::string val);
 	void set_received(bool r);
 	void set_last_value(float val);
+	int create_rx_filter();
 };

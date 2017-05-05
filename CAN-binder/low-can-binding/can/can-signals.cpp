@@ -22,7 +22,10 @@
 #include "../binding/configuration.hpp"
 #include "../utils/signals.hpp"
 #include "can-decoder.hpp"
+#include "can-message.hpp"
+#include "can-bus.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
+#include "canutil/write.h"
 
 std::string can_signal_t::prefix_ = "messages";
 
@@ -63,6 +66,10 @@ can_signal_t::can_signal_t(std::uint8_t message_set_id,
 	, last_value_{.0f}
 {}
 
+utils::socketcan_bcm_t can_signal_t::get_socket() const
+{
+	return socket_;
+}
 
 const can_message_definition_t& can_signal_t::get_message() const
 {
@@ -184,3 +191,47 @@ void can_signal_t::set_last_value(float val)
 {
 	last_value_ = val;
 }
+
+/// @brief Create a RX_SETUP receive job using the BCM socket.
+///
+/// @return 0 if ok else -1
+int can_signal_t::create_rx_filter()
+{
+	// Make sure that socket has been opened.
+	if(! socket_)
+		socket_.open(
+			get_message().get_bus_name());
+
+	uint32_t can_id  = get_message().get_id();
+
+	struct utils::simple_bcm_msg bcm_msg;
+	struct can_frame cfd;
+
+	memset(&cfd, 0, sizeof(cfd));
+	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
+	float val = (float)(1 << bit_size_)-1;
+	float freq = frequency_.frequency_to_period();
+	if(freq <= 0)
+		freq = 0.000001f;
+
+	bcm_msg.msg_head.opcode  = RX_SETUP;
+	bcm_msg.msg_head.can_id  = can_id;
+	bcm_msg.msg_head.flags = SETTIMER;
+	bcm_msg.msg_head.ival2.tv_sec = long(freq);
+	bcm_msg.msg_head.ival2.tv_usec = (freq - (long)freq) * 1000000;
+	bcm_msg.msg_head.nframes = 1;
+	bitfield_encode_float(val,
+										bit_position_,
+										bit_size_,
+										factor_,
+										offset_,
+										cfd.data,
+										CAN_MAX_DLEN);
+
+	bcm_msg.frames = cfd;
+
+	if(socket_ << bcm_msg)
+		return 0;
+	return -1;
+}
+

@@ -391,15 +391,6 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 	vehicle_message_q_.push(v_msg);
 }
 
-/// @brief Create a RX_SETUP receive job for the BCM socket of a CAN signal.
-///
-/// @return 0 if ok -1 if not.
-	int can_bus_t::create_rx_filter(const can_signal_t& s)
-	{
-		const std::string& bus  = s.get_message().get_bus_name();
-		return can_bus_t::can_devices_[bus]->create_rx_filter(s);
-	}
-
 /// @brief Return a map with the can_bus_dev_t initialized
 ///
 /// @return map can_bus_dev_m_ map

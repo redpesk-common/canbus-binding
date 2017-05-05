@@ -58,7 +58,6 @@ public:
 	void stop_reading();
 
 	can_message_t read();
-	int create_rx_filter(const can_signal_t& s);
 
 	int send(can_message_t& can_msg);
 	bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
