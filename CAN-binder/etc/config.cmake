@@ -23,7 +23,10 @@ set(VERSION "1.0")
 set(PROJECT_PRETTY_NAME "Low level CAN binding")
 set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
 set(PROJECT_URL "https://github.com/iotbzh/CAN_signaling")
+set(PROJECT_AUTHOR "Romain Forlot")
+set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
 set(PROJECT_ICON "icon.png")
+set(PROJECT_LANGUAGES,"C")
 
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
@@ -36,7 +39,7 @@ set(CMAKE_BUILD_TYPE "DEBUG")
 
 # PKG_CONFIG required packages
 # -----------------------------
-set (PKG_REQUIRED_LIST 
+set (PKG_REQUIRED_LIST
 	json-c
 	libsystemd
 	afb-daemon
@@ -58,7 +61,7 @@ set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/low-can-binding/p
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
 # ---------------------------------------------------------------------
-set(CMAKE_INSTALL_PREFIX ${HOME}/opt)
+set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
 set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX}/lib64/pkgconfig ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 

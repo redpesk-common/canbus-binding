@@ -17,4 +17,4 @@
 ###########################################################################
 
 # Add target to project dependency list
-search_targets()
+project_subdirs_add()

@@ -17,9 +17,6 @@
 # limitations under the License.
 ###########################################################################
 
-# Add subdir targets
-search_targets()
-
 # Add target to project dependency list
 PROJECT_TARGET_ADD(low-can-demo)
 
@@ -35,11 +32,11 @@ PROJECT_TARGET_ADD(low-can-demo)
  
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-		PREFIX ""
 		LABELS "HTDOCS"
 		OUTPUT_NAME dist.prod)
 
 	# installation directory
 	INSTALL(DIRECTORY dist.prod/ DESTINATION ${BINDINGS_INSTALL_DIR})
 
-	populate_widget()
+# Add subdir targets
+project_subdirs_add()
