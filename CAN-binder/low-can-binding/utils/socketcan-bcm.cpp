@@ -51,7 +51,7 @@ namespace utils
 
 		// Attempts to open a socket to CAN bus
 		::strcpy(ifr.ifr_name, device_name.c_str());
-		DEBUG(binder_interface, "%s: ifr_name is : %s", __FUNCTION__, ifr.ifr_name);
+		DEBUG(binder_interface, "%s: BCM socket ifr_name is : %s", __FUNCTION__, ifr.ifr_name);
 		if(::ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
 		{
 			ERROR(binder_interface, "%s: ioctl failed. Error was : %s", __FUNCTION__, strerror(errno));

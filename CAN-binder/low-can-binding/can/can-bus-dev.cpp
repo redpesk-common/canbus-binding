@@ -104,7 +104,7 @@ can_message_t can_bus_dev_t::read()
 	// Test that socket is really opened
 	if (!can_socket_)
 	{
-		ERROR(binder_interface, "read: Socket unavailable. Closing thread.");
+		ERROR(binder_interface, "%s: Socket unavailable. Closing thread.", __FUNCTION__);
 		is_running_ = false;
 	}
 
@@ -114,8 +114,8 @@ can_message_t can_bus_dev_t::read()
 	if (nbytes != CANFD_MTU && nbytes != CAN_MTU)
 	{
 		if (errno == ENETDOWN)
-			ERROR(binder_interface, "read: %s CAN device down", device_name_.c_str());
-		ERROR(binder_interface, "read: Incomplete CAN(FD) frame");
+			ERROR(binder_interface, "%s: %s CAN device down", __FUNCTION__, device_name_.c_str());
+		ERROR(binder_interface, "%s: Incomplete CAN(FD) frame", __FUNCTION__);
 		::memset(&cfd, 0, sizeof(cfd));
 	}
 
