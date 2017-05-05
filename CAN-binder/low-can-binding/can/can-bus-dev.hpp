@@ -34,9 +34,9 @@ class can_bus_dev_t
 {
 private:
 	std::string device_name_; ///< a string identifier identitfying the linux CAN device.
-	utils::socketcan_raw_t can_socket_;
+	utils::socketcan_raw_t can_socket_; ///< can_socket_ - A Raw socket attached to a specified device
 
-	int index_;
+	int index_; ///< index_ - An index number, it's the index number to access this object using the can_devices_ map from can_bus_t class
 
 	std::thread th_reading_; ///< Thread handling read the socket can device filling can_message_q_ queue of can_bus_t
 	bool is_running_ = false; ///< boolean telling whether or not reading is running or not

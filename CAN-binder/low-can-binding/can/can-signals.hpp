@@ -157,5 +157,7 @@ public:
 	void set_prefix(std::string val);
 	void set_received(bool r);
 	void set_last_value(float val);
+
 	int create_rx_filter();
+	can_message_format_t read_socket();
 };
