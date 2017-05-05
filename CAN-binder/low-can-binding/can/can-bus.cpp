@@ -83,8 +83,8 @@ int can_bus_t::can_reader()
 					std::lock_guard<std::mutex> can_message_lock(get_can_message_mutex());
 					{ push_new_can_message(msg); }
 					get_new_can_message_cv().notify_one();
-					}
 				}
+			}
 		}
 		else
 			printf("Timeout\n");
