@@ -159,5 +159,5 @@ public:
 	void set_last_value(float val);
 
 	int create_rx_filter();
-	can_message_format_t read_socket();
+	void read_socket();
 };

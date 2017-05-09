@@ -55,9 +55,16 @@ void on_no_clients(std::string message)
 int read(sd_event_source *s, int fd, uint32_t revents, void *userdata)
 {
 	can_signal_t* sig= (can_signal_t*)userdata;
-	if(sig->read_socket() != can_message_format_t::ERROR)
-		return 0;
-	return -1;
+	sig->read_socket();
+
+	/* check if error or hangup */
+	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
+	{
+		sd_event_source_unref(s);
+		sig->get_socket().close();
+		sig->create_rx_filter();
+	}
+	return 0;
 }
 
 ///******************************************************************************
