@@ -21,8 +21,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 include(${CMAKE_CURRENT_SOURCE_DIR}/etc/config.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/etc/macros.cmake)
 
-MESSAGE(STATUS "INSTALL PREFIX: ${CMAKE_INSTALL_PREFIX}")
-
 # Bindings to compile
 # --------------------
 project_subdirs_add()

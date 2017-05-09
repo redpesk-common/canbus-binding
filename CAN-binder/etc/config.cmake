@@ -34,8 +34,7 @@ set(CMAKE_BUILD_TYPE "DEBUG")
 
 # Compiler selection if needed. Overload the detected compiler.
 # -----------------------------------------------
-#set(CMAKE_C_COMPILER "gcc")
-#set(CMAKE_CXX_COMPILER "g++")
+ set (gcc_minimal_version 4.9) 
 
 # PKG_CONFIG required packages
 # -----------------------------
@@ -57,7 +56,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
 set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/low-can-binding/package --ldpaths=\$\$(pwd)/low-can-binding/package/lib --port=1234 --roothttp=\$\$(pwd)/low-can-binding/package/htdocs --tracereq=common --token=\"\" --verbose")
-
+set(WIDGET_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
 # ---------------------------------------------------------------------
