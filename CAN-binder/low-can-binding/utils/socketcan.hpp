@@ -68,6 +68,4 @@ namespace utils
 			ERROR(binder_interface, "%s: Error sending : %i %s", __FUNCTION__, errno, ::strerror(errno));
 		return s;
 	}
-
-	socketcan_t& operator>>(socketcan_t& s, can_message_t& cm);
 }

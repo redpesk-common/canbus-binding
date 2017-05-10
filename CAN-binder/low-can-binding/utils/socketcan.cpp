@@ -90,28 +90,4 @@ namespace utils
 	{
 		return socket_;
 	}
-
-	socketcan_t& operator>>(socketcan_t& s, can_message_t& cm)
-	{
-		struct {
-			struct bcm_msg_head msg_head;
-			struct can_frame frames;
-		} msg;
-
-		const struct sockaddr_can& addr = s.get_tx_address();
-		socklen_t addrlen = sizeof(addr);
-		struct ifreq ifr;
-
-		ssize_t nbytes = ::recvfrom(s.socket(), &msg, sizeof(msg), 0, (struct sockaddr*)&addr, &addrlen);
-		ifr.ifr_ifindex = addr.can_ifindex;
-		ioctl(s.socket(), SIOCGIFNAME, &ifr);
-
-		DEBUG(binder_interface, "Data available: %i bytes read", (int)nbytes);
-		DEBUG(binder_interface, "read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, msg.msg_head.can_id, msg.frames.can_dlc,
-			msg.frames.data[0], msg.frames.data[1], msg.frames.data[2], msg.frames.data[3], msg.frames.data[4], msg.frames.data[5], msg.frames.data[6], msg.frames.data[7]);
-
-		cm = ::can_message_t::convert_from_frame(msg.frames , nbytes-sizeof(struct bcm_msg_head));
-
-		return s;
-	}
 }

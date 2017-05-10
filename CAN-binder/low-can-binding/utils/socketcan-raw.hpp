@@ -29,4 +29,6 @@ namespace utils
 	private:
 		int bind(const struct sockaddr* addr, socklen_t len);
 	};
+
+	socketcan_raw_t& operator>>(socketcan_raw_t& s, can_message_t& cm);
 }

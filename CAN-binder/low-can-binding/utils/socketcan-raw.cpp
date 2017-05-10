@@ -61,4 +61,25 @@ namespace utils
 		}
 		return socket_;
 	}
+
+	socketcan_raw_t& operator>>(socketcan_raw_t& s, can_message_t& cm)
+	{
+		struct canfd_frame frame;
+
+		const struct sockaddr_can& addr = s.get_tx_address();
+		socklen_t addrlen = sizeof(addr);
+		struct ifreq ifr;
+
+		ssize_t nbytes = ::recvfrom(s.socket(), &frame, sizeof(frame), 0, (struct sockaddr*)&addr, &addrlen);
+		ifr.ifr_ifindex = addr.can_ifindex;
+		ioctl(s.socket(), SIOCGIFNAME, &ifr);
+
+		DEBUG(binder_interface, "Data available: %i bytes read", (int)nbytes);
+		DEBUG(binder_interface, "read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, frame.can_id, frame.len,
+			frame.data[0], frame.data[1], frame.data[2], frame.data[3], frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
+
+		cm = ::can_message_t::convert_from_frame(frame , nbytes);
+
+		return s;
+	}
 }

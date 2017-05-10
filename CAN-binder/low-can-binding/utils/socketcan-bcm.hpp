@@ -44,6 +44,8 @@ namespace utils
 	private:
 		int connect(const struct sockaddr* addr, socklen_t len);
 	};
+
+	socketcan_bcm_t& operator>>(socketcan_bcm_t& s, can_message_t& cm);
 //	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const struct simple_bcm_msg& obj);
 //	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const struct canfd_bcm_msg& obj);
 }
