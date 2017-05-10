@@ -51,7 +51,7 @@ class can_bus_t
 private:
 	utils::config_parser_t conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
 
-	int process_can_signals(can_message_t& can_message);
+	int process_can_signals(const can_message_t& can_message);
 	int process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message);
 
 	void can_decode_message();

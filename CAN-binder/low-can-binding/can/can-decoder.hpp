@@ -35,7 +35,7 @@ public:
 	static openxc_DynamicField noopDecoder(can_signal_t& signal, const std::vector<can_signal_t>& signals,
 			float value, bool* send);
 
-	static openxc_DynamicField translateSignal(can_signal_t& signal, can_message_t& message,
+	static openxc_DynamicField translateSignal(can_signal_t& signal, const can_message_t& message,
 		const std::vector<can_signal_t>& signals, bool* send);
 
 	static openxc_DynamicField decodeSignal(can_signal_t& signal, const can_message_t& message,
