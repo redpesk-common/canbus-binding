@@ -29,8 +29,7 @@
 
 std::string can_signal_t::prefix_ = "messages";
 
-can_signal_t::can_signal_t(std::uint8_t message_set_id,
-	std::uint8_t message_id,
+can_signal_t::can_signal_t(
 	std::string generic_name,
 	uint8_t bit_position,
 	uint8_t bit_size,
@@ -46,9 +45,8 @@ can_signal_t::can_signal_t(std::uint8_t message_set_id,
 	SignalDecoder decoder,
 	SignalEncoder encoder,
 	bool received)
-	: message_set_id_{ message_set_id }
-	, message_id_{ message_id }
-	, generic_name_{ generic_name }
+	: parent_{nullptr},
+	 generic_name_{ generic_name }
 	, bit_position_{ bit_position }
 	, bit_size_{ bit_size }
 	, factor_{ factor }
@@ -66,14 +64,34 @@ can_signal_t::can_signal_t(std::uint8_t message_set_id,
 	, last_value_{.0f}
 {}
 
+/*can_signal_t::can_signal_t(const can_signal_t& b)
+	: parent_{b.parent_},
+	 generic_name_{ b.generic_name_}
+	, bit_position_{ b.bit_position_}
+	, bit_size_{ b.bit_size_}
+	, factor_{ b.factor_ }
+	, offset_{ b.offset_}
+	, min_value_{b.min_value_}
+	, max_value_{b.max_value_}
+	, frequency_{b.frequency_}
+	, send_same_{b.send_same_}
+	, force_send_changed_{b.force_send_changed_}
+	, states_{b.states_}
+	, writable_{b.writable_}
+	, decoder_{b.decoder_}
+	, encoder_{b.encoder_}
+	, received_{b.received_}
+	, last_value_{b.last_value_}
+{}*/
+
 utils::socketcan_bcm_t can_signal_t::get_socket() const
 {
 	return socket_;
 }
 
-can_message_definition_t& can_signal_t::get_message() const
+std::shared_ptr<can_message_definition_t> can_signal_t::get_message() const
 {
-	return configuration_t::instance().get_can_message_definition(message_set_id_, message_id_);
+	return parent_;
 }
 
 const std::string& can_signal_t::get_generic_name() const
@@ -175,6 +193,11 @@ bool can_signal_t::get_received() const
 float can_signal_t::get_last_value() const
 {
 	return last_value_;
+}
+
+void can_signal_t::set_parent(std::shared_ptr<can_message_definition_t> parent)
+{
+	parent_(parent);
 }
 
 void can_signal_t::set_prefix(std::string val)

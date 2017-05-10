@@ -52,9 +52,9 @@ const std::vector<can_message_set_t>& configuration_t::get_can_message_set()
 	return can_message_set_;
 }
 
-std::vector<can_signal_t>& configuration_t::get_can_signals()
+std::vector<std::shared_ptr<can_signal_t> > configuration_t::get_can_signals()
 {
-	return can_signals_[active_message_set_];
+	return can_message_set_[active_message_set_].get_can_signals();
 }
 
 std::vector<diagnostic_message_t>& configuration_t::get_diagnostic_messages()
@@ -62,14 +62,9 @@ std::vector<diagnostic_message_t>& configuration_t::get_diagnostic_messages()
 	return diagnostic_messages_[active_message_set_];
 }
 
-const std::vector<can_message_definition_t>& configuration_t::get_can_message_definition()
+std::vector<std::shared_ptr<can_message_definition_t> > configuration_t::get_can_message_definition()
 {
-	return can_message_definition_[active_message_set_];
-}
-
-can_message_definition_t& configuration_t::get_can_message_definition(std::uint8_t message_set_id, std::uint8_t message_id)
-{
-	return can_message_definition_[message_set_id][message_id];
+	return can_message_set_[active_message_set_].get_can_message_definition();
 }
 
 uint32_t configuration_t::get_signal_id(diagnostic_message_t& sig) const
@@ -79,7 +74,7 @@ uint32_t configuration_t::get_signal_id(diagnostic_message_t& sig) const
 
 uint32_t configuration_t::get_signal_id(can_signal_t& sig) const
 {
-	return sig.get_message().get_id();
+	return sig.get_message()->get_id();
 }
 
 void configuration_t::set_active_message_set(uint8_t id)

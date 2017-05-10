@@ -20,6 +20,12 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
+#include <memory>
+
+#include "can-message-definition.hpp"
+
+class can_signal_t;
 
 /// @brief A parent wrapper for a particular set of CAN messages and associated
 /// CAN buses(e.g. a vehicle or program).
@@ -33,6 +39,7 @@ private:
 	uint16_t can_signal_count_; /// < The number of CAN signals (across all messages) defined for this message set.
 	uint16_t can_command_count_; /// < The number of CanCommmands defined for this message set.
 	uint16_t obd2_signal_count_; /// < The number of obd2 signals defined for this message set.
+	std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition_; ///< Vector holding all message definition handled by this message set.
 
 public:
 	can_message_set_t(
@@ -42,6 +49,9 @@ public:
 			short unsigned int can_message_count,
 			short unsigned int can_signal_count,
 			short unsigned int can_command_count,
-			short unsigned int obd2_signal_count);
+			short unsigned int obd2_signal_count,
+			std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition);
 
+	std::vector<std::shared_ptr<can_message_definition_t> > get_can_message_definition();
+	std::vector<std::shared_ptr<can_signal_t> > get_can_signals() const;
 };

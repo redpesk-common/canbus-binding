@@ -154,7 +154,7 @@ openxc_DynamicField decoder_t::stateDecoder(can_signal_t& signal,
 /// string or boolean.
 ///
 openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, const can_message_t& message,
-	const std::vector<can_signal_t>& signals, bool* send)
+	const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send)
 {
 	float value = decoder_t::parseSignalBitfield(signal, message);
 	DEBUG(binder_interface, "%s: Decoded message from parseSignalBitfield: %f", __FUNCTION__, value);

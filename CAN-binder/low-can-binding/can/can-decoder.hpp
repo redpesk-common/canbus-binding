@@ -36,7 +36,7 @@ public:
 			float value, bool* send);
 
 	static openxc_DynamicField translateSignal(can_signal_t& signal, const can_message_t& message,
-		const std::vector<can_signal_t>& signals, bool* send);
+		const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send);
 
 	static openxc_DynamicField decodeSignal(can_signal_t& signal, const can_message_t& message,
 			const std::vector<can_signal_t>& signals, bool* send);

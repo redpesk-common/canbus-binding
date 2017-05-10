@@ -25,7 +25,8 @@ can_message_set_t::can_message_set_t(
 		unsigned short can_message_count,
 		unsigned short can_signal_count,
 		unsigned short can_command_count,
-		unsigned short obd2_signal_count)
+		unsigned short obd2_signal_count,
+		std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition)
 	: index_{index}
 	, name_{name}
 	, can_bus_count_{can_bus_count}
@@ -33,5 +34,30 @@ can_message_set_t::can_message_set_t(
 	, can_signal_count_{can_signal_count}
 	, can_command_count_{can_command_count}
 	, obd2_signal_count_{obd2_signal_count}
+	, can_messages_definition_{can_messages_definition}
 {
+	for(auto& cmd : can_messages_definition_)
+	{
+		cmd->set_parent(std::make_shared<can_message_set_t>(this));
+	}
+}
+
+/// @brief Return vector holding all message definition handled by this message set.
+std::vector<std::shared_ptr<can_message_definition_t> > can_message_set_t::get_can_message_definition()
+{
+	return can_messages_definition_;
+}
+
+std::vector<std::shared_ptr<can_signal_t> > can_message_set_t::get_can_signals() const
+{
+	std::vector<std::shared_ptr<can_signal_t> > can_signals(can_signal_count_);
+	for(const auto& cmd: can_messages_definition_)
+	{
+		can_signals.insert( can_signals.end(),
+									cmd->get_can_signals().begin(),
+									cmd->get_can_signals().end()
+		);
+	}
+
+	return can_signals;
 }

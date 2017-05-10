@@ -17,16 +17,16 @@
 
 #include "can-message-definition.hpp"
 
-can_message_definition_t::can_message_definition_t(std::uint8_t message_set_id, const std::string bus)
-	: message_set_id_{message_set_id}, bus_{bus}, last_value_{CAN_MESSAGE_SIZE}
+can_message_definition_t::can_message_definition_t(const std::string bus)
+	: parent_{nullptr}, bus_{bus}, last_value_{CAN_MESSAGE_SIZE}
 {}
 
-can_message_definition_t::can_message_definition_t(std::uint8_t message_set_id,
+can_message_definition_t::can_message_definition_t(
 	const std::string bus,
 	uint32_t id,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed)
-	: message_set_id_{message_set_id},
+	: parent_{nullptr},
 	  bus_{bus},
 	  id_{id},
 	  frequency_clock_{frequency_clock},
@@ -34,13 +34,13 @@ can_message_definition_t::can_message_definition_t(std::uint8_t message_set_id,
 	  last_value_{CAN_MESSAGE_SIZE}
 {}
 
-can_message_definition_t::can_message_definition_t(std::uint8_t message_set_id,
+can_message_definition_t::can_message_definition_t(
 	const std::string bus,
 	uint32_t id,
 	can_message_format_t format,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed)
-	: message_set_id_{message_set_id},
+	: parent_{nullptr},
 	bus_{bus},
 	id_{id},
 	format_{format},
@@ -48,6 +48,39 @@ can_message_definition_t::can_message_definition_t(std::uint8_t message_set_id,
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE}
 {}
+
+can_message_definition_t::can_message_definition_t(
+	const std::string bus,
+	uint32_t id,
+	can_message_format_t format,
+	frequency_clock_t frequency_clock,
+	bool force_send_changed,
+	std::vector<std::shared_ptr<can_signal_t> > can_signals)
+	:  parent_{nullptr},
+	bus_{bus},
+	id_{id},
+	format_{format},
+	frequency_clock_{frequency_clock},
+	force_send_changed_{force_send_changed},
+	last_value_{CAN_MESSAGE_SIZE},
+	can_signals_{std::move(can_signals)}
+{
+	for(auto& sig: can_signals_)
+	{
+		sig->set_parent(std::make_shared<can_signal_t>(this));
+	}
+}
+
+/*can_message_definition_t(const can_message_definition_t& b)
+	:  parent_{b.parent_},
+	bus_{b.bus_},
+	id_{b.id_},
+	format_{b.format_},
+	frequency_clock_{b.frequency_clock_},
+	force_send_changed_{b.force_send_changed_},
+	last_value_{b.last_value_},
+	can_signals_{b.can_signals_}
+	{}*/
 
 const std::string& can_message_definition_t::get_bus_name() const
 {
@@ -57,6 +90,17 @@ const std::string& can_message_definition_t::get_bus_name() const
 uint32_t can_message_definition_t::get_id() const
 {
 	return id_;
+}
+
+std::vector<std::shared_ptr<can_signal_t> > can_message_definition_t::get_can_signals()
+{
+	return can_signals_;
+}
+
+void can_message_definition_t::set_parent(std::shared_ptr<can_message_set_t> parent)
+{
+	parent_= parent;
+}
 
 void can_message_definition_t::set_last_value(const can_message_t& cm)
 {
