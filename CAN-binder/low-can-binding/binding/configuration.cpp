@@ -57,7 +57,7 @@ std::vector<std::shared_ptr<can_signal_t> > configuration_t::get_can_signals()
 	return can_message_set_[active_message_set_].get_can_signals();
 }
 
-std::vector<diagnostic_message_t>& configuration_t::get_diagnostic_messages()
+std::vector<std::shared_ptr<diagnostic_message_t> > configuration_t::get_diagnostic_messages()
 {
 	return diagnostic_messages_[active_message_set_];
 }
@@ -83,7 +83,7 @@ void configuration_t::set_active_message_set(uint8_t id)
 }
 
 
-diagnostic_message_t* configuration_t::get_diagnostic_message(std::string message_name) const
+std::shared_ptr<diagnostic_message_t> configuration_t::get_diagnostic_message(std::string message_name) const
 {
 	struct utils::signals_found found;
 	 found = utils::signals_manager_t::instance().find_signals(build_DynamicField(message_name));
@@ -94,7 +94,7 @@ diagnostic_message_t* configuration_t::get_diagnostic_message(std::string messag
 
 DiagnosticRequest* configuration_t::get_request_from_diagnostic_message(std::string message_name) const
 {
-	diagnostic_message_t* diag_msg = get_diagnostic_message(message_name);
+	std::shared_ptr<diagnostic_message_t> diag_msg = get_diagnostic_message(message_name);
 	if( diag_msg != nullptr && diag_msg->get_supported())
 		return new DiagnosticRequest(diag_msg->build_diagnostic_request());
 	return nullptr;

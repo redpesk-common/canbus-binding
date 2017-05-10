@@ -32,8 +32,8 @@ namespace utils
 {
 	struct signals_found
 	{
-		std::vector<can_signal_t*> can_signals;
-		std::vector<diagnostic_message_t*> diagnostic_messages;
+		std::vector<std::shared_ptr<can_signal_t> > can_signals;
+		std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages;
 	};
 
 	class signals_manager_t
@@ -51,29 +51,29 @@ namespace utils
 		std::map<std::string, struct afb_event>& get_subscribed_signals();
 
 		struct signals_found find_signals(const openxc_DynamicField &key);
-		void find_diagnostic_messages(const openxc_DynamicField &key, std::vector<diagnostic_message_t*>& found_signals);
-		void find_can_signals(const openxc_DynamicField &key, std::vector<can_signal_t*>& found_signals);
+		void find_diagnostic_messages(const openxc_DynamicField &key, std::vector<std::shared_ptr<diagnostic_message_t> >& found_signals);
+		void find_can_signals(const openxc_DynamicField &key, std::vector<std::shared_ptr<can_signal_t> >& found_signals);
 
 		template <typename T>
-		void lookup_signals_by_name(const std::string& key, std::vector<T>& signals, std::vector<T*>& found_signals)
+		void lookup_signals_by_name(const std::string& key, std::vector<std::shared_ptr<T> > signals, std::vector<std::shared_ptr<T> > found_signals)
 		{
-			for(T& s : signals)
+			for(std::shared_ptr<T> s : signals)
 			{
-				if(::fnmatch(key.c_str(), s.get_generic_name().c_str(), FNM_CASEFOLD) == 0)
-					found_signals.push_back(&s);
-				else if(::fnmatch(key.c_str(), s.get_name().c_str(), FNM_CASEFOLD) == 0)
-					found_signals.push_back(&s);
+				if(::fnmatch(key.c_str(), s->get_generic_name().c_str(), FNM_CASEFOLD) == 0)
+					found_signals.push_back(s);
+				else if(::fnmatch(key.c_str(), s->get_name().c_str(), FNM_CASEFOLD) == 0)
+					found_signals.push_back(s);
 			}
 		}
 
 		template <typename T>
-		void lookup_signals_by_id(const double key, std::vector<T>& signals, std::vector<T*>& found_signals)
+		void lookup_signals_by_id(const double key, std::vector<std::shared_ptr<T> > signals, std::vector<std::shared_ptr<T> > found_signals)
 		{
-			for(T& s : signals)
+			for(std::shared_ptr<T> s : signals)
 			{
-				if(configuration_t::instance().get_signal_id(s) == key)
+				if(configuration_t::instance().get_signal_id(*s) == key)
 				{
-					found_signals.push_back(&s);
+					found_signals.push_back(s);
 				}
 			}
 		}

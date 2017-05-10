@@ -57,7 +57,7 @@ class can_message_definition_t;
 /// @return a decoded value in an openxc_DynamicField struct.
 ///
 typedef openxc_DynamicField (*SignalDecoder)(can_signal_t& signal,
-		const std::vector<can_signal_t>& signals, float value, bool* send);
+		const std::vector<std::shared_ptr<can_signal_t> > signals, float value, bool* send);
 
 ///
 /// @brief: The type signature for a CAN signal encoder.

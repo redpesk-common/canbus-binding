@@ -54,7 +54,7 @@ float decoder_t::parseSignalBitfield(can_signal_t& signal, const can_message_t& 
 /// always succeeds.
 ///
 openxc_DynamicField decoder_t::noopDecoder(can_signal_t& signal,
-		const std::vector<can_signal_t>& signals, float value, bool* send)
+		const std::vector<std::shared_ptr<can_signal_t> > signals, float value, bool* send)
 {
 	openxc_DynamicField decoded_value = build_DynamicField(value);
 
@@ -76,7 +76,7 @@ openxc_DynamicField decoder_t::noopDecoder(can_signal_t& signal,
 /// decoder always succeeds.
 ///
 openxc_DynamicField decoder_t::booleanDecoder(can_signal_t& signal,
-		const std::vector<can_signal_t>& signals, float value, bool* send)
+		const std::vector<std::shared_ptr<can_signal_t> > signals, float value, bool* send)
 {
 	openxc_DynamicField decoded_value = build_DynamicField(value == 0.0 ? false : true);
 
@@ -98,7 +98,7 @@ openxc_DynamicField decoder_t::booleanDecoder(can_signal_t& signal,
 /// @return Return value is undefined.
 ///
 openxc_DynamicField decoder_t::ignoreDecoder(can_signal_t& signal,
-		const std::vector<can_signal_t>& signals, float value, bool* send)
+		const std::vector<std::shared_ptr<can_signal_t> > signals, float value, bool* send)
 {
 	if(send)
 	  *send = false;
@@ -125,7 +125,7 @@ openxc_DynamicField decoder_t::ignoreDecoder(can_signal_t& signal,
 /// return value is undefined.
 ///
 openxc_DynamicField decoder_t::stateDecoder(can_signal_t& signal,
-		const std::vector<can_signal_t>& signals, float value, bool* send)
+		const std::vector<std::shared_ptr<can_signal_t> > signals, float value, bool* send)
 {
 	const std::string signal_state = signal.get_states((uint8_t)value);
 	openxc_DynamicField decoded_value = build_DynamicField(signal_state);
@@ -154,7 +154,7 @@ openxc_DynamicField decoder_t::stateDecoder(can_signal_t& signal,
 /// string or boolean.
 ///
 openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, const can_message_t& message,
-	const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send)
+	const std::vector<std::shared_ptr<can_signal_t> > signals, bool* send)
 {
 	float value = decoder_t::parseSignalBitfield(signal, message);
 	DEBUG(binder_interface, "%s: Decoded message from parseSignalBitfield: %f", __FUNCTION__, value);
@@ -172,7 +172,7 @@ openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, const can_m
 		*send = false;
 	}
 	signal.set_last_value(value);
-	signal.get_message().set_last_value(message);
+	signal.get_message()->set_last_value(message);
 	return decoded_value;
 }
 
@@ -192,7 +192,7 @@ openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, const can_m
 /// string or boolean. If 'send' is false, the return value is undefined.
 ///
 openxc_DynamicField decoder_t::decodeSignal( can_signal_t& signal,
-		float value, const std::vector<can_signal_t>& signals, bool* send)
+		float value, const std::vector<std::shared_ptr<can_signal_t> > signals, bool* send)
 {
 	SignalDecoder decoder = signal.get_decoder() == nullptr ?
 							noopDecoder : signal.get_decoder();
@@ -215,7 +215,7 @@ openxc_DynamicField decoder_t::decodeSignal( can_signal_t& signal,
 ///      not be decoded.
 ///
 openxc_DynamicField decoder_t::decodeSignal( can_signal_t& signal,
-		const can_message_t& message, const std::vector<can_signal_t>& signals, bool* send)
+		const can_message_t& message, const std::vector<std::shared_ptr<can_signal_t> > signals, bool* send)
 {
 	float value = parseSignalBitfield(signal, message);
 	return decodeSignal(signal, value, signals, send);

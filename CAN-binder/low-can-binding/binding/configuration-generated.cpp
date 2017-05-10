@@ -104,7 +104,7 @@ configuration_t::configuration_t()
 	, diagnostic_messages_
 	{
 		{
-			{
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				4,
 				"engine.load",
 				0,
@@ -114,8 +114,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				5,
 				"engine.coolant.temperature",
 				0,
@@ -125,8 +125,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				10,
 				"fuel.pressure",
 				0,
@@ -136,8 +136,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				11,
 				"intake.manifold.pressure",
 				0,
@@ -147,8 +147,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				12,
 				"engine.speed",
 				0,
@@ -158,8 +158,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				13,
 				"vehicle.speed",
 				0,
@@ -169,8 +169,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				15,
 				"intake.air.temperature",
 				0,
@@ -180,8 +180,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				16,
 				"mass.airflow",
 				0,
@@ -191,8 +191,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				17,
 				"throttle.position",
 				0,
@@ -202,8 +202,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				31,
 				"running.time",
 				0,
@@ -213,8 +213,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				45,
 				"EGR.error",
 				0,
@@ -224,8 +224,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				47,
 				"fuel.level",
 				0,
@@ -235,8 +235,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				51,
 				"barometric.pressure",
 				0,
@@ -246,8 +246,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				76,
 				"commanded.throttle.position",
 				0,
@@ -257,8 +257,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				82,
 				"ethanol.fuel.percentage",
 				0,
@@ -268,8 +268,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				90,
 				"accelerator.pedal.position",
 				0,
@@ -279,8 +279,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				91,
 				"hybrid.battery-pack.remaining.life",
 				0,
@@ -290,8 +290,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				92,
 				"engine.oil.temperature",
 				0,
@@ -301,8 +301,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				94,
 				"engine.fuel.rate",
 				0,
@@ -312,8 +312,8 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			},
-			{
+			})},
+			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				99,
 				"engine.torque",
 				0,
@@ -323,7 +323,7 @@ configuration_t::configuration_t()
 				decoder_t::decode_obd2_response,
 				nullptr,
 				true
-			}
+			})}
 		}
 	}
 {}

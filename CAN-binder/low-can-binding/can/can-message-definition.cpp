@@ -67,7 +67,7 @@ can_message_definition_t::can_message_definition_t(
 {
 	for(auto& sig: can_signals_)
 	{
-		sig->set_parent(std::make_shared<can_signal_t>(this));
+		sig->set_parent(std::make_shared<can_message_definition_t>(*this));
 	}
 }
 

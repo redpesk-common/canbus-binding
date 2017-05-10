@@ -197,7 +197,7 @@ float can_signal_t::get_last_value() const
 
 void can_signal_t::set_parent(std::shared_ptr<can_message_definition_t> parent)
 {
-	parent_(parent);
+	parent_ = parent;
 }
 
 void can_signal_t::set_prefix(std::string val)
@@ -223,9 +223,9 @@ int can_signal_t::create_rx_filter()
 	// Make sure that socket has been opened.
 	if(! socket_)
 		socket_.open(
-			get_message().get_bus_name());
+			get_message()->get_bus_name());
 
-	uint32_t can_id  = get_message().get_id();
+	uint32_t can_id  = get_message()->get_id();
 
 	struct utils::simple_bcm_msg bcm_msg;
 	struct can_frame cfd;
