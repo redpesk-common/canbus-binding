@@ -71,16 +71,11 @@ int can_bus_t::process_can_signals(const can_message_t& can_message)
 	signals = sm.find_signals(search_key);
 
 	// Decoding the message ! Don't kill the messenger !
-	for(auto& sig : signals.can_signals)
+	for(const auto& sig : signals.can_signals)
 	{
 		std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
 		std::map<std::string, struct afb_event>& s = sm.get_subscribed_signals();
 
-		// DEBUG message to make easier debugger STL containers...
-		//DEBUG(binder_interface, "Operator[] key char: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[sig.generic_name]));
-		//DEBUG(binder_interface, "Operator[] key string: %s, event valid? %d", sig.generic_name, afb_event_is_valid(s[std::string(sig.generic_name)]));
-		//DEBUG(binder_interface, "Nb elt matched char: %d", (int)s.count(sig.generic_name));
-		//DEBUG(binder_interface, "Nb elt matched string: %d", (int)s.count(std::string(sig.generic_name));
 		if( s.find(sig->get_name()) != s.end() && afb_event_is_valid(s[sig->get_name()]))
 		{
 			bool send = true;
