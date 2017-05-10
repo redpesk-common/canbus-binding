@@ -54,7 +54,6 @@ frequency_clock_t::frequency_clock_t()
 	: unit_{1000000}, frequency_{10.0}, last_tick_{0}, time_function_{nullptr}
 {}
 
-
 frequency_clock_t::frequency_clock_t(float frequency)
 	: unit_{1000000}, frequency_{frequency}, last_tick_{0}, time_function_{nullptr}
 {}

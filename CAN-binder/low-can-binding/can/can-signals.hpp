@@ -39,7 +39,6 @@ extern "C"
 
 class can_signal_t;
 class can_message_definition_t;
-
 ///
 /// @brief The type signature for a CAN signal decoder.
 ///

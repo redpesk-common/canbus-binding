@@ -52,17 +52,36 @@ active_diagnostic_request_t& active_diagnostic_request_t::operator=(const active
 }
 
 active_diagnostic_request_t::active_diagnostic_request_t()
-	: bus_{nullptr}, id_{0}, handle_{nullptr}, name_{""},
-	  decoder_{nullptr}, callback_{nullptr}, recurring_{false}, wait_for_multiple_responses_{false},
-	  in_flight_{false}, frequency_clock_{frequency_clock_t()}, timeout_clock_{frequency_clock_t()}
+	: bus_{nullptr},
+	  id_{0},
+	  handle_{nullptr},
+	  name_{""},
+	  decoder_{nullptr},
+	  callback_{nullptr},
+	  recurring_{false},
+	  wait_for_multiple_responses_{false},
+	  in_flight_{false},
+	  frequency_clock_{frequency_clock_t()},
+	  timeout_clock_{frequency_clock_t()}
 {}
 
 active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus, DiagnosticRequest* request,
-		const std::string& name, bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
-		const DiagnosticResponseCallback callback, float frequencyHz)
-	: bus_{bus}, id_{request->arbitration_id}, handle_{nullptr}, name_{name},
-	  decoder_{decoder}, callback_{callback}, recurring_{frequencyHz ? true : false}, wait_for_multiple_responses_{wait_for_multiple_responses},
-	  in_flight_{false}, frequency_clock_{frequency_clock_t(frequencyHz)}, timeout_clock_{frequency_clock_t(10)}
+		const std::string& name,
+		bool wait_for_multiple_responses,
+		const DiagnosticResponseDecoder decoder,
+		const DiagnosticResponseCallback callback,
+		float frequencyHz)
+	: bus_{bus},
+	  id_{request->arbitration_id},
+	  handle_{nullptr},
+	  name_{name},
+	  decoder_{decoder},
+	  callback_{callback},
+	  recurring_{frequencyHz ? true : false},
+	  wait_for_multiple_responses_{wait_for_multiple_responses},
+	  in_flight_{false},
+	  frequency_clock_{frequency_clock_t(frequencyHz)},
+	  timeout_clock_{frequency_clock_t(10)}
 {}
 
 uint32_t active_diagnostic_request_t::get_id() const
