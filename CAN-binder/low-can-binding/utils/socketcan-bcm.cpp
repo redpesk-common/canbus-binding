@@ -19,6 +19,7 @@
 
 #include <net/if.h>
 #include <sys/ioctl.h>
+#include <fcntl.h>
 
 namespace utils
 {
@@ -58,6 +59,8 @@ namespace utils
 				ERROR(binder_interface, "%s: Connect failed. %s", __FUNCTION__, strerror(errno));
 				close();
 			}
+			// Needed because of using systemD event loop. See sd_event_add_io manual.
+			fcntl(socketcan_t::socket_, F_SETFL, O_NONBLOCK);
 		}
 		return socket_;
 	}
