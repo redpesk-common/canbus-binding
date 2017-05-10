@@ -57,4 +57,8 @@ const std::string& can_message_definition_t::get_bus_name() const
 uint32_t can_message_definition_t::get_id() const
 {
 	return id_;
+
+void can_message_definition_t::set_last_value(const can_message_t& cm)
+{
+	last_value_= cm.get_data_vector();
 }

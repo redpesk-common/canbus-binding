@@ -100,6 +100,16 @@ const uint8_t* can_message_t::get_data() const
 }
 
 ///
+/// @brief Retrieve data_ member whole vector
+///
+/// @return the vector as is
+///
+const std::vector<uint8_t> can_message_t::get_data_vector() const
+{
+	return data_;
+}
+
+///
 /// @brief Retrieve length_ member value.
 ///
 /// @return length_ class member

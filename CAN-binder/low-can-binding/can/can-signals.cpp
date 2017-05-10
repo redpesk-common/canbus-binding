@@ -71,7 +71,7 @@ utils::socketcan_bcm_t can_signal_t::get_socket() const
 	return socket_;
 }
 
-const can_message_definition_t& can_signal_t::get_message() const
+can_message_definition_t& can_signal_t::get_message() const
 {
 	return configuration_t::instance().get_can_message_definition(message_set_id_, message_id_);
 }

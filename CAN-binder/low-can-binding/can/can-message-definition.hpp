@@ -54,4 +54,6 @@ public:
 
 	const std::string& get_bus_name() const;
 	uint32_t get_id() const;
+
+	void set_last_value(const can_message_t& cm);
 };

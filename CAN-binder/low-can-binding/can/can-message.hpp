@@ -64,6 +64,7 @@ public:
 	can_message_format_t get_format() const;
 	uint8_t get_flags() const;
 	const uint8_t* get_data() const;
+	const std::vector<uint8_t> get_data_vector() const;
 	uint8_t get_length() const;
 
 	void set_format(const can_message_format_t new_format);
