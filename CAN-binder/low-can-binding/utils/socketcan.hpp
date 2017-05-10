@@ -23,7 +23,6 @@
 #include <linux/can/bcm.h>
 #include <string.h>
 
-#include "../can/can-message.hpp"
 #include "../binding/low-can-hat.hpp"
 
 #define INVALID_SOCKET -1
