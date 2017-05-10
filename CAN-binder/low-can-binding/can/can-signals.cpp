@@ -216,7 +216,7 @@ int can_signal_t::create_rx_filter()
 
 	bcm_msg.msg_head.opcode  = RX_SETUP;
 	bcm_msg.msg_head.can_id  = can_id;
-	bcm_msg.msg_head.flags = SETTIMER;
+	bcm_msg.msg_head.flags = SETTIMER|RX_NO_AUTOTIMER;
 	bcm_msg.msg_head.ival2.tv_sec = long(freq);
 	bcm_msg.msg_head.ival2.tv_usec = (freq - (long)freq) * 1000000;
 	bcm_msg.msg_head.nframes = 1;
