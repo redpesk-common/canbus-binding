@@ -28,8 +28,8 @@
 #include <vector>
 #include <memory>
 
-#include "can-message.hpp"
 #include "can-signals.hpp"
+#include "can-message.hpp"
 #include "../utils/timer.hpp"
 
 class can_message_set_t;

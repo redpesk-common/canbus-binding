@@ -23,7 +23,6 @@
 #include <linux/can.h>
 
 #include "../utils/timer.hpp"
-#include "can-message-set.hpp"
 
 #define CAN_MESSAGE_SIZE 8
 
