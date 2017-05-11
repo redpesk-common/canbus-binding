@@ -196,6 +196,26 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	return rets;
 }
 
+static int process_args(struct afb_req request, std::vector<std::string> args, bool subscribe)
+{
+	struct utils::signals_found sf;
+	int ok = 0, total = 0;
+
+	for(const auto& sig: args)
+	{
+		openxc_DynamicField search_key = build_DynamicField(sig);
+		sf = utils::signals_manager_t::instance().find_signals(search_key);
+		total = (int)sf.can_signals.size() + (int)sf.diagnostic_messages.size();
+
+		if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
+			NOTICE(binder_interface, "%s: No signal(s) found for %s.", __FUNCTION__, sig.c_str());
+		else
+			ok = subscribe_unsubscribe_signals(request, subscribe, sf);
+	}
+	NOTICE(binder_interface, "%s: Subscribed/unsubscribe correctly to %d/%d signal(s).", __FUNCTION__, ok, total);
+	return ok;
+}
+
 static const std::vector<std::string> parse_args_from_request(struct afb_req request, bool subscribe)
 {
 	int i, n;
@@ -228,32 +248,25 @@ static const std::vector<std::string> parse_args_from_request(struct afb_req req
 void subscribe(struct afb_req request)
 {
 	std::vector<std::string> args;
-	struct utils::signals_found sf;
-	int ok = 0, total = 0;
 	bool subscribe = true;
 
 	args = parse_args_from_request(request, subscribe);
 
-	for(const auto& sig: args)
-	{
-		openxc_DynamicField search_key = build_DynamicField(sig);
-		sf = utils::signals_manager_t::instance().find_signals(search_key);
-		total = (int)sf.can_signals.size() + (int)sf.diagnostic_messages.size();
-
-		if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
-			NOTICE(binder_interface, "%s: No signal(s) found for %s.", __FUNCTION__, sig.c_str());
-		else
-			ok = subscribe_unsubscribe_signals(request, subscribe, sf);
-	}
-
-	NOTICE(binder_interface, "%s: Subscribed/unsubscribe correctly to %d/%d signal(s).", __FUNCTION__, ok, total);
-	if (ok > 0)
+	if (process_args(request, args, subscribe) > 0)
 		afb_req_success(request, NULL, NULL);
 	else
 		afb_req_fail(request, "error", NULL);
 }
 
-	void unsubscribe(struct afb_req request)
+void unsubscribe(struct afb_req request)
 {
-	parse_args_from_request(request, false);
+	std::vector<std::string> args;
+	bool subscribe = false;
+	
+	args = parse_args_from_request(request, subscribe);
+
+	if (process_args(request, args, subscribe) > 0)
+		afb_req_success(request, NULL, NULL);
+	else
+		afb_req_fail(request, "error", NULL);
 }
