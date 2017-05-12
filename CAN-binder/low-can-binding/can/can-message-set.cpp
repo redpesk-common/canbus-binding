@@ -28,7 +28,7 @@ can_message_set_t::can_message_set_t(
 {
 	for(auto& cmd : can_messages_definition_)
 	{
-		cmd->set_parent(std::make_shared<can_message_set_t>(*this));
+		cmd->set_parent(this);
 	}
 }
 

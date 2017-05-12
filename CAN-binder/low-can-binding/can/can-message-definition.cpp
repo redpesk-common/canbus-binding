@@ -67,7 +67,7 @@ can_message_definition_t::can_message_definition_t(
 {
 	for(auto& sig: can_signals_)
 	{
-		sig->set_parent(std::make_shared<can_message_definition_t>(*this));
+		sig->set_parent(this);
 	}
 }
 
@@ -97,7 +97,7 @@ std::vector<std::shared_ptr<can_signal_t> >& can_message_definition_t::get_can_s
 	return can_signals_;
 }
 
-void can_message_definition_t::set_parent(std::shared_ptr<can_message_set_t> parent)
+void can_message_definition_t::set_parent(can_message_set_t* parent)
 {
 	parent_= parent;
 }

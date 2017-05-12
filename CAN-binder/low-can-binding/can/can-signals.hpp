@@ -75,7 +75,7 @@ typedef uint64_t (*SignalEncoder)(can_signal_t* signal,
 class can_signal_t
 {
 private:
-	std::shared_ptr<can_message_definition_t> parent_; /*!< parent_ - pointer to the parent message definition holding this signal*/
+	can_message_definition_t* parent_; /*!< parent_ - pointer to the parent message definition holding this signal*/
 	utils::socketcan_bcm_t	socket_; /*!< socket_ - Specific BCM socket that filter the signal read from CAN device */
 	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
 	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
@@ -129,7 +129,7 @@ public:
 		bool received);
 
 	utils::socketcan_bcm_t get_socket() const;
-	std::shared_ptr<can_message_definition_t> get_message() const;
+	can_message_definition_t* get_message() const;
 	const std::string& get_generic_name() const;
 	const std::string get_name() const;
 	const std::string& get_prefix() const;
@@ -151,7 +151,7 @@ public:
 	bool get_received() const;
 	float get_last_value() const;
 
-	void set_parent(std::shared_ptr<can_message_definition_t> parent);
+	void set_parent(can_message_definition_t* parent);
 	void set_prefix(std::string val);
 	void set_received(bool r);
 	void set_last_value(float val);

@@ -89,7 +89,7 @@ utils::socketcan_bcm_t can_signal_t::get_socket() const
 	return socket_;
 }
 
-std::shared_ptr<can_message_definition_t> can_signal_t::get_message() const
+can_message_definition_t* can_signal_t::get_message() const
 {
 	return parent_;
 }
@@ -195,7 +195,7 @@ float can_signal_t::get_last_value() const
 	return last_value_;
 }
 
-void can_signal_t::set_parent(std::shared_ptr<can_message_definition_t> parent)
+void can_signal_t::set_parent(can_message_definition_t* parent)
 {
 	parent_ = parent;
 }

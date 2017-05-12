@@ -37,7 +37,7 @@ class can_message_set_t;
 class can_message_definition_t
 {
 private:
-	std::shared_ptr<can_message_set_t> parent_; /*!< parent_ - Pointer to the CAN message set holding this CAN message definition */
+	can_message_set_t* parent_; /*!< parent_ - Pointer to the CAN message set holding this CAN message definition */
 	std::string bus_; /*!< bus_ - Address of CAN bus device. */
 	uint32_t id_; /*!< id_ - The ID of the message.*/
 	can_message_format_t format_; /*!< format_ - the format of the message's ID.*/
@@ -62,6 +62,6 @@ public:
 	uint32_t get_id() const;
 	std::vector<std::shared_ptr<can_signal_t> >& get_can_signals();
 
-	void set_parent(std::shared_ptr<can_message_set_t> parent);
+	void set_parent(can_message_set_t* parent);
 	void set_last_value(const can_message_t& cm);
 };
