@@ -55,7 +55,7 @@ namespace utils
 		void find_can_signals(const openxc_DynamicField &key, std::vector<std::shared_ptr<can_signal_t> >& found_signals);
 
 		template <typename T>
-		void lookup_signals_by_name(const std::string& key, std::vector<std::shared_ptr<T> > signals, std::vector<std::shared_ptr<T> > found_signals)
+		void lookup_signals_by_name(const std::string& key, std::vector<std::shared_ptr<T> > signals, std::vector<std::shared_ptr<T> >& found_signals)
 		{
 			for(std::shared_ptr<T> s : signals)
 			{
@@ -67,7 +67,7 @@ namespace utils
 		}
 
 		template <typename T>
-		void lookup_signals_by_id(const double key, std::vector<std::shared_ptr<T> > signals, std::vector<std::shared_ptr<T> > found_signals)
+		void lookup_signals_by_id(const double key, std::vector<std::shared_ptr<T> > signals, std::vector<std::shared_ptr<T> >& found_signals)
 		{
 			for(std::shared_ptr<T> s : signals)
 			{
