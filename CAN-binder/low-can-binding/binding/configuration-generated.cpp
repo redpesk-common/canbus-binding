@@ -4,7 +4,7 @@
 configuration_t::configuration_t()
 	:can_bus_manager_{utils::config_parser_t{"/etc/dev-mapping.conf"}}
 	, can_message_set_{
-		can_message_set_t{0, "example", 0, 1, 5, 0, 20, {
+		can_message_set_t{0, "example", {
 			{std::make_shared<can_message_definition_t>(can_message_definition_t{"can0", 0x620, can_message_format_t::STANDARD, frequency_clock_t(0.00000f), true,
 				{
 					{std::make_shared<can_signal_t>(

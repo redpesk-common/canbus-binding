@@ -21,19 +21,9 @@
 can_message_set_t::can_message_set_t(
 		uint8_t index,
 		const std::string& name,
-		uint8_t can_bus_count,
-		unsigned short can_message_count,
-		unsigned short can_signal_count,
-		unsigned short can_command_count,
-		unsigned short obd2_signal_count,
 		std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition)
 	: index_{index}
 	, name_{name}
-	, can_bus_count_{can_bus_count}
-	, can_message_count_{can_message_count}
-	, can_signal_count_{can_signal_count}
-	, can_command_count_{can_command_count}
-	, obd2_signal_count_{obd2_signal_count}
 	, can_messages_definition_{can_messages_definition}
 {
 	for(auto& cmd : can_messages_definition_)
