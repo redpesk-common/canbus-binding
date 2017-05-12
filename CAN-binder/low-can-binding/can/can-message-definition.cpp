@@ -92,7 +92,7 @@ uint32_t can_message_definition_t::get_id() const
 	return id_;
 }
 
-std::vector<std::shared_ptr<can_signal_t> > can_message_definition_t::get_can_signals()
+std::vector<std::shared_ptr<can_signal_t> >& can_message_definition_t::get_can_signals()
 {
 	return can_signals_;
 }

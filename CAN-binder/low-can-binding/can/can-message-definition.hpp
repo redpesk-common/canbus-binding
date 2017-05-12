@@ -60,7 +60,7 @@ public:
 
 	const std::string& get_bus_name() const;
 	uint32_t get_id() const;
-	std::vector<std::shared_ptr<can_signal_t> > get_can_signals();
+	std::vector<std::shared_ptr<can_signal_t> >& get_can_signals();
 
 	void set_parent(std::shared_ptr<can_message_set_t> parent);
 	void set_last_value(const can_message_t& cm);
