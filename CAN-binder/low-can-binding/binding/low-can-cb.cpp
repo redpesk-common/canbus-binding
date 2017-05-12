@@ -196,7 +196,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	return rets;
 }
 
-static int process_args(struct afb_req request, std::vector<std::string> args, bool subscribe)
+static int process_args(struct afb_req request, const std::vector<std::string>& args, bool subscribe)
 {
 	struct utils::signals_found sf;
 	int ok = 0, total = 0;
@@ -216,7 +216,7 @@ static int process_args(struct afb_req request, std::vector<std::string> args, b
 	return ok;
 }
 
-static const std::vector<std::string> parse_args_from_request(struct afb_req request, bool subscribe)
+static const std::vector<std::string> parse_args_from_request(struct afb_req request)
 {
 	int i, n;
 	std::vector<std::string> ret;
@@ -247,10 +247,9 @@ static const std::vector<std::string> parse_args_from_request(struct afb_req req
 
 void subscribe(struct afb_req request)
 {
-	std::vector<std::string> args;
 	bool subscribe = true;
 
-	args = parse_args_from_request(request, subscribe);
+	const std::vector<std::string> args = parse_args_from_request(request);
 
 	if (process_args(request, args, subscribe) > 0)
 		afb_req_success(request, NULL, NULL);
@@ -263,7 +262,7 @@ void unsubscribe(struct afb_req request)
 	std::vector<std::string> args;
 	bool subscribe = false;
 	
-	args = parse_args_from_request(request, subscribe);
+	args = parse_args_from_request(request);
 
 	if (process_args(request, args, subscribe) > 0)
 		afb_req_success(request, NULL, NULL);
