@@ -50,12 +50,13 @@ std::vector<std::shared_ptr<can_message_definition_t> > can_message_set_t::get_c
 
 std::vector<std::shared_ptr<can_signal_t> > can_message_set_t::get_can_signals() const
 {
-	std::vector<std::shared_ptr<can_signal_t> > can_signals(can_signal_count_);
+	std::vector<std::shared_ptr<can_signal_t> > can_signals;
 	for(const auto& cmd: can_messages_definition_)
 	{
+		std::vector<std::shared_ptr<can_signal_t> > cmd_signals = cmd->get_can_signals();
 		can_signals.insert( can_signals.end(),
-									cmd->get_can_signals().begin(),
-									cmd->get_can_signals().end()
+							cmd_signals.begin(),
+							cmd_signals.end()
 		);
 	}
 
