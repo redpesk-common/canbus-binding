@@ -17,6 +17,7 @@
 
 #include <systemd/sd-event.h>
 #include <algorithm>
+#include <string.h>
 
 #include "diagnostic-manager.hpp"
 
@@ -55,6 +56,21 @@ bool diagnostic_manager_t::initialize()
 	return initialized_;
 }
 
+void diagnostic_manager_t::read_socket()
+{
+	can_message_t msg;
+	can_bus_t& cbm = configuration_t::instance().get_can_bus_manager();
+	socket_ >> msg;
+	std::lock_guard<std::mutex> can_message_lock(cbm.get_can_message_mutex());
+	{ cbm.push_new_can_message(msg); }
+	cbm.get_new_can_message_cv().notify_one();
+}
+
+utils::socketcan_bcm_t& diagnostic_manager_t::get_socket()
+{
+	return socket_;
+}
+
 /// @brief initialize shims used by UDS lib and set initialized_ to true.
 ///  It is needed before used the diagnostic manager fully because shims are
 ///  required by most member functions.
@@ -71,6 +87,51 @@ void diagnostic_manager_t::reset()
 	cleanup_active_requests(true);
 }
 
+/// @brief Adds 8 RX_SETUP jobs to the BCM rx_socket_ then diagnotic manager
+///  listens on CAN ID range 7E8 - 7EF affected to the OBD2 communications.
+///
+/// @return -1 or negative value on error, 0 if ok.
+int diagnostic_manager_t::add_rx_filter(uint32_t can_id)
+{
+	// Make sure that socket has been opened.
+	if(! socket_)
+		socket_.open(bus_);
+
+	struct utils::simple_bcm_msg bcm_msg;
+	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
+
+	const struct timeval freq =  recurring_requests_.back()->get_timeout_clock().get_timeval_from_period();
+
+	bcm_msg.msg_head.opcode  = RX_SETUP;
+	bcm_msg.msg_head.flags = SETTIMER|RX_FILTER_ID;
+	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec;
+	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
+
+	// If it isn't an OBD2 CAN ID then just add a simple RX_SETUP job
+	if(can_id != OBD2_FUNCTIONAL_RESPONSE_START) 
+	{
+		bcm_msg.msg_head.can_id  = can_id;
+
+		socket_ << bcm_msg;
+			if(! socket_)
+				return -1;
+	}
+	else
+	{
+		for(uint8_t i = 0; i < 8; i++)
+		{
+			can_id  =  OBD2_FUNCTIONAL_RESPONSE_START + i;
+			bcm_msg.msg_head.can_id  = can_id;
+
+			socket_ << bcm_msg;
+			if(! socket_)
+				return -1;
+		}
+	}
+
+	return 0;
+}
+
 /// @brief send function use by diagnostic library. Only one bus used for now
 ///  so diagnostic request is sent using the default diagnostic bus not matter of
 ///  which is specified in the diagnostic message definition.
@@ -83,10 +144,36 @@ void diagnostic_manager_t::reset()
 /// @return true if the CAN message was sent successfully. 
 bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
-	std::shared_ptr<can_bus_dev_t> can_bus_dev = can_bus_t::get_can_device(configuration_t::instance().get_diagnostic_manager().bus_);
-	if(can_bus_dev != nullptr)
-		return can_bus_dev->shims_send(arbitration_id, data, size);
-	ERROR(binder_interface, "%s: Can not retrieve diagnostic bus: %s", __FUNCTION__, configuration_t::instance().get_diagnostic_manager().bus_.c_str());
+	diagnostic_manager_t& dm = configuration_t::instance().get_diagnostic_manager();
+	active_diagnostic_request_t* current_adr = dm.get_last_recurring_requests();
+	utils::socketcan_bcm_t& tx_socket = current_adr->get_socket();
+
+	// Make sure that socket has been opened.
+	if(! tx_socket)
+		tx_socket.open(
+			dm.get_can_bus());
+
+	struct utils::simple_bcm_msg bcm_msg;
+	struct can_frame cfd;
+
+	memset(&cfd, 0, sizeof(cfd));
+	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
+
+	struct timeval freq = current_adr->get_frequency_clock().get_timeval_from_period();
+
+	bcm_msg.msg_head.opcode  = TX_SETUP;
+	bcm_msg.msg_head.can_id  = arbitration_id;
+	bcm_msg.msg_head.flags = SETTIMER|STARTTIMER|TX_CP_CAN_ID;
+	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec;
+	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
+	bcm_msg.msg_head.nframes = 1;
+	::memcpy(cfd.data, data, size);
+
+	bcm_msg.frames = cfd;
+
+	tx_socket << bcm_msg;
+	if(tx_socket)
+		return true;
 	return false;
 }
 
@@ -113,8 +200,9 @@ void diagnostic_manager_t::shims_timer()
 {}
 
 std::shared_ptr<can_bus_dev_t> diagnostic_manager_t::get_can_bus_dev()
+active_diagnostic_request_t* diagnostic_manager_t::get_last_recurring_requests() const
 {
-	return can_bus_t::get_can_device(bus_);
+	return recurring_requests_.back();
 }
 
 /// @brief Return diagnostic manager shims member.
@@ -251,13 +339,13 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const 
 /// @return true if the request was added successfully. Returns false if there
 /// wasn't a free active request entry, if the frequency was too high or if the
 /// CAN acceptance filters could not be configured,
-bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::string name,
+active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::string name,
 	bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 	const DiagnosticResponseCallback callback)
 {
 	cleanup_active_requests(false);
 
-	bool added = true;
+	active_diagnostic_request_t* entry = nullptr;
 
 	if (non_recurring_requests_.size() <= MAX_SIMULTANEOUS_DIAG_REQUESTS)
 	{
@@ -281,9 +369,8 @@ bool diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::st
 	{
 		WARNING(binder_interface, "%s: There isn't enough request entry. Vector exhausted %d/%d", __FUNCTION__, (int)non_recurring_requests_.size(), MAX_SIMULTANEOUS_DIAG_REQUESTS);
 		non_recurring_requests_.resize(MAX_SIMULTANEOUS_DIAG_REQUESTS);
-		added = false;
 	}
-	return added;
+	return entry;
 }
 
 bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyHz)
@@ -348,63 +435,42 @@ bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyH
 /// @return true if the request was added successfully. Returns false if there
 /// was too much already running requests, if the frequency was too high TODO:or if the
 /// CAN acceptance filters could not be configured,
-///
-bool diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, const char* name,
+active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz)
 {
+	active_diagnostic_request_t* entry = nullptr;
+
 	if(!validate_optional_request_attributes(frequencyHz))
-		return false;
+		return entry;
 
 	cleanup_active_requests(false);
 
-	bool added = true;
 	if(find_recurring_request(request) == nullptr)
 	{
 		if(recurring_requests_.size() <= MAX_SIMULTANEOUS_DIAG_REQUESTS)
 		{
-			sd_event_source *source;
 			// TODO: implement Acceptance Filter
 			//if(updateRequiredAcceptanceFilters(bus, request)) {
 			active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request, name,
 					wait_for_multiple_responses, decoder, callback, frequencyHz);
-			entry->set_handle(shims_, request);
-
-			uint64_t usec;
-			sd_event_now(afb_daemon_get_event_loop(binder_interface->daemon), CLOCK_BOOTTIME, &usec);
-			if(recurring_requests_.size() > 0)
-			{
-				DEBUG(binder_interface, "%s: Added 100ms to usec to stagger sending requests", __FUNCTION__);
-				usec += 100000;
-			}
-
-			DEBUG(binder_interface, "%s: Added recurring diagnostic request (freq: %f) on bus %s at %ld. Event loop state: %d", __FUNCTION__,
-					frequencyHz,
-					bus_.c_str(),
-					usec,
-					sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)));
-
-			if(sd_event_add_time(afb_daemon_get_event_loop(binder_interface->daemon), &source,
-					CLOCK_BOOTTIME, usec, TIMERFD_ACCURACY, send_request, request) < 0)
-			{
-				ERROR(binder_interface, "%s: Request fails to be schedule through event loop", __FUNCTION__);
-				added = false;
-			}
 			recurring_requests_.push_back(entry);
+
+			entry->set_handle(shims_, request);
+			if(add_rx_filter(OBD2_FUNCTIONAL_BROADCAST_ID) < 0)
+			{ recurring_requests_.pop_back(); }
+			else
+			{ start_diagnostic_request(&shims_, entry->get_handle()); }
 		}
 		else
 		{
 			WARNING(binder_interface, "%s: There isn't enough request entry. Vector exhausted %d/%d", __FUNCTION__, (int)recurring_requests_.size(), MAX_SIMULTANEOUS_DIAG_REQUESTS);
 			recurring_requests_.resize(MAX_SIMULTANEOUS_DIAG_REQUESTS);
-			added = false;
 		}
 	}
 	else
-	{
-		DEBUG(binder_interface, "%s: Can't add request, one already exists with same key", __FUNCTION__);
-		added = false;
-	}
-	return added;
+	{ DEBUG(binder_interface, "%s: Can't add request, one already exists with same key", __FUNCTION__);}
+	return entry;
 }
 
 /// @brief Returns true if there are two active requests running for the same arbitration ID.
@@ -440,61 +506,6 @@ bool diagnostic_manager_t::clear_to_send(active_diagnostic_request_t* request) c
 	if(total_in_flight > MAX_SIMULTANEOUS_IN_FLIGHT_REQUESTS)
 		return false;
 	return true;
-}
-
-int diagnostic_manager_t::reschedule_request(sd_event_source *s, uint64_t usec, active_diagnostic_request_t* adr)
-{
-	usec = usec + (uint64_t)(adr->get_frequency_clock().frequency_to_period());
-	DEBUG(binder_interface, "%s: Event loop state: %d. usec: %ld", __FUNCTION__, sd_event_get_state(afb_daemon_get_event_loop(binder_interface->daemon)), usec);
-	if(sd_event_source_set_time(s, usec) >= 0)
-		if(sd_event_source_set_enabled(s, SD_EVENT_ON) >= 0)
-			return 0;
-	sd_event_source_unref(s);
-	return -1;
-}
-
-/// @brief Systemd timer event callback use to send CAN messages at regular interval. Depending
-/// on the diagnostic message frequency.
-///
-/// This should be called from systemd binder event loop and the event is created on add_recurring_request
-///
-/// @param[in] s - Systemd event source pointer used to reschedule the new iteration.
-/// @param[in] usec - previous call timestamp in microseconds.
-/// @param[in] userdata - the DiagnosticRequest struct, use to retrieve the active request from the list.
-///
-/// @return positive integer if sent and rescheduled or negative value if something wrong. If an error occurs
-/// event will be disabled.
-int diagnostic_manager_t::send_request(sd_event_source *s, uint64_t usec, void *userdata)
-{
-	diagnostic_manager_t& dm = configuration_t::instance().get_diagnostic_manager();
-	DiagnosticRequest* request = (DiagnosticRequest*)userdata;
-	active_diagnostic_request_t* adr = dm.find_recurring_request(request);
-
-	dm.cleanup_active_requests(false);
-	if(adr != nullptr && adr->get_can_bus_dev() == dm.get_can_bus_dev() && adr->should_send() &&
-		dm.clear_to_send(adr))
-	{
-		adr->get_frequency_clock().tick();
-		start_diagnostic_request(&dm.shims_, adr->get_handle());
-		if(adr->get_handle()->completed && !adr->get_handle()->success)
-		{
-				ERROR(binder_interface, "%s: Fatal error sending diagnostic request", __FUNCTION__);
-				sd_event_source_unref(s);
-				return -1;
-		}
-
-		adr->get_timeout_clock().tick();
-		adr->set_in_flight(true);
-	}
-
-	if(adr != nullptr && adr->get_recurring())
-	{
-		return dm.reschedule_request(s, usec, adr);
-	}
-
-	sd_event_source_unref(s);
-	NOTICE(binder_interface, "%s: Request doesn't exist anymore. Canceling.'", __FUNCTION__);
-	return -2;
 }
 
 /// @brief Will decode the diagnostic response and build the final openxc_VehicleMessage to return.
@@ -543,6 +554,8 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 		adr->get_callback()(adr, &response, value);
 	}
 
+	// Reset the completed flag handle to make sure that it will be reprocessed the next time.
+	adr->get_handle()->completed = false;
 	return message;
 }
 

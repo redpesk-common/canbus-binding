@@ -21,6 +21,7 @@
 #include <map>
 #include <vector>
 
+#include "../utils/socketcan-bcm.hpp"
 #include "uds/uds.h"
 #include "openxc.pb.h"
 #include "../can/can-bus.hpp"
@@ -55,15 +56,18 @@ private:
 	std::vector<active_diagnostic_request_t*> non_recurring_requests_; /*!< nonrecurringRequests - A list of active one-time diagnostic requests. When a
 																	   * response is received for a non-recurring request or it times out, it is removed*/
 	bool initialized_; /*!< * initialized - True if the DiagnosticsManager has been initialized with shims. It will interface with the uds-c lib*/
+	utils::socketcan_bcm_t socket_; ///< rx_socket_ - a BCM socket with 8 RX_SETUP jobs for the 8 CAN ID on which ECU could respond.
 
 	void init_diagnostic_shims();
 	void reset();
+	int add_rx_filter(uint32_t can_id);
 public:
 	diagnostic_manager_t();
 
 	bool initialize();
 
-	std::shared_ptr<can_bus_dev_t> get_can_bus_dev();
+	std::string get_can_bus();
+	active_diagnostic_request_t* get_last_recurring_requests() const;
 	DiagnosticShims& get_shims();
 
 	void find_and_erase(active_diagnostic_request_t* entry, std::vector<active_diagnostic_request_t*>& requests_list);
@@ -76,11 +80,11 @@ public:
 		const DiagnosticResponse& response, float parsedPayload);
 
 	// Subscription parts
-	bool add_request(DiagnosticRequest* request, const std::string name,
+	active_diagnostic_request_t* add_request(DiagnosticRequest* request, const std::string name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback);
 	bool validate_optional_request_attributes(float frequencyHz);
-	bool add_recurring_request(DiagnosticRequest* request, const char* name,
+	active_diagnostic_request_t* add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
 

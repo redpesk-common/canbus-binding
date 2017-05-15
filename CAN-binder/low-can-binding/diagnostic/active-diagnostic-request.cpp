@@ -146,6 +146,11 @@ frequency_clock_t& active_diagnostic_request_t::get_timeout_clock()
 	return timeout_clock_;
 }
 
+utils::socketcan_bcm_t& active_diagnostic_request_t::get_socket()
+{
+	return socket_;
+}
+
 void active_diagnostic_request_t::set_handle(DiagnosticShims& shims, DiagnosticRequest* request)
 {
 	handle_ = new DiagnosticRequestHandle(generate_diagnostic_request(&shims, request, nullptr));
