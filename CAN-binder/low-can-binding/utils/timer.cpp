@@ -17,6 +17,7 @@
 
 #include <time.h>
 #include <stdlib.h> 
+#include <cmath>
 
 #include "timer.hpp"
 
@@ -63,6 +64,16 @@ frequency_clock_t::frequency_clock_t(float frequency)
 float frequency_clock_t::frequency_to_period()
 {
 	return frequency_ == 0 ? 0 : 1 / frequency_ * unit_;
+}
+
+const struct timeval frequency_clock_t::get_timeval_from_period() const
+{
+	struct timeval freq = {0, 0};
+	float f;
+	freq.tv_usec = (long int)std::modf(frequency_, &f);
+	freq.tv_sec = (time_t)f;
+
+	return freq;
 }
 
 bool frequency_clock_t::started()

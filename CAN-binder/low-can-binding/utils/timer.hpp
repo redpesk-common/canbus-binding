@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <sys/time.h>
+
 /// @brief return epoch in milliseconds
 ///
 /// @return long long int epoch in milliseconds
@@ -43,6 +45,7 @@ public:
 	frequency_clock_t(float frequency, unsigned long last_tick, time_function_t time_function);
 
 	float get_frequency() const;
+	const struct timeval get_timeval_from_period() const;
 
 	float frequency_to_period();
 	bool started();
