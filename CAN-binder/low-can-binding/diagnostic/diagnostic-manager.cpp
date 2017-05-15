@@ -523,7 +523,7 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 		value = adr->get_decoder()(&response, value);
 	}
 
-	if((response.success && strnlen(adr->get_name().c_str(), adr->get_name().size())) > 0)
+	if((response.success && adr->get_name().size()) > 0)
 	{
 		// If name, include 'value' instead of payload, and leave of response
 		// details.
