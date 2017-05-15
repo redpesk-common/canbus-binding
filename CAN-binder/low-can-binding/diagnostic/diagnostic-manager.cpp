@@ -199,7 +199,11 @@ void diagnostic_manager_t::shims_logger(const char* format, ...)
 void diagnostic_manager_t::shims_timer()
 {}
 
-std::shared_ptr<can_bus_dev_t> diagnostic_manager_t::get_can_bus_dev()
+std::string diagnostic_manager_t::get_can_bus()
+{
+	return bus_;
+}
+
 active_diagnostic_request_t* diagnostic_manager_t::get_last_recurring_requests() const
 {
 	return recurring_requests_.back();
