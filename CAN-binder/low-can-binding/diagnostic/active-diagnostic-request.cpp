@@ -43,7 +43,6 @@ active_diagnostic_request_t& active_diagnostic_request_t::operator=(const active
 		callback_ = adr.callback_;
 		recurring_ = adr.recurring_; 
 		wait_for_multiple_responses_ = adr.wait_for_multiple_responses_;
-		in_flight_ = adr.in_flight_;
 		frequency_clock_ = adr.frequency_clock_;
 		timeout_clock_ = adr.timeout_clock_;
 	}
@@ -60,7 +59,6 @@ active_diagnostic_request_t::active_diagnostic_request_t()
 	  callback_{nullptr},
 	  recurring_{false},
 	  wait_for_multiple_responses_{false},
-	  in_flight_{false},
 	  frequency_clock_{frequency_clock_t()},
 	  timeout_clock_{frequency_clock_t()}
 {}
@@ -79,7 +77,6 @@ active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus,
 	  callback_{callback},
 	  recurring_{frequencyHz ? true : false},
 	  wait_for_multiple_responses_{wait_for_multiple_responses},
-	  in_flight_{false},
 	  frequency_clock_{frequency_clock_t(frequencyHz)},
 	  timeout_clock_{frequency_clock_t(10)}
 {}
@@ -87,11 +84,6 @@ active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus,
 uint32_t active_diagnostic_request_t::get_id() const
 {
 	return id_;
-}
-
-const std::shared_ptr<can_bus_dev_t> active_diagnostic_request_t::get_can_bus_dev() const
-{
-	return can_bus_t::get_can_device(bus_);
 }
 
 uint16_t active_diagnostic_request_t::get_pid() const
@@ -131,11 +123,6 @@ bool active_diagnostic_request_t::get_recurring() const
 	return recurring_;
 }
 
-bool active_diagnostic_request_t::get_in_flight() const
-{
-	return in_flight_;
-}
-
 frequency_clock_t& active_diagnostic_request_t::get_frequency_clock()
 {
 	return frequency_clock_;
@@ -156,11 +143,6 @@ void active_diagnostic_request_t::set_handle(DiagnosticShims& shims, DiagnosticR
 	handle_ = new DiagnosticRequestHandle(generate_diagnostic_request(&shims, request, nullptr));
 }
 
-void active_diagnostic_request_t::set_in_flight(bool val)
-{
-	in_flight_ = val;
-}
-
 ///
 /// @brief Check if requested signal name is a diagnostic message. If the name
 ///  begin with the diagnostic message prefix then true else false.
@@ -177,26 +159,6 @@ bool active_diagnostic_request_t::is_diagnostic_signal(const std::string& name)
 	return false;
 }
 
-/// @brief Check is the request should be sent or not
-///
-/// @return true if the request is not running or recurring nor completed,
-/// or it's recurring, its clock elapsed
-/// so it's time to send another one.
-bool active_diagnostic_request_t::should_send()
-{
-	return !in_flight_ && ( (!recurring_ && !request_completed()) ||
-			(recurring_ && frequency_clock_.elapsed(true)) );
-}
-
-/// @brief check if the timeout clock has elapsed
-///
-/// @return true if elapsed, so it is a timeout, else false.
-bool active_diagnostic_request_t::timed_out()
-{
-	// don't use staggered start with the timeout clock
-	return timeout_clock_.elapsed(false);
-}
-
 /// @brief Returns true if a sufficient response has been received for a
 /// diagnostic request.
 ///
@@ -206,13 +168,5 @@ bool active_diagnostic_request_t::timed_out()
 bool active_diagnostic_request_t::response_received() const
 {
 	return !wait_for_multiple_responses_ &&
-				handle_->completed;
-}
-
-/// @brief Returns true if the request has timed out waiting for a response,
-/// or a sufficient number of responses has been received.
-bool active_diagnostic_request_t::request_completed()
-{
-	return response_received() || 
-		(timed_out() && diagnostic_request_sent(handle_));
+				handle_->completed && handle_->success;
 }

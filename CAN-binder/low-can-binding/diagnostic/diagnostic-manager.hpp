@@ -78,9 +78,6 @@ public:
 	void cleanup_active_requests(bool force);
 	active_diagnostic_request_t* find_recurring_request(const DiagnosticRequest* request);
 
-	void checkSupportedPids(const active_diagnostic_request_t& request,
-		const DiagnosticResponse& response, float parsedPayload);
-
 	// Subscription parts
 	active_diagnostic_request_t* add_request(DiagnosticRequest* request, const std::string name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
@@ -89,12 +86,6 @@ public:
 	active_diagnostic_request_t* add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
-
-	// Sendig requests part
-	bool conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const;
-	bool clear_to_send(active_diagnostic_request_t* request) const;
-	int reschedule_request(sd_event_source *s, uint64_t usec, active_diagnostic_request_t* adr);
-	static int send_request(sd_event_source *s, uint64_t usec, void *userdata);
 
 	// Decoding part
 	openxc_VehicleMessage relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response);

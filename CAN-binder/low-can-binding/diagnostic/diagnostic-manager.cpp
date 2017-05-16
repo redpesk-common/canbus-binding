@@ -245,10 +245,8 @@ void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 /// @param[in] force - Force the cleaning or not ?
 void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, bool force)
 {
-	if((force || (entry != nullptr && entry->get_in_flight() && entry->request_completed())))
+	if((force || (entry != nullptr && entry->response_received())))
 	{
-		entry->set_in_flight(false);
-
 		char request_string[128] = {0};
 		diagnostic_request_to_string(&entry->get_handle()->request,
 			request_string, sizeof(request_string));
@@ -474,41 +472,6 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 	else
 		{ DEBUG(binder_interface, "%s: Can't add request, one already exists with same key", __FUNCTION__);}
 	return entry;
-}
-
-/// @brief Returns true if there are two active requests running for the same arbitration ID.
-bool diagnostic_manager_t::conflicting(active_diagnostic_request_t* request, active_diagnostic_request_t* candidate) const
-{
-	return (candidate->get_in_flight() && candidate != request &&
-			candidate->get_can_bus_dev() == request->get_can_bus_dev() &&
-			candidate->get_id() == request->get_id());
-}
-
-
-/// @brief Returns true if there are no other active requests to the same arbitration ID
-/// and if there aren't more than 8 requests in flight at the same time.
-bool diagnostic_manager_t::clear_to_send(active_diagnostic_request_t* request) const
-{
-	int total_in_flight = 0;
-	for ( auto entry : non_recurring_requests_)
-	{
-		if(conflicting(request, entry))
-			return false;
-		if(entry->get_in_flight())
-			total_in_flight++;
-	}
-
-	for ( auto entry : recurring_requests_)
-	{
-		if(conflicting(request, entry))
-			return false;
-		if(entry->get_in_flight())
-			total_in_flight++;
-	}
-
-	if(total_in_flight > MAX_SIMULTANEOUS_IN_FLIGHT_REQUESTS)
-		return false;
-	return true;
 }
 
 /// @brief Will decode the diagnostic response and build the final openxc_VehicleMessage to return.

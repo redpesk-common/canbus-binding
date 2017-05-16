@@ -80,7 +80,6 @@ private:
 	bool wait_for_multiple_responses_; ///< wait_for_multiple_responses_ - False by default, when any response is received for a request
 									   ///< it will be removed from the active list. If true, the request will remain active until the timeout
 									   ///< clock expires, to allow it to receive multiple response (e.g. to a functional broadcast request).
-	bool in_flight_; ///< in_flight_ - True if the request has been sent and we are waiting for a response.
 	frequency_clock_t frequency_clock_; ///< frequency_clock_ - A frequency_clock_t object to control the send rate for a
 										///< recurring request. If the request is not reecurring, this attribute is not used.
 	frequency_clock_t timeout_clock_; ///< timeout_clock_ - A frequency_clock_t object to monitor how long it's been since
@@ -105,19 +104,13 @@ public:
 	DiagnosticResponseDecoder& get_decoder();
 	DiagnosticResponseCallback& get_callback();
 	bool get_recurring() const;
-	bool get_in_flight() const;
 	frequency_clock_t& get_frequency_clock();
 	frequency_clock_t& get_timeout_clock();
 	utils::socketcan_bcm_t& get_socket();
 
 	void set_handle(DiagnosticShims& shims, DiagnosticRequest* request);
-	void set_in_flight(bool val);
 
 	static bool is_diagnostic_signal(const std::string& name);
 
-	bool should_send();
-
-	bool timed_out();
 	bool response_received() const;
-	bool request_completed();
 };
