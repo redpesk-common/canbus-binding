@@ -18,17 +18,26 @@
 
 #include "can-message-set.hpp"
 
+#include "../can/can-message-definition.hpp"
+
 can_message_set_t::can_message_set_t(
 		uint8_t index,
 		const std::string& name,
-		std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition)
+		std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition,
+		std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages)
 	: index_{index}
 	, name_{name}
 	, can_messages_definition_{can_messages_definition}
+	, diagnostic_messages_{diagnostic_messages}
 {
 	for(auto& cmd : can_messages_definition_)
 	{
 		cmd->set_parent(this);
+	}
+
+	for(auto& dm : diagnostic_messages_)
+	{
+		dm->set_parent(this);
 	}
 }
 
@@ -51,4 +60,9 @@ std::vector<std::shared_ptr<can_signal_t> > can_message_set_t::get_can_signals()
 	}
 
 	return can_signals;
+}
+
+std::vector<std::shared_ptr<diagnostic_message_t> > can_message_set_t::get_diagnostic_messages()
+{
+	return diagnostic_messages_;
 }

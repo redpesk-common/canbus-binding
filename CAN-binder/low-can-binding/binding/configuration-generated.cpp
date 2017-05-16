@@ -96,13 +96,10 @@ configuration_t::configuration_t()
 					decoder_t::booleanDecoder,
 					nullptr,
 					false
-				})}
-				}
-			})}
-		}}
-	}
-	, diagnostic_messages_
-	{
+				})} // end can_signals entry
+				} // end can_signals vector
+			})} // end can_message_definition entry
+		}, // end can_message_definition vector
 		{
 			{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 				4,
@@ -324,8 +321,9 @@ configuration_t::configuration_t()
 				nullptr,
 				true
 			})}
-		}
-	}
+		} // end diagnostic_messages_ vector
+	}// end can_message_set entry
+	} // end can_message_set vector
 {}
 
 const std::string configuration_t::get_diagnostic_bus() const

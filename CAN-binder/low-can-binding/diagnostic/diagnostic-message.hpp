@@ -21,6 +21,7 @@
 #include <string>
 
 #include "uds/uds.h"
+#include "../can/can-message-set.hpp"
 #include "../can/can-message.hpp"
 #include "active-diagnostic-request.hpp"
 
@@ -38,12 +39,15 @@ enum UNIT {
 	INVALID
 };
 
+class can_message_set_t;
+
 ///
 /// @brief - A representation of an OBD-II PID.
 ///
 class diagnostic_message_t
 {
 	private:
+		can_message_set_t* parent_; /*!< parent_ - Pointer to the CAN message set holding this diagnostic message */
 		uint8_t pid_; /*!< pid_ - The 1 byte PID.*/
 		std::string generic_name_; /*!< generic_name_ - A human readable name to use for this PID when published.*/
 		int min_; /*!< min_ - Minimum value that can take this pid */
@@ -72,7 +76,7 @@ class diagnostic_message_t
 		bool get_supported() const;
 
 		void set_supported(bool value);
-
+		void set_parent(can_message_set_t* parent);
 		const DiagnosticRequest build_diagnostic_request();
 
 		bool is_obd2_response(const can_message_t& can_message);

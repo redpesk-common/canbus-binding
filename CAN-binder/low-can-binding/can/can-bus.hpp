@@ -26,9 +26,7 @@
 
 #include "openxc.pb.h"
 #include "can-message.hpp"
-#include "can-signals.hpp"
 #include "../utils/config-parser.hpp"
-#include "../diagnostic/diagnostic-manager.hpp"
 #include "../binding/low-can-hat.hpp"
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
@@ -37,6 +35,8 @@
 #define MAX_DYNAMIC_MESSAGE_COUNT 12
 
 #define CAN_ACTIVE_TIMEOUT_S 30
+
+class diagnostic_manager_t;
 
 /// @brief Object used to handle decoding and manage event queue to be pushed.
 ///
@@ -76,7 +76,7 @@ public:
 
 	void set_can_devices();
 	int get_can_device_index(std::string bus_name) const;
-	const std::string get_can_device_name(std::string id_name) const;
+	std::string get_can_device_name(std::string id_name) const;
 
 	void start_threads();
 	void stop_threads();

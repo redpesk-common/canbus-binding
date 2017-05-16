@@ -30,6 +30,7 @@
 
 #include "can-signals.hpp"
 #include "can-message.hpp"
+#include "can-message-set.hpp"
 #include "../utils/timer.hpp"
 
 class can_message_set_t;

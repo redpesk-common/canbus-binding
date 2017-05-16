@@ -23,9 +23,9 @@
 #include <vector>
 #include <memory>
 
-#include "can-message-definition.hpp"
-
 class can_signal_t;
+class can_message_definition_t;
+class diagnostic_message_t;
 
 /// @brief A parent wrapper for a particular set of CAN messages and associated
 /// CAN buses(e.g. a vehicle or program).
@@ -35,13 +35,16 @@ private:
 	uint8_t index_; /// < A numerical ID for the message set, ideally the index in an array for fast lookup
 	const std::string name_; /// < The name of the message set.
 	std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition_; ///< Vector holding all message definition handled by this message set.
+	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages_; ///< Vector holding all diagnostics messages from JSON signals description file. First vector map to message set
 
 public:
 	can_message_set_t(
 			uint8_t index,
 			const std::string& name,
-			std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition);
+			std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition,
+			std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages);
 
 	std::vector<std::shared_ptr<can_message_definition_t> > get_can_message_definition();
 	std::vector<std::shared_ptr<can_signal_t> > get_can_signals() const;
+	std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_messages();
 };

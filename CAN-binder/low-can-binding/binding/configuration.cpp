@@ -54,7 +54,7 @@ std::vector<std::shared_ptr<can_signal_t> > configuration_t::get_can_signals()
 
 std::vector<std::shared_ptr<diagnostic_message_t> > configuration_t::get_diagnostic_messages()
 {
-	return diagnostic_messages_[active_message_set_];
+	return can_message_set_[active_message_set_].get_diagnostic_messages();
 }
 
 std::vector<std::shared_ptr<can_message_definition_t> > configuration_t::get_can_message_definition()

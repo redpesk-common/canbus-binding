@@ -80,6 +80,11 @@ void diagnostic_message_t::set_supported(bool value)
 	supported_ = value;
 }
 
+void diagnostic_message_t::set_parent(can_message_set_t* parent)
+{
+	parent_ = parent;
+}
+
 ///
 /// @brief Build a DiagnosticRequest struct to be passed
 ///  to diagnostic manager instance.

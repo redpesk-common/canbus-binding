@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "openxc.pb.h"
+#include "can-message-definition.hpp"
 #include "../utils/timer.hpp"
 #include "../utils/socketcan-bcm.hpp"
 #include "can-message.hpp"
@@ -38,7 +39,6 @@ extern "C"
 #define MESSAGE_SET_ID 0
 
 class can_signal_t;
-class can_message_definition_t;
 ///
 /// @brief The type signature for a CAN signal decoder.
 ///

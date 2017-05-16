@@ -308,7 +308,7 @@ int can_bus_t::get_can_device_index(std::string bus_name) const
 	return i;
 }
 
-const std::string can_bus_t::get_can_device_name(std::string id_name) const
+std::string can_bus_t::get_can_device_name(std::string id_name) const
 {
 	std::string ret;
 	for(const auto& d: can_devices_)
