@@ -233,23 +233,7 @@ void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t* entry, st
 // @brief TODO: implement cancel_request if needed... Don't know.
 void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 {
-
-	/* TODO: implement acceptance filters.
-	if(entry.arbitration_id_ == OBD2_FUNCTIONAL_BROADCAST_ID) {
-		for(uint32_t filter = OBD2_FUNCTIONAL_RESPONSE_START;
-				filter < OBD2_FUNCTIONAL_RESPONSE_START +
-					OBD2_FUNCTIONAL_RESPONSE_COUNT;
-				filter++) {
-			removeAcceptanceFilter(entry.bus_, filter,
-					CanMessageFormat::STANDARD, getCanBuses(),
-					getCanBusCount());
-		}
-	} else {
-		removeAcceptanceFilter(entry.bus_,
-				entry.arbitration_id_ +
-					DIAGNOSTIC_RESPONSE_ARBITRATION_ID_OFFSET,
-				CanMessageFormat::STANDARD, getCanBuses(), getCanBusCount());
-	}*/
+	entry->get_socket().close();
 }
 
 /// @brief Cleanup a specific request if it isn't running and get complete. As it is almost
