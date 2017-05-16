@@ -233,15 +233,13 @@ int can_signal_t::create_rx_filter()
 	memset(&cfd, 0, sizeof(cfd));
 	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
 	float val = (float)(1 << bit_size_)-1;
-	float freq = frequency_.frequency_to_period();
-	if(freq <= 0)
-		freq = 0.000001f;
+	struct timeval freq = frequency_.get_timeval_from_period();
 
 	bcm_msg.msg_head.opcode  = RX_SETUP;
 	bcm_msg.msg_head.can_id  = can_id;
 	bcm_msg.msg_head.flags = SETTIMER|RX_NO_AUTOTIMER;
-	bcm_msg.msg_head.ival2.tv_sec = long(freq);
-	bcm_msg.msg_head.ival2.tv_usec = (freq - (long)freq) * 1000000;
+	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec ;
+	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
 	bcm_msg.msg_head.nframes = 1;
 	bitfield_encode_float(val,
 										bit_position_,
