@@ -69,12 +69,14 @@ private:
 	std::mutex decoded_can_message_mutex_;  ///< mutex protecting the vehicle_message_q_ queue.
 	std::queue <openxc_VehicleMessage> vehicle_message_q_; ///< queue that'll store openxc_VehicleMessage to pushed
 
-	static std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_devices_; ///< Can device map containing all can_bus_dev_t objects initialized during init_can_dev function
-
+	std::vector<std::pair<std::string, std::string> > can_devices_;
 public:
 	can_bus_t(utils::config_parser_t conf_file);
 	can_bus_t(can_bus_t&&);
 
+	void set_can_devices();
+	int get_can_device_index(std::string bus_name) const;
+	const std::string get_can_device_name(std::string id_name) const;
 
 	void start_threads();
 	void stop_threads();

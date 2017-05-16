@@ -47,14 +47,14 @@ namespace utils
 	/// have to test the returned value.
 	///
 	/// @return A const vector with string of linux CAN devices.
-	const std::vector<std::string> config_parser_t::get_devices_name()
+	const std::vector<std::pair<std::string, std::string> > config_parser_t::get_devices_name()
 	{
-		std::vector<std::string> devices_name;
+		std::vector<std::pair<std::string, std::string> > devices_name;
 
 		std::map<std::string, std::string> bus_mapping = config_content_.get_keys("CANbus-mapping");
 		for(const auto& busIt : bus_mapping )
 		{
-			devices_name.push_back(busIt.second);
+			devices_name.push_back(std::make_pair(busIt.first, busIt.second));
 		}
 
 		return devices_name;

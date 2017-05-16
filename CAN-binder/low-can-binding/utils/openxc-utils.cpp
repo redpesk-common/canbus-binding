@@ -40,9 +40,8 @@ openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request,
 	message.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_DIAGNOSTIC;
 	message.has_diagnostic_response = true;
 	message.diagnostic_response.has_bus = true;
-	message.diagnostic_response.bus = conf.get_can_bus_manager().get_can_device(
-																conf.get_diagnostic_manager().get_can_bus())
-																->get_index();
+	message.diagnostic_response.bus = conf.get_can_bus_manager().get_can_device_index(
+																conf.get_diagnostic_manager().get_can_bus());
 	message.diagnostic_response.has_message_id = true;
 
 	if(request->get_id() != OBD2_FUNCTIONAL_BROADCAST_ID)

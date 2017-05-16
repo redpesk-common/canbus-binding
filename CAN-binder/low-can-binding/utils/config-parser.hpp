@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 #include "ini-config.hpp"
 
 namespace utils
@@ -36,6 +37,6 @@ namespace utils
 		config_parser_t(std::string conf_file);
 
 		bool check_conf();
-		const std::vector<std::string> get_devices_name();
+		const std::vector<std::pair<std::string, std::string> > get_devices_name();
 	};
 }
