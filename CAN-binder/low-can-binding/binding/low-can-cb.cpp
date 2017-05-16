@@ -206,6 +206,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		{
 			return -1;
 		}
+		struct sd_event_source* e_source;
 		sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), &e_source, sig->get_socket().socket(), EPOLLIN, read_can_signal, sig.get());
 		rets++;
 		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
