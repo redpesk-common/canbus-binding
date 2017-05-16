@@ -26,7 +26,6 @@
 
 #include "openxc.pb.h"
 #include "can-message.hpp"
-#include "can-bus-dev.hpp"
 #include "can-signals.hpp"
 #include "../utils/config-parser.hpp"
 #include "../diagnostic/diagnostic-manager.hpp"
@@ -76,8 +75,6 @@ public:
 	can_bus_t(utils::config_parser_t conf_file);
 	can_bus_t(can_bus_t&&);
 
-	int init_can_dev();
-	std::vector<std::string> read_conf();
 
 	void start_threads();
 	void stop_threads();
@@ -89,7 +86,4 @@ public:
 
 	openxc_VehicleMessage next_vehicle_message();
 	void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
-
-	const std::map<std::string, std::shared_ptr<can_bus_dev_t>>& get_can_devices() const;
-	static std::shared_ptr<can_bus_dev_t> get_can_device(std::string bus);
 };

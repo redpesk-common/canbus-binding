@@ -32,11 +32,6 @@ can_bus_t& configuration_t::get_can_bus_manager()
 	return can_bus_manager_;
 }
 
-const std::map<std::string, std::shared_ptr<can_bus_dev_t>>& configuration_t::get_can_bus_devices()
-{
-	return can_bus_manager_.get_can_devices();
-}
-
 diagnostic_manager_t& configuration_t::get_diagnostic_manager()
 {
 	return diagnostic_manager_;

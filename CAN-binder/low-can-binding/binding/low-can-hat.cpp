@@ -68,19 +68,15 @@ extern "C"
 	{
 		can_bus_t& can_bus_manager = configuration_t::instance().get_can_bus_manager();
 
-		/// Initialize CAN socket
-		if(can_bus_manager.init_can_dev() == 0)
-		{
-			can_bus_manager.start_threads();
+		can_bus_manager.start_threads();
 
-			/// Initialize Diagnostic manager that will handle obd2 requests.
-			/// We pass by default the first CAN bus device to its Initialization.
-			/// TODO: be able to choose the CAN bus device that will be use as Diagnostic bus.
-			if(configuration_t::instance().get_diagnostic_manager().initialize())
-				return 0;
-		}
+		/// Initialize Diagnostic manager that will handle obd2 requests.
+		/// We pass by default the first CAN bus device to its Initialization.
+		/// TODO: be able to choose the CAN bus device that will be use as Diagnostic bus.
+		if(configuration_t::instance().get_diagnostic_manager().initialize())
+			return 0;
 
-		ERROR(binder_interface, "%s: There was something wrong with CAN device Initialization. Check your config file maybe", __FUNCTION__);
+		ERROR(binder_interface, "%s: There was something wrong with CAN device Initialization.", __FUNCTION__);
 		return 1;
 	}
 };

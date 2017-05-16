@@ -24,7 +24,6 @@
 #include "uds/uds.h"
 #include "uds/uds_types.h"
 #include "../utils/timer.hpp"
-#include "../can/can-bus-dev.hpp"
 
 class active_diagnostic_request_t;
 class diagnostic_manager_t;
@@ -99,7 +98,6 @@ public:
 		const DiagnosticResponseCallback callback, float frequencyHz);
 
 	uint32_t get_id() const;
-	const std::shared_ptr<can_bus_dev_t> get_can_bus_dev() const;
 	DiagnosticRequestHandle* get_handle();
 	uint16_t get_pid() const;
 	const std::string get_name() const;

@@ -45,8 +45,6 @@ can_bus_t::can_bus_t(utils::config_parser_t conf_file)
 	: conf_file_{conf_file}
 {}
 
-std::map<std::string, std::shared_ptr<can_bus_dev_t>> can_bus_t::can_devices_;
-
 /// @brief Will make the decoding operation on a classic CAN message. It will not
 /// handle CAN commands nor diagnostic messages that have their own method to get
 /// this happens.
@@ -218,54 +216,6 @@ void can_bus_t::stop_threads()
 	is_pushing_ = false;
 }
 
-/// @brief Will initialize can_bus_dev_t objects after reading
-/// the configuration file passed in the constructor. All CAN buses
-/// Initialized here will be added to a vector holding them for
-/// inventory and later access.
-///
-/// That will initialize CAN socket reading too using a new thread.
-///
-/// @return 0 if ok, other if not.
-int can_bus_t::init_can_dev()
-{
-	std::vector<std::string> devices_name;
-	int i = 0;
-	size_t t;
-
-	if(conf_file_.check_conf())
-	{
-		devices_name = conf_file_.get_devices_name();
-		if (! devices_name.empty())
-		{
-			t = devices_name.size();
-
-			for(const auto& device : devices_name)
-			{
-				can_bus_t::can_devices_[device] = std::make_shared<can_bus_dev_t>(device, i);
-				if (can_bus_t::can_devices_[device]->open() >= 0)
-				{
-					can_bus_t::can_devices_[device]->configure();
-					DEBUG(binder_interface, "%s: Start reading thread", __FUNCTION__);
-					NOTICE(binder_interface, "%s: %s device opened and reading", __FUNCTION__, device.c_str());
-					//can_bus_t::can_devices_[device]->start_reading(*this);
-					i++;
-				}
-				else
-				{
-					ERROR(binder_interface, "%s: Can't open device %s", __FUNCTION__, device.c_str());
-					return 1;
-				}
-			}
-			NOTICE(binder_interface, "%s: Initialized %d/%d can bus device(s)", __FUNCTION__, i, (int)t);
-			return 0;
-		}
-		ERROR(binder_interface, "%s: Error at CAN device initialization. No devices read from configuration file", __FUNCTION__);
-		return 1;
-	}
-	ERROR(binder_interface, "%s: Can't read INI configuration file", __FUNCTION__);
-	return 2;
-}
-
 /// @brief return new_can_message_cv_ member
 ///
 /// @return  return new_can_message_cv_ member
@@ -335,21 +285,39 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 	vehicle_message_q_.push(v_msg);
 }
 
-/// @brief Return a map with the can_bus_dev_t initialized
-///
-/// @return map can_bus_dev_m_ map
-const std::map<std::string, std::shared_ptr<can_bus_dev_t>>& can_bus_t::get_can_devices() const
-{
-	return can_bus_t::can_devices_;
-}
-
 /// @brief Return the shared pointer on the can_bus_dev_t initialized 
 /// with device_name "bus"
 ///
 /// @param[in] bus - CAN bus device name to retrieve.
 ///
 /// @return A shared pointer on an object can_bus_dev_t
-std::shared_ptr<can_bus_dev_t> can_bus_t::get_can_device(std::string bus)
+void can_bus_t::set_can_devices()
 {
-	return can_bus_t::can_devices_[bus];
+	can_devices_ = conf_file_.get_devices_name();
+}
+
+int can_bus_t::get_can_device_index(std::string bus_name) const
+{
+	int i = 0;
+	for(const auto& d: can_devices_)
+	{
+		if(d.first == bus_name)
+			break;
+		i++;
+	}
+	return i;
+}
+
+const std::string can_bus_t::get_can_device_name(std::string id_name) const
+{
+	std::string ret;
+	for(const auto& d: can_devices_)
+	{
+		if(d.first == id_name)
+		{
+			ret = d.second;
+			break;
+		}
+	}
+	return ret;
 }

@@ -59,8 +59,6 @@ class configuration_t
 
 		can_bus_t& get_can_bus_manager();
 
-		const std::map<std::string, std::shared_ptr<can_bus_dev_t>>& get_can_bus_devices();
-
 		const std::string get_diagnostic_bus() const;
 
 		diagnostic_manager_t& get_diagnostic_manager() ;

@@ -27,7 +27,6 @@ PROJECT_TARGET_ADD(low-can)
 		binding/configuration.cpp
 		binding/configuration-generated.cpp
 		can/can-bus.cpp
-		can/can-bus-dev.cpp
 		can/can-message-set.cpp
 		can/can-message-definition.cpp
 		can/can-message.cpp
