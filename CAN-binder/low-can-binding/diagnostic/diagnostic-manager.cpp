@@ -49,6 +49,7 @@ bool diagnostic_manager_t::initialize()
 	bus_ = configuration_t::instance().get_diagnostic_bus();
 
 	init_diagnostic_shims();
+	event_source_ = nullptr;
 	reset();
 
 	initialized_ = true;
@@ -456,15 +457,28 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 		{
 			// TODO: implement Acceptance Filter
 			//if(updateRequiredAcceptanceFilters(bus, request)) {
-			active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request, name,
+			entry = new active_diagnostic_request_t(bus_, request, name,
 					wait_for_multiple_responses, decoder, callback, frequencyHz);
 			recurring_requests_.push_back(entry);
 
 			entry->set_handle(shims_, request);
 			if(add_rx_filter(OBD2_FUNCTIONAL_BROADCAST_ID) < 0)
-			{ recurring_requests_.pop_back(); }
+				{ recurring_requests_.pop_back(); }
 			else
-			{ start_diagnostic_request(&shims_, entry->get_handle()); }
+				{
+					start_diagnostic_request(&shims_, entry->get_handle()); 
+					if(event_source_ == nullptr && sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), 
+						&event_source_,
+						socket_.socket(),
+						EPOLLIN,
+						read_diagnostic_message,
+						nullptr) < 0)
+					{
+						cleanup_request(entry, true);
+						WARNING(binder_interface, "%s: signal: %s isn't supported. Canceling operation.", __FUNCTION__, entry->get_name().c_str());
+						return entry;
+					}
+				}
 		}
 		else
 		{
@@ -473,7 +487,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 		}
 	}
 	else
-	{ DEBUG(binder_interface, "%s: Can't add request, one already exists with same key", __FUNCTION__);}
+		{ DEBUG(binder_interface, "%s: Can't add request, one already exists with same key", __FUNCTION__);}
 	return entry;
 }
 

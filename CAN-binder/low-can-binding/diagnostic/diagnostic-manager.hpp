@@ -57,6 +57,7 @@ private:
 																	   * response is received for a non-recurring request or it times out, it is removed*/
 	bool initialized_; /*!< * initialized - True if the DiagnosticsManager has been initialized with shims. It will interface with the uds-c lib*/
 	utils::socketcan_bcm_t socket_; ///< rx_socket_ - a BCM socket with 8 RX_SETUP jobs for the 8 CAN ID on which ECU could respond.
+	struct sd_event_source* event_source_;
 
 	void init_diagnostic_shims();
 	void reset();
@@ -66,6 +67,8 @@ public:
 
 	bool initialize();
 
+	void read_socket();
+	utils::socketcan_bcm_t& get_socket();
 	std::string get_can_bus();
 	active_diagnostic_request_t* get_last_recurring_requests() const;
 	DiagnosticShims& get_shims();

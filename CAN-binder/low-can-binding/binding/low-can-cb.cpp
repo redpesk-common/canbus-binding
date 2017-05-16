@@ -52,7 +52,7 @@ void on_no_clients(std::string message)
 	}
 }
 
-int read(sd_event_source *s, int fd, uint32_t revents, void *userdata)
+int read_can_signal(sd_event_source *s, int fd, uint32_t revents, void *userdata)
 {
 	can_signal_t* sig= (can_signal_t*)userdata;
 	sig->read_socket();
@@ -66,6 +66,25 @@ int read(sd_event_source *s, int fd, uint32_t revents, void *userdata)
 	}
 	return 0;
 }
+
+int read_diagnostic_message(sd_event_source *s, int fd, uint32_t revents, void *userdata)
+{
+	diagnostic_manager_t& diag_m = configuration_t::instance().get_diagnostic_manager();
+	diag_m.read_socket();
+
+	/* check if error or hangup */
+	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
+	{
+		sd_event_source_unref(s);
+		diag_m.get_socket().close();
+		diag_m.cleanup_active_requests(true);
+		ERROR(binder_interface, "%s: Error on diagnostic manager socket, cancelling active requests.", __FUNCTION__);
+		return -1;
+	}
+
+	return 0;
+}
+
 
 ///******************************************************************************
 ///
@@ -161,10 +180,9 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		// poll a PID for nothing.
 		if(sig->get_supported() && subscribe)
 		{
-				float frequency = sig->get_frequency();
-				subscribe = diag_m.add_recurring_request(
-					diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), (float)frequency);
-					//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
+			float frequency = sig->get_frequency();
+			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), (float)frequency);
+				//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
 		}
 		else
 		{
@@ -188,8 +206,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		{
 			return -1;
 		}
-		struct sd_event_source* e_source;
-		sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), &e_source, sig->get_socket().socket(), EPOLLIN, read, sig.get());
+		sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), &e_source, sig->get_socket().socket(), EPOLLIN, read_can_signal, sig.get());
 		rets++;
 		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}
