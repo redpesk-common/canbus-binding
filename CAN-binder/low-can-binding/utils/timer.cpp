@@ -97,7 +97,7 @@ bool frequency_clock_t::elapsed(bool stagger)
 		last_tick_ = get_time_function()() - (rand() % int(period));
 
 	// Make sure it ticks the the first call
-	elapsed_time = !started() ? period : get_time_function()() - last_tick_;
+	elapsed_time = !started() ? period : (float)get_time_function()() - (float)last_tick_;
 
 	return frequency_ == 0 || elapsed_time >= period;
 }
