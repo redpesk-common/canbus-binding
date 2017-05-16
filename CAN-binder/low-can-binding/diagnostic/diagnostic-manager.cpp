@@ -109,7 +109,7 @@ int diagnostic_manager_t::add_rx_filter(uint32_t can_id)
 	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
 
 	// If it isn't an OBD2 CAN ID then just add a simple RX_SETUP job
-	if(can_id != OBD2_FUNCTIONAL_RESPONSE_START) 
+	if(can_id != OBD2_FUNCTIONAL_BROADCAST_ID) 
 	{
 		bcm_msg.msg_head.can_id  = can_id;
 
