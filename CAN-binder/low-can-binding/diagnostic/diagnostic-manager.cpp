@@ -558,7 +558,7 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 	}
 
 	// Reset the completed flag handle to make sure that it will be reprocessed the next time.
-	adr->get_handle()->completed = false;
+	adr->get_handle()->success = false;
 	return message;
 }
 
