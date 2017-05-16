@@ -64,7 +64,7 @@ frequency_clock_t::frequency_clock_t(float frequency)
 
 /// @brief Return the period in ms given the frequency in hertz.
 /// @param[in] frequency - Frequency to convert, in hertz
-float frequency_clock_t::frequency_to_period()
+float frequency_clock_t::frequency_to_period() const
 {
 	return frequency_ == 0 ? 0 : 1 / frequency_;
 }

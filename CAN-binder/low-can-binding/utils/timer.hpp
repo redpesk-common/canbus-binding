@@ -47,7 +47,7 @@ public:
 	float get_frequency() const;
 	const struct timeval get_timeval_from_period() const;
 
-	float frequency_to_period();
+	float frequency_to_period() const;
 	bool started();
 	time_function_t get_time_function();
 	bool elapsed(bool stagger);
