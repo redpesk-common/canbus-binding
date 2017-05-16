@@ -42,11 +42,6 @@ class active_diagnostic_request_t;
 /// the diagnostics library to the CAN device.
 ///
 class diagnostic_manager_t {
-protected:
-	static bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
-	static void shims_logger(const char* m, ...);
-	static void shims_timer();
-
 private:
 	DiagnosticShims shims_; /*!< shims_ - Shim functions for each CAN bus that plug the diagnostics
 							 * library (uds-c) into the VI's CAN peripheral.*/
@@ -56,12 +51,16 @@ private:
 	std::vector<active_diagnostic_request_t*> non_recurring_requests_; /*!< nonrecurringRequests - A list of active one-time diagnostic requests. When a
 																	   * response is received for a non-recurring request or it times out, it is removed*/
 	bool initialized_; /*!< * initialized - True if the DiagnosticsManager has been initialized with shims. It will interface with the uds-c lib*/
-	utils::socketcan_bcm_t socket_; ///< rx_socket_ - a BCM socket with 8 RX_SETUP jobs for the 8 CAN ID on which ECU could respond.
+	utils::socketcan_bcm_t socket_; ///< socket_ - a BCM socket with 8 RX_SETUP jobs for the 8 CAN ID on which ECU could respond.
 	struct sd_event_source* event_source_;
 
 	void init_diagnostic_shims();
 	void reset();
 	int add_rx_filter(uint32_t can_id);
+
+	static bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
+	static void shims_logger(const char* m, ...);
+	static void shims_timer();
 public:
 	diagnostic_manager_t();
 

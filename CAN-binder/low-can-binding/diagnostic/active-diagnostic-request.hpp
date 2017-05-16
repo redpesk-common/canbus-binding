@@ -85,7 +85,7 @@ private:
 										///< recurring request. If the request is not reecurring, this attribute is not used.
 	frequency_clock_t timeout_clock_; ///< timeout_clock_ - A frequency_clock_t object to monitor how long it's been since
 									  ///< this request was sent.
-	utils::socketcan_bcm_t socket_; ///< tx_socket_ - A BCM socket setup to send cyclic message to CAN ID 7DF.
+	utils::socketcan_bcm_t socket_; ///< socket_ - A BCM socket setup to send cyclic message to CAN ID 7DF.
 public:
 	bool operator==(const active_diagnostic_request_t& b);
 	active_diagnostic_request_t& operator=(const active_diagnostic_request_t& adr);
