@@ -52,33 +52,50 @@ void on_no_clients(std::string message)
 	}
 }
 
-int read_can_signal(sd_event_source *s, int fd, uint32_t revents, void *userdata)
+static void push_n_notify(const can_message_t cm)
 {
-	can_signal_t* sig= (can_signal_t*)userdata;
-	sig->read_socket();
-
-	/* check if error or hangup */
-	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
-	{
-		sd_event_source_unref(s);
-		sig->get_socket().close();
-		sig->create_rx_filter();
-	}
-	return 0;
+	can_bus_t& cbm = configuration_t::instance().get_can_bus_manager();
+	std::lock_guard<std::mutex> can_message_lock(cbm.get_can_message_mutex());
+	{ cbm.push_new_can_message(cm); }
+	cbm.get_new_can_message_cv().notify_one();
 }
 
-int read_diagnostic_message(sd_event_source *s, int fd, uint32_t revents, void *userdata)
+int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata)
 {
+	can_message_t cm;
+	can_signal_t* sig;
 	diagnostic_manager_t& diag_m = configuration_t::instance().get_diagnostic_manager();
-	diag_m.read_socket();
+
+	if(userdata != nullptr)
+	{
+		sig = (can_signal_t*)userdata;
+		utils::socketcan_bcm_t s = sig->get_socket();
+		s >> cm;
+	}
+	else
+	{
+		utils::socketcan_bcm_t s = diag_m.get_socket();
+		s >> cm;
+	}
+
+	push_n_notify(cm);
 
 	/* check if error or hangup */
 	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
 	{
 		sd_event_source_unref(s);
-		diag_m.get_socket().close();
-		diag_m.cleanup_active_requests(true);
-		ERROR(binder_interface, "%s: Error on diagnostic manager socket, cancelling active requests.", __FUNCTION__);
+		if(userdata != nullptr)
+		{
+			sig->get_socket().close();
+			sig->create_rx_filter();
+			NOTICE(binder_interface, "%s: Recreated RX_SETUP BCM job for signal: %s", __FUNCTION__, sig->get_name().c_str());
+		}
+		else
+		{
+			diag_m.get_socket().close();
+			diag_m.cleanup_active_requests(true);
+			ERROR(binder_interface, "%s: Error on diagnostic manager socket, cancelling active requests.", __FUNCTION__);
+		}
 		return -1;
 	}
 
@@ -207,7 +224,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			return -1;
 		}
 		struct sd_event_source* e_source;
-		sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), &e_source, sig->get_socket().socket(), EPOLLIN, read_can_signal, sig.get());
+		sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), &e_source, sig->get_socket().socket(), EPOLLIN, read_message, sig.get());
 		rets++;
 		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}

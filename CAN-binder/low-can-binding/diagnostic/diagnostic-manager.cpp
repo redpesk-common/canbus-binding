@@ -57,16 +57,6 @@ bool diagnostic_manager_t::initialize()
 	return initialized_;
 }
 
-void diagnostic_manager_t::read_socket()
-{
-	can_message_t msg;
-	can_bus_t& cbm = configuration_t::instance().get_can_bus_manager();
-	socket_ >> msg;
-	std::lock_guard<std::mutex> can_message_lock(cbm.get_can_message_mutex());
-	{ cbm.push_new_can_message(msg); }
-	cbm.get_new_can_message_cv().notify_one();
-}
-
 utils::socketcan_bcm_t& diagnostic_manager_t::get_socket()
 {
 	return socket_;
@@ -454,7 +444,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 						&event_source_,
 						socket_.socket(),
 						EPOLLIN,
-						read_diagnostic_message,
+						read_message,
 						nullptr) < 0)
 					{
 						cleanup_request(entry, true);

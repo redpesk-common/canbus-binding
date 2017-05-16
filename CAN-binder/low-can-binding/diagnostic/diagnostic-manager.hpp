@@ -66,7 +66,6 @@ public:
 
 	bool initialize();
 
-	void read_socket();
 	utils::socketcan_bcm_t& get_socket();
 	std::string get_can_bus();
 	active_diagnostic_request_t* get_last_recurring_requests() const;

@@ -255,13 +255,3 @@ int can_signal_t::create_rx_filter()
 		return 0;
 	return -1;
 }
-
-void can_signal_t::read_socket()
-{
-	can_message_t msg;
-	can_bus_t& cbm = configuration_t::instance().get_can_bus_manager();
-	socket_ >> msg;
-	std::lock_guard<std::mutex> can_message_lock(cbm.get_can_message_mutex());
-	{ cbm.push_new_can_message(msg); }
-	cbm.get_new_can_message_cv().notify_one();
-}

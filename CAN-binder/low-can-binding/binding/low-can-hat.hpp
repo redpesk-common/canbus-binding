@@ -32,8 +32,7 @@ extern "C" struct afb_binding_interface;
 extern const struct afb_binding_interface *binder_interface;
 
 void on_no_clients(std::string message);
-int read_can_signal(sd_event_source *s, int fd, uint32_t revents, void *userdata);
-int read_diagnostic_message(sd_event_source *s, int fd, uint32_t revents, void *userdata);
+int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata);
 
 void subscribe(struct afb_req request);
 void unsubscribe(struct afb_req request);
