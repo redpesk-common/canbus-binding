@@ -28,7 +28,7 @@
 # Generic useful macro
 # -----------------------
 macro(PROJECT_TARGET_ADD TARGET_NAME)
-	set_property( GLOBAL APPEND PROPERTY PROJECT_TARGETS ${TARGET_NAME}) 
+	set_property( GLOBAL APPEND PROPERTY PROJECT_TARGETS ${TARGET_NAME})
 	set(TARGET_NAME ${TARGET_NAME})
 endmacro(PROJECT_TARGET_ADD)
 
@@ -72,7 +72,7 @@ macro(project_targets_populate)
 					COMMAND cp ${BD}/${P}${OUT}.so ${WIDGET_LIBDIR}
 				)
 				add_custom_target(${POPULE_WIDGET_TARGET} DEPENDS ${WIDGET_LIBDIR}/${P}${TARGET}.so)
-				add_dependencies(MAIN_POPULATE ${POPULE_WIDGET_TARGET}) 
+				add_dependencies(MAIN_POPULATE ${POPULE_WIDGET_TARGET})
 			elseif(${T} STREQUAL "EXECUTABLE")
 				add_custom_command(OUTPUT ${WIDGET_BINDIR}/${P}${TARGET}
 					DEPENDS ${TARGET}
@@ -80,21 +80,21 @@ macro(project_targets_populate)
 					COMMAND cp ${BD}/${P}${OUT} ${WIDGET_BINDIR}
 				)
 				add_custom_target(${POPULE_WIDGET_TARGET} DEPENDS ${WIDGET_BINDIR}/${P}${TARGET})
-				add_dependencies(MAIN_POPULATE ${POPULE_WIDGET_TARGET}) 
+				add_dependencies(MAIN_POPULATE ${POPULE_WIDGET_TARGET})
 			elseif(${T} STREQUAL "HTDOCS")
 				add_custom_command(OUTPUT ${WIDGET_HTTPDIR}
 					DEPENDS ${TARGET}
 					COMMAND cp -r ${BD}/${P}${OUT} ${WIDGET_HTTPDIR}
 					)
 					add_custom_target(${POPULE_WIDGET_TARGET} DEPENDS ${WIDGET_HTTPDIR})
-					add_dependencies(MAIN_POPULATE ${POPULE_WIDGET_TARGET}) 
+					add_dependencies(MAIN_POPULATE ${POPULE_WIDGET_TARGET})
 			elseif(${T} STREQUAL "DATA")
 				add_custom_command(OUTPUT ${WIDGET_DATADIR}
 					DEPENDS ${TARGET}
 					COMMAND cp -r ${BD}/${P}${OUT} ${WIDGET_DATADIR}
 					)
 					add_custom_target(${POPULE_WIDGET_TARGET} DEPENDS ${WIDGET_HTTPDIR})
-					add_dependencies(MAIN_POPULATE ${POPULE_WIDGET_TARGET}) 
+					add_dependencies(MAIN_POPULATE ${POPULE_WIDGET_TARGET})
 			endif(${T} STREQUAL "BINDING")
 #		elseif(${CMAKE_BUILD_TYPE} MATCHES "[Dd][Ee][Bb][Uu][Gg]")
 #					MESSAGE(WARNING "This target, ${TARGET}, will be not be included in the package.")

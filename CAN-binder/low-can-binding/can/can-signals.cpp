@@ -215,7 +215,7 @@ void can_signal_t::set_last_value(float val)
 	last_value_ = val;
 }
 
-/// @brief Create a RX_SETUP receive job using the BCM socket.
+/// @brief Create a RX_SETUP receive job used by the BCM socket.
 ///
 /// @return 0 if ok else -1
 int can_signal_t::create_rx_filter()

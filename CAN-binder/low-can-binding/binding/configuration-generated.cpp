@@ -454,7 +454,6 @@ configuration_t::configuration_t()
 					nullptr,
 					true
 				})}
-
 			} // end diagnostic_messages_ vector
 		} // end can_message_set entry
 	} // end can_message_set vector

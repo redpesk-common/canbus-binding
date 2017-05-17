@@ -110,7 +110,6 @@ private:
 						*	this value is undefined. */
 
 public:
-	//can_signal_t(const can_signal_t& b);
 	can_signal_t(
 		std::string generic_name,
 		uint8_t bit_position,
