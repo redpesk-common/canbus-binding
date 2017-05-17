@@ -32,12 +32,11 @@ PROJECT_TARGET_ADD(isotp-c)
 	)
 
 	# Define target includes
-	get_target_property(Bitfield_inc bitfield-c INCLUDE_DIRECTORIES)
 	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-		${Bitfield_inc}
 	)
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
+		bitfield-c
 		${link_libraries})

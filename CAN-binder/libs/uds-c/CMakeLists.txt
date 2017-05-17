@@ -31,12 +31,11 @@ PROJECT_TARGET_ADD(uds-c)
 	)
 
 	# Define target includes
-	get_target_property(IsoTP_inc isotp-c INCLUDE_DIRECTORIES)
 	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-		${IsoTP_inc}
 	)
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
+		isotp-c
 		${link_libraries})

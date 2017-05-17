@@ -28,16 +28,8 @@
 # Generic useful macro
 # -----------------------
 macro(PROJECT_TARGET_ADD TARGET_NAME)
-	set(PROJECT_TARGETS ${PROJECT_TARGETS} ${TARGET_NAME} CACHE INTERNAL PROJECT_TARGETS)
+	set_property( GLOBAL APPEND PROPERTY PROJECT_TARGETS ${TARGET_NAME}) 
 	set(TARGET_NAME ${TARGET_NAME})
-
-	# Cmake does not maintain targets list before 3.7
-	# -------------------------------------------------
-	if(${CMAKE_VERSION} VERSION_LESS 3.7)
-		set(GLOBAL_TARGET_LIST ${PROJECT_TARGETS} CACHE INTERNAL "Hold project targets")
-	else()
-		get_property(GLOBAL_TARGET_LIST GLOBAL PROPERTY GlobalTargetList)
-	endif()
 endmacro(PROJECT_TARGET_ADD)
 
 # Check GCC minimal version version
@@ -258,11 +250,12 @@ endif()
 # Print developer helper message when build is done
 # -------------------------------------------------------
 macro(project_closing_msg)
-	if(CLOSING_MESSAGE AND GLOBAL_TARGET_LIST)
+	get_property(PROJECT_TARGETS GLOBAL PROPERTY PROJECT_TARGETS)
+	if(CLOSING_MESSAGE AND PROJECT_TARGETS)
 		add_custom_target(${PROJECT_NAME}_build_done ALL
 			COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan "++ ${CLOSING_MESSAGE}"
 		)
 		 add_dependencies(${PROJECT_NAME}_build_done
-		 	${DEPENDENCIES_TARGET} ${GLOBAL_TARGET_LIST})
+		 	${DEPENDENCIES_TARGET}  ${PROJECT_TARGETS})
 	endif()
 endmacro()
