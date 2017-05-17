@@ -27,7 +27,7 @@
 /// Constructor about can_message_t class.
 ///
 can_message_t::can_message_t()
-	: maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::ERROR}, rtr_flag_{false}, flags_{0}
+	: maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::INVALID}, rtr_flag_{false}, flags_{0}
 {}
 
 can_message_t::can_message_t(uint8_t maxdlen,
@@ -74,7 +74,7 @@ bool can_message_t::get_rtr_flag_() const
 can_message_format_t can_message_t::get_format() const
 {
 	if (format_ != can_message_format_t::STANDARD || format_ != can_message_format_t::EXTENDED)
-		return can_message_format_t::ERROR;
+		return can_message_format_t::INVALID;
 	return format_;
 }
 
@@ -127,7 +127,7 @@ uint8_t can_message_t::get_length() const
 ///
 bool can_message_t::is_correct_to_send()
 {
-	if (id_ != 0 && length_ != 0 && format_ != can_message_format_t::ERROR)
+	if (id_ != 0 && length_ != 0 && format_ != can_message_format_t::INVALID)
 	{
 		int i;
 		for(i=0;i<CAN_MESSAGE_SIZE;i++)
@@ -147,7 +147,7 @@ bool can_message_t::is_correct_to_send()
 ///
 void can_message_t::set_format(const can_message_format_t new_format)
 {
-	if(new_format == can_message_format_t::STANDARD || new_format == can_message_format_t::EXTENDED || new_format == can_message_format_t::ERROR)
+	if(new_format == can_message_format_t::STANDARD || new_format == can_message_format_t::EXTENDED || new_format == can_message_format_t::INVALID)
 		format_ = new_format;
 	else
 		ERROR(binder_interface, "%s: Can set format, wrong format chosen", __FUNCTION__);
@@ -187,7 +187,7 @@ can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame,
 
 	if (frame.can_id & CAN_ERR_FLAG)
 	{
-		format = can_message_format_t::ERROR;
+		format = can_message_format_t::INVALID;
 		id = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
 	}
 	else if (frame.can_id & CAN_EFF_FLAG)
@@ -262,7 +262,7 @@ can_message_t can_message_t::convert_from_frame(const struct can_frame& frame, s
 
 	if (frame.can_id & CAN_ERR_FLAG)
 	{
-		format = can_message_format_t::ERROR;
+		format = can_message_format_t::INVALID;
 		id = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
 	}
 	else if (frame.can_id & CAN_EFF_FLAG)

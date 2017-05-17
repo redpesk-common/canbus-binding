@@ -33,7 +33,7 @@
 enum class can_message_format_t {
 	STANDARD, /*!< STANDARD - standard 11-bit CAN arbitration ID. */
 	EXTENDED, /*!< EXTENDED - an extended frame, with a 29-bit arbitration ID. */
-	ERROR,    /*!< ERROR - ERROR code used at initialization to signify that it isn't usable'*/
+	INVALID,    /*!< INVALID - INVALID code used at initialization to signify that it isn't usable'*/
 };
 
 /**
