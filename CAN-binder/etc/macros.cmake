@@ -47,6 +47,7 @@ endmacro(defstr)
 # WGT packaging
 macro(project_targets_populate)
 	add_custom_target(MAIN_POPULATE)
+	get_property(PROJECT_TARGETS GLOBAL PROPERTY PROJECT_TARGETS)
 	foreach(TARGET ${PROJECT_TARGETS})
 		get_target_property(T ${TARGET} LABELS)
 		if(T)
