@@ -2,15 +2,15 @@
 
 * An AGL system installed with latest Chinook version \(&gt;3.0.2\).
 
-* Make sure you built the AGL generator else you will not be able to generate custom low-level CAN binding. Generator can be found [here](http://github.com/iotbzh/can-config-generator) with the attached instruction to install and run it.
+* Make sure you built the AGL generator else you will not be able to generate custom low-level CAN binding.
 
 It will produce a _configuration-generated.cpp_ file to paste in the source, _src/_, directory.
 
 * Make sure you already set up the AGL SDK using the following [SDK Quick Setup Guide](http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html). Alternatively, please refer to official guides available on [AGL Developer Site](http://docs.automotivelinux.org/docs/devguides/en/dev/#guides).
 
-To get the correct SDK version installed, you **must** prepare your environment with the **chinook-next** version. To do so, run the following command in your docker image in the step 4 in place of `... [ prepare build environment ] ...`:
+To get the correct SDK version installed, you **must** prepare your environment with the **iotbzh** flavor using _prepare_meta_ tool. To do so, run the following command in your docker image in the step 4 in place of `... [ prepare build environment ] ...`:
 
-> **NOTE** These commands assume that proprietary graphic drivers for Renesas Porter board are located in `/home/devel/share/proprietary-renesas-rcar` directory.
+> **NOTE** These commands assume that proprietary graphic drivers for Renesas Porter board are located in _/home/devel/share/proprietary-renesas-rcar_ directory.
 
 ```bash
 $ prepare_meta -f chinook-next -o /xdt -l /home/devel/mirror -p /home/devel/share/proprietary-renesas-rcar/ -t porter -e wipeconfig -e rm_work
@@ -29,19 +29,6 @@ $ /xdt/build/agl-init-build-env
 
 * CMake version 3.0 or later
 * G++, Clang++ or any C++11 compliant compiler.
-* Boost
-  * filesystem
-  * program\_options
-  * system
-
-You can install any of these using your package manager. For instance, inside the iotbzh's docker image, you must enter this command :
-
-```bash
-$ sudo apt-get update
-$ sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-program-options-dev
-```
-
-You may want to install `libboost-all-dev` to get all boost components even if it's not required.
 
 ### Compile
 
@@ -50,8 +37,8 @@ You may want to install `libboost-all-dev` to get all boost components even if i
 ```bash
 $ export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
 $ export WD=$(pwd)
-$ git clone https://github.com/iotbzh/can-config-generator.git
-$ cd can-config-generator
+$ git clone https://github.com/iotbzh/CAN_signaling
+$ export GENERATOR=${WD}/CAN-signaling/CAN-config-generator
 $ mkdir -p build
 $ cd build
 $ cmake -G "Unix Makefiles" ..
@@ -159,68 +146,31 @@ Clone the binding repository, copy the generated file and updated the git submod
 Execute the following commands from this repository:
 
 ```bash
-$ cd $WD
-$ git clone https://github.com/iotbzh/CAN_signaling -b v1.0
-$ cd CAN_signaling
-$ git submodule init
-$ git submodule update
-$ cp $WD/can-config-generator/build/configuration-generated.cpp src/
+$ cd $WD/CAN_signaling/CAN-binder
+$ cp ${GENERATOR}/build/configuration-generated.cpp ../low-can-binding/binding
 ```
 
-### Installation using *make install*
-
-With an AGL SDK environment correctly configured and **sourced**, I suggest you to set the TARGET variable in the CMakeLists.txt file located under _src_ directory if you have an AGL target already running in your network.
-
-Then you can directly build and install the binding and source directory on your target system.
-
-Execute these commands to get your binding compile:
+### Installation
 
 ```bash
-$ mkdir -p build
+$ mkdir build
 $ cd build
 $ cmake ..
 $ make
+$ make widget
 ```
-
-And if you have set TARGET variable, you can install it on your AGL system:
-
-```bash
-$ make install
-[ 16%] Built target bitfield
-[ 27%] Built target isotp
-[ 40%] Built target openxc
-[ 48%] Built target uds
-[ 97%] Built target low-can-binding
-[100%] Built target widget
-Install the project...
--- Install configuration: ""
-true
-{ "added": "low-can-binding@0.1" }
-```
-
-It's possible that you'll see the following message :
-
-```bash
-Error org.freedesktop.DBus.Error.Failed: "system error"
-```
-
-It's because installation remove the binding before installing it.
-
-If it is the first time that you make the installation then you'll have this message in place of _**true**_.
-
-### Manual Installation
 
 To install it manually, you need to copy the _low-can-binding.wgt_ file on your target, then from it execute the following commands :
 
 On your host, to copy over the network :
 
 ```bash
-$ scp low-can-binding.wgt root@<target_IP>:~
+$ scp low-can-project.wgt root@<target_IP>:~
 ```
 
 On the target, assuming _**wgt**_ file is in the root home directory:
 
 ```bash
 # afm-util install low-can-binding.wgt
-{ "added": "low-can-binding@0.1" }
+{ "added": "low-can-project@0.1" }
 ```
