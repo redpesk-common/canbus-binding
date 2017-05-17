@@ -92,16 +92,16 @@ std::ostream& operator<<(std::ostream& o, const generator<std::string>& v)
 template <typename T>
 std::ostream& operator<<(std::ostream& o, const generator<std::vector<T>>& v)
 {
-	o << v.line_prefix_ << "{\n";
+//	o << v.line_prefix_;
 	auto sz = v.v_.size();
 	for(const T& i : v.v_)
 	{
 		o << gen(i, v.line_prefix_ + '\t');
 		if (sz > 1) o << ",";
 		--sz;
-		o << '\n';
+//		o << '\n';
 	}
-	o << v.line_prefix_ << '}';
+//	o << v.line_prefix_;
 	return o;
 }
 
@@ -109,34 +109,16 @@ template <>
 std::ostream& operator<<(std::ostream& o, const generator<openxc::message_set>& v)
 {
 	o	<< v.line_prefix_
-		<< '{'
-		<< "0, "
-		<< gen(v.v_.name()) << ", "
-		<< v.v_.buses().size() << ", "
-		<< v.v_.messages().size() << ", "
-		<< std::accumulate(
-			std::begin(v.v_.messages()),
-			std::end(v.v_.messages()),
-			0,
-			[](int sum, const openxc::can_message& p) { return sum + p.signals().size(); }
-			) << ", "
-		<< v.v_.commands().size() << ", "
-		<< v.v_.diagnostic_messages().size() << "}";
-	return o;
-}
-
-template <>
-std::ostream& operator<<(std::ostream& o, const generator<openxc::can_message>& v)
-{
-	o	<< v.line_prefix_
-		<< "can_message_definition_t("
-		<< "0, "
-		<< gen(v.v_.bus()) << ", "
-		<< v.v_.id() << ", "
-		<< "can_message_format_t::STANDARD, "
-		<< "frequency_clock_t(" << gen(v.v_.max_frequency()) << "), "
-		<< gen(v.v_.force_send_changed())
-		<< ')';
+		<< "can_message_set_t{"
+		<< "0,"
+		<< gen(v.v_.name()) << ",\n"
+		<< "\t\t\t{ // beginning can_message_definition_ vector\n"
+		<< gen(v.v_.messages(), "\t\t\t")
+		<< "\n\t\t}, // end can_message_definition vector\n"
+		<< "\t\t\t{ // beginning diagnostic_messages_ vector\n"
+		<< gen(v.v_.diagnostic_messages(),"\t\t\t") << "\n"
+		<< "\t\t\t} // end diagnostic_messages_ vector\n"
+		<< "\t\t} // end can_message_set entry\n";
 	return o;
 }
 
@@ -144,13 +126,13 @@ template <>
 std::ostream& operator<<(std::ostream& o, const generator<std::map<std::string, std::vector<std::uint32_t>>>& v)
 {
 	o << v.line_prefix_ << "{\n";
-	std::uint32_t c1 = v.v_.size();
+	std::uint32_t c1 = (uint32_t)v.v_.size();
 	for(const auto& state : v.v_)
 	{
-		std::uint32_t c2 = state.second.size();
+		std::uint32_t c2 = (uint32_t)state.second.size();
 		for(const auto& i : state.second)
 		{
-			o << v.line_prefix_ << "\t" << "{" << i << ", " << gen(state.first) << "}";
+			o << v.line_prefix_ << "\t" << "{" << i << "," << gen(state.first) << "}";
 			if (c1 > 1 || c2 > 1) o << ',';
 			o << '\n';
 			--c2;
@@ -164,14 +146,12 @@ std::ostream& operator<<(std::ostream& o, const generator<std::map<std::string, 
 template <>
 std::ostream& operator<<(std::ostream& o, const generator<openxc::signal>& v)
 {
-	o	<< v.line_prefix_ << "{\n"
-		<< v.line_prefix_ << "\t0,\n"
-		<< v.line_prefix_ << "\t" << v.index_ << ",\n"
+	o	<< v.line_prefix_ << "{std::make_shared<can_signal_t> (can_signal_t{\n"
 		<< v.line_prefix_ << "\t" << gen(v.v_.generic_name()) << ",\n"
 		<< v.line_prefix_ << "\t" << v.v_.bit_position() << ",\n"
 		<< v.line_prefix_ << "\t" << v.v_.bit_size() << ",\n"
-		<< v.line_prefix_ << "\t" << gen(v.v_.factor()) << ", \n"
-		<< v.line_prefix_ << "\t" << v.v_.offset() << ", \n"
+		<< v.line_prefix_ << "\t" << gen(v.v_.factor()) << ",\n"
+		<< v.line_prefix_ << "\t" << v.v_.offset() << ",\n"
 		<< v.line_prefix_ << "\t" << "0,\n"
 		<< v.line_prefix_ << "\t" << "0,\n"
 		<< v.line_prefix_ << "\tfrequency_clock_t(" << gen(v.v_.max_frequency()) << "),\n"
@@ -182,14 +162,39 @@ std::ostream& operator<<(std::ostream& o, const generator<openxc::signal>& v)
 		<< v.line_prefix_ << '\t' << (v.v_.decoder().size() ? v.v_.decoder() : "nullptr") << ",\n"
 		<< v.line_prefix_ << '\t' << (v.v_.encoder().size() ? v.v_.encoder() : "nullptr") << ",\n"
 		<< v.line_prefix_ << '\t' << "false\n"
-		<< v.line_prefix_ << "}";
+		<< v.line_prefix_ << "})}";
+	return o;
+}
+
+template <>
+std::ostream& operator<<(std::ostream& o, const generator<openxc::can_message>& v)
+{
+	o	<< v.line_prefix_
+		<< "{std::make_shared<can_message_definition_t>(can_message_definition_t{"
+		<< gen(v.v_.bus()) << ","
+		<< v.v_.id() << ","
+		<< "can_message_format_t::STANDARD,"
+		<< "frequency_clock_t(" << gen(v.v_.max_frequency()) << "),"
+		<< gen(v.v_.force_send_changed()) << ",\n";
+		std::uint32_t index = 0;
+	o	<< "\t\t\t\t\t{ // beginning can_signals vector\n";
+			std::uint32_t signal_count = (uint32_t)v.v_.signals().size();
+			for(const openxc::signal& s : v.v_.signals())
+			{
+	o			<< gen(s, index,"\t\t\t\t\t\t");
+				if (signal_count > 1) o << ',';
+				--signal_count;
+	o			<< '\n';
+			}
+	o	<< "\t\t\t\t\t} // end can_signals vector\n"
+		<< "\t\t\t\t})} // end can_message_definition entry\n";
 	return o;
 }
 
 template <>
 std::ostream& operator<<(std::ostream& o, const generator<openxc::diagnostic_message>& v)
 {
-	o	<< v.line_prefix_ << "{\n"
+	o	<< v.line_prefix_ << "{std::make_shared<diagnostic_message_t>(diagnostic_message_t{\n"
 		<< v.line_prefix_ << "\t" << v.v_.pid() << ",\n"
 		<< v.line_prefix_ << "\t" << gen(v.v_.name()) << ",\n"
 		<< v.line_prefix_ << "\t" << 0 << ",\n"
@@ -199,7 +204,7 @@ std::ostream& operator<<(std::ostream& o, const generator<openxc::diagnostic_mes
 		<< v.line_prefix_ << "\t" << (v.v_.decoder().size() ? v.v_.decoder() : "nullptr") << ",\n"
 		<< v.line_prefix_ << "\t" << (v.v_.callback().size() ? v.v_.callback() : "nullptr") << ",\n"
 		<< v.line_prefix_ << "\t" << "true" << "\n"
-		<< v.line_prefix_ << "}";
+		<< v.line_prefix_ << "})}\n";
 	return o;
 }
 
@@ -211,44 +216,18 @@ std::ostream& operator<<(std::ostream& o, const generator<openxc::diagnostic_mes
 void generate(const std::string& header, const std::string& footer, const openxc::message_set& message_set, std::ostream& out)
 {
 	out << "#include \"configuration.hpp\"\n"
-		<< "#include \"can/can-decoder.hpp\"\n\n";
+		<< "#include \"../can/can-decoder.hpp\"\n\n";
 
 	if (header.size()) out << header << "\n";
 
 	out	<< "configuration_t::configuration_t()\n"
-		<< "	: can_message_set_{" << gen(message_set) << "}\n"
-		<< "	, can_message_definition_\n"
-		<< "	{\n"
-				<< gen(message_set.messages(), "\t\t") << '\n'
-		<< "	}\n"
-		<< "	, can_signals_\n"
-		<< "	{\n";
-		std::uint32_t message_count = message_set.messages().size();
-		std::uint32_t index = 0;
-		out << "		{\n";
-		for(const openxc::can_message& m : message_set.messages())
-		{
-			std::uint32_t signal_count = m.signals().size();
-			for(const openxc::signal& s : m.signals())
-			{
-				out << gen(s, index, "			");
-				if (signal_count > 1) out << ',';
-				--signal_count;
-				out << '\n';
-			}
-			if (index + 1 < message_count) out << ',';
-			++index;
-		}
-		out << "		}\n";
-		out << "	}\n"
-			<< "	, diagnostic_messages_\n"
-			<< "	{\n"
-			<< gen(message_set.diagnostic_messages(), "		") << "\n"
-			<< "	}\n"
-			<< "{\n"
-			<< "}\n\n"
-			<< "const std::string configuration_t::get_diagnostic_bus() const\n"
-			<< "{\n";
+		<< "	: can_bus_manager_{utils::config_parser_t{\"/etc/dev-mapping.conf\"}}\n"
+		<< "	, can_message_set_{\n"
+		<< gen(message_set, "\t\t")
+		<< "\t} // end can_message_set vector\n"
+		<< "{}\n\n"
+		<< "const std::string configuration_t::get_diagnostic_bus() const\n"
+		<< "{\n";
 
 		std::string active_bus = "";
 		for (const auto& d : message_set.diagnostic_messages())
@@ -258,9 +237,9 @@ void generate(const std::string& header, const std::string& footer, const openxc
 			if (active_bus != d.bus()) std::cerr << "ERROR: The bus name should be the same for each diagnostic message." << std::endl;
 		}
 
-		out	<< "	return " << gen(active_bus) << ";\n"
-			<< "}\n\n";
-	out << footer << std::endl;
+	out	<< "\treturn " << gen(active_bus) << ";\n"
+		<< "}\n\n";
+	out	<< footer << std::endl;
 }
 
 /// @brief Read whole file content to a string.
@@ -338,7 +317,7 @@ int main(int argc, char *argv[])
 		/*use function getopt to get the arguments with option."hu:p:s:v" indicate 
 		that option h,v are the options without arguments while u,p,s are the
 		options with arguments*/
-		while((tmp=getopt(argc,argv,"m:h:f:o:"))!=-1)
+		while((tmp=(char)getopt(argc,argv,"m:h:f:o:"))!=-1)
 		{
 			switch(tmp)
 			{
