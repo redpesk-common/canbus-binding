@@ -54,12 +54,12 @@ private:
 
 public:
 	//can_message_definition_t(const can_message_definition_t& b);
-	can_message_definition_t(const std::string bus);
-	can_message_definition_t(const std::string bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed);
-	can_message_definition_t(const std::string bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed);
-	can_message_definition_t(const std::string bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed, std::vector<std::shared_ptr<can_signal_t> > can_signals);
+	can_message_definition_t(const std::string& bus);
+	can_message_definition_t(const std::string& bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed);
+	can_message_definition_t(const std::string& bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed);
+	can_message_definition_t(const std::string& bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed, std::vector<std::shared_ptr<can_signal_t> > can_signals);
 
-	const std::string& get_bus_name() const;
+	const std::string get_bus_name() const;
 	uint32_t get_id() const;
 	std::vector<std::shared_ptr<can_signal_t> >& get_can_signals();
 

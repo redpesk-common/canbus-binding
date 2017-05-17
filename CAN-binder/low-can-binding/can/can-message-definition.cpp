@@ -17,12 +17,12 @@
 
 #include "can-message-definition.hpp"
 
-can_message_definition_t::can_message_definition_t(const std::string bus)
+can_message_definition_t::can_message_definition_t(const std::string& bus)
 	: parent_{nullptr}, bus_{bus}, last_value_{CAN_MESSAGE_SIZE}
 {}
 
 can_message_definition_t::can_message_definition_t(
-	const std::string bus,
+	const std::string& bus,
 	uint32_t id,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed)
@@ -35,7 +35,7 @@ can_message_definition_t::can_message_definition_t(
 {}
 
 can_message_definition_t::can_message_definition_t(
-	const std::string bus,
+	const std::string& bus,
 	uint32_t id,
 	can_message_format_t format,
 	frequency_clock_t frequency_clock,
@@ -50,7 +50,7 @@ can_message_definition_t::can_message_definition_t(
 {}
 
 can_message_definition_t::can_message_definition_t(
-	const std::string bus,
+	const std::string& bus,
 	uint32_t id,
 	can_message_format_t format,
 	frequency_clock_t frequency_clock,
@@ -82,7 +82,7 @@ can_message_definition_t::can_message_definition_t(
 	can_signals_{b.can_signals_}
 	{}*/
 
-const std::string& can_message_definition_t::get_bus_name() const
+const std::string can_message_definition_t::get_bus_name() const
 {
 	return bus_;
 }
