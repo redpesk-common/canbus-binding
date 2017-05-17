@@ -16,7 +16,7 @@ namespace openxc
 		std::uint32_t										bit_position_;
 		std::uint32_t										bit_size_;
 		float												factor_;
-		std::uint32_t										offset_;
+		float												offset_;
 		std::string											decoder_;
 		bool												ignore_;
 		bool												enabled_;
@@ -33,7 +33,7 @@ namespace openxc
 		std::uint32_t bit_position() const;
 		std::uint32_t bit_size() const;
 		float factor() const;
-		std::uint32_t offset() const;
+		float offset() const;
 		std::string decoder() const;
 		bool ignore() const;
 		bool enabled() const;

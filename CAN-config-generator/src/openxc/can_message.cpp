@@ -69,8 +69,8 @@ namespace openxc
 		name_ = j.count("name") ? j["name"].get<std::string>() : "";
 		handlers_ = j.count("handlers") ? j["handlers"].get<std::vector<std::string>>() : std::vector<std::string>();
 		enabled_ = j.count("enabled") ? j["enabled"].get<bool>() : true;
-		max_frequency_ = j.count("max_frequency") ? j["max_frequency"].get<float>() : 0;
-		max_signal_frequency_ = j.count("max_signal_frequency") ? j["max_signal_frequency"].get<float>() : 0;
+		max_frequency_ = (float)j.count("max_frequency") ? j["max_frequency"].get<float>() : 5;
+		max_signal_frequency_ = j.count("max_signal_frequency") ? j["max_signal_frequency"].get<float>() : 5;
 		force_send_changed_ = j.count("force_send_changed") ? j["force_send_changed"].get<bool>() : true;
 		force_send_changed_signals_ = j.count("force_send_changed_signals") ? j["force_send_changed_signals"].get<bool>() : false;
 		
@@ -89,7 +89,7 @@ namespace openxc
 	
 	std::uint32_t can_message::get_signals_count() const
 	{
-		return signals_.size();
+		return (uint32_t)signals_.size();
 	}
 
 	nlohmann::json can_message::to_json() const

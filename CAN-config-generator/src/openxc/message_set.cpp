@@ -89,7 +89,7 @@ namespace openxc
 	{
 		name_ = j["name"].get<std::string>();
 		bit_numbering_inverted_ = j.count("bit_numbering_inverted") ? j["bit_numbering_inverted"].get<bool>() : false; // TODO: should be true by default if database-backed.
-		max_message_frequency_ = j.count("max_message_frequency") ? j["max_message_frequency"].get<std::uint32_t>() : 0;
+		max_message_frequency_ = j.count("max_message_frequency") ? j["max_message_frequency"].get<float>() : 0.0f;
 		raw_can_mode_ = j.count("raw_can_mode") ? j["raw_can_mode"].get<can_bus_mode>() : can_bus_mode::off;
 		parents_ = j.count("parents") ? j["parents"].get<std::vector<std::string>>() : std::vector<std::string>();
 		initializers_ = j.count("initializers") ? j["initializers"].get<std::vector<std::string>>() : std::vector<std::string>();

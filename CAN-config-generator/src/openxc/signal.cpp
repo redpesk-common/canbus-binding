@@ -34,7 +34,7 @@ namespace openxc
 		return factor_;
 	}
 	
-	std::uint32_t signal::offset() const
+	float signal::offset() const
 	{
 		return offset_;
 	}
@@ -90,11 +90,11 @@ namespace openxc
 		bit_position_ = j.count("bit_position") ? j["bit_position"].get<std::uint32_t>() : 0;
 		bit_size_ = j.count("bit_size") ? j["bit_size"].get<std::uint32_t>() : 0;
 		factor_ = j.count("factor") ? j["factor"].get<float>() : 1.0f;
-		offset_ = j.count("offset") ? j["offset"].get<std::uint32_t>() : 0;
+		offset_ = j.count("offset") ? j["offset"].get<float>() : 0.0f;
 		decoder_ = j.count("decoder") ? j["decoder"].get<std::string>() : "";
 		ignore_ = j.count("ignore") ? j["ignore"].get<bool>() : false;
 		enabled_ = j.count("enabled") ? j["enabled"].get<bool>() : true;
-		max_frequency_ = j.count("max_frequency") ? j["max_frequency"].get<std::uint32_t>() : 0;
+		max_frequency_ = j.count("max_frequency") ? j["max_frequency"].get<float>() : 0.0f;
 		send_same_ = j.count("send_same") ? j["send_same"].get<bool>() : true;
 		force_send_changed_ = j.count("force_send_changed") ? j["force_send_changed"].get<bool>() : false;
 		writable_ = j.count("writable") ? j["writable"].get<bool>() : false;
