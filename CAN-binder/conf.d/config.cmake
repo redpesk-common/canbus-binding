@@ -18,7 +18,7 @@
 
 # Project Info
 # ------------------
-set(NAME low-can-project)
+set(PROJECT_NAME low-can-project)
 set(VERSION "1.0")
 set(PROJECT_PRETTY_NAME "Low level CAN binding")
 set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
@@ -84,3 +84,4 @@ set(BINDINGS_INSTALL_PREFIX /opt )
 # Optional force binding Linking flag
 # ------------------------------------
 # set(BINDINGS_LINK_FLAG LinkOptions )
+
