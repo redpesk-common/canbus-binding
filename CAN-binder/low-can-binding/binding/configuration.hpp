@@ -47,7 +47,7 @@ class configuration_t
 		diagnostic_manager_t diagnostic_manager_; ///< Diagnostic manager use to manage diagnostic message communication.
 		uint8_t active_message_set_ = 0; ///< Which is the active message set ? Default to 0.
 
-		std::vector<can_message_set_t> can_message_set_; ///< Vector holding all message set from JSON signals description file
+		std::vector<std::shared_ptr<can_message_set_t> > can_message_set_; ///< Vector holding all message set from JSON signals description file
 		//std::vector<std::vector<can_message_definition_t>> can_message_definition_; ///< Vector of vector holding all can message definition from JSON signals description file. This describe a CAN message. First vector map to message set
 		//std::vector<std::vector<can_signal_t>> can_signals_; ///< Vector of vector holding all can signasl from JSON signals description file. A CAN signal is a part of a CAN message.  First vector map to message set
 		//std::vector<std::vector<std::shared_ptr<diagnostic_message_t> > > diagnostic_messages_; ///< Vector of vector holding all diagnostics messages from JSON signals description file. First vector map to message set
@@ -65,7 +65,7 @@ class configuration_t
 
 		uint8_t get_active_message_set() const;
 
-		const std::vector<can_message_set_t>& get_can_message_set();
+		const std::vector<std::shared_ptr<can_message_set_t> >& get_can_message_set();
 
 		std::vector<std::shared_ptr<can_signal_t> > get_can_signals();
 

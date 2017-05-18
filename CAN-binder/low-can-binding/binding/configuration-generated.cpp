@@ -4,7 +4,7 @@
 configuration_t::configuration_t()
 	: can_bus_manager_{utils::config_parser_t{"/etc/dev-mapping.conf"}}
 	, can_message_set_{
-		can_message_set_t{0,"example",
+		{std::make_shared<can_message_set_t>(can_message_set_t{0,"example",
 			{ // beginning can_message_definition_ vector
 				{std::make_shared<can_message_definition_t>(can_message_definition_t{"can0",0x3D9,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning can_signals vector
@@ -220,7 +220,6 @@ configuration_t::configuration_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-
 		}, // end can_message_definition vector
 			{ // beginning diagnostic_messages_ vector
 				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
@@ -455,7 +454,7 @@ configuration_t::configuration_t()
 					true
 				})}
 			} // end diagnostic_messages_ vector
-		} // end can_message_set entry
+		})} // end can_message_set entry
 	} // end can_message_set vector
 {}
 
