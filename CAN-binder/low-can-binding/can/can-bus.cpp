@@ -77,7 +77,7 @@ int can_bus_t::process_can_signals(const can_message_t& can_message)
 		if( s.find(sig->get_name()) != s.end() && afb_event_is_valid(s[sig->get_name()]))
 		{
 			bool send = true;
-			decoded_message = decoder_t::translateSignal(*sig, can_message, conf.get_can_signals(), &send);
+			decoded_message = decoder_t::translateSignal(*sig, can_message, conf.get_all_can_signals(), &send);
 
 			if(send)
 			{

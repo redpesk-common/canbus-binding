@@ -67,7 +67,7 @@ class configuration_t
 
 		const std::vector<std::shared_ptr<can_message_set_t> >& get_can_message_set();
 
-		std::vector<std::shared_ptr<can_signal_t> > get_can_signals();
+		std::vector<std::shared_ptr<can_signal_t> > get_all_can_signals();
 
 		std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_messages();
 
