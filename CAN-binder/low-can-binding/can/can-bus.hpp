@@ -75,8 +75,8 @@ public:
 	can_bus_t(can_bus_t&&);
 
 	void set_can_devices();
-	int get_can_device_index(std::string bus_name) const;
-	std::string get_can_device_name(std::string id_name) const;
+	int get_can_device_index(const std::string& bus_name) const;
+	const std::string get_can_device_name(const std::string& id_name) const;
 
 	void start_threads();
 	void stop_threads();

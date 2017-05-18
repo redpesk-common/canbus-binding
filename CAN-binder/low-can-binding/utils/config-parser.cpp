@@ -23,9 +23,14 @@ namespace utils
 {
 	/// @brief constructor using path to file
 	config_parser_t::config_parser_t(std::string conf_file)
-		: config_content_{}
+		: filepath_{conf_file}, config_content_{}
 	{
 		config_content_.read_file(conf_file);
+	}
+
+	const std::string& config_parser_t::filepath() const
+	{
+		return filepath_;
 	}
 
 	/// @brief read the conf_file_ and parse it into an INIReader object

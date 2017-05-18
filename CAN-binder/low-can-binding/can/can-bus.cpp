@@ -294,9 +294,15 @@ void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
 void can_bus_t::set_can_devices()
 {
 	can_devices_ = conf_file_.get_devices_name();
+
+	if(can_devices_.empty())
+	{
+		ERROR(binder_interface, "%s: No mapping found in config file: '%s'. Check it that it have a CANbus-mapping section.",
+			__FUNCTION__, conf_file_.filepath().c_str());
+	}
 }
 
-int can_bus_t::get_can_device_index(std::string bus_name) const
+int can_bus_t::get_can_device_index(const std::string& bus_name) const
 {
 	int i = 0;
 	for(const auto& d: can_devices_)
@@ -308,7 +314,7 @@ int can_bus_t::get_can_device_index(std::string bus_name) const
 	return i;
 }
 
-std::string can_bus_t::get_can_device_name(std::string id_name) const
+const std::string can_bus_t::get_can_device_name(const std::string& id_name) const
 {
 	std::string ret;
 	for(const auto& d: can_devices_)

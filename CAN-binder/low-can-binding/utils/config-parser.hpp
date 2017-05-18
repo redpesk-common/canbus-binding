@@ -29,6 +29,7 @@ namespace utils
 	class config_parser_t
 	{
 	private:
+		const std::string filepath_; /*!< filepath_ - Path to the config file*/
 		ini_config config_content_; /*!< config_content_ - Parsed content of INI file.*/
 
 	public:
@@ -36,6 +37,7 @@ namespace utils
 		config_parser_t(const config_parser_t&) = default;
 		config_parser_t(std::string conf_file);
 
+		const std::string& filepath() const;
 		bool check_conf();
 		const std::vector<std::pair<std::string, std::string> > get_devices_name();
 	};

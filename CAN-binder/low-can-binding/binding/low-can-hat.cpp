@@ -68,6 +68,7 @@ extern "C"
 	{
 		can_bus_t& can_bus_manager = configuration_t::instance().get_can_bus_manager();
 
+		can_bus_manager.set_can_devices();
 		can_bus_manager.start_threads();
 
 		/// Initialize Diagnostic manager that will handle obd2 requests.
