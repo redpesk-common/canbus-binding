@@ -129,9 +129,9 @@ public:
 
 	utils::socketcan_bcm_t get_socket() const;
 	can_message_definition_t* get_message() const;
-	const std::string& get_generic_name() const;
+	const std::string get_generic_name() const;
 	const std::string get_name() const;
-	const std::string& get_prefix() const;
+	const std::string get_prefix() const;
 	uint8_t get_bit_position() const;
 	uint8_t get_bit_size() const;
 	float get_factor() const;

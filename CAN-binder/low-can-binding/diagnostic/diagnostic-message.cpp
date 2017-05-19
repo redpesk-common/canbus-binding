@@ -46,7 +46,7 @@ uint32_t diagnostic_message_t::get_pid()
 	return (uint32_t)pid_;
 }
 
-const std::string& diagnostic_message_t::get_generic_name() const
+const std::string diagnostic_message_t::get_generic_name() const
 {
 	return generic_name_;
 }

@@ -65,15 +65,15 @@ class configuration_t
 
 		uint8_t get_active_message_set() const;
 
-		const std::vector<std::shared_ptr<can_message_set_t> >& get_can_message_set();
+		std::vector<std::shared_ptr<can_message_set_t> > get_can_message_set();
 
 		std::vector<std::shared_ptr<can_signal_t> > get_all_can_signals();
 
-		std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_messages();
+		std::vector<std::shared_ptr<diagnostic_message_t> >& get_diagnostic_messages();
 
 		const std::vector<std::string>& get_signals_prefix() const;
 
-		std::vector<std::shared_ptr<can_message_definition_t> > get_can_message_definition();
+		std::vector<std::shared_ptr<can_message_definition_t> >& get_can_message_definition();
 
 		uint32_t get_signal_id(diagnostic_message_t& sig) const;
 
