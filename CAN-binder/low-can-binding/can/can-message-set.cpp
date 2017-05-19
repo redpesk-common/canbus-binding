@@ -27,8 +27,8 @@ can_message_set_t::can_message_set_t(
 		const std::vector<std::shared_ptr<diagnostic_message_t> >& diagnostic_messages)
 	: index_{index}
 	, name_{name}
-	, can_messages_definition_{std::move(can_messages_definition)}
-	, diagnostic_messages_{std::move(diagnostic_messages)}
+	, can_messages_definition_{can_messages_definition}
+	, diagnostic_messages_{diagnostic_messages}
 {}
 
 /// @brief Return vector holding all message definition handled by this message set.

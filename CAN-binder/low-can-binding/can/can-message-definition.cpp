@@ -63,7 +63,7 @@ can_message_definition_t::can_message_definition_t(
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
-	can_signals_{std::move(can_signals)}
+	can_signals_{can_signals}
 {}
 
 const std::string can_message_definition_t::get_bus_name() const
