@@ -35,7 +35,7 @@ PROJECT_TARGET_ADD(openxc-message-format)
 	# Define target includes
 	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/gen/cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/libs/nanopb
+		${CMAKE_CURRENT_SOURCE_DIR}/../nanopb
 	)
 
 	# Library dependencies (include updates automatically)
