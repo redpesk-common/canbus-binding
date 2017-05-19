@@ -27,7 +27,7 @@
 /// Constructor about can_message_t class.
 ///
 can_message_t::can_message_t()
-	: maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::INVALID}, rtr_flag_{false}, flags_{0}
+	: maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::INVALID}, rtr_flag_{false}, flags_{0}, timestamp_{0}
 {}
 
 can_message_t::can_message_t(uint8_t maxdlen,
@@ -36,14 +36,16 @@ can_message_t::can_message_t(uint8_t maxdlen,
 	can_message_format_t format,
 	bool rtr_flag,
 	uint8_t flags,
-	std::vector<uint8_t> data)
+	std::vector<uint8_t> data,
+	uint64_t timestamp)
 	:  maxdlen_{maxdlen},
 	id_{id},
 	length_{length},
 	format_{format},
 	rtr_flag_{rtr_flag},
 	flags_{flags},
-	data_{data}
+	data_{data},
+	timestamp_{timestamp}
 {}
 
 ///
@@ -119,6 +121,16 @@ uint8_t can_message_t::get_length() const
 	return length_;
 }
 
+uint64_t can_message_t::get_timestamp() const
+{
+	return timestamp_;
+}
+
+void can_message_t::set_timestamp(uint64_t timestamp)
+{
+	timestamp_ = timestamp;
+}
+
 ///
 /// @brief Control whether the object is correctly initialized
 ///  to be sent over the CAN bus
@@ -162,7 +174,7 @@ void can_message_t::set_format(const can_message_format_t new_format)
 ///
 /// @return A can_message_t object fully initialized with canfd_frame values.
 ///
-can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes)
+can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes, uint64_t timestamp)
 {
 	uint8_t maxdlen, length, flags = (uint8_t)NULL;
 	uint32_t id;
@@ -239,10 +251,10 @@ can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame,
 								id, (uint8_t)format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 	}
 
-	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data);
+	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data, timestamp);
 }
 
-can_message_t can_message_t::convert_from_frame(const struct can_frame& frame, size_t nbytes)
+can_message_t can_message_t::convert_from_frame(const struct can_frame& frame, size_t nbytes, uint64_t timestamp)
 {
 	uint8_t maxdlen, length, flags = (uint8_t)NULL;
 	uint32_t id;
@@ -310,7 +322,7 @@ can_message_t can_message_t::convert_from_frame(const struct can_frame& frame, s
 //								id, (uint8_t)format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 	}
 
-	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data);
+	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data, timestamp);
 }
 
 ///

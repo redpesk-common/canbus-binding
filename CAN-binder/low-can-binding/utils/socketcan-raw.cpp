@@ -78,7 +78,10 @@ namespace utils
 		DEBUG(binder_interface, "read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, frame.can_id, frame.len,
 			frame.data[0], frame.data[1], frame.data[2], frame.data[3], frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
 
-		cm = ::can_message_t::convert_from_frame(frame , nbytes);
+		struct timeval tv;
+		ioctl(s.socket(), SIOCGSTAMP, &tv);
+		uint64_t timestamp = 1000000 * tv.tv_sec + tv.tv_usec;
+		cm = ::can_message_t::convert_from_frame(frame , nbytes, timestamp);
 
 		return s;
 	}

@@ -154,6 +154,7 @@ public:
 	void set_prefix(std::string val);
 	void set_received(bool r);
 	void set_last_value(float val);
+	void set_timestamp(uint64_t timestamp);
 
 	int create_rx_filter();
 };

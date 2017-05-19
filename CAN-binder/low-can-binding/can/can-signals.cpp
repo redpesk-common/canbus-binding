@@ -215,6 +215,11 @@ void can_signal_t::set_last_value(float val)
 	last_value_ = val;
 }
 
+void can_signal_t::set_timestamp(uint64_t timestamp)
+{
+	frequency_.tick(timestamp);
+}
+
 /// @brief Create a RX_SETUP receive job used by the BCM socket.
 ///
 /// @return 0 if ok else -1

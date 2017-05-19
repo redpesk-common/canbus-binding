@@ -18,6 +18,7 @@
 #pragma once
 
 #include <sys/time.h>
+#include <stdint.h>
 
 /// @brief return epoch in milliseconds
 ///
@@ -36,13 +37,13 @@ class frequency_clock_t
 private:
 	float unit_; ///< unit_ - multiplicator to make operation to be in the right unit (milli, micro, nano, etc)
 	float frequency_; ///< the clock frequency in Hz.
-	unsigned long last_tick_; ///< the last time (in milliseconds since startup) that the clock ticked.
+	uint64_t last_tick_; ///< the last time (in microseconds since startup) that the clock ticked.
 	time_function_t time_function_; ///<  a function returning current time
 
 public:
 	frequency_clock_t();
 	frequency_clock_t(float frequency);
-	frequency_clock_t(float frequency, unsigned long last_tick, time_function_t time_function);
+	frequency_clock_t(float frequency, uint64_t last_tick, time_function_t time_function);
 
 	float get_frequency() const;
 	const struct timeval get_timeval_from_period() const;
@@ -52,5 +53,5 @@ public:
 	time_function_t get_time_function();
 	bool elapsed(bool stagger);
 
-	void tick();
+	void tick(uint64_t timestamp);
 };

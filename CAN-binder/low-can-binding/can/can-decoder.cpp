@@ -172,6 +172,7 @@ openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, const can_m
 		*send = false;
 	}
 	signal.set_last_value(value);
+	signal.set_timestamp(message.get_timestamp());
 	signal.get_message()->set_last_value(message);
 	return decoded_value;
 }

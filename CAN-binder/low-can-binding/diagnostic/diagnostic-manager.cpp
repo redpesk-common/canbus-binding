@@ -534,7 +534,8 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_handle(active_diagn
 	else if(!response.completed && response.multi_frame)
 	{
 		// Reset the timeout clock while completing the multi-frame receive
-		entry->get_timeout_clock().tick();
+		entry->get_timeout_clock().tick(
+			entry->get_timeout_clock().get_time_function()());
 	}
 
 	return build_VehicleMessage();

@@ -51,10 +51,11 @@ private:
 	bool rtr_flag_; /*!< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
 	uint8_t flags_; /*!< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
 	std::vector<uint8_t> data_; /*!< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
+	uint64_t timestamp_; /*!< timestamp_ - timestamp of the received message*/
 
 public:
 	can_message_t();
-	can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, can_message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t> data);
+	can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, can_message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t> data, uint64_t timestamp);
 
 	uint32_t get_id() const;
 	bool get_rtr_flag_() const;
@@ -63,13 +64,15 @@ public:
 	const uint8_t* get_data() const;
 	const std::vector<uint8_t> get_data_vector() const;
 	uint8_t get_length() const;
+	uint64_t get_timestamp() const;
 
+	void set_timestamp(uint64_t timestamp);
 	void set_format(const can_message_format_t new_format);
 
 	bool is_correct_to_send();
 
-	static can_message_t convert_from_frame(const canfd_frame& frame, size_t nbytes);
-	static can_message_t convert_from_frame(const can_frame& frame, size_t nbytes);
+	static can_message_t convert_from_frame(const canfd_frame& frame, size_t nbytes, uint64_t timestamp);
+	static can_message_t convert_from_frame(const can_frame& frame, size_t nbytes, uint64_t timestamp);
 
 	struct canfd_frame convert_to_canfd_frame();
 	struct can_frame convert_to_can_frame();

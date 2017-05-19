@@ -62,6 +62,12 @@ frequency_clock_t::frequency_clock_t(float frequency)
 		frequency_ = 1;
 }
 
+frequency_clock_t::frequency_clock_t(float frequency, uint64_t last_tick, time_function_t time_function)
+	: unit_{1000000}, frequency_{frequency}, last_tick_{0}, time_function_{nullptr}
+{
+	if(frequency_ <= 0)
+		frequency_ = 1;
+}
 /// @brief Return the period in ms given the frequency in hertz.
 /// @param[in] frequency - Frequency to convert, in hertz
 float frequency_clock_t::frequency_to_period() const
@@ -109,7 +115,7 @@ float frequency_clock_t::get_frequency() const
 
 /// @brief Force the clock to tick, regardless of it its time has actually
 /// elapsed.
-void frequency_clock_t::tick()
+void frequency_clock_t::tick(uint64_t timestamp)
 {
-	last_tick_ = get_time_function()();
+	last_tick_ = timestamp;
 }
