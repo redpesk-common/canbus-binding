@@ -1,3 +1,0 @@
-[submodule "deps/canutil"]
-	path = deps/bitfield-c
-	url = https://github.com/openxc/canutil
