@@ -27,14 +27,20 @@ clean:
 	@([ -d ${BUILD_DIR} ] && make -C ${BUILD_DIR} clean) || echo Nothing to clean
 
 mrproper:
-	rm -rf ${BUILD_DIR}
+	@rm -rf ${BUILD_DIR}
 
 build:  ${BUILD_DIR}/Makefile
-	cmake --build ${BUILD_DIR} --target all
+	@cmake --build ${BUILD_DIR} --target all
 
 package: config.xml.in icon.png.in build | $(PKG_FILELIST)
-	mkdir -p ${BUILD_DIR}/$@/{bin,etc,lib,htdocs,data}
-	cmake --build ${BUILD_DIR} --target widget
+	@mkdir -p ${BUILD_DIR}/$@/bin
+	@mkdir -p ${BUILD_DIR}/$@/etc
+	@mkdir -p ${BUILD_DIR}/$@/lib
+	@mkdir -p ${BUILD_DIR}/$@/htdocs
+	@mkdir -p ${BUILD_DIR}/$@/data
+	@mkdir -p package
+	@cmake --build ${BUILD_DIR} --target widget
+	@cp ${BUILD_DIR}/*wgt package
 
 ${BUILD_DIR}/Makefile:
 	@[ -d ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
