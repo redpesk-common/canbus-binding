@@ -29,17 +29,7 @@ can_message_set_t::can_message_set_t(
 	, name_{name}
 	, can_messages_definition_{std::move(can_messages_definition)}
 	, diagnostic_messages_{std::move(diagnostic_messages)}
-{
-	for(auto& cmd : can_messages_definition_)
-	{
-		cmd->set_parent(this);
-	}
-
-	for(auto& dm : diagnostic_messages_)
-	{
-		dm->set_parent(this);
-	}
-}
+{}
 
 /// @brief Return vector holding all message definition handled by this message set.
 std::vector<std::shared_ptr<can_message_definition_t> >& can_message_set_t::get_can_message_definition()

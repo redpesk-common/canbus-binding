@@ -456,7 +456,27 @@ configuration_t::configuration_t()
 			} // end diagnostic_messages_ vector
 		})} // end can_message_set entry
 	} // end can_message_set vector
-{}
+{
+	for(auto& cms: can_message_set_)
+	{
+		std::vector<std::shared_ptr<can_message_definition_t> >& can_messages_definition = cms->get_can_message_definition();
+		for(auto& cmd : can_messages_definition)
+		{
+			cmd->set_parent(cms.get());
+			std::vector<std::shared_ptr<can_signal_t> >& can_signals = cmd->get_can_signals();
+			for(auto& sig: can_signals)
+			{
+				sig->set_parent(cmd.get());
+			}
+		}
+
+		std::vector<std::shared_ptr<diagnostic_message_t> >& diagnostic_messages = cms->get_diagnostic_messages();
+		for(auto& dm : diagnostic_messages)
+		{
+			dm->set_parent(cms.get());
+		}
+	}
+}
 
 const std::string configuration_t::get_diagnostic_bus() const
 {

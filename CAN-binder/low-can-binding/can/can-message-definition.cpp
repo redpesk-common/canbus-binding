@@ -64,12 +64,7 @@ can_message_definition_t::can_message_definition_t(
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
 	can_signals_{std::move(can_signals)}
-{
-	for(auto& sig: can_signals_)
-	{
-		sig->set_parent(this);
-	}
-}
+{}
 
 const std::string can_message_definition_t::get_bus_name() const
 {
