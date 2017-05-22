@@ -67,7 +67,8 @@ public:
 	bool initialize();
 
 	utils::socketcan_bcm_t& get_socket();
-	std::string get_can_bus();
+	const std::string get_bus_name() const;
+	const std::string get_bus_device_name() const;
 	active_diagnostic_request_t* get_last_recurring_requests() const;
 	DiagnosticShims& get_shims();
 

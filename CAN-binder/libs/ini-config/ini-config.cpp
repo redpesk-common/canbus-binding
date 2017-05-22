@@ -58,9 +58,10 @@ void ini_config::read_file(const std::string& filename)
 	}
 }
 
-std::map<std::string, std::string> ini_config::get_keys(const std::string& section)
+ini_config::map ini_config::get_keys(const std::string& section, bool wo_prefix)
 {
-	std::map<std::string, std::string> ret;
+	map ret;
+	std::string key;
 	
 	std::string prefix = section + '/';
 	for(auto i = config_.begin();
@@ -69,7 +70,11 @@ std::map<std::string, std::string> ini_config::get_keys(const std::string& secti
 	{
 		if (starts_with(i->first, prefix))
 		{
-			ret[i->first] = i->second;
+			if(wo_prefix)
+				key = i->first.substr(section.size()+1);
+			else
+				key = i->first;
+			ret[key] = i->second;
 		}
 	}
 	return ret;

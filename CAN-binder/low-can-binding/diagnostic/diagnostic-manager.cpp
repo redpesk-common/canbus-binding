@@ -86,7 +86,7 @@ int diagnostic_manager_t::add_rx_filter(uint32_t can_id)
 {
 	// Make sure that socket has been opened.
 	if(! socket_)
-		socket_.open(bus_);
+		socket_.open(get_bus_device_name());
 
 	struct utils::simple_bcm_msg bcm_msg;
 	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
@@ -142,7 +142,7 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 	// Make sure that socket has been opened.
 	if(! tx_socket)
 		tx_socket.open(
-			dm.get_can_bus());
+			dm.get_bus_device_name());
 
 	struct utils::simple_bcm_msg bcm_msg;
 	struct can_frame cfd;
@@ -191,9 +191,15 @@ void diagnostic_manager_t::shims_logger(const char* format, ...)
 void diagnostic_manager_t::shims_timer()
 {}
 
-std::string diagnostic_manager_t::get_can_bus()
+const std::string diagnostic_manager_t::get_bus_name() const
 {
 	return bus_;
+}
+
+const std::string diagnostic_manager_t::get_bus_device_name() const
+{
+	return configuration_t::instance().get_can_bus_manager()
+		.get_can_device_name(bus_);
 }
 
 active_diagnostic_request_t* diagnostic_manager_t::get_last_recurring_requests() const

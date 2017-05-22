@@ -6,7 +6,7 @@ configuration_t::configuration_t()
 	, can_message_set_{
 		{std::make_shared<can_message_set_t>(can_message_set_t{0,"example",
 			{ // beginning can_message_definition_ vector
-				{std::make_shared<can_message_definition_t>(can_message_definition_t{"can0",0x3D9,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x3D9,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning can_signals vector
 						{std::make_shared<can_signal_t> (can_signal_t{
 							"engine.speed",
@@ -64,7 +64,7 @@ configuration_t::configuration_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"can0",0x3E9,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x3E9,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning can_signals vector
 						{std::make_shared<can_signal_t> (can_signal_t{
 							"vehicle.average.speed",
@@ -86,7 +86,7 @@ configuration_t::configuration_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"can0",0x4D1,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x4D1,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning can_signals vector
 						{std::make_shared<can_signal_t> (can_signal_t{
 							"engine.oil.temp",
@@ -126,7 +126,7 @@ configuration_t::configuration_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"can0",0x620,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x620,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning can_signals vector
 						{std::make_shared<can_signal_t> (can_signal_t{
 							"doors.boot.open",
@@ -480,7 +480,7 @@ configuration_t::configuration_t()
 
 const std::string configuration_t::get_diagnostic_bus() const
 {
-	return "can0";
+	return "hs";
 }
 
 

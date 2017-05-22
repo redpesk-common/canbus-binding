@@ -228,7 +228,7 @@ int can_signal_t::create_rx_filter()
 	// Make sure that socket has been opened.
 	if(! socket_)
 		socket_.open(
-			get_message()->get_bus_name());
+			get_message()->get_bus_device_name());
 
 	uint32_t can_id  = get_message()->get_id();
 

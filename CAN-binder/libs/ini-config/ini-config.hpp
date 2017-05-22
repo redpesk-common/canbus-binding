@@ -32,7 +32,7 @@ public:
 
 	void read_file(const std::string& filename);
 
-	map get_keys(const std::string& section);
+	map get_keys(const std::string& section, bool wo_prefix=true);
 	std::string get_value(const std::string& section, const std::string& key);
 
 	typename map::size_type size() const { return config_.size(); }
