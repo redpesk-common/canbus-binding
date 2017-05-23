@@ -61,7 +61,8 @@ active_diagnostic_request_t::active_diagnostic_request_t()
 	  recurring_{false},
 	  wait_for_multiple_responses_{false},
 	  frequency_clock_{frequency_clock_t()},
-	  timeout_clock_{frequency_clock_t()}
+	  timeout_clock_{frequency_clock_t()},
+	  socket_{}
 {}
 
 active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus, DiagnosticRequest* request,
@@ -79,7 +80,8 @@ active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus,
 	  recurring_{frequencyHz ? true : false},
 	  wait_for_multiple_responses_{wait_for_multiple_responses},
 	  frequency_clock_{frequency_clock_t(frequencyHz)},
-	  timeout_clock_{frequency_clock_t(10)}
+	  timeout_clock_{frequency_clock_t(10)},
+	  socket_{}
 {}
 
 active_diagnostic_request_t::~active_diagnostic_request_t()
