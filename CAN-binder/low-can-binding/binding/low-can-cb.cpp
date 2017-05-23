@@ -231,19 +231,19 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	return rets;
 }
 
-static int process_args(struct afb_req request, const std::vector<std::string>& args, bool subscribe)
+static int process_args(struct afb_req request, const std::map<std::string, struct event_filter_t>& args, bool subscribe)
 {
 	struct utils::signals_found sf;
 	int ok = 0, total = 0;
 
 	for(const auto& sig: args)
 	{
-		openxc_DynamicField search_key = build_DynamicField(sig);
+		openxc_DynamicField search_key = build_DynamicField(sig.first);
 		sf = utils::signals_manager_t::instance().find_signals(search_key);
 		total = (int)sf.can_signals.size() + (int)sf.diagnostic_messages.size();
 
 		if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
-			NOTICE(binder_interface, "%s: No signal(s) found for %s.", __FUNCTION__, sig.c_str());
+			NOTICE(binder_interface, "%s: No signal(s) found for %s.", __FUNCTION__, sig.first.c_str());
 		else
 			ok = subscribe_unsubscribe_signals(request, subscribe, sf);
 	}
@@ -251,29 +251,67 @@ static int process_args(struct afb_req request, const std::vector<std::string>& 
 	return ok;
 }
 
-static const std::vector<std::string> parse_args_from_request(struct afb_req request)
+static int parse_filter(json_object* event, struct event_filter_t* event_filter)
+{
+	struct json_object  *filter, *obj;
+	int ret = 0;
+
+	if (json_object_object_get_ex(event, "filter", &filter))
+	{
+		event_filter->frequency = -1.0;
+		event_filter->min = -1.0;
+		event_filter->max = -1.0;
+		if (json_object_object_get_ex(filter, "frequency", &obj)
+		&& json_object_get_type(obj) == json_type_double)
+		{
+			event_filter->frequency = json_object_get_double(obj);
+			ret += 1;
+		}
+		if (json_object_object_get_ex(filter, "min", &obj)
+		&& json_object_get_type(obj) == json_type_double)
+		{
+			event_filter->min = json_object_get_double(obj);
+			ret += 2;
+		}
+		if (json_object_object_get_ex(filter, "max", &obj)
+		&& json_object_get_type(obj) == json_type_double)
+		{
+			event_filter->max = json_object_get_double(obj);
+			ret += 4;
+		}
+	}
+
+	return ret;
+}
+
+static const std::map<std::string, struct event_filter_t> parse_args_from_request(struct afb_req request)
 {
 	int i, n;
-	std::vector<std::string> ret;
-	struct json_object *args, *a, *x;
-
+ 	std::map<std::string, struct event_filter_t> ret;
+	struct json_object *args, *event, *x;
+	struct event_filter_t event_filter;
+	
 	/* retrieve signals to subscribe */
 	args = afb_req_json(request);
-	if (args == NULL || !json_object_object_get_ex(args, "event", &a))
+	if (args == NULL || !json_object_object_get_ex(args, "event", &event))
 	{
-		ret.push_back("*");
+		ret["*"] = event_filter;
 	}
-	else if (json_object_get_type(a) != json_type_array)
+	else if (json_object_get_type(event) != json_type_array)
 	{
-		ret.push_back(json_object_get_string(a));
+		const std::string event_pattern = std::string(json_object_get_string(event));
+		parse_filter(event, &event_filter);
+		ret[event_pattern] = event_filter;
 	}
 	else
 	{
-		n = json_object_array_length(a);
+		n = json_object_array_length(event);
 		for (i = 0 ; i < n ; i++)
 		{
-			x = json_object_array_get_idx(a, i);
-			ret.push_back(json_object_get_string(x));
+			x = json_object_array_get_idx(event, i);
+			const std::string event_pattern = std::string(json_object_get_string(x));
+			parse_filter(x, &event_filter);
+			ret[event_pattern] = event_filter;
 		}
 	}
 
@@ -284,7 +322,7 @@ void subscribe(struct afb_req request)
 {
 	bool subscribe = true;
 
-	const std::vector<std::string> args = parse_args_from_request(request);
+	const std::map<std::string, struct event_filter_t> args = parse_args_from_request(request);
 
 	if (process_args(request, args, subscribe) > 0)
 		afb_req_success(request, NULL, NULL);
@@ -294,10 +332,9 @@ void subscribe(struct afb_req request)
 
 void unsubscribe(struct afb_req request)
 {
-	std::vector<std::string> args;
 	bool subscribe = false;
 	
-	args = parse_args_from_request(request);
+	const std::map<std::string, struct event_filter_t> args = parse_args_from_request(request);
 
 	if (process_args(request, args, subscribe) > 0)
 		afb_req_success(request, NULL, NULL);
