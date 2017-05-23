@@ -82,6 +82,13 @@ active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus,
 	  timeout_clock_{frequency_clock_t(10)}
 {}
 
+active_diagnostic_request_t::~active_diagnostic_request_t()
+{
+	socket_.close();
+	delete handle_;
+	handle_ = nullptr;
+}
+
 uint32_t active_diagnostic_request_t::get_id() const
 {
 	return id_;

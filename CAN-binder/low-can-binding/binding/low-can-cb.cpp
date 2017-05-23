@@ -50,6 +50,8 @@ void on_no_clients(std::string message)
 		if( adr != nullptr)
 			configuration_t::instance().get_diagnostic_manager().cleanup_request(adr, true);
 	}
+	delete diag_req;
+	diag_req = nullptr;
 }
 
 static void push_n_notify(const can_message_t& cm)
@@ -207,6 +209,8 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			diag_m.cleanup_request(
 				diag_m.find_recurring_request(diag_req), true);
 			WARNING(binder_interface, "%s: signal: %s isn't supported. Canceling operation.", __FUNCTION__, sig->get_name().c_str());
+			delete diag_req;
+			diag_req = nullptr;
 			return -1;
 		}
 

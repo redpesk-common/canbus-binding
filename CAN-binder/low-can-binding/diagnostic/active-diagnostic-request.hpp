@@ -95,6 +95,7 @@ public:
 		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz);
+	~active_diagnostic_request_t();
 
 	uint32_t get_id() const;
 	DiagnosticRequestHandle* get_handle();
