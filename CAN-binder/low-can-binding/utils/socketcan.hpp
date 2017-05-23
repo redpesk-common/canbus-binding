@@ -35,6 +35,7 @@ namespace utils
 		socketcan_t();
 		socketcan_t(const socketcan_t& s);
 		socketcan_t(socketcan_t&&);
+		socketcan_t& operator=(const socketcan_t& s);
 		virtual ~socketcan_t();
 
 		const struct sockaddr_can& get_tx_address() const;

@@ -43,6 +43,12 @@ namespace utils
 		s.socket_ = INVALID_SOCKET;
 	}
 
+	socketcan_t& socketcan_t::operator=(const socketcan_t& s)
+	{
+		socket_ = std::move(s.socket_);
+		return *this;
+	}
+
 	socketcan_t::~socketcan_t()
 	{}
 
