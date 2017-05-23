@@ -214,6 +214,16 @@ DiagnosticShims& diagnostic_manager_t::get_shims()
 	return shims_;
 }
 
+bool diagnostic_manager_t::socket_close()
+{
+	if(non_recurring_requests_.empty() && recurring_requests_.empty())
+	{
+		socket_.close();
+		return true;
+	}
+	return false;
+}
+
 /// @brief Search for a specific active diagnostic request in the provided requests list
 /// and erase it from the vector. This is useful at unsubscription to clean up the list otherwize
 /// all received CAN messages will be passed to DiagnosticRequestHandle of all active diagnostic request
@@ -251,16 +261,17 @@ void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, b
 			request_string, sizeof(request_string));
 		if(force && entry->get_recurring())
 		{
-			find_and_erase(entry, recurring_requests_);
 			cancel_request(entry);
+			find_and_erase(entry, recurring_requests_);
 			DEBUG(binder_interface, "%s: Cancelling completed, recurring request: %s", __FUNCTION__, request_string);
 		}
-		else
+		else if (!entry->get_recurring())
 		{
 			DEBUG(binder_interface, "%s: Cancelling completed, non-recurring request: %s", __FUNCTION__, request_string);
-			find_and_erase(entry, non_recurring_requests_);
 			cancel_request(entry);
+			find_and_erase(entry, non_recurring_requests_);
 		}
+		socket_close();
 	}
 }
 
@@ -271,12 +282,17 @@ void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, b
 void diagnostic_manager_t::cleanup_active_requests(bool force)
 {
 	for(auto& entry : non_recurring_requests_)
+	{
 		if (entry != nullptr)
 			cleanup_request(entry, force);
+	}
 
 	for(auto& entry : recurring_requests_)
+	 {
 		if (entry != nullptr)
 			cleanup_request(entry, force);
+	 }
+
 }
 
 /// @brief Will return the active_diagnostic_request_t pointer for theDiagnosticRequest or nullptr if

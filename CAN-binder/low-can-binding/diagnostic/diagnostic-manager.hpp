@@ -71,6 +71,7 @@ public:
 	const std::string get_bus_device_name() const;
 	active_diagnostic_request_t* get_last_recurring_requests() const;
 	DiagnosticShims& get_shims();
+	bool socket_close();
 
 	void find_and_erase(active_diagnostic_request_t* entry, std::vector<active_diagnostic_request_t*>& requests_list);
 	void cancel_request(active_diagnostic_request_t* entry);
