@@ -30,7 +30,7 @@ loop1                                                                           
     253:4    0    10G  0 dm   /var/lib/docker/devicemapper/mnt/e9f80849a2681e18549d3a4238cbf031e44052e36cd88a0abf041804b799b61c
 sdb                                                                                       8:16   0 238.5G  0 disk
 ├─sdb2                                                                                    8:18   0   238G  0 part
-│ └─Shamash-agl                                                                         253:1    0   238G  0 lvm  /home/claneys/Workspace/agl-docker
+│ └─agl                                                                         253:1    0   238G  0 lvm  /home/claneys/Workspace/agl-docker
 └─sdb1                                                                                    8:17   0   500M  0 part /boot
 sr0                                                                                      11:0    1  1024M  0 rom
 loop0                                                                                     7:0    0   100G  0 loop
@@ -41,8 +41,8 @@ sdc                                                                             
 └─sdc1                                                                                    8:33   1     2G  0 part /run/media/claneys/97f418a5-612f-44e9-b968-a19505695151
 sda                                                                                       8:0    0 931.5G  0 disk
 ├─sda2                                                                                    8:2    0   500G  0 part
-│ ├─Shamash-home                                                                        253:2    0   150G  0 lvm  /home
-│ └─Shamash-root                                                                        253:0    0    50G  0 lvm  /
+│ ├─home                                                                        253:2    0   150G  0 lvm  /home
+│ └─root                                                                        253:0    0    50G  0 lvm  /
 └─sda1                                                                                    8:1    0    16G  0 part [SWAP]
 ```
 
@@ -131,47 +131,39 @@ The instructions will be the same:
 
 ## Configure the binding
 
-Configure the binding specifying in the JSON configuration file the CAN device\(s\) that it will to connect to. Edit file _/var/lib/afm/applications/low-can-binding/0.1/can\_buses.json_ and change the CAN device name to the one you will use :
+The binding reads system configuration file _/etc/dev-mapping.conf_ at start to map logical name from signals described in JSON file to linux devices name initialized by the system.
+Edit file _/etc/dev-mappping.conf_ and add mapping in section `CANbus-mapping` :
 
 Using virtual CAN device as described in the previous chapter:
-```json
-{
-    "canbus":  "vcan0"
-}
+```ini
+[CANbus-mapping]
+hs="vcan0"
+ls="vcan1"
 ```
 
 Using real CAN device, this example assume CAN bus traffic will be on can0.
-```json
-{
-    "canbus":  "can0"
-}
+```ini
+[CANbus-mapping]
+hs="can0"
+ls="can1"
 ```
 
 On a Porter board there is an embedded CAN device so `can0` already exists.
 
 So you might want to use your USB CAN adapter plugged to the OBD2 connector, in this case use `can1`:
-```json
-{
-    "canbus":  "can1"
-}
+```ini
+[CANbus-mapping]
+hs="can1"
 ```
 
-If you have several specify CAN bus devices use an array:
-
-```json
-{
-    "canbus": [ "can0", "can1" ]
-}
-```
-
-> **CAUTION VERY IMPORTANT:** Make sure the CAN bus\(es\) you specify in your configuration file match those specified in your generated source file with the [can-config-generator](http://github.com/iotbzh/can-config-generator).
+> **CAUTION VERY IMPORTANT:** Make sure the CAN bus\(es\) you specify in your configuration file match those specified in your generated source file with the `CAN-config-generator`.
 
 ## Run it, test it, use it !
 
 You can run the binding using **afm-util** tool, here is the classic way to go :
 
 ```bash
-# afm-util run low-can-binding@0.1
+# afm-util run low-can-binding@1.0
 1
 ```
 
@@ -182,14 +174,14 @@ But you can't control nor interact with it because you don't know security token
 So, to test it, it is better to launch the binding manually. In the following example, we will use port **1234** and left empty security token for testing purpose:
 
 ```bash
-# afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-binding/0.1/libs/ --rootdir=/var/lib/afm/applications/low-can-binding/0.1/ --port=1234 --token=
+# afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-binding/1.0/libs/ --rootdir=/var/lib/afm/applications/low-can-binding/1.0/ --port=1234 --token=1
 NOTICE: binding [/usr/lib/afb/afb-dbus-binding.so] calling registering function afbBindingV1Register
 NOTICE: binding /usr/lib/afb/afb-dbus-binding.so loaded with API prefix dbus
 NOTICE: binding [/usr/lib/afb/authLogin.so] calling registering function afbBindingV1Register
 NOTICE: binding /usr/lib/afb/authLogin.so loaded with API prefix auth
-NOTICE: binding [/var/lib/afm/applications/low-can-binding/0.1/libs//low-can-binding.so] calling registering function afbBindingV1Register
-NOTICE: binding /var/lib/afm/applications/low-can-binding/0.1/libs//low-can-binding.so loaded with API prefix low-can
-NOTICE: Waiting port=1234 rootdir=/var/lib/afm/applications/low-can-binding/0.1/
+NOTICE: binding [/var/lib/afm/applications/low-can-binding/1.0/libs//low-can-binding.so] calling registering function afbBindingV1Register
+NOTICE: binding /var/lib/afm/applications/low-can-binding/1.0/libs//low-can-binding.so loaded with API prefix low-can
+NOTICE: Waiting port=1234 rootdir=/var/lib/afm/applications/low-can-binding/1.0/
 NOTICE: Browser URL= http:/*localhost:1234
 NOTICE: vcan0 device opened and reading {binding low-can}
 NOTICE: Initialized 1/1 can bus device(s) {binding low-can}
@@ -198,7 +190,7 @@ NOTICE: Initialized 1/1 can bus device(s) {binding low-can}
 On another terminal, connect to the binding using previously installed _**AFB Websocket CLI**_ tool:
 
 ```bash
-# afb-client-demo ws://localhost:1234/api?token=
+# afb-client-demo ws://localhost:1234/api?token=1
 ```
 
 You will be on an interactive session where you can communicate directly with the binding API.

@@ -39,6 +39,7 @@ $ export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
 $ export WD=$(pwd)
 $ git clone https://github.com/iotbzh/CAN_signaling
 $ export GENERATOR=${WD}/CAN-signaling/CAN-config-generator
+$ cd ${GENERATOR}
 $ mkdir -p build
 $ cd build
 $ cmake -G "Unix Makefiles" ..
@@ -153,6 +154,7 @@ $ cp ${GENERATOR}/build/configuration-generated.cpp ../low-can-binding/binding
 ### Installation
 
 ```bash
+$ cd $WD/CAN_signaling/CAN-binder
 $ mkdir build
 $ cd build
 $ cmake ..
