@@ -35,7 +35,7 @@ namespace utils
 	public:
 		config_parser_t(config_parser_t&&) = default;
 		config_parser_t(const config_parser_t&) = default;
-		config_parser_t(std::string conf_file);
+		explicit config_parser_t(std::string conf_file);
 
 		const std::string& filepath() const;
 		bool check_conf();

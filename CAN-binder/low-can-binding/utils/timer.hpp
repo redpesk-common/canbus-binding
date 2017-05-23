@@ -42,7 +42,7 @@ private:
 
 public:
 	frequency_clock_t();
-	frequency_clock_t(float frequency);
+	explicit frequency_clock_t(float frequency);
 	frequency_clock_t(float frequency, uint64_t last_tick, time_function_t time_function);
 
 	float get_frequency() const;

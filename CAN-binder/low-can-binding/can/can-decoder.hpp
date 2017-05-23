@@ -26,23 +26,23 @@ class decoder_t
 public:
 	static float parseSignalBitfield(can_signal_t& signal, const can_message_t& message);
 
-	static openxc_DynamicField stateDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> > signals,
+	static openxc_DynamicField stateDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> >& signals,
 			float value, bool* send);
-	static openxc_DynamicField booleanDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> > signals,
+	static openxc_DynamicField booleanDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> >& signals,
 			float value, bool* send);
-	static openxc_DynamicField ignoreDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> > signals,
+	static openxc_DynamicField ignoreDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> >& signals,
 			float value, bool* send);
-	static openxc_DynamicField noopDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> > signals,
+	static openxc_DynamicField noopDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> >& signals,
 			float value, bool* send);
 
 	static openxc_DynamicField translateSignal(can_signal_t& signal, const can_message_t& message,
-		const std::vector<std::shared_ptr<can_signal_t> > signals, bool* send);
+		const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send);
 
 	static openxc_DynamicField decodeSignal(can_signal_t& signal, const can_message_t& message,
-			const std::vector<std::shared_ptr<can_signal_t> > signals, bool* send);
+			const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send);
 
 	static openxc_DynamicField decodeSignal(can_signal_t& signal, float value,
-		const std::vector<std::shared_ptr<can_signal_t> > signals, bool* send);
+		const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send);
 
 	static float decode_obd2_response(const DiagnosticResponse* response, float parsed_payload);
 

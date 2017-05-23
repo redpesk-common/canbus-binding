@@ -52,7 +52,7 @@ void on_no_clients(std::string message)
 	}
 }
 
-static void push_n_notify(const can_message_t cm)
+static void push_n_notify(const can_message_t& cm)
 {
 	can_bus_t& cbm = configuration_t::instance().get_can_bus_manager();
 	std::lock_guard<std::mutex> can_message_lock(cbm.get_can_message_mutex());
@@ -181,7 +181,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 ///
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const struct utils::signals_found& signals)
 {
-	int ret,  rets = 0;
+	int rets = 0;
 
 	//TODO: Implement way to dynamically call the right function no matter
 	// how much signals types we have.
@@ -189,6 +189,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 
 	for(const auto& sig : signals.diagnostic_messages)
 	{
+		int ret = 0;
 		diagnostic_manager_t& diag_m = conf.get_diagnostic_manager();
 		DiagnosticRequest* diag_req = conf.get_request_from_diagnostic_message(sig->get_name());
 
@@ -295,6 +296,8 @@ static const std::map<std::string, struct event_filter_t> parse_args_from_reques
 	args = afb_req_json(request);
 	if (args == NULL || !json_object_object_get_ex(args, "event", &event))
 	{
+		event = json_object_new_string("*");
+		parse_filter(event, &event_filter);
 		ret["*"] = event_filter;
 	}
 	else if (json_object_get_type(event) != json_type_array)

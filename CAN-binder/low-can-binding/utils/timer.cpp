@@ -24,7 +24,7 @@
 long long int system_time_us()
 {
 	struct timespec t_usec;
-	long long int timestamp_usec;
+	long long int timestamp_usec = 0;
 	
 	if(!::clock_gettime(CLOCK_MONOTONIC, &t_usec))
 		timestamp_usec = (t_usec.tv_nsec / 1000ll) + (t_usec.tv_sec* 1000000ll);
@@ -34,7 +34,7 @@ long long int system_time_us()
 long long int system_time_ms()
 {
 	struct timespec t_msec;
-	long long int timestamp_msec;
+	long long int timestamp_msec = 0;
 	
 	if(!::clock_gettime(CLOCK_MONOTONIC, &t_msec))
 		timestamp_msec = (t_msec.tv_nsec / 1000000ll) + (t_msec.tv_sec* 1000ll);
@@ -44,7 +44,7 @@ long long int system_time_ms()
 long long int system_time_s()
 {
 	struct timespec t_sec;
-	long long int timestamp_sec;
+	long long int timestamp_sec = 0;
 	
 	if(!::clock_gettime(CLOCK_MONOTONIC, &t_sec))
 		timestamp_sec = t_sec.tv_sec;

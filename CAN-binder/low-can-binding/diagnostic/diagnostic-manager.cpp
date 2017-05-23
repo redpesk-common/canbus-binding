@@ -33,7 +33,7 @@
 #define MICRO 1000000
 
 diagnostic_manager_t::diagnostic_manager_t()
-	: initialized_{false}
+	: initialized_{false}, event_source_{nullptr}
 {}
 
 /// @brief Diagnostic manager isn't initialized at launch but after
@@ -185,6 +185,7 @@ void diagnostic_manager_t::shims_logger(const char* format, ...)
 	vsnprintf(buffer, 256, format, args);
 
 	DEBUG(binder_interface, "%s: %s", __FUNCTION__, buffer);
+	va_end(args);
 }
 
 /// @brief The type signature for a... OpenXC TODO: not used yet.
@@ -288,10 +289,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const 
 		if(entry != nullptr)
 		{
 			if(diagnostic_request_equals(&entry->get_handle()->request, request))
-			{
-				return entry;
-				break;
-			}
+				{return entry;}
 		}
 	}
 	return nullptr;
@@ -323,7 +321,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const 
 /// @return true if the request was added successfully. Returns false if there
 /// wasn't a free active request entry, if the frequency was too high or if the
 /// CAN acceptance filters could not be configured,
-active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::string name,
+active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::string& name,
 	bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 	const DiagnosticResponseCallback callback)
 {

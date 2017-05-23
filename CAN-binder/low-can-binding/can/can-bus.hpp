@@ -71,7 +71,7 @@ private:
 
 	std::vector<std::pair<std::string, std::string> > can_devices_;
 public:
-	can_bus_t(utils::config_parser_t conf_file);
+	explicit can_bus_t(utils::config_parser_t conf_file);
 	can_bus_t(can_bus_t&&);
 
 	void set_can_devices();

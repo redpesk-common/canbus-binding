@@ -22,7 +22,7 @@
 
 can_message_set_t::can_message_set_t(
 		uint8_t index,
-		const std::string name,
+		const std::string& name,
 		const std::vector<std::shared_ptr<can_message_definition_t> >& can_messages_definition,
 		const std::vector<std::shared_ptr<diagnostic_message_t> >& diagnostic_messages)
 	: index_{index}

@@ -36,7 +36,7 @@ can_message_t::can_message_t(uint8_t maxdlen,
 	can_message_format_t format,
 	bool rtr_flag,
 	uint8_t flags,
-	std::vector<uint8_t> data,
+	std::vector<uint8_t>& data,
 	uint64_t timestamp)
 	:  maxdlen_{maxdlen},
 	id_{id},
