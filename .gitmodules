@@ -1,4 +1,4 @@
-[submodule "CAN-binder/conf.d/app-templates"]
-	path = CAN-binder/conf.d/app-templates
+[submodule "CAN-binder/conf.d"]
+	path = CAN-binder/conf.d
 	url = https://gerrit.automotivelinux.org/gerrit/p/apps/app-templates.git
 	branch = reference
