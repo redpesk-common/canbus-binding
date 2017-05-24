@@ -30,7 +30,7 @@ set(PROJECT_LANGUAGES,"C")
 
 # Where are stored default templates files from submodule or subtree app-templates in your project tree
 # relative to the root project directory
-set(PROJECT_APP_TEMPLATES_DIR "conf.d")
+set(PROJECT_APP_TEMPLATES_DIR "conf.d/default")
 
 # Where are stored your external libraries for your project. This is 3rd party library that you don't maintain
 # but used and must be built and linked.
@@ -42,6 +42,10 @@ set(PROJECT_APP_TEMPLATES_DIR "conf.d")
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
 set(CMAKE_BUILD_TYPE "DEBUG")
+
+# Kernel selection if needed. Overload the detected compiler.
+# -----------------------------------------------
+set (kernel_minimal_version 4.8)
 
 # Compiler selection if needed. Overload the detected compiler.
 # -----------------------------------------------
