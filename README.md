@@ -16,7 +16,7 @@ Just use build.sh script:
 ./build.sh
 ```
 
-This will build both projects under build directory for each of them.
+This will build both projects under build directory for each of them with default configuration.
 
 # Generate documentation
 
