@@ -10,7 +10,9 @@
 obj
 build
 bin
-src/configuration-generated.cpp
+configuration-generated.cpp
 docs_doxygen
 node_modules/
 _book/
+CAN-binder/conf.d/packaging/
+CAN-binder/package/
