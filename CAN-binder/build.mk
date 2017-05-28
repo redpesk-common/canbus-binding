@@ -15,7 +15,7 @@
 # limitations under the License.
 
 BUILD_DIR   := build
-PACKAGING_DIR := packaging/wgt
+PACKAGING_DIR := conf.d/default/wgt
 
 VPATH = etc:$(PACKAGING_DIR):$(PACKAGING_DIR)/etc:$(BUILD_DIR)
 
@@ -27,12 +27,12 @@ clean:
 	@([ -d ${BUILD_DIR} ] && make -C ${BUILD_DIR} clean) || echo Nothing to clean
 
 mrproper:
-	@rm -rf ${BUILD_DIR}
+	@rm -rf ${BUILD_DIR} package packaging
 
-build:  ${BUILD_DIR}/Makefile
+build: conf.d/default/cmake config.xml.in icon-default.png ${BUILD_DIR}/Makefile
 	@cmake --build ${BUILD_DIR} --target all
 
-package: config.xml.in icon.png.in build | $(PKG_FILELIST)
+package: build | $(PKG_FILELIST)
 	@mkdir -p ${BUILD_DIR}/$@/bin
 	@mkdir -p ${BUILD_DIR}/$@/etc
 	@mkdir -p ${BUILD_DIR}/$@/lib
@@ -45,3 +45,11 @@ package: config.xml.in icon.png.in build | $(PKG_FILELIST)
 ${BUILD_DIR}/Makefile:
 	@[ -d ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
 	@[ -f ${BUILD_DIR}/Makefile ] || (cd ${BUILD_DIR} && cmake ${CMAKE_OPTS} ..)
+
+submodule:
+	@[ -d conf.d/default/cmake ] || git submodule init
+	@[ -d conf.d/default/cmake ] || git submodule update
+
+conf.d/default/cmake: submodule
+config.xml.in: submodule
+icon-default.png: submodule
