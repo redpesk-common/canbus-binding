@@ -19,13 +19,14 @@
 # Project Info
 # ------------------
 set(PROJECT_NAME low-can-project)
-set(VERSION "1.0")
+set(PROJECT_VERSION "1.0")
 set(PROJECT_PRETTY_NAME "Low level CAN binding")
 set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
 set(PROJECT_URL "https://github.com/iotbzh/CAN_signaling")
 set(PROJECT_AUTHOR "Romain Forlot")
 set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
 set(PROJECT_ICON "icon.png")
+set(PROJECT_LICENCE "APL2.0")
 set(PROJECT_LANGUAGES,"C")
 
 # Where are stored default templates files from submodule or subtree app-templates in your project tree
