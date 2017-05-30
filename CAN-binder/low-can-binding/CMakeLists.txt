@@ -24,8 +24,8 @@ PROJECT_TARGET_ADD(low-can)
 	add_library(${TARGET_NAME} MODULE
 		binding/${TARGET_NAME}-hat.cpp
 		binding/${TARGET_NAME}-cb.cpp
-		binding/configuration.cpp
-		binding/configuration-generated.cpp
+		binding/application.cpp
+		binding/application-generated.cpp
 		can/can-bus.cpp
 		can/can-message-set.cpp
 		can/can-message-definition.cpp

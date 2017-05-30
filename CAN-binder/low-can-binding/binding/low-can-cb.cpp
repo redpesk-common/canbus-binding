@@ -27,7 +27,7 @@
 #include <systemd/sd-event.h>
 
 #include "openxc.pb.h"
-#include "configuration.hpp"
+#include "application.hpp"
 #include "../can/can-bus.hpp"
 #include "../can/can-signals.hpp"
 #include "../can/can-message.hpp"
@@ -187,7 +187,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 
 	//TODO: Implement way to dynamically call the right function no matter
 	// how much signals types we have.
-	configuration_t& conf = configuration_t::instance();
+	application_t& conf = application_t::instance();
 
 	for(const auto& sig : signals.diagnostic_messages)
 	{

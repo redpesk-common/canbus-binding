@@ -23,7 +23,7 @@
 
 #include "../utils/openxc-utils.hpp"
 #include "../utils/signals.hpp"
-#include "../binding/configuration.hpp"
+#include "../binding/application.hpp"
 
 #define MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 10
 #define MAX_SIMULTANEOUS_DIAG_REQUESTS 50
@@ -46,7 +46,7 @@ diagnostic_manager_t::diagnostic_manager_t()
 bool diagnostic_manager_t::initialize()
 {
 	// Mandatory to set the bus before intialize shims.
-	bus_ = configuration_t::instance().get_diagnostic_bus();
+	bus_ = application_t::instance().get_diagnostic_bus();
 
 	init_diagnostic_shims();
 	event_source_ = nullptr;
@@ -135,7 +135,7 @@ int diagnostic_manager_t::add_rx_filter(uint32_t can_id)
 /// @return true if the CAN message was sent successfully. 
 bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
-	diagnostic_manager_t& dm = configuration_t::instance().get_diagnostic_manager();
+	diagnostic_manager_t& dm = application_t::instance().get_diagnostic_manager();
 	active_diagnostic_request_t* current_adr = dm.get_last_recurring_requests();
 	utils::socketcan_bcm_t& tx_socket = current_adr->get_socket();
 
@@ -199,7 +199,7 @@ const std::string diagnostic_manager_t::get_bus_name() const
 
 const std::string diagnostic_manager_t::get_bus_device_name() const
 {
-	return configuration_t::instance().get_can_bus_manager()
+	return application_t::instance().get_can_bus_manager()
 		.get_can_device_name(bus_);
 }
 

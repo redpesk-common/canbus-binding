@@ -1,7 +1,7 @@
-#include "configuration.hpp"
+#include "application.hpp"
 #include "can/can-decoder.hpp"
 
-configuration_t::configuration_t()
+application_t::application_t()
 	: can_message_set_{{0, "example", 0, 1, 5, 0, 19}}
 	, can_message_definition_
 	{
@@ -331,7 +331,7 @@ configuration_t::configuration_t()
 {
 }
 
-const std::string configuration_t::get_diagnostic_bus() const
+const std::string application_t::get_diagnostic_bus() const
 {
 	return "can0";
 }

@@ -17,7 +17,7 @@
 
 #include "can-message-definition.hpp"
 
-#include "../binding/configuration.hpp"
+#include "../binding/application.hpp"
 
 can_message_definition_t::can_message_definition_t(const std::string bus)
 	: parent_{nullptr}, bus_{bus}, last_value_{CAN_MESSAGE_SIZE}
@@ -75,7 +75,7 @@ const std::string can_message_definition_t::get_bus_name() const
 
 const std::string can_message_definition_t::get_bus_device_name() const
 {
-	return configuration_t::instance().get_can_bus_manager()
+	return application_t::instance().get_can_bus_manager()
 		.get_can_device_name(bus_);
 }
 

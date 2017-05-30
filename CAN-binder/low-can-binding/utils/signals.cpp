@@ -60,12 +60,12 @@ namespace utils
 		switch(key.type)
 		{
 			case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-					lookup_signals_by_name(key.string_value, configuration_t::instance().get_all_can_signals(), sf.can_signals);
-					lookup_signals_by_name(key.string_value, configuration_t::instance().get_diagnostic_messages(), sf.diagnostic_messages);
+					lookup_signals_by_name(key.string_value, application_t::instance().get_all_can_signals(), sf.can_signals);
+					lookup_signals_by_name(key.string_value, application_t::instance().get_diagnostic_messages(), sf.diagnostic_messages);
 				break;
 			case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-					lookup_signals_by_id(key.numeric_value, configuration_t::instance().get_all_can_signals(), sf.can_signals);
-					lookup_signals_by_id(key.numeric_value, configuration_t::instance().get_diagnostic_messages(), sf.diagnostic_messages);
+					lookup_signals_by_id(key.numeric_value, application_t::instance().get_all_can_signals(), sf.can_signals);
+					lookup_signals_by_id(key.numeric_value, application_t::instance().get_diagnostic_messages(), sf.diagnostic_messages);
 				break;
 			default:
 				ERROR(binder_interface, "%s: wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.", __FUNCTION__);

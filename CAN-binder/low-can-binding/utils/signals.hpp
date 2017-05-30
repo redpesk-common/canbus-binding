@@ -22,7 +22,7 @@
 #include <fnmatch.h>
 
 #include "openxc.pb.h"
-#include "../binding/configuration.hpp"
+#include "../binding/application.hpp"
 #include "../can/can-signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 
@@ -71,7 +71,7 @@ namespace utils
 		{
 			for(std::shared_ptr<T> s : signals)
 			{
-				if(configuration_t::instance().get_signal_id(*s) == key)
+				if(application_t::instance().get_signal_id(*s) == key)
 				{
 					found_signals.push_back(s);
 				}

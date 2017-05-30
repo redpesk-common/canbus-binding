@@ -1,7 +1,7 @@
-#include "configuration.hpp"
+#include "application.hpp"
 #include "../can/can-decoder.hpp"
 
-configuration_t::configuration_t()
+application_t::application_t()
 	: can_bus_manager_{utils::config_parser_t{"/etc/dev-mapping.conf"}}
 	, can_message_set_{
 		{std::make_shared<can_message_set_t>(can_message_set_t{0,"example",
@@ -478,7 +478,7 @@ configuration_t::configuration_t()
 	}
 }
 
-const std::string configuration_t::get_diagnostic_bus() const
+const std::string application_t::get_diagnostic_bus() const
 {
 	return "hs";
 }

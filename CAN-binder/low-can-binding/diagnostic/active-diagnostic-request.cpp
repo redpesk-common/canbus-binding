@@ -20,7 +20,7 @@
 
 #include "active-diagnostic-request.hpp"
 
-#include "../binding/configuration.hpp"
+#include "../binding/application.hpp"
 
 #define ERROR_PID 0xFF
 

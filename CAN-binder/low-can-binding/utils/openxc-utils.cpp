@@ -18,7 +18,7 @@
 
 #include "openxc-utils.hpp"
 
-#include "../binding/configuration.hpp"
+#include "../binding/application.hpp"
 
 ///
 /// @brief Build a specific VehicleMessage containing a DiagnosticResponse.
@@ -34,7 +34,7 @@
 openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value)
 {
 	openxc_VehicleMessage message;
-	configuration_t& conf = configuration_t::instance();
+	application_t& conf = application_t::instance();
 
 	message.has_type = true;
 	message.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_DIAGNOSTIC;

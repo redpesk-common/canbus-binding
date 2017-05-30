@@ -24,7 +24,7 @@
 #include <vector>
 #include <json-c/json.h>
 
-#include "configuration.hpp"
+#include "application.hpp"
 #include "../can/can-bus.hpp"
 
 extern "C"
@@ -66,7 +66,7 @@ extern "C"
 	/// @return Exit code, zero if success.
 	int afbBindingV1ServiceInit(struct afb_service service)
 	{
-		can_bus_t& can_bus_manager = configuration_t::instance().get_can_bus_manager();
+		can_bus_t& can_bus_manager = application_t::instance().get_can_bus_manager();
 
 		can_bus_manager.set_can_devices();
 		can_bus_manager.start_threads();
@@ -74,7 +74,7 @@ extern "C"
 		/// Initialize Diagnostic manager that will handle obd2 requests.
 		/// We pass by default the first CAN bus device to its Initialization.
 		/// TODO: be able to choose the CAN bus device that will be use as Diagnostic bus.
-		if(configuration_t::instance().get_diagnostic_manager().initialize())
+		if(application_t::instance().get_diagnostic_manager().initialize())
 			return 0;
 
 		ERROR(binder_interface, "%s: There was something wrong with CAN device Initialization.", __FUNCTION__);

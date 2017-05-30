@@ -19,7 +19,7 @@
 
 #include "can-signals.hpp"
 
-#include "../binding/configuration.hpp"
+#include "../binding/application.hpp"
 #include "../utils/signals.hpp"
 #include "can-decoder.hpp"
 #include "can-message.hpp"

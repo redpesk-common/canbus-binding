@@ -29,7 +29,7 @@
 
 #include "can-signals.hpp"
 #include "can-decoder.hpp"
-#include "../binding/configuration.hpp"
+#include "../binding/application.hpp"
 #include "../utils/signals.hpp"
 #include "../utils/openxc-utils.hpp"
 
@@ -61,7 +61,7 @@ int can_bus_t::process_can_signals(const can_message_t& can_message)
 	struct utils::signals_found signals;
 	openxc_DynamicField search_key, decoded_message;
 	openxc_VehicleMessage vehicle_message;
-	configuration_t& conf = configuration_t::instance();
+	application_t& conf = application_t::instance();
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
 	// First we have to found which can_signal_t it is
