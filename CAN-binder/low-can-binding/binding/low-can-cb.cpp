@@ -445,111 +445,86 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	return rets;
 }
 
-static int process_args(struct afb_req request, std::map<std::string, struct event_filter_t>& args, bool subscribe)
+static int one_subscribe_unsubscribe(struct afb_req request, bool subscribe, const char *tag, struct json_object *event)
 {
-	struct utils::signals_found sf;
-	int ok = 0, total = 0;
-
-	for(auto& sig: args)
-	{
-		openxc_DynamicField search_key = build_DynamicField(sig.first);
-		sf = utils::signals_manager_t::instance().find_signals(search_key);
-		total = (int)sf.can_signals.size() + (int)sf.diagnostic_messages.size();
-
-		if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
-			NOTICE(binder_interface, "%s: No signal(s) found for %s.", __FUNCTION__, sig.first.c_str());
-		else
-			ok = subscribe_unsubscribe_signals(request, subscribe, sf, sig.second);
-	}
-	NOTICE(binder_interface, "%s: Subscribed/unsubscribe correctly to %d/%d signal(s).", __FUNCTION__, ok, total);
-	return ok;
-}
-
-static int parse_filter(json_object* event,  struct event_filter_t& event_filter)
-{
-	struct json_object  *filter, *obj;
 	int ret = 0;
+	struct event_filter_t event_filter;
+	struct json_object  *filter, *obj;
+	struct utils::signals_found sf;
 
+	// computes the filter
 	if (json_object_object_get_ex(event, "filter", &filter))
 	{
 		if (json_object_object_get_ex(filter, "frequency", &obj)
-		&& json_object_get_type(obj) == json_type_double)
+		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
 		{
 			event_filter.frequency = (float)json_object_get_double(obj);
 			ret += 1;
 		}
 		if (json_object_object_get_ex(filter, "min", &obj)
-		&& json_object_get_type(obj) == json_type_double)
+		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
 		{
 			event_filter.min = (float)json_object_get_double(obj);
 			ret += 2;
 		}
 		if (json_object_object_get_ex(filter, "max", &obj)
-		&& json_object_get_type(obj) == json_type_double)
+		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
 		{
 			event_filter.max = (float)json_object_get_double(obj);
 			ret += 4;
 		}
 	}
 
+	// subscribe or unsubscribe
+	openxc_DynamicField search_key = build_DynamicField(tag);
+	sf = utils::signals_manager_t::instance().find_signals(search_key);
+	if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
+		NOTICE(binder_interface, "%s: No signal(s) found for %s.", __FUNCTION__, tag.c_str());
+	else
+		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);
+
 	return ret;
 }
 
-static const std::map<std::string, struct event_filter_t> parse_args_from_request(struct afb_req request)
+static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
 {
-	int i, n;
- 	std::map<std::string,  struct event_filter_t > ret;
+	int rc, rc2;
 	struct json_object *args, *event, *x;
-	struct event_filter_t event_filter;
 
-	/* retrieve signals to subscribe */
 	args = afb_req_json(request);
 	if (args == NULL || !json_object_object_get_ex(args, "event", &event))
 	{
-		parse_filter(json_object_new_string("*"), event_filter);
-		ret["*"] = event_filter;
+		rc = one_subscribe_unsubscribe(request, subscribe, "*", NULL);
 	}
 	else if (json_object_get_type(event) != json_type_array)
 	{
-		const std::string event_pattern = std::string(json_object_get_string(event));
-		parse_filter(event, event_filter);
-		ret[event_pattern] = event_filter;
+		rc = one_subscribe_unsubscribe(request, subscribe, json_object_get_string(event), event);
 	}
 	else
 	{
+		rc = 0;
 		n = json_object_array_length(event);
 		for (i = 0 ; i < n ; i++)
 		{
 			x = json_object_array_get_idx(event, i);
-			const std::string event_pattern = std::string(json_object_get_string(x));
-			parse_filter(x, event_filter);
-			ret[event_pattern] = event_filter;
+			rc2 = one_subscribe_unsubscribe(request, subscribe, json_object_get_string(x), x);
+			if (rc >= 0)
+				rc = rc2 >= 0 ? rc + rc2 : rc2;
 		}
 	}
 
-	return ret;
+	if (rc >= 0)
+		afb_req_success(request, NULL, NULL);
+	else
+		afb_req_fail(request, "error", NULL);
 }
 
 void subscribe(struct afb_req request)
 {
-	bool subscribe = true;
-
-	 std::map<std::string, struct event_filter_t> args = parse_args_from_request(request);
-
-	if (process_args(request, args, subscribe) > 0)
-		afb_req_success(request, NULL, NULL);
-	else
-		afb_req_fail(request, "error", NULL);
+	do_subscribe_unsubscribe(request, true);
 }
 
 void unsubscribe(struct afb_req request)
 {
-	bool subscribe = false;
-
-	std::map<std::string, struct event_filter_t>  args = parse_args_from_request(request);
-
-	if (process_args(request, args, subscribe) > 0)
-		afb_req_success(request, NULL, NULL);
-	else
-		afb_req_fail(request, "error", NULL);
+	do_subscribe_unsubscribe(request, false);
 }
