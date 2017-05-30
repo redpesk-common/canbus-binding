@@ -16,6 +16,7 @@
  */
 
 #include <string>
+#include <cmath>
 #include "../utils/socketcan-bcm.hpp"
 
 struct event_filter_t
@@ -23,6 +24,7 @@ struct event_filter_t
 	float frequency;
 	float min;
 	float max;
+	event_filter_t() : frequency{NAN}, min{NAN}, max{NAN} {}
 };
 
 class low_can_subscription_t
@@ -44,7 +46,7 @@ private:
 							*	don't need an offset. */
 
 	/// Filtering part
-	struct event_filter_t event_filter_ = {-1.0, -1.0, -1.0};
+	struct event_filter_t event_filter_;
 
 	utils::socketcan_bcm_t socket_;
 public:

@@ -395,12 +395,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		// poll a PID for nothing.
 		if(sig->get_supported() && subscribe)
 		{
-			float frequency;
-
-			if(event_filter.frequency >= 0)
-				{ frequency = event_filter.frequency; }
-			else
-				{ frequency = sig->get_frequency(); }
+			float frequency = isnan(event_filter.frequency) ? sig->get_frequency() : event_filter.frequency;
 
 			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), frequency);
 			//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
