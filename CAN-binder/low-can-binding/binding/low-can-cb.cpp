@@ -139,6 +139,9 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<can_signal_t> sig)
 /// @return 0 if ok else -1
 int low_can_subscription_t::create_rx_filter()
 {
+	if (can_signal_ == nullptr)
+		{return -1;}
+
 	// Make sure that socket has been opened.
 	if(! socket_)
 	{
@@ -154,7 +157,7 @@ int low_can_subscription_t::create_rx_filter()
 	float val = (float)(1 << can_signal_->get_bit_size()) - 1;
 
 	struct timeval freq;
-	frequency_clock_t f(event_filter_.frequency);
+	frequency_clock_t f = event_filter_.frequency > 0.0f ? frequency_clock_t(event_filter_.frequency) : can_signal_->get_frequency();
 	freq = f.get_timeval_from_period();
 
 	bcm_msg.msg_head.opcode  = RX_SETUP;
