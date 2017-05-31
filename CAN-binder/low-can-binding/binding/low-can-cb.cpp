@@ -483,7 +483,7 @@ static int one_subscribe_unsubscribe(struct afb_req request, bool subscribe, con
 
 static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
 {
-	int rc, rc2;
+	int i, n, rc, rc2;
 	struct json_object *args, *event, *x;
 
 	args = afb_req_json(request);
