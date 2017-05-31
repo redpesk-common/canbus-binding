@@ -87,9 +87,10 @@ const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* re
 	return message;
 }
 ///
-/// @brief Build a specific VehicleMessage containing a SimpleMessage.
+/// @brief Build a specific VehicleMessage containing a SimpleMessage with associated timestamp
 ///
 /// @param[in] message - simple message to include into openxc_VehicleMessage
+/// @param[in] timestamp - timestamp from ioctl when reading the socket
 ///
 /// @return a vehicle message including simple message that will be convert into 
 /// a JSON object before being pushed to the subscribers
@@ -178,6 +179,28 @@ const openxc_SimpleMessage build_SimpleMessage(const std::string& name, const op
 	s.value = value;
 
 	return s;
+}
+
+///
+/// @brief Build an openxc_DynamicField with a string value
+///
+/// @param[in] value - const string reference value to assign to builded
+///  openxc_DynamicField.
+///
+/// @return openxc_DynamicField initialized with a string value.
+///
+const openxc_DynamicField build_DynamicField(const char* value)
+{
+	openxc_DynamicField d;
+	d.has_type = true;
+	d.type = openxc_DynamicField_Type_STRING;
+
+	d.has_string_value = true;
+	d.has_numeric_value = false;
+	d.has_boolean_value = false;
+	::strncpy(d.string_value, value, 100);
+
+	return d;
 }
 
 ///

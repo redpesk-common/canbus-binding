@@ -32,6 +32,7 @@ openxc_VehicleMessage build_VehicleMessage();
 bool is_valid(const openxc_VehicleMessage& v);
 
 const openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_DynamicField& value);
+const openxc_DynamicField build_DynamicField(const char* value);
 const openxc_DynamicField build_DynamicField(const std::string& value);
 const openxc_DynamicField build_DynamicField(double value);
 const openxc_DynamicField build_DynamicField(bool value);
