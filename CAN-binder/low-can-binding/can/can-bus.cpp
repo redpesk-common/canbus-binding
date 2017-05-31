@@ -72,9 +72,9 @@ int can_bus_t::process_can_signals(const can_message_t& can_message)
 	for(const auto& sig : signals.can_signals)
 	{
 		std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-		std::map<std::string, struct afb_event>& s = sm.get_subscribed_signals();
+		std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> >& s = sm.get_subscribed_signals();
 
-		if( s.find(sig->get_name()) != s.end() && afb_event_is_valid(s[sig->get_name()]))
+		if( s.find(can_message.get_sub_id()) != s.end() && afb_event_is_valid(s[can_message.get_sub_id()].second))
 		{
 			bool send = true;
 			decoded_message = decoder_t::translateSignal(*sig, can_message, conf.get_all_can_signals(), &send);
@@ -82,10 +82,10 @@ int can_bus_t::process_can_signals(const can_message_t& can_message)
 			if(send)
 			{
 				openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
-				vehicle_message = build_VehicleMessage(s_message);
+				vehicle_message = build_VehicleMessage(s_message, can_message.get_timestamp());
 
 				std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
-				push_new_vehicle_message(vehicle_message);
+				push_new_vehicle_message(std::make_pair(can_message.get_sub_id(), vehicle_message));
 			}
 			processed_signals++;
 		}
@@ -110,14 +110,14 @@ int can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const c
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-	std::map<std::string, struct afb_event>& s = sm.get_subscribed_signals();
+	std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> >& s = sm.get_subscribed_signals();
 
 	openxc_VehicleMessage vehicle_message = manager.find_and_decode_adr(can_message);
 	if( (vehicle_message.has_simple_message && vehicle_message.simple_message.has_name) &&
-		(s.find(vehicle_message.simple_message.name) != s.end() && afb_event_is_valid(s[vehicle_message.simple_message.name])))
+		(s.find(can_message.get_sub_id()) != s.end() && afb_event_is_valid(s[can_message.get_sub_id()].second)))
 	{
 		std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
-		push_new_vehicle_message(vehicle_message);
+		push_new_vehicle_message(std::make_pair(can_message.get_sub_id(), vehicle_message));
 		processed_signals++;
 	}
 
@@ -138,8 +138,6 @@ int can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const c
 ///  TODO: make diagnostic messages parsing optionnal.
 void can_bus_t::can_decode_message()
 {
-	can_message_t can_message;
-
 	while(is_decoding_)
 	{
 		{
@@ -147,10 +145,10 @@ void can_bus_t::can_decode_message()
 			new_can_message_cv_.wait(can_message_lock);
 			while(!can_message_q_.empty())
 			{
-				can_message = next_can_message();
+				const can_message_t can_message = next_can_message();
 
-				if(configuration_t::instance().get_diagnostic_manager().is_diagnostic_response(can_message))
-					process_diagnostic_signals(configuration_t::instance().get_diagnostic_manager(), can_message);
+				if(application_t::instance().get_diagnostic_manager().is_diagnostic_response(can_message))
+					process_diagnostic_signals(application_t::instance().get_diagnostic_manager(), can_message);
 				else
 					process_can_signals(can_message);
 			}
@@ -163,7 +161,7 @@ void can_bus_t::can_decode_message()
 /// which are events that has to be pushed.
 void can_bus_t::can_event_push()
 {
-	openxc_VehicleMessage v_message;
+	std::pair<int, openxc_VehicleMessage> v_message;
 	openxc_SimpleMessage s_message;
 	json_object* jo;
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
@@ -176,15 +174,15 @@ void can_bus_t::can_event_push()
 		{
 			v_message = next_vehicle_message();
 
-			s_message = get_simple_message(v_message);
+			s_message = get_simple_message(v_message.second);
 			{
 				std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-				std::map<std::string, struct afb_event>& s = sm.get_subscribed_signals();
-				if(s.find(std::string(s_message.name)) != s.end() && afb_event_is_valid(s[std::string(s_message.name)]))
+				std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> >& s = sm.get_subscribed_signals();
+				if(s.find(v_message.first) != s.end() && afb_event_is_valid(s[v_message.first].second))
 				{
 					jo = json_object_new_object();
 					jsonify_simple(s_message, jo);
-					if(afb_event_push(s[std::string(s_message.name)], jo) == 0)
+					if(afb_event_push(s[v_message.first].second, jo) == 0)
 						on_no_clients(std::string(s_message.name));
 				}
 			}
@@ -235,7 +233,7 @@ std::mutex& can_bus_t::get_can_message_mutex()
 /// @brief Return first can_message_t on the queue
 ///
 /// @return a can_message_t
-can_message_t can_bus_t::next_can_message()
+const can_message_t can_bus_t::next_can_message()
 {
 	can_message_t can_msg;
 
@@ -262,9 +260,9 @@ void can_bus_t::push_new_can_message(const can_message_t& can_msg)
 /// @brief Return first openxc_VehicleMessage on the queue
 ///
 /// @return a openxc_VehicleMessage containing a decoded can message
-openxc_VehicleMessage can_bus_t::next_vehicle_message()
+std::pair<int, openxc_VehicleMessage> can_bus_t::next_vehicle_message()
 {
-	openxc_VehicleMessage v_msg;
+	std::pair<int, openxc_VehicleMessage> v_msg;
 
 	if(! vehicle_message_q_.empty())
 	{
@@ -280,7 +278,7 @@ openxc_VehicleMessage can_bus_t::next_vehicle_message()
 /// @brief Push a openxc_VehicleMessage into the queue
 ///
 /// @param[in] v_msg - const reference openxc_VehicleMessage object to push into the queue
-void can_bus_t::push_new_vehicle_message(const openxc_VehicleMessage& v_msg)
+void can_bus_t::push_new_vehicle_message(const std::pair<int, openxc_VehicleMessage>& v_msg)
 {
 	vehicle_message_q_.push(v_msg);
 }

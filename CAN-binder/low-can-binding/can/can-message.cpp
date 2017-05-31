@@ -27,7 +27,14 @@
 /// Constructor about can_message_t class.
 ///
 can_message_t::can_message_t()
-	: maxdlen_{0}, id_{0}, length_{0}, format_{can_message_format_t::INVALID}, rtr_flag_{false}, flags_{0}, timestamp_{0}
+	: maxdlen_{0},
+	 id_{0},
+	 length_{0},
+	 format_{can_message_format_t::INVALID},
+	 rtr_flag_{false},
+	 flags_{0},
+	 timestamp_{0},
+	 sub_id_{-1}
 {}
 
 can_message_t::can_message_t(uint8_t maxdlen,
@@ -45,7 +52,8 @@ can_message_t::can_message_t(uint8_t maxdlen,
 	rtr_flag_{rtr_flag},
 	flags_{flags},
 	data_{data},
-	timestamp_{timestamp}
+	timestamp_{timestamp},
+	sub_id_{-1}
 {}
 
 ///
@@ -56,6 +64,11 @@ can_message_t::can_message_t(uint8_t maxdlen,
 uint32_t can_message_t::get_id() const
 {
 	return id_;
+}
+
+int can_message_t::get_sub_id() const
+{
+	return sub_id_;
 }
 
 ///
@@ -119,6 +132,11 @@ const std::vector<uint8_t> can_message_t::get_data_vector() const
 uint8_t can_message_t::get_length() const
 {
 	return length_;
+}
+
+void can_message_t::set_sub_id(int sub_id)
+{
+	sub_id_ = sub_id;
 }
 
 uint64_t can_message_t::get_timestamp() const

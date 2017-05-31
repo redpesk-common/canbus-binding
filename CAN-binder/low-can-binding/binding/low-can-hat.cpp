@@ -17,6 +17,7 @@
  */
 
 #include "low-can-hat.hpp"
+#include "low-can-cb.hpp"
 
 #include <map>
 #include <queue>

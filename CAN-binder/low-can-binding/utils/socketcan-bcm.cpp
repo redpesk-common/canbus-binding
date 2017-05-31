@@ -90,6 +90,7 @@ namespace utils
 		cm = ::can_message_t::convert_from_frame(msg.frames ,
 				nbytes-sizeof(struct bcm_msg_head),
 				timestamp);
+		cm.set_sub_id((int)s.socket());
 
 		return s;
 	}

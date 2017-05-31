@@ -52,12 +52,14 @@ private:
 	uint8_t flags_; /*!< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
 	std::vector<uint8_t> data_; /*!< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 	uint64_t timestamp_; /*!< timestamp_ - timestamp of the received message*/
+	int sub_id_; /*!< sub_id_ - Subscription index. */
 
 public:
 	can_message_t();
 	can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, can_message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
 
 	uint32_t get_id() const;
+	int get_sub_id() const;
 	bool get_rtr_flag_() const;
 	can_message_format_t get_format() const;
 	uint8_t get_flags() const;
@@ -66,6 +68,7 @@ public:
 	uint8_t get_length() const;
 	uint64_t get_timestamp() const;
 
+	void set_sub_id(int sub_id);
 	void set_timestamp(uint64_t timestamp);
 	void set_format(const can_message_format_t new_format);
 

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <utility>
 #include <mutex>
 #include <queue>
 #include <thread>
@@ -67,7 +68,7 @@ private:
 
 	std::condition_variable new_decoded_can_message_; ///< condition_variable use to wait until there is a new vehicle message to read from the queue vehicle_message_q_
 	std::mutex decoded_can_message_mutex_;  ///< mutex protecting the vehicle_message_q_ queue.
-	std::queue <openxc_VehicleMessage> vehicle_message_q_; ///< queue that'll store openxc_VehicleMessage to pushed
+	std::queue <std::pair<int, openxc_VehicleMessage> > vehicle_message_q_; ///< queue that'll store openxc_VehicleMessage to pushed
 
 	std::vector<std::pair<std::string, std::string> > can_devices_;
 public:
@@ -81,11 +82,11 @@ public:
 	void start_threads();
 	void stop_threads();
 
-	can_message_t next_can_message();
+	const can_message_t next_can_message();
 	void push_new_can_message(const can_message_t& can_msg);
 	std::mutex& get_can_message_mutex();
 	std::condition_variable& get_new_can_message_cv();
 
-	openxc_VehicleMessage next_vehicle_message();
-	void push_new_vehicle_message(const openxc_VehicleMessage& v_msg);
+	std::pair<int, openxc_VehicleMessage> next_vehicle_message();
+	void push_new_vehicle_message(const std::pair<int, openxc_VehicleMessage>& v_msg);
 };

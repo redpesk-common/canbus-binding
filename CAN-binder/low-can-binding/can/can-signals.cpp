@@ -83,12 +83,6 @@ can_signal_t::can_signal_t(
 	, received_{b.received_}
 	, last_value_{b.last_value_}
 {}*/
-
-utils::socketcan_bcm_t can_signal_t::get_socket() const
-{
-	return socket_;
-}
-
 can_message_definition_t* can_signal_t::get_message() const
 {
 	return parent_;
@@ -220,43 +214,3 @@ void can_signal_t::set_timestamp(uint64_t timestamp)
 	frequency_.tick(timestamp);
 }
 
-/// @brief Create a RX_SETUP receive job used by the BCM socket.
-///
-/// @return 0 if ok else -1
-int can_signal_t::create_rx_filter()
-{
-	// Make sure that socket has been opened.
-	if(! socket_)
-		socket_.open(
-			get_message()->get_bus_device_name());
-
-	uint32_t can_id  = get_message()->get_id();
-
-	struct utils::simple_bcm_msg bcm_msg;
-	struct can_frame cfd;
-
-	memset(&cfd, 0, sizeof(cfd));
-	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
-	float val = (float)(1 << bit_size_)-1;
-	struct timeval freq = frequency_.get_timeval_from_period();
-
-	bcm_msg.msg_head.opcode  = RX_SETUP;
-	bcm_msg.msg_head.can_id  = can_id;
-	bcm_msg.msg_head.flags = SETTIMER|RX_NO_AUTOTIMER;
-	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec ;
-	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
-	bcm_msg.msg_head.nframes = 1;
-	bitfield_encode_float(val,
-										bit_position_,
-										bit_size_,
-										factor_,
-										offset_,
-										cfd.data,
-										CAN_MAX_DLEN);
-
-	bcm_msg.frames = cfd;
-
-	if(socket_ << bcm_msg)
-		return 0;
-	return -1;
-}

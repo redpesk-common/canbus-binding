@@ -31,13 +31,7 @@ extern "C" struct afb_binding_interface;
 
 extern const struct afb_binding_interface *binder_interface;
 
-struct event_filter_t {
-	double frequency;
-	double min;
-	double max;
-};
-
-void on_no_clients(std::string message);
+void on_no_clients(const std::string& message);
 int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata);
 
 void subscribe(struct afb_req request);
