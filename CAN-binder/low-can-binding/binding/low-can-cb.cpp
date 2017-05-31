@@ -383,7 +383,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	return rets;
 }
 
-static int one_subscribe_unsubscribe(struct afb_req request, bool subscribe, const std::string& tag, struct json_object *event)
+static int one_subscribe_unsubscribe(struct afb_req request, bool subscribe, const std::string& tag, json_object* args)
 {
 	int ret = 0;
 	struct event_filter_t event_filter;
@@ -391,7 +391,7 @@ static int one_subscribe_unsubscribe(struct afb_req request, bool subscribe, con
 	struct utils::signals_found sf;
 
 	// computes the filter
-	if (json_object_object_get_ex(event, "filter", &filter))
+	if (json_object_object_get_ex(args, "filter", &filter))
 	{
 		if (json_object_object_get_ex(filter, "frequency", &obj)
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
@@ -432,11 +432,11 @@ static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
 	args = afb_req_json(request);
 	if (args == NULL || !json_object_object_get_ex(args, "event", &event))
 	{
-		rc = one_subscribe_unsubscribe(request, subscribe, "*", NULL);
+		rc = one_subscribe_unsubscribe(request, subscribe, "*", args);
 	}
 	else if (json_object_get_type(event) != json_type_array)
 	{
-		rc = one_subscribe_unsubscribe(request, subscribe, json_object_get_string(event), event);
+		rc = one_subscribe_unsubscribe(request, subscribe, json_object_get_string(event), args);
 	}
 	else
 	{
@@ -445,7 +445,7 @@ static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
 		for (i = 0 ; i < n ; i++)
 		{
 			x = json_object_array_get_idx(event, i);
-			rc2 = one_subscribe_unsubscribe(request, subscribe, json_object_get_string(x), x);
+			rc2 = one_subscribe_unsubscribe(request, subscribe, json_object_get_string(x), args);
 			if (rc >= 0)
 				rc = rc2 >= 0 ? rc + rc2 : rc2;
 		}
