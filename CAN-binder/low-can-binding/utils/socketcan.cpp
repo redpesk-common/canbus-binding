@@ -31,17 +31,10 @@ namespace utils
 		: socket_{INVALID_SOCKET}
 	{}
 
-	/// @brief Construct a socket by copying an existing one.
-	socketcan_t::socketcan_t(const socketcan_t& s)
-		: socket_{s.socket_}
-	{}
-
 	/// @brief Construct a socket by moving an existing one.
 	socketcan_t::socketcan_t(socketcan_t&& s)
 		: socket_{s.socket_}
-	{
-		s.socket_ = INVALID_SOCKET;
-	}
+	{}
 
 	socketcan_t& socketcan_t::operator=(const socketcan_t& s)
 	{
