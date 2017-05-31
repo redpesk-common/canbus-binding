@@ -64,25 +64,6 @@ can_signal_t::can_signal_t(
 	, last_value_{.0f}
 {}
 
-/*can_signal_t::can_signal_t(const can_signal_t& b)
-	: parent_{b.parent_},
-	 generic_name_{ b.generic_name_}
-	, bit_position_{ b.bit_position_}
-	, bit_size_{ b.bit_size_}
-	, factor_{ b.factor_ }
-	, offset_{ b.offset_}
-	, min_value_{b.min_value_}
-	, max_value_{b.max_value_}
-	, frequency_{b.frequency_}
-	, send_same_{b.send_same_}
-	, force_send_changed_{b.force_send_changed_}
-	, states_{b.states_}
-	, writable_{b.writable_}
-	, decoder_{b.decoder_}
-	, encoder_{b.encoder_}
-	, received_{b.received_}
-	, last_value_{b.last_value_}
-{}*/
 can_message_definition_t* can_signal_t::get_message() const
 {
 	return parent_;
