@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "../can/can-signals.hpp"
+#include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/socketcan-bcm.hpp"
 
 struct event_filter_t
@@ -37,6 +38,7 @@ private:
 
 	/// Signal part
 	std::shared_ptr<can_signal_t> can_signal_;
+	std::shared_ptr<diagnostic_message_t> diagnostic_message_;
 
 	/// Filtering part
 	struct event_filter_t event_filter_;
@@ -45,6 +47,7 @@ private:
 public:
 	low_can_subscription_t();
 	low_can_subscription_t(struct event_filter_t event_filter);
+	low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<diagnostic_message_t> sig_name);
 	low_can_subscription_t(const low_can_subscription_t& s) = delete;
 	low_can_subscription_t(low_can_subscription_t&& s);
 

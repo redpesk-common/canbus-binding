@@ -19,6 +19,7 @@
 #include "low-can-hat.hpp"
 
 #include <map>
+#include <memory>
 #include <queue>
 #include <mutex>
 #include <vector>
@@ -56,6 +57,10 @@ low_can_subscription_t::low_can_subscription_t()
 
 low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filter)
 	: event_filter_{event_filter}
+{}
+
+low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<diagnostic_message_t> diagnostic_message)
+	: event_filter_{event_filter}, diagnostic_message_{diagnostic_message}
 {}
 
 low_can_subscription_t::low_can_subscription_t( low_can_subscription_t&& s)
@@ -339,6 +344,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	for(const auto& sig : signals.diagnostic_messages)
 	{
 		int ret = 0;
+		active_diagnostic_request_t* adr;
 		diagnostic_manager_t& diag_m = conf.get_diagnostic_manager();
 		DiagnosticRequest* diag_req = conf.get_request_from_diagnostic_message(sig->get_name());
 
@@ -349,7 +355,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		{
 			float frequency = std::isnan(event_filter.frequency) ? sig->get_frequency() : event_filter.frequency;
 
-			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), frequency);
+			adr = diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), frequency);
 			//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
 		}
 		else
@@ -362,7 +368,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			return -1;
 		}
 
-		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter));
+		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter, std::make_shared(adr)));
 		ret = subscribe_unsubscribe_signal(request, subscribe, can_subscription);
 		if(ret < 0)
 			return ret;
