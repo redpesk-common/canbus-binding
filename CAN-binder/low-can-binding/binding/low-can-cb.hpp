@@ -17,6 +17,9 @@
 
 #include <string>
 #include <cmath>
+#include <utility>
+
+#include "../can/can-signals.hpp"
 #include "../utils/socketcan-bcm.hpp"
 
 struct event_filter_t
@@ -33,17 +36,7 @@ private:
 	int index_;
 
 	/// Signal part
-	std::string sig_name_;
-	std::string bus_name_;
-	uint32_t can_id_;
-	uint8_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
-									*	non-inverted bit numbering, i.e. the most significant bit of
-									*	each byte is 0) */
-	uint8_t bit_size_; /*!< bit_size_ - The width of the bit field in the CAN message. */
-	float factor_; /*!< factor_ - The final value will be multiplied by this factor. Use 1 if you
-							*	don't need a factor. */
-	float offset_; /*!< offset_ - The final value will be added to this offset. Use 0 if you
-							*	don't need an offset. */
+	std::shared_ptr<can_signal_t> can_signal_;
 
 	/// Filtering part
 	struct event_filter_t event_filter_;
@@ -59,6 +52,7 @@ public:
 	explicit operator bool() const;
 
 	int get_index() const;
+	const std::shared_ptr<can_signal_t> get_can_signal() const;
 	const std::string get_sig_name() const;
 	float get_frequency() const;
 	float get_min() const;
@@ -70,5 +64,5 @@ public:
 	void set_max(float max);
 
 	int create_rx_filter();
-	int create_rx_filter(const std::string& bus_name, const std::string& sig_name, uint32_t can_id, uint8_t bit_position, uint8_t bit_size, float factor, float offset);
+	int create_rx_filter(std::shared_ptr<can_signal_t> sig);
 };

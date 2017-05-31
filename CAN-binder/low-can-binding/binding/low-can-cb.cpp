@@ -50,13 +50,7 @@ extern "C"
 
 low_can_subscription_t::low_can_subscription_t()
 	: index_{-1},
-	sig_name_{},
-	bus_name_{""},
-	can_id_{0},
-	bit_position_{0},
-	bit_size_{0},
-	factor_{-1.0},
-	offset_{-1},
+	event_filter_{event_filter_t()},
 	socket_{}
 {}
 
@@ -66,13 +60,6 @@ low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filte
 
 low_can_subscription_t::low_can_subscription_t( low_can_subscription_t&& s)
 	: index_{s.index_},
-	sig_name_{s.sig_name_},
-	bus_name_{s.bus_name_},
-	can_id_{s.can_id_},
-	bit_position_{s.bit_position_},
-	bit_size_{s.bit_size_},
-	factor_{s.factor_},
-	offset_{s.offset_},
 	event_filter_{s.event_filter_},
 	socket_{std::move(s.socket_)}
 {}
@@ -93,9 +80,14 @@ int low_can_subscription_t::get_index() const
 	return index_;
 }
 
+const std::shared_ptr<can_signal_t> low_can_subscription_t::get_can_signal() const
+{
+	return can_signal_;
+}
+
 const std::string low_can_subscription_t::get_sig_name() const
 {
-	return sig_name_;
+	return can_signal_->get_name();
 }
 
 float low_can_subscription_t::get_frequency() const
@@ -136,53 +128,10 @@ void low_can_subscription_t::set_max(float max)
 /// @brief Create a RX_SETUP receive job used by the BCM socket.
 ///
 /// @return 0 if ok else -1
-int low_can_subscription_t::create_rx_filter(const std::string& bus_name, const std::string& sig_name, uint32_t can_id, uint8_t bit_position, uint8_t bit_size, float factor, float offset)
+int low_can_subscription_t::create_rx_filter(std::shared_ptr<can_signal_t> sig)
 {
-	// Make sure that socket has been opened.
-	if(! socket_)
-	{
-		socket_.open(bus_name);
-		index_ = (int)socket_.socket();
-	}
-
-	sig_name_ = sig_name;
-	bus_name_ = bus_name;
-	can_id_ = can_id;
-	bit_position_ = bit_position;
-	bit_size_ = bit_size;
-	factor_ = factor;
-	offset_ = offset;
-
-	struct utils::simple_bcm_msg bcm_msg;
-	struct can_frame cfd;
-
-	memset(&cfd, 0, sizeof(cfd));
-	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
-	float val = (float)(1 << bit_size_) - 1;
-
-	struct timeval freq;
-	frequency_clock_t f(event_filter_.frequency);
-	freq = f.get_timeval_from_period();
-
-	bcm_msg.msg_head.opcode  = RX_SETUP;
-	bcm_msg.msg_head.can_id  = can_id_;
-	bcm_msg.msg_head.flags = SETTIMER|RX_NO_AUTOTIMER;
-	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec ;
-	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
-	bcm_msg.msg_head.nframes = 1;
-	bitfield_encode_float(val,
-										bit_position_,
-										bit_size_,
-										factor_,
-										offset_,
-										cfd.data,
-										CAN_MAX_DLEN);
-
-	bcm_msg.frames = cfd;
-
-	if(socket_ << bcm_msg)
-		return 0;
-	return -1;
+	can_signal_= sig;
+	return create_rx_filter();
 }
 
 /// @brief Create a RX_SETUP receive job used by the BCM socket.
@@ -193,7 +142,7 @@ int low_can_subscription_t::create_rx_filter()
 	// Make sure that socket has been opened.
 	if(! socket_)
 	{
-		socket_.open(bus_name_);
+		socket_.open(can_signal_->get_message()->get_bus_device_name());
 		index_ = (int)socket_.socket();
 	}
 
@@ -202,25 +151,25 @@ int low_can_subscription_t::create_rx_filter()
 
 	memset(&cfd, 0, sizeof(cfd));
 	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
-	float val = (float)(1 << bit_size_) - 1;
+	float val = (float)(1 << can_signal_->get_bit_size()) - 1;
 
 	struct timeval freq;
 	frequency_clock_t f(event_filter_.frequency);
 	freq = f.get_timeval_from_period();
 
 	bcm_msg.msg_head.opcode  = RX_SETUP;
-	bcm_msg.msg_head.can_id  = can_id_;
+	bcm_msg.msg_head.can_id  = can_signal_->get_message()->get_id();
 	bcm_msg.msg_head.flags = SETTIMER|RX_NO_AUTOTIMER;
 	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec ;
 	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
 	bcm_msg.msg_head.nframes = 1;
 	bitfield_encode_float(val,
-										bit_position_,
-										bit_size_,
-										factor_,
-										offset_,
-										cfd.data,
-										CAN_MAX_DLEN);
+							can_signal_->get_bit_position(),
+							can_signal_->get_bit_size(),
+							can_signal_->get_factor(),
+							can_signal_->get_offset(),
+							cfd.data,
+							CAN_MAX_DLEN);
 
 	bcm_msg.frames = cfd;
 
@@ -421,26 +370,20 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 	for(const auto& sig: signals.can_signals)
 	{
 		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter));
-		if(can_subscription->create_rx_filter(sig->get_message()->get_bus_device_name(),
-		sig->get_name(),
-		sig->get_message()->get_id(),
-		sig->get_bit_position(),
-		sig->get_bit_size(),
-		sig->get_factor(),
-		sig->get_offset()) < 0)
+		if(can_subscription->create_rx_filter(sig) < 0)
 			{return -1;}
 		else if(subscribe_unsubscribe_signal(request, subscribe, can_subscription) < 0)
 			{return -1;}
 
 		struct sd_event_source* e_source;
-		sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), &e_source, can_subscription->get_socket().socket(), EPOLLIN, read_message, sig.get());
+		sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), &e_source, can_subscription->get_socket().socket(), EPOLLIN, read_message, can_subscription.get());
 		rets++;
 		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}
 	return rets;
 }
 
-static int one_subscribe_unsubscribe(struct afb_req request, bool subscribe, const char *tag, struct json_object *event)
+static int one_subscribe_unsubscribe(struct afb_req request, bool subscribe, const std::string& tag, struct json_object *event)
 {
 	int ret = 0;
 	struct event_filter_t event_filter;
