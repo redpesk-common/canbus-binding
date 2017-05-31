@@ -88,5 +88,5 @@ public:
 	std::condition_variable& get_new_can_message_cv();
 
 	std::pair<int, openxc_VehicleMessage> next_vehicle_message();
-	void push_new_vehicle_message(const std::pair<int, openxc_VehicleMessage>& v_msg);
+	void push_new_vehicle_message(int subscription_id, const openxc_VehicleMessage& v_msg);
 };

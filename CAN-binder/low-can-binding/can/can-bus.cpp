@@ -82,8 +82,8 @@ int can_bus_t::process_can_signals(const can_message_t& can_message)
 			openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_sig_name(), decoded_message);
 			vehicle_message = build_VehicleMessage(s_message, can_message.get_timestamp());
 
-				push_new_vehicle_message(std::make_pair(can_message.get_sub_id(), vehicle_message));
 			std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
+			push_new_vehicle_message(subscription_id, vehicle_message);
 		}
 		processed_signals++;
 	}
@@ -116,7 +116,7 @@ int can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const c
 		(s.find(can_message.get_sub_id()) != s.end() && afb_event_is_valid(s[can_message.get_sub_id()].second)))
 	{
 		std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
-		push_new_vehicle_message(std::make_pair(can_message.get_sub_id(), vehicle_message));
+		push_new_vehicle_message(can_message.get_sub_id(), vehicle_message);
 		processed_signals++;
 	}
 	}
@@ -277,9 +277,9 @@ std::pair<int, openxc_VehicleMessage> can_bus_t::next_vehicle_message()
 /// @brief Push a openxc_VehicleMessage into the queue
 ///
 /// @param[in] v_msg - const reference openxc_VehicleMessage object to push into the queue
-void can_bus_t::push_new_vehicle_message(const std::pair<int, openxc_VehicleMessage>& v_msg)
+void can_bus_t::push_new_vehicle_message(int subscription_id, const openxc_VehicleMessage& v_msg)
 {
-	vehicle_message_q_.push(v_msg);
+	vehicle_message_q_.push(std::make_pair(subscription_id, v_msg));
 }
 
 /// @brief Return the shared pointer on the can_bus_dev_t initialized 
