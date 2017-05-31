@@ -25,17 +25,18 @@
 #include "openxc.pb.h"
 #include "../diagnostic/active-diagnostic-request.hpp"
 
-openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value);
-openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message);
+const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value);
+const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message, uint64_t timestamp);
+const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message);
 openxc_VehicleMessage build_VehicleMessage();
 bool is_valid(const openxc_VehicleMessage& v);
 
-openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_DynamicField& value);
-openxc_DynamicField build_DynamicField(const std::string& value);
-openxc_DynamicField build_DynamicField(double value);
-openxc_DynamicField build_DynamicField(bool value);
+const openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_DynamicField& value);
+const openxc_DynamicField build_DynamicField(const std::string& value);
+const openxc_DynamicField build_DynamicField(double value);
+const openxc_DynamicField build_DynamicField(bool value);
 
-openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg);
+const openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg);
 
 void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value);
 

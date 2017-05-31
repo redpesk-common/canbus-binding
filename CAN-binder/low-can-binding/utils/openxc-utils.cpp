@@ -31,7 +31,7 @@
 /// @return a vehicle message including simple message that will be convert into 
 /// a JSON object before being pushed to the subscribers
 ///
-openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value)
+const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value)
 {
 	openxc_VehicleMessage message;
 	application_t& conf = application_t::instance();
@@ -86,6 +86,27 @@ openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request,
 
 	return message;
 }
+///
+/// @brief Build a specific VehicleMessage containing a SimpleMessage.
+///
+/// @param[in] message - simple message to include into openxc_VehicleMessage
+///
+/// @return a vehicle message including simple message that will be convert into 
+/// a JSON object before being pushed to the subscribers
+///
+const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message, uint64_t timestamp)
+{
+	openxc_VehicleMessage v;
+	
+	v.has_type = true,
+	v.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE;
+	v.has_simple_message = true;
+	v.simple_message =  message;
+	v.has_timestamp = true;
+	v.timestamp = timestamp;
+
+	return v;
+}
 
 ///
 /// @brief Build a specific VehicleMessage containing a SimpleMessage.
@@ -95,7 +116,7 @@ openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request,
 /// @return a vehicle message including simple message that will be convert into 
 /// a JSON object before being pushed to the subscribers
 ///
-openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message)
+const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message)
 {
 	openxc_VehicleMessage v;
 	
@@ -104,7 +125,7 @@ openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message)
 	v.has_simple_message = true;
 	v.simple_message =  message;
 	v.has_timestamp = true;
-	v.timestamp = system_time_ms();
+	v.timestamp = system_time_us();
 
 	return v;
 }
@@ -147,7 +168,7 @@ bool is_valid(const openxc_VehicleMessage& v)
 ///
 /// @return an openxc_SimpleMessage struct initialized with name and value provided.
 ///
-openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_DynamicField& value)
+const openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_DynamicField& value)
 {
 	openxc_SimpleMessage s;
 
@@ -167,7 +188,7 @@ openxc_SimpleMessage build_SimpleMessage(const std::string& name, const openxc_D
 ///
 /// @return openxc_DynamicField initialized with a string value.
 ///
-openxc_DynamicField build_DynamicField(const std::string& value)
+const openxc_DynamicField build_DynamicField(const std::string& value)
 {
 	openxc_DynamicField d;
 	d.has_type = true;
@@ -190,7 +211,7 @@ openxc_DynamicField build_DynamicField(const std::string& value)
 ///
 /// @return openxc_DynamicField initialized with a double value.
 ///
-openxc_DynamicField build_DynamicField(double value)
+const openxc_DynamicField build_DynamicField(double value)
 {
 	openxc_DynamicField d;
 	d.has_type = true;
@@ -211,7 +232,7 @@ openxc_DynamicField build_DynamicField(double value)
 ///
 /// @return openxc_DynamicField initialized with a boolean value.
 ///
-openxc_DynamicField build_DynamicField(bool value)
+const openxc_DynamicField build_DynamicField(bool value)
 {
 	openxc_DynamicField d;
 	d.has_type = true;
@@ -235,7 +256,7 @@ openxc_DynamicField build_DynamicField(bool value)
 ///
 /// @return A simpleMessage from the provided VehicleMessage.
 ///
-openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg)
+const openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg)
 {
 	if (v_msg.has_simple_message)
 		return v_msg.simple_message;
