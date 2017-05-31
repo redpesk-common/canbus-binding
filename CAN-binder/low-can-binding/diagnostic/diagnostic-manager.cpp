@@ -82,7 +82,7 @@ void diagnostic_manager_t::reset()
 ///  listens on CAN ID range 7E8 - 7EF affected to the OBD2 communications.
 ///
 /// @return -1 or negative value on error, 0 if ok.
-int diagnostic_manager_t::add_rx_filter(uint32_t can_id)
+int diagnostic_manager_t::create_rx_filter(uint32_t can_id)
 {
 	// Make sure that socket has been opened.
 	if(! socket_)
@@ -457,7 +457,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 			recurring_requests_.push_back(entry);
 
 			entry->set_handle(shims_, request);
-			if(add_rx_filter(OBD2_FUNCTIONAL_BROADCAST_ID) < 0)
+			if(create_rx_filter(OBD2_FUNCTIONAL_BROADCAST_ID) < 0)
 				{ recurring_requests_.pop_back(); }
 			else
 				{

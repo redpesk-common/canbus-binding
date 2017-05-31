@@ -56,7 +56,7 @@ private:
 
 	void init_diagnostic_shims();
 	void reset();
-	int add_rx_filter(uint32_t can_id);
+	int create_rx_filter(uint32_t can_id);
 
 	static bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
 	static void shims_logger(const char* m, ...);
