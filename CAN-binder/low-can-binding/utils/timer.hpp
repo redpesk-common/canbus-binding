@@ -53,5 +53,6 @@ public:
 	time_function_t get_time_function();
 	bool elapsed(bool stagger);
 
+	uint64_t get_last_tick() const;
 	void tick(uint64_t timestamp);
 };

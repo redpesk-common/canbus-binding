@@ -147,6 +147,7 @@ public:
 	SignalEncoder& get_encoder();
 	bool get_received() const;
 	float get_last_value() const;
+	std::pair<float, uint64_t> get_last_value_with_timestamp() const;
 
 	void set_parent(can_message_definition_t* parent);
 	void set_prefix(std::string val);

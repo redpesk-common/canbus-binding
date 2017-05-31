@@ -113,6 +113,11 @@ float frequency_clock_t::get_frequency() const
 	return frequency_;
 }
 
+uint64_t frequency_clock_t::get_last_tick() const
+{
+	return last_tick_;
+}
+
 /// @brief Force the clock to tick, regardless of it its time has actually
 /// elapsed.
 void frequency_clock_t::tick(uint64_t timestamp)

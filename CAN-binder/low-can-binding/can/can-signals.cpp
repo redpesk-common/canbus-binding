@@ -165,9 +165,15 @@ bool can_signal_t::get_received() const
 {
 	return received_;
 }
+
 float can_signal_t::get_last_value() const
 {
 	return last_value_;
+}
+
+std::pair<float, uint64_t> can_signal_t::get_last_value_with_timestamp() const
+{
+	return std::make_pair(last_value_, frequency_.get_last_tick());
 }
 
 void can_signal_t::set_parent(can_message_definition_t* parent)
