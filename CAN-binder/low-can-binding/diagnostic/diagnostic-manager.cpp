@@ -292,7 +292,6 @@ void diagnostic_manager_t::cleanup_active_requests(bool force)
 		if (entry != nullptr)
 			cleanup_request(entry, force);
 	 }
-
 }
 
 /// @brief Will return the active_diagnostic_request_t pointer for theDiagnosticRequest or nullptr if
