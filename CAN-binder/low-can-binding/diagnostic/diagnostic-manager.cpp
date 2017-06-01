@@ -82,16 +82,17 @@ void diagnostic_manager_t::reset()
 ///  listens on CAN ID range 7E8 - 7EF affected to the OBD2 communications.
 ///
 /// @return -1 or negative value on error, 0 if ok.
-int diagnostic_manager_t::create_rx_filter(uint32_t can_id)
+int diagnostic_manager_t::create_rx_filter(uint32_t can_id, float frequency)
 {
 	// Make sure that socket has been opened.
 	if(! socket_)
 		socket_.open(get_bus_device_name());
 
 	struct utils::simple_bcm_msg bcm_msg;
-	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
+	memset(&bcm_msg, 0, sizeof(bcm_msg));
 
-	const struct timeval freq =  recurring_requests_.back()->get_timeout_clock().get_timeval_from_period();
+	const struct timeval freq =  (frequency == recurring_requests_.back()->get_frequency_clock().get_frequency() ) ?
+		recurring_requests_.back()->get_frequency_clock().get_timeval_from_period() : frequency_clock_t(frequency).get_timeval_from_period();
 
 	bcm_msg.msg_head.opcode  = RX_SETUP;
 	bcm_msg.msg_head.flags = SETTIMER|RX_FILTER_ID;
@@ -456,8 +457,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 			recurring_requests_.push_back(entry);
 
 			entry->set_handle(shims_, request);
-			if(create_rx_filter(OBD2_FUNCTIONAL_BROADCAST_ID) < 0)
-				{ recurring_requests_.pop_back(); }
+			if(create_rx_filter(OBD2_FUNCTIONAL_BROADCAST_ID, frequencyHz) < 0)
 			else
 				{
 					start_diagnostic_request(&shims_, entry->get_handle()); 
