@@ -59,8 +59,8 @@ low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filte
 	: event_filter_{event_filter}
 {}
 
-low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<diagnostic_message_t> diagnostic_message)
-	: event_filter_{event_filter}, diagnostic_message_{diagnostic_message}
+low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<active_diagnostic_request_t> active_diagnostic_request)
+	: active_diagnostic_request_{active_diagnostic_request}, event_filter_{event_filter}
 {}
 
 low_can_subscription_t::low_can_subscription_t( low_can_subscription_t&& s)
@@ -90,9 +90,14 @@ const std::shared_ptr<can_signal_t> low_can_subscription_t::get_can_signal() con
 	return can_signal_;
 }
 
-const std::string low_can_subscription_t::get_sig_name() const
+const std::string low_can_subscription_t::get_name() const
 {
-	return can_signal_->get_name();
+	if (can_signal_ != nullptr)
+		return can_signal_->get_name();
+	if (active_diagnostic_request_ != nullptr)
+		return active_diagnostic_request_->get_name() ;
+
+	return "";
 }
 
 float low_can_subscription_t::get_frequency() const
@@ -241,7 +246,7 @@ int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata)
 		{
 			can_subscription->get_socket().close();
 			can_subscription->create_rx_filter();
-			NOTICE(binder_interface, "%s: Recreated RX_SETUP BCM job for can_subscription: %s", __FUNCTION__, can_subscription->get_sig_name().c_str());
+			NOTICE(binder_interface, "%s: Recreated RX_SETUP BCM job for can_subscription: %s", __FUNCTION__, can_subscription->get_name().c_str());
 		}
 		else
 		{
@@ -266,7 +271,7 @@ static int make_subscription_unsubscription(struct afb_req request, std::shared_
 	/* Make the subscription or unsubscription to the event */
 	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[can_subscription->get_index()].second)) < 0)
 	{
-		ERROR(binder_interface, "%s: Operation goes wrong for signal: %s", __FUNCTION__, can_subscription->get_sig_name().c_str());
+		ERROR(binder_interface, "%s: Operation goes wrong for signal: %s", __FUNCTION__, can_subscription->get_name().c_str());
 		return -1;
 	}
 	return 0;
@@ -275,11 +280,11 @@ static int make_subscription_unsubscription(struct afb_req request, std::shared_
 static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subscription, std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> >& s)
 {
 	int sub_index = can_subscription->get_index();
-	struct afb_event event = afb_daemon_make_event(binder_interface->daemon, can_subscription->get_sig_name().c_str());
+	struct afb_event event = afb_daemon_make_event(binder_interface->daemon, can_subscription->get_name().c_str());
 	s[sub_index] = std::make_pair(can_subscription, event);
 	if (!afb_event_is_valid(s[sub_index].second))
 	{
-		ERROR(binder_interface, "%s: Can't create an event for %s, something goes wrong.", __FUNCTION__, can_subscription->get_sig_name().c_str());
+		ERROR(binder_interface, "%s: Can't create an event for %s, something goes wrong.", __FUNCTION__, can_subscription->get_name().c_str());
 		return -1;
 	}
 	return 0;

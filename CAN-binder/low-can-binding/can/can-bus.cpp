@@ -83,14 +83,14 @@ void can_bus_t::process_can_signals(const can_message_t& can_message)
 		{
 			bool send = true;
 			decoded_message = decoder_t::translateSignal(*sig->get_can_signal(), can_message, conf.get_all_can_signals(), &send);
-			openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_sig_name(), decoded_message);
+			openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
 			vehicle_message = build_VehicleMessage(s_message, can_message.get_timestamp());
 
 			if(send && apply_filter(vehicle_message, sig))
 			{
 				std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 				push_new_vehicle_message(subscription_id, vehicle_message);
-				DEBUG(binder_interface, "%s: %s CAN signals processed.", __FUNCTION__,  sig->get_sig_name().c_str());
+				DEBUG(binder_interface, "%s: %s CAN signals processed.", __FUNCTION__,  sig->get_name().c_str());
 			}
 		}
 	}
@@ -122,7 +122,7 @@ void can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const 
 			{
 				std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 				push_new_vehicle_message(subscription_id, vehicle_message);
-				DEBUG(binder_interface, "%s: %s CAN signals processed.", __FUNCTION__,  s[subscription_id].first->get_diag_name().c_str());
+				DEBUG(binder_interface, "%s: %s CAN signals processed.", __FUNCTION__,  s[subscription_id].first->get_name().c_str());
 			}
 		}
 	}

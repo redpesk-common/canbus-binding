@@ -40,7 +40,7 @@ private:
 
 	/// Signal part
 	std::shared_ptr<can_signal_t> can_signal_;
-	std::shared_ptr<diagnostic_message_t> diagnostic_message_;
+	std::shared_ptr<active_diagnostic_request_t> active_diagnostic_request_;
 
 	/// Filtering part
 	struct event_filter_t event_filter_;
@@ -49,7 +49,7 @@ private:
 public:
 	low_can_subscription_t();
 	low_can_subscription_t(struct event_filter_t event_filter);
-	low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<diagnostic_message_t> sig_name);
+	low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<active_diagnostic_request_t> active_diagnostic_request);
 	low_can_subscription_t(const low_can_subscription_t& s) = delete;
 	low_can_subscription_t(low_can_subscription_t&& s);
 
@@ -58,7 +58,7 @@ public:
 
 	int get_index() const;
 	const std::shared_ptr<can_signal_t> get_can_signal() const;
-	const std::string get_sig_name() const;
+	const std::string get_name() const;
 	float get_frequency() const;
 	float get_min() const;
 	float get_max() const;
