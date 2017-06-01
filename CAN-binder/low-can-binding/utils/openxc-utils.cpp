@@ -34,14 +34,14 @@
 const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value)
 {
 	openxc_VehicleMessage message;
-	application_t& conf = application_t::instance();
+	application_t& app = application_t::instance();
 
 	message.has_type = true;
 	message.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_DIAGNOSTIC;
 	message.has_diagnostic_response = true;
 	message.diagnostic_response.has_bus = true;
-	message.diagnostic_response.bus = conf.get_can_bus_manager().get_can_device_index(
-																conf.get_diagnostic_manager().get_bus_name());
+	message.diagnostic_response.bus = app.get_can_bus_manager().get_can_device_index(
+																app.get_diagnostic_manager().get_bus_name());
 	message.diagnostic_response.has_message_id = true;
 
 	if(request->get_id() != OBD2_FUNCTIONAL_BROADCAST_ID)

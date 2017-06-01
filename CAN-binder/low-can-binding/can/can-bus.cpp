@@ -69,7 +69,6 @@ void can_bus_t::process_can_signals(const can_message_t& can_message)
 	int subscription_id = can_message.get_sub_id();
 	openxc_DynamicField decoded_message;
 	openxc_VehicleMessage vehicle_message;
-	application_t& conf = application_t::instance();
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
 	{
@@ -82,7 +81,7 @@ void can_bus_t::process_can_signals(const can_message_t& can_message)
 		if( s.find(subscription_id) != s.end() && afb_event_is_valid(s[subscription_id]->get_event()))
 		{
 			bool send = true;
-			decoded_message = decoder_t::translateSignal(*sig->get_can_signal(), can_message, conf.get_all_can_signals(), &send);
+			decoded_message = decoder_t::translateSignal(*sig->get_can_signal(), can_message, application_t::instance().get_all_can_signals(), &send);
 			openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
 			vehicle_message = build_VehicleMessage(s_message, can_message.get_timestamp());
 

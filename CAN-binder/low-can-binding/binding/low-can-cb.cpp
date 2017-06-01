@@ -344,12 +344,12 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, bool subscribe, std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages, struct event_filter_t& event_filter)
 {
 	int rets = 0;
-	application_t& conf = application_t::instance();
-	diagnostic_manager_t& diag_m = conf.get_diagnostic_manager();
+	application_t& app = application_t::instance();
+	diagnostic_manager_t& diag_m = app.get_diagnostic_manager();
 
 	for(const auto& sig : diagnostic_messages)
 	{
-		DiagnosticRequest* diag_req = conf.get_request_from_diagnostic_message(sig->get_name());
+		DiagnosticRequest* diag_req = app.get_request_from_diagnostic_message(sig->get_name());
 		float frequency = std::isnan(event_filter.frequency) ? sig->get_frequency() : event_filter.frequency;
 
 		// If the requested diagnostic message isn't supported by the car then unsubcribe it
