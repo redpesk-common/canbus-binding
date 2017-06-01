@@ -34,7 +34,9 @@ namespace utils
 	/// @brief Construct a socket by moving an existing one.
 	socketcan_t::socketcan_t(socketcan_t&& s)
 		: socket_{s.socket_}
-	{}
+	{
+		::memset(&tx_address_, 0, sizeof(tx_address_));
+	}
 
 	socketcan_t& socketcan_t::operator=(const socketcan_t& s)
 	{
