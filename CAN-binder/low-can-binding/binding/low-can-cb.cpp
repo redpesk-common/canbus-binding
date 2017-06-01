@@ -61,7 +61,9 @@ low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filte
 
 low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<diagnostic_message_t> diagnostic_message)
 	: diagnostic_message_{diagnostic_message}, event_filter_{event_filter}
-{}
+{
+	index_ = diagnostic_message->get_pid();
+}
 
 low_can_subscription_t::low_can_subscription_t( low_can_subscription_t&& s)
 	: index_{s.index_},
