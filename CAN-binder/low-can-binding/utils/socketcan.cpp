@@ -45,7 +45,10 @@ namespace utils
 	}
 
 	socketcan_t::~socketcan_t()
-	{}
+	{
+		close();
+		socket_ = INVALID_SOCKET;
+	}
 
 	const struct sockaddr_can& socketcan_t::get_tx_address() const
 	{
