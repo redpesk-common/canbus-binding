@@ -47,11 +47,15 @@ can_bus_t::can_bus_t(utils::config_parser_t conf_file)
 
 bool can_bus_t::apply_filter(const openxc_VehicleMessage& vehicle_message, std::shared_ptr<low_can_subscription_t> can_subscription)
 {
+	bool send = false;
 	if(is_valid(vehicle_message))
 	{
-		return true;
+		float min = std::isnan(can_subscription->get_min()) ? -INFINITY : can_subscription->get_min();
+		float max = std::isnan(can_subscription->get_max()) ? INFINITY : can_subscription->get_max();
+		double value = get_numerical_from_DynamicField(vehicle_message);
+		send = (value < min && value > max) ? false : true;
 	}
-	return false;
+	return send;
 }
 
 /// @brief Will make the decoding operation on a classic CAN message. It will not
