@@ -349,18 +349,22 @@ int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, bool subsc
 
 	for(const auto& sig : diagnostic_messages)
 	{
-		active_diagnostic_request_t* adr;
 		DiagnosticRequest* diag_req = conf.get_request_from_diagnostic_message(sig->get_name());
+		float frequency = std::isnan(event_filter.frequency) ? sig->get_frequency() : event_filter.frequency;
 
 		// If the requested diagnostic message isn't supported by the car then unsubcribe it
 		// no matter what we want, worse case will be a fail unsubscription but at least we don't
 		// poll a PID for nothing.
-		if(sig->get_supported() && subscribe)
+		//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
+		if(sig->get_supported() && subscribe &&
+			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), frequency) != nullptr)
 		{
-			float frequency = std::isnan(event_filter.frequency) ? sig->get_frequency() : event_filter.frequency;
-
-			adr = diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), frequency);
-			//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
+		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter, sig));
+		int ret = subscribe_unsubscribe_signal(request, subscribe, can_subscription);
+		if(ret < 0)
+			return ret;
+		rets++;
+		DEBUG(binder_interface, "%s: Signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 		}
 		else
 		{
@@ -371,13 +375,6 @@ int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, bool subsc
 			diag_req = nullptr;
 			return -1;
 		}
-
-		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter, sig));
-		int ret = subscribe_unsubscribe_signal(request, subscribe, can_subscription);
-		if(ret < 0)
-			return ret;
-		rets++;
-		DEBUG(binder_interface, "%s: Signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}
 
 	return rets;
