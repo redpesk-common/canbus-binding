@@ -359,7 +359,8 @@ active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest
 			diagnostic_request_to_string(&entry->get_handle()->request, request_string,
 					sizeof(request_string));
 
-			find_and_erase(entry, non_recurring_requests_);
+			// Erase any existing request not already cleaned.
+			cleanup_request(entry, true);
 			DEBUG(binder_interface, "%s: Added one-time diagnostic request on bus %s: %s", __FUNCTION__,
 					bus_.c_str(), request_string);
 
