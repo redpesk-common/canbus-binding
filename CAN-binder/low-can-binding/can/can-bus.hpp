@@ -29,6 +29,7 @@
 #include "can-message.hpp"
 #include "../utils/config-parser.hpp"
 #include "../binding/low-can-hat.hpp"
+#include "../binding/low-can-cb.hpp"
 
 // TODO actual max is 32 but dropped to 24 for memory considerations
 #define MAX_ACCEPTANCE_FILTERS 24
@@ -51,8 +52,9 @@ class can_bus_t
 private:
 	utils::config_parser_t conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
 
-	int process_can_signals(const can_message_t& can_message);
-	int process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message);
+	bool apply_filter(const openxc_VehicleMessage& vehicle_message, std::shared_ptr<low_can_subscription_t> can_subscription);
+	void process_can_signals(const can_message_t& can_message);
+	void process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message);
 
 	void can_decode_message();
 	std::thread th_decoding_; ///< thread that'll handle decoding a can frame
