@@ -272,9 +272,12 @@ const openxc_DynamicField build_DynamicField(bool value)
 int get_bool_from_DynamicField(const openxc_VehicleMessage& v_msg, bool* ret)
 {
 	if(v_msg.has_simple_message && v_msg.simple_message.has_value && v_msg.simple_message.value.has_boolean_value)
-		{*ret = v_msg.simple_message.value.boolean_value;}
-	else
-		{return -1;}
+	{
+		*ret = v_msg.simple_message.value.boolean_value;
+		return 0;
+	}
+
+	return -1;
 }
 
 double get_numerical_from_DynamicField(const openxc_VehicleMessage& v_msg)
