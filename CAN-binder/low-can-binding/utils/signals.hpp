@@ -41,7 +41,7 @@ namespace utils
 	{
 	private:
 		std::mutex subscribed_signals_mutex_;
-		std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> > subscribed_signals_;
+		std::map<int, std::shared_ptr<low_can_subscription_t> > subscribed_signals_;
 
 		signals_manager_t(); ///< Private constructor to make singleton class.
 
@@ -49,7 +49,7 @@ namespace utils
 		static signals_manager_t& instance();
 
 		std::mutex& get_subscribed_signals_mutex();
-		std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> >& get_subscribed_signals();
+		std::map<int, std::shared_ptr<low_can_subscription_t> >& get_subscribed_signals();
 
 		struct signals_found find_signals(const openxc_DynamicField &key);
 		void find_diagnostic_messages(const openxc_DynamicField &key, std::vector<std::shared_ptr<diagnostic_message_t> >& found_signals);

@@ -39,7 +39,7 @@ namespace utils
 	/// @brief return the subscribed_signals map.
 	/// 
 	/// @return Map of subscribed signals.
-	std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> >& signals_manager_t::get_subscribed_signals()
+	std::map<int, std::shared_ptr<low_can_subscription_t> >& signals_manager_t::get_subscribed_signals()
 	{
 		return subscribed_signals_;
 	}

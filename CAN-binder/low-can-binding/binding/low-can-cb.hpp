@@ -37,6 +37,7 @@ class low_can_subscription_t
 {
 private:
 	int index_;
+	struct afb_event event_;
 
 	/// Signal part
 	std::shared_ptr<can_signal_t> can_signal_;
@@ -57,6 +58,7 @@ public:
 	explicit operator bool() const;
 
 	int get_index() const;
+	struct afb_event& get_event();
 	const std::shared_ptr<can_signal_t> get_can_signal() const;
 	const std::string get_name() const;
 	float get_frequency() const;
@@ -64,6 +66,7 @@ public:
 	float get_max() const;
 	utils::socketcan_bcm_t& get_socket();
 
+	void set_event(struct afb_event event);
 	void set_frequency(float freq);
 	void set_min(float min);
 	void set_max(float max);

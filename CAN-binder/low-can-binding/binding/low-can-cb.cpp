@@ -80,6 +80,11 @@ low_can_subscription_t::operator bool() const
 	return socket_.socket() != INVALID_SOCKET;
 }
 
+struct afb_event& low_can_subscription_t::get_event()
+{
+	return event_;
+}
+
 int low_can_subscription_t::get_index() const
 {
 	return index_;
@@ -118,6 +123,11 @@ float low_can_subscription_t::get_max() const
 utils::socketcan_bcm_t& low_can_subscription_t::get_socket()
 {
 	return socket_;
+}
+
+void low_can_subscription_t::set_event(struct afb_event event)
+{
+	event_ = event;
 }
 
 void low_can_subscription_t::set_frequency(float freq)
@@ -266,10 +276,10 @@ int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata)
 ///
 ///*******************************************************************************/
 
-static int make_subscription_unsubscription(struct afb_req request, std::shared_ptr<low_can_subscription_t>& can_subscription, std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> >& s, bool subscribe)
+static int make_subscription_unsubscription(struct afb_req request, std::shared_ptr<low_can_subscription_t>& can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s, bool subscribe)
 {
 	/* Make the subscription or unsubscription to the event */
-	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[can_subscription->get_index()].second)) < 0)
+	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[can_subscription->get_index()]->get_event())) < 0)
 	{
 		ERROR(binder_interface, "%s: Operation goes wrong for signal: %s", __FUNCTION__, can_subscription->get_name().c_str());
 		return -1;
@@ -277,12 +287,12 @@ static int make_subscription_unsubscription(struct afb_req request, std::shared_
 	return 0;
 }
 
-static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subscription, std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> >& s)
+static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int sub_index = can_subscription->get_index();
-	struct afb_event event = afb_daemon_make_event(binder_interface->daemon, can_subscription->get_name().c_str());
-	s[sub_index] = std::make_pair(can_subscription, event);
-	if (!afb_event_is_valid(s[sub_index].second))
+	can_subscription->set_event(afb_daemon_make_event(binder_interface->daemon, can_subscription->get_name().c_str()));
+	s[sub_index] = can_subscription;
+	if (!afb_event_is_valid(s[sub_index]->get_event()))
 	{
 		ERROR(binder_interface, "%s: Can't create an event for %s, something goes wrong.", __FUNCTION__, can_subscription->get_name().c_str());
 		return -1;
@@ -300,10 +310,10 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-	std::map<int, std::pair<std::shared_ptr<low_can_subscription_t>, struct afb_event> >& s = sm.get_subscribed_signals();
+	std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
 	if (can_subscription && s.find(sub_index) != s.end())
 	{
-		if (!afb_event_is_valid(s[sub_index].second) && !subscribe)
+		if (!afb_event_is_valid(s[sub_index]->get_event()) && !subscribe)
 		{
 			NOTICE(binder_interface, "%s: Event isn't valid, no need to unsubscribed.", __FUNCTION__);
 			ret = -1;
@@ -317,8 +327,8 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	else
 	{
 		/* Event doesn't exist , so let's create it */
-		struct afb_event empty_event = {nullptr, nullptr};
-		s[sub_index] = std::make_pair(can_subscription, empty_event);
+		can_subscription->set_event({nullptr, nullptr});
+		s[sub_index] = can_subscription;
 		ret = create_event_handle(can_subscription, s);
 	}
 
