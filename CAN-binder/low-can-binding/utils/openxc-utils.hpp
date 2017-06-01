@@ -37,6 +37,9 @@ const openxc_DynamicField build_DynamicField(const std::string& value);
 const openxc_DynamicField build_DynamicField(double value);
 const openxc_DynamicField build_DynamicField(bool value);
 
+int get_bool_from_DynamicField(const openxc_VehicleMessage& v_msg, bool& ret);
+double get_numerical_from_DynamicField(const openxc_VehicleMessage& v_msg);
+const std::string get_string_from_DynamicField(const openxc_VehicleMessage& v_msg);
 const openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg);
 
 void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value);

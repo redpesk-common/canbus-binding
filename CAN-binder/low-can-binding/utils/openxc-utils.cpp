@@ -269,6 +269,26 @@ const openxc_DynamicField build_DynamicField(bool value)
 	return d;
 }
 
+int get_bool_from_DynamicField(const openxc_VehicleMessage& v_msg, bool* ret)
+{
+	if(v_msg.has_simple_message && v_msg.simple_message.has_value && v_msg.simple_message.value.has_boolean_value)
+		{*ret = v_msg.simple_message.value.boolean_value;}
+	else
+		{return -1;}
+}
+
+double get_numerical_from_DynamicField(const openxc_VehicleMessage& v_msg)
+{
+	return (v_msg.has_simple_message && v_msg.simple_message.has_value && v_msg.simple_message.value.has_numeric_value) ?
+		v_msg.simple_message.value.numeric_value : -1.0;
+}
+
+const std::string get_string_from_DynamicField(const openxc_VehicleMessage& v_msg)
+{
+return (v_msg.has_simple_message && v_msg.simple_message.has_value && v_msg.simple_message.value.has_string_value) ?
+		v_msg.simple_message.value.string_value : "";
+}
+
 ///
 /// @brief Extract the simple message value from an openxc_VehicleMessage
 ///  and return it. If there isn't SimpleMessage in the VehicleMessage then
