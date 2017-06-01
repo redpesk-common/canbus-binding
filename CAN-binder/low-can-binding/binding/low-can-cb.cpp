@@ -59,8 +59,8 @@ low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filte
 	: event_filter_{event_filter}
 {}
 
-low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<active_diagnostic_request_t> active_diagnostic_request)
-	: active_diagnostic_request_{active_diagnostic_request}, event_filter_{event_filter}
+low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<diagnostic_message_t> diagnostic_message)
+	: diagnostic_message_{diagnostic_message}, event_filter_{event_filter}
 {}
 
 low_can_subscription_t::low_can_subscription_t( low_can_subscription_t&& s)
@@ -94,8 +94,8 @@ const std::string low_can_subscription_t::get_name() const
 {
 	if (can_signal_ != nullptr)
 		return can_signal_->get_name();
-	if (active_diagnostic_request_ != nullptr)
-		return active_diagnostic_request_->get_name() ;
+	if (diagnostic_message_ != nullptr)
+		return diagnostic_message_->get_name() ;
 
 	return "";
 }
@@ -360,7 +360,7 @@ int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, bool subsc
 			return -1;
 		}
 
-		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter, std::shared_ptr<active_diagnostic_request_t>(adr)));
+		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter, sig));
 		int ret = subscribe_unsubscribe_signal(request, subscribe, can_subscription);
 		if(ret < 0)
 			return ret;
