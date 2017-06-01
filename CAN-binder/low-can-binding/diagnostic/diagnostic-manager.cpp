@@ -458,6 +458,11 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 
 			entry->set_handle(shims_, request);
 			if(create_rx_filter(OBD2_FUNCTIONAL_BROADCAST_ID, frequencyHz) < 0)
+			{
+				recurring_requests_.pop_back();
+				delete entry;
+				entry = nullptr;
+			}
 			else
 				{
 					start_diagnostic_request(&shims_, entry->get_handle()); 
