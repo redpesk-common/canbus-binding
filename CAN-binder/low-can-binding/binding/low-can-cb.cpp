@@ -324,28 +324,15 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	return make_subscription_unsubscription(request, can_subscription, s, subscribe);
 }
 
-///
-/// @brief subscribe to all signals in the vector signals
-///
-/// @param[in] afb_req request : contain original request use to subscribe or unsubscribe
-/// @param[in] subscribe boolean value used to chose between a subscription operation or an unsubscription
-/// @param[in] signals -  struct containing vectors with can_signal_t and diagnostic_messages to subscribe
-///
-/// @return Number of correctly subscribed signal
-///
-static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const struct utils::signals_found& signals, struct event_filter_t& event_filter)
+int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, bool subscribe, std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages, struct event_filter_t& event_filter)
 {
 	int rets = 0;
-
-	//TODO: Implement way to dynamically call the right function no matter
-	// how much signals types we have.
 	application_t& conf = application_t::instance();
+	diagnostic_manager_t& diag_m = conf.get_diagnostic_manager();
 
-	for(const auto& sig : signals.diagnostic_messages)
+	for(const auto& sig : diagnostic_messages)
 	{
-		int ret = 0;
 		active_diagnostic_request_t* adr;
-		diagnostic_manager_t& diag_m = conf.get_diagnostic_manager();
 		DiagnosticRequest* diag_req = conf.get_request_from_diagnostic_message(sig->get_name());
 
 		// If the requested diagnostic message isn't supported by the car then unsubcribe it
@@ -368,15 +355,21 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 			return -1;
 		}
 
-		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter, std::make_shared(adr)));
-		ret = subscribe_unsubscribe_signal(request, subscribe, can_subscription);
+		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter, std::shared_ptr<active_diagnostic_request_t>(adr)));
+		int ret = subscribe_unsubscribe_signal(request, subscribe, can_subscription);
 		if(ret < 0)
 			return ret;
 		rets++;
 		DEBUG(binder_interface, "%s: Signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}
 
-	for(const auto& sig: signals.can_signals)
+	return rets;
+}
+
+int subscribe_unsubscribe_can_signals(struct afb_req request, bool subscribe, std::vector<std::shared_ptr<can_signal_t> > can_signals, struct event_filter_t& event_filter)
+{
+	int rets = 0;
+	for(const auto& sig: can_signals)
 	{
 		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter));
 		if(can_subscription->create_rx_filter(sig) < 0)
@@ -389,6 +382,25 @@ static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe,
 		rets++;
 		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}
+	return rets;
+}
+
+///
+/// @brief subscribe to all signals in the vector signals
+///
+/// @param[in] afb_req request : contain original request use to subscribe or unsubscribe
+/// @param[in] subscribe boolean value used to chose between a subscription operation or an unsubscription
+/// @param[in] signals -  struct containing vectors with can_signal_t and diagnostic_messages to subscribe
+///
+/// @return Number of correctly subscribed signal
+///
+static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const struct utils::signals_found& signals, struct event_filter_t& event_filter)
+{
+	int rets = 0;
+
+	rets += subscribe_unsubscribe_diagnostic_messages(request, subscribe, signals.diagnostic_messages, event_filter);
+	rets += subscribe_unsubscribe_can_signals(request, subscribe, signals.can_signals, event_filter);
+
 	return rets;
 }
 
