@@ -14,5 +14,6 @@ configuration-generated.cpp
 docs_doxygen
 node_modules/
 _book/
-CAN-binder/conf.d/packaging/
+packaging/
 CAN-binder/package/
+compile_commands.json
