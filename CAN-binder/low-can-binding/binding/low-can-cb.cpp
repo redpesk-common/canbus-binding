@@ -79,7 +79,7 @@ low_can_subscription_t::low_can_subscription_t( low_can_subscription_t&& s)
 
 low_can_subscription_t::operator bool() const
 {
-	return socket_.socket() != INVALID_SOCKET;
+	return ((can_signal_ != nullptr || diagnostic_message_ != nullptr) && afb_event_is_valid(event_));
 }
 
 struct afb_event& low_can_subscription_t::get_event()
