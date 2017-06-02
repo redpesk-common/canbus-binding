@@ -206,13 +206,11 @@ void can_bus_t::start_threads()
 {
 	is_decoding_ = true;
 	th_decoding_ = std::thread(&can_bus_t::can_decode_message, this);
-	if(!th_decoding_.joinable())
-		is_decoding_ = false;
+	th_decoding_.detach();
 
 	is_pushing_ = true;
 	th_pushing_ = std::thread(&can_bus_t::can_event_push, this);
-	if(!th_pushing_.joinable())
-		is_pushing_ = false;
+	th_pushing_.detach();
 }
 
 /// @brief Will stop all threads holded by can_bus_t object
