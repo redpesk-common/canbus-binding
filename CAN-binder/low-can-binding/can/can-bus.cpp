@@ -189,7 +189,11 @@ void can_bus_t::can_event_push()
 					jo = json_object_new_object();
 					jsonify_simple(s_message, jo);
 					if(afb_event_push(s[v_message.first]->get_event(), jo) == 0)
-						on_no_clients(std::string(s_message.name));
+					{
+						if(v_message.second.has_diagnostic_response)
+							{on_no_clients(s[v_message.first], v_message.second.diagnostic_response.pid);}
+						on_no_clients(s[v_message.first]);
+					}
 				}
 			}
 		}

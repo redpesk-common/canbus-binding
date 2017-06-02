@@ -33,7 +33,7 @@
 #define MICRO 1000000
 
 diagnostic_manager_t::diagnostic_manager_t()
-	: initialized_{false}, event_source_{nullptr}
+	: initialized_{false}
 {}
 
 /// @brief Diagnostic manager isn't initialized at launch but after
@@ -49,17 +49,11 @@ bool diagnostic_manager_t::initialize()
 	bus_ = application_t::instance().get_diagnostic_bus();
 
 	init_diagnostic_shims();
-	event_source_ = nullptr;
 	reset();
 
 	initialized_ = true;
 	DEBUG(binder_interface, "%s: Diagnostic Manager initialized", __FUNCTION__);
 	return initialized_;
-}
-
-utils::socketcan_bcm_t& diagnostic_manager_t::get_socket()
-{
-	return socket_;
 }
 
 /// @brief initialize shims used by UDS lib and set initialized_ to true.
@@ -76,52 +70,6 @@ void diagnostic_manager_t::reset()
 {
 	DEBUG(binder_interface, "%s: Clearing existing diagnostic requests", __FUNCTION__);
 	cleanup_active_requests(true);
-}
-
-/// @brief Adds 8 RX_SETUP jobs to the BCM rx_socket_ then diagnotic manager
-///  listens on CAN ID range 7E8 - 7EF affected to the OBD2 communications.
-///
-/// @return -1 or negative value on error, 0 if ok.
-int diagnostic_manager_t::create_rx_filter(uint32_t can_id, float frequency)
-{
-	// Make sure that socket has been opened.
-	if(! socket_)
-		socket_.open(get_bus_device_name());
-
-	struct utils::simple_bcm_msg bcm_msg;
-	memset(&bcm_msg, 0, sizeof(bcm_msg));
-
-	const struct timeval freq =  (frequency == recurring_requests_.back()->get_frequency_clock().get_frequency() ) ?
-		recurring_requests_.back()->get_frequency_clock().get_timeval_from_period() : frequency_clock_t(frequency).get_timeval_from_period();
-
-	bcm_msg.msg_head.opcode  = RX_SETUP;
-	bcm_msg.msg_head.flags = SETTIMER|RX_FILTER_ID;
-	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec;
-	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
-
-	// If it isn't an OBD2 CAN ID then just add a simple RX_SETUP job
-	if(can_id != OBD2_FUNCTIONAL_BROADCAST_ID) 
-	{
-		bcm_msg.msg_head.can_id  = can_id;
-
-		socket_ << bcm_msg;
-			if(! socket_)
-				return -1;
-	}
-	else
-	{
-		for(uint8_t i = 0; i < 8; i++)
-		{
-			can_id  =  OBD2_FUNCTIONAL_RESPONSE_START + i;
-			bcm_msg.msg_head.can_id  = can_id;
-
-			socket_ << bcm_msg;
-			if(! socket_)
-				return -1;
-		}
-	}
-
-	return 0;
 }
 
 /// @brief send function use by diagnostic library. Only one bus used for now
@@ -215,11 +163,10 @@ DiagnosticShims& diagnostic_manager_t::get_shims()
 	return shims_;
 }
 
-bool diagnostic_manager_t::socket_close()
+bool diagnostic_manager_t::is_active_requests_running()
 {
 	if(non_recurring_requests_.empty() && recurring_requests_.empty())
 	{
-		socket_.close();
 		return true;
 	}
 	return false;
@@ -272,7 +219,6 @@ void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, b
 			cancel_request(entry);
 			find_and_erase(entry, non_recurring_requests_);
 		}
-		socket_close();
 	}
 }
 
@@ -451,34 +397,12 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 	{
 		if(recurring_requests_.size() <= MAX_SIMULTANEOUS_DIAG_REQUESTS)
 		{
-			// TODO: implement Acceptance Filter
-			//if(updateRequiredAcceptanceFilters(bus, request)) {
 			entry = new active_diagnostic_request_t(bus_, request, name,
 					wait_for_multiple_responses, decoder, callback, frequencyHz);
 			recurring_requests_.push_back(entry);
 
 			entry->set_handle(shims_, request);
-			if(create_rx_filter(OBD2_FUNCTIONAL_BROADCAST_ID, frequencyHz) < 0)
-			{
-				recurring_requests_.pop_back();
-				delete entry;
-				entry = nullptr;
-			}
-			else
-				{
-					start_diagnostic_request(&shims_, entry->get_handle()); 
-					if(event_source_ == nullptr && sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon), 
-						&event_source_,
-						socket_.socket(),
-						EPOLLIN,
-						read_message,
-						nullptr) < 0)
-					{
-						cleanup_request(entry, true);
-						WARNING(binder_interface, "%s: signal: %s isn't supported. Canceling operation.", __FUNCTION__, entry->get_name().c_str());
-						return entry;
-					}
-				}
+			start_diagnostic_request(&shims_, entry->get_handle()); 
 		}
 		else
 		{
@@ -511,10 +435,12 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 		// If name, include 'value' instead of payload, and leave of response
 		// details.
 		message = build_VehicleMessage(build_SimpleMessage(adr->get_name(), build_DynamicField(value)));
+		message.has_diagnostic_response = true;
+		message.diagnostic_response = build_VehicleMessage(adr, response, value).diagnostic_response;
 	}
 	else
 	{
-		// If no name, send full details of response but still include 'value'
+		// If no name, only send full details of response but still include 'value'
 		// instead of 'payload' if they provided a decoder. The one case you
 		// can't get is the full detailed response with 'value'. We could add
 		// another parameter for that but it's onerous to carry that around.

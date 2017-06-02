@@ -41,7 +41,7 @@ private:
 
 	/// Signal part
 	std::shared_ptr<can_signal_t> can_signal_;
-	std::shared_ptr<diagnostic_message_t> diagnostic_message_;
+	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_;
 
 	/// Filtering part
 	struct event_filter_t event_filter_;
@@ -50,9 +50,9 @@ private:
 public:
 	low_can_subscription_t();
 	low_can_subscription_t(struct event_filter_t event_filter);
-	low_can_subscription_t(struct event_filter_t event_filter, std::shared_ptr<diagnostic_message_t> diagnostic_message);
 	low_can_subscription_t(const low_can_subscription_t& s) = delete;
 	low_can_subscription_t(low_can_subscription_t&& s);
+	~low_can_subscription_t();
 
 	low_can_subscription_t& operator=(const low_can_subscription_t& s);
 	explicit operator bool() const;
@@ -60,8 +60,11 @@ public:
 	int get_index() const;
 	struct afb_event& get_event();
 	const std::shared_ptr<can_signal_t> get_can_signal() const;
-	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message() const;
+	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(uint32_t pid) const;
+	const std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_message() const;
+	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(const std::string& name) const;
 	const std::string get_name() const;
+	const std::string get_name(uint32_t pid) const;
 	float get_frequency() const;
 	float get_min() const;
 	float get_max() const;
@@ -72,6 +75,11 @@ public:
 	void set_min(float min);
 	void set_max(float max);
 
+	struct utils::simple_bcm_msg make_bcm_head(uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning) const;
+	void add_bcm_frame(const struct can_frame& cfd, struct utils::simple_bcm_msg& bcm_msg) const;
+	int open_socket();
 	int create_rx_filter();
 	int create_rx_filter(std::shared_ptr<can_signal_t> sig);
+	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
+	int create_rx_filter(utils::simple_bcm_msg& bcm_msg);
 };

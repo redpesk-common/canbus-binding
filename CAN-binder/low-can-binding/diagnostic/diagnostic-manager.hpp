@@ -51,12 +51,9 @@ private:
 	std::vector<active_diagnostic_request_t*> non_recurring_requests_; /*!< nonrecurringRequests - A list of active one-time diagnostic requests. When a
 																	   * response is received for a non-recurring request or it times out, it is removed*/
 	bool initialized_; /*!< * initialized - True if the DiagnosticsManager has been initialized with shims. It will interface with the uds-c lib*/
-	utils::socketcan_bcm_t socket_; ///< socket_ - a BCM socket with 8 RX_SETUP jobs for the 8 CAN ID on which ECU could respond.
-	struct sd_event_source* event_source_;
 
 	void init_diagnostic_shims();
 	void reset();
-	int create_rx_filter(uint32_t can_id, float frequency);
 
 	static bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
 	static void shims_logger(const char* m, ...);
@@ -66,12 +63,10 @@ public:
 
 	bool initialize();
 
-	utils::socketcan_bcm_t& get_socket();
 	const std::string get_bus_name() const;
 	const std::string get_bus_device_name() const;
 	active_diagnostic_request_t* get_last_recurring_requests() const;
 	DiagnosticShims& get_shims();
-	bool socket_close();
 
 	void find_and_erase(active_diagnostic_request_t* entry, std::vector<active_diagnostic_request_t*>& requests_list);
 	void cancel_request(active_diagnostic_request_t* entry);

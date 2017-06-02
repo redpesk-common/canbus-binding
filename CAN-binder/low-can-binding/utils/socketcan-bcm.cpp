@@ -69,11 +69,9 @@ namespace utils
 
 	socketcan_bcm_t& operator>>(socketcan_bcm_t& s, can_message_t& cm)
 	{
-		struct {
-			struct bcm_msg_head msg_head;
-			struct can_frame frames;
-		} msg;
+		struct utils::simple_bcm_msg msg;
 
+		::memset(&msg, 0, sizeof(msg));
 		const struct sockaddr_can& addr = s.get_tx_address();
 		socklen_t addrlen = sizeof(addr);
 		struct ifreq ifr;
@@ -92,10 +90,7 @@ namespace utils
 		cm = ::can_message_t::convert_from_frame(msg.frames ,
 				nbytes-sizeof(struct bcm_msg_head),
 				timestamp);
-		if(application_t::instance().get_diagnostic_manager().is_diagnostic_response(cm))
-			{cm.set_sub_id(msg.frames.data[2]);}
-		else
-			{cm.set_sub_id((int)s.socket());}
+		cm.set_sub_id((int)s.socket());
 
 		return s;
 	}
