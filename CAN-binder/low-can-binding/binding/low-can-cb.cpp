@@ -310,25 +310,17 @@ static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subs
 /// @brief Will determine if it is needed or not to create the event handle and checks it to be sure that
 /// we got a valid afb_event to get subscribe or unsubscribe. Then launch the subscription or unsubscription
 /// against the application framework using that event handle.
-static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, std::shared_ptr<low_can_subscription_t>& can_subscription)
+static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, std::shared_ptr<low_can_subscription_t>& can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int ret;
 	int sub_index = can_subscription->get_index();
-	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
-	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-	std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
 	if (can_subscription && s.find(sub_index) != s.end())
 	{
 		if (!afb_event_is_valid(s[sub_index]->get_event()) && !subscribe)
 		{
 			NOTICE(binder_interface, "%s: Event isn't valid, no need to unsubscribed.", __FUNCTION__);
 			ret = -1;
-		}
-		else
-		{
-			// Event it isn't valid anymore, recreate it
-			ret = create_event_handle(can_subscription, s);
 		}
 	}
 	else
@@ -346,7 +338,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	return make_subscription_unsubscription(request, can_subscription, s, subscribe);
 }
 
-int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, bool subscribe, std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages, struct event_filter_t& event_filter)
+int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, bool subscribe, std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages, struct event_filter_t& event_filter, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int rets = 0;
 	application_t& app = application_t::instance();
@@ -356,44 +348,68 @@ int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, bool subsc
 	{
 		DiagnosticRequest* diag_req = app.get_request_from_diagnostic_message(sig->get_name());
 		float frequency = std::isnan(event_filter.frequency) ? sig->get_frequency() : event_filter.frequency;
+		std::shared_ptr<low_can_subscription_t> can_subscription;
 
 		// If the requested diagnostic message isn't supported by the car then unsubcribe it
 		// no matter what we want, worse case will be a fail unsubscription but at least we don't
 		// poll a PID for nothing.
 		//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
-		if(sig->get_supported() && subscribe &&
-			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), frequency) != nullptr)
+		if(sig->get_supported() && subscribe)
 		{
-		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter, sig));
-		int ret = subscribe_unsubscribe_signal(request, subscribe, can_subscription);
-		if(ret < 0)
-			return ret;
-		rets++;
-		DEBUG(binder_interface, "%s: Signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
+			if (s.find(sig->get_pid()) != s.end())
+			{
+				can_subscription = s[sig->get_pid()];
+				DEBUG(binder_interface, "%s: Signal: %s already subscribed. Adding a new subscription", __FUNCTION__, sig->get_name().c_str());
+			}
+			else
+			{
+				diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), frequency);
+				can_subscription = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter, sig));
+				DEBUG(binder_interface, "%s: Signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
+			}
 		}
 		else
 		{
 			diag_m.cleanup_request(
 				diag_m.find_recurring_request(diag_req), true);
-			WARNING(binder_interface, "%s: signal: %s isn't supported. Canceling operation.", __FUNCTION__, sig->get_name().c_str());
 			delete diag_req;
 			diag_req = nullptr;
+			if(sig->get_supported())
+			{
+				DEBUG(binder_interface, "%s: %s cancelled due to unsubscribe", __FUNCTION__, sig->get_name().c_str());
+				return 0;
+			}
+			WARNING(binder_interface, "%s: signal: %s isn't supported. Canceling operation.", __FUNCTION__, sig->get_name().c_str());
 			return -1;
 		}
+		int ret = subscribe_unsubscribe_signal(request, subscribe, can_subscription, s);
+		if(ret < 0)
+			return ret;
+		rets++;
 	}
 
 	return rets;
 }
 
-int subscribe_unsubscribe_can_signals(struct afb_req request, bool subscribe, std::vector<std::shared_ptr<can_signal_t> > can_signals, struct event_filter_t& event_filter)
+int subscribe_unsubscribe_can_signals(struct afb_req request, bool subscribe, std::vector<std::shared_ptr<can_signal_t> > can_signals, struct event_filter_t& event_filter, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int rets = 0;
 	for(const auto& sig: can_signals)
 	{
-		std::shared_ptr<low_can_subscription_t> can_subscription(new low_can_subscription_t(event_filter));
-		if(can_subscription->create_rx_filter(sig) < 0)
-			{return -1;}
-		else if(subscribe_unsubscribe_signal(request, subscribe, can_subscription) < 0)
+		auto it =  std::find_if(s.begin(), s.end(), [&sig](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub){ return sub.second->get_can_signal() == sig; });
+		std::shared_ptr<low_can_subscription_t> can_subscription;
+		if(it != s.end())
+		{
+			 can_subscription = it->second;
+		}
+		else
+		{
+			 can_subscription = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
+			if(can_subscription->create_rx_filter(sig) < 0)
+				{return -1;}
+		}
+
+		if(subscribe_unsubscribe_signal(request, subscribe, can_subscription, s) < 0)
 			{return -1;}
 
 		struct sd_event_source* e_source;
@@ -416,9 +432,13 @@ int subscribe_unsubscribe_can_signals(struct afb_req request, bool subscribe, st
 static int subscribe_unsubscribe_signals(struct afb_req request, bool subscribe, const struct utils::signals_found& signals, struct event_filter_t& event_filter)
 {
 	int rets = 0;
+	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
-	rets += subscribe_unsubscribe_diagnostic_messages(request, subscribe, signals.diagnostic_messages, event_filter);
-	rets += subscribe_unsubscribe_can_signals(request, subscribe, signals.can_signals, event_filter);
+	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
+	std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
+
+	rets += subscribe_unsubscribe_diagnostic_messages(request, subscribe, signals.diagnostic_messages, event_filter, s);
+	rets += subscribe_unsubscribe_can_signals(request, subscribe, signals.can_signals, event_filter, s);
 
 	return rets;
 }
