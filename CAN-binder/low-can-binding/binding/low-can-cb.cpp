@@ -97,6 +97,11 @@ const std::shared_ptr<can_signal_t> low_can_subscription_t::get_can_signal() con
 	return can_signal_;
 }
 
+const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnostic_message() const
+{
+	return diagnostic_message_;
+}
+
 const std::string low_can_subscription_t::get_name() const
 {
 	if (can_signal_ != nullptr)

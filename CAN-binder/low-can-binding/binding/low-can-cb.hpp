@@ -60,6 +60,7 @@ public:
 	int get_index() const;
 	struct afb_event& get_event();
 	const std::shared_ptr<can_signal_t> get_can_signal() const;
+	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message() const;
 	const std::string get_name() const;
 	float get_frequency() const;
 	float get_min() const;
