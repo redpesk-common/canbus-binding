@@ -78,8 +78,6 @@ class application_t
 
 		void set_active_message_set(uint8_t id);
 
-		std::shared_ptr<diagnostic_message_t> get_diagnostic_message(const std::string& message_name) const;
-		DiagnosticRequest* get_request_from_diagnostic_message(const std::string& message_name) const;
 /*
 		/// TODO: implement this function as method into can_bus class
 		/// @brief Pre initialize actions made before CAN bus initialization

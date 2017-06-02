@@ -246,13 +246,13 @@ void diagnostic_manager_t::cleanup_active_requests(bool force)
 ///
 /// @param[in] request - Search key, method will go through recurring list to see if it find that request
 ///  holded by the DiagnosticHandle member.
-active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(const DiagnosticRequest* request)
+active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(DiagnosticRequest& request)
 {
 	for (auto& entry : recurring_requests_)
 	{
 		if(entry != nullptr)
 		{
-			if(diagnostic_request_equals(&entry->get_handle()->request, request))
+			if(diagnostic_request_equals(&entry->get_handle()->request, &request))
 				{return entry;}
 		}
 	}
@@ -297,7 +297,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest
 	{
 		// TODO: implement Acceptance Filter
 		//	if(updateRequiredAcceptanceFilters(bus, request)) {
-			active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request, name,
+			active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request->arbitration_id, name,
 					wait_for_multiple_responses, decoder, callback, 0);
 			entry->set_handle(shims_, request);
 
@@ -393,11 +393,11 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 
 	cleanup_active_requests(false);
 
-	if(find_recurring_request(request) == nullptr)
+	if(find_recurring_request(*request) == nullptr)
 	{
 		if(recurring_requests_.size() <= MAX_SIMULTANEOUS_DIAG_REQUESTS)
 		{
-			entry = new active_diagnostic_request_t(bus_, request, name,
+			entry = new active_diagnostic_request_t(bus_, request->arbitration_id, name,
 					wait_for_multiple_responses, decoder, callback, frequencyHz);
 			recurring_requests_.push_back(entry);
 

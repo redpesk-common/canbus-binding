@@ -65,14 +65,14 @@ active_diagnostic_request_t::active_diagnostic_request_t()
 	  socket_{}
 {}
 
-active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus, DiagnosticRequest* request,
+active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus, uint32_t id,
 		const std::string& name,
 		bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback,
 		float frequencyHz)
 	: bus_{bus},
-	  id_{request->arbitration_id},
+	  id_{id},
 	  handle_{nullptr},
 	  name_{name},
 	  decoder_{decoder},

@@ -76,21 +76,3 @@ void application_t::set_active_message_set(uint8_t id)
 {
 	active_message_set_ = id;
 }
-
-
-std::shared_ptr<diagnostic_message_t> application_t::get_diagnostic_message(const std::string& message_name) const
-{
-	struct utils::signals_found found;
-	 found = utils::signals_manager_t::instance().find_signals(build_DynamicField(message_name));
-	if(! found.diagnostic_messages.empty())
-		return found.diagnostic_messages.front();
-	return nullptr;
-}
-
-DiagnosticRequest* application_t::get_request_from_diagnostic_message(const std::string& message_name) const
-{
-	std::shared_ptr<diagnostic_message_t> diag_msg = get_diagnostic_message(message_name);
-	if( diag_msg != nullptr && diag_msg->get_supported())
-		return new DiagnosticRequest(diag_msg->build_diagnostic_request());
-	return nullptr;
-}
