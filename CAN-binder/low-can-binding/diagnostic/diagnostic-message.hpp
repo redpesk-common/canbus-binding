@@ -77,7 +77,7 @@ class diagnostic_message_t
 
 		void set_supported(bool value);
 		void set_parent(can_message_set_t* parent);
-		const DiagnosticRequest build_diagnostic_request();
+		const DiagnosticRequest build_diagnostic_request() const;
 
 		bool is_obd2_response(const can_message_t& can_message);
 		bool is_obd2_request(const DiagnosticRequest *request);

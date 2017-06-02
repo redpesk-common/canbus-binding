@@ -89,7 +89,7 @@ void diagnostic_message_t::set_parent(can_message_set_t* parent)
 /// @brief Build a DiagnosticRequest struct to be passed
 ///  to diagnostic manager instance.
 ///
-const DiagnosticRequest diagnostic_message_t::build_diagnostic_request()
+ const DiagnosticRequest diagnostic_message_t::build_diagnostic_request() const
 {
 	return {/*arbitration_id: */OBD2_FUNCTIONAL_BROADCAST_ID,
 			/*mode: */0x1,
