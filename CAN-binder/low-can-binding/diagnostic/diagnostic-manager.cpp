@@ -202,7 +202,7 @@ void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 /// @param[in] force - Force the cleaning or not ?
 void diagnostic_manager_t::cleanup_request(active_diagnostic_request_t* entry, bool force)
 {
-	if((force || (entry != nullptr && entry->response_received())))
+	if(entry != nullptr && (force || entry->response_received()))
 	{
 		char request_string[128] = {0};
 		diagnostic_request_to_string(&entry->get_handle()->request,
