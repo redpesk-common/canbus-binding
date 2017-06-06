@@ -130,7 +130,7 @@ application_t::application_t()
 					{ // beginning can_signals vector
 						{std::make_shared<can_signal_t> (can_signal_t{
 							"doors.boot.open",
-							56,
+							47,
 							1,
 							1.00000f,
 							0.00000,
@@ -148,7 +148,7 @@ application_t::application_t()
 						})},
 						{std::make_shared<can_signal_t> (can_signal_t{
 							"doors.front_left.open",
-							46,
+							43,
 							1,
 							1.00000f,
 							0.00000,
@@ -166,7 +166,7 @@ application_t::application_t()
 						})},
 						{std::make_shared<can_signal_t> (can_signal_t{
 							"doors.front_right.open",
-							47,
+							44,
 							1,
 							1.00000f,
 							0.00000,
@@ -184,46 +184,6 @@ application_t::application_t()
 						})},
 						{std::make_shared<can_signal_t> (can_signal_t{
 							"doors.rear_left.open",
-							54,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
-							{
-							},
-							false,
-							decoder_t::booleanDecoder,
-							nullptr,
-							false
-						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"doors.rear_right.open",
-							53,
-							4,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
-							{
-							},
-							false,
-							decoder_t::booleanDecoder,
-							nullptr,
-							false
-						})}
-					} // end can_signals vector
-				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x799,can_message_format_t::STANDARD,frequency_clock_t(1.00000f),true,
-					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"windows.front_left.open",
 							46,
 							1,
 							1.00000f,
@@ -241,44 +201,8 @@ application_t::application_t()
 							false
 						})},
 						{std::make_shared<can_signal_t> (can_signal_t{
-							"windows.front_right.open",
-							47,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
-							{
-							},
-							false,
-							decoder_t::booleanDecoder,
-							nullptr,
-							false
-						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"windows.rear_left.open",
-							54,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
-							{
-							},
-							false,
-							decoder_t::booleanDecoder,
-							nullptr,
-							false
-						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"windows.rear_right.open",
-							53,
+							"doors.rear_right.open",
+							45,
 							4,
 							1.00000f,
 							0.00000,
@@ -296,7 +220,84 @@ application_t::application_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-			}, // end can_message_definition vector
+,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x799,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+					{ // beginning can_signals vector
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"windows.front_left.open",
+							43,
+							1,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							decoder_t::booleanDecoder,
+							nullptr,
+							false
+						})},
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"windows.front_right.open",
+							44,
+							1,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							decoder_t::booleanDecoder,
+							nullptr,
+							false
+						})},
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"windows.rear_left.open",
+							46,
+							1,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							decoder_t::booleanDecoder,
+							nullptr,
+							false
+						})},
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"windows.rear_right.open",
+							45,
+							4,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							decoder_t::booleanDecoder,
+							nullptr,
+							false
+						})}
+					} // end can_signals vector
+				})} // end can_message_definition entry
+
+		}, // end can_message_definition vector
 			{ // beginning diagnostic_messages_ vector
 				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					4,
@@ -529,6 +530,7 @@ application_t::application_t()
 					nullptr,
 					true
 				})}
+
 			} // end diagnostic_messages_ vector
 		})} // end can_message_set entry
 	} // end can_message_set vector
@@ -552,7 +554,7 @@ application_t::application_t()
 			dm->set_parent(cms.get());
 		}
 	}
-}
+		}
 
 const std::string application_t::get_diagnostic_bus() const
 {
