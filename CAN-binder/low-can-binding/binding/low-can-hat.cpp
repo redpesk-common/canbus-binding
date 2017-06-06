@@ -17,7 +17,7 @@
  */
 
 #include "low-can-hat.hpp"
-#include "low-can-cb.hpp"
+#include "low-can-subscription.hpp"
 
 #include <map>
 #include <queue>

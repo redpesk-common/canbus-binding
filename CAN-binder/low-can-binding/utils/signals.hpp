@@ -27,7 +27,7 @@
 #include "../diagnostic/diagnostic-message.hpp"
 
 #include "../binding/low-can-hat.hpp"
-#include "../binding/low-can-cb.hpp"
+#include "../binding/low-can-subscription.hpp"
 
 namespace utils
 {
