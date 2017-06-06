@@ -1,4 +1,4 @@
-#include "configuration.hpp"
+#include "application.hpp"
 #include "can/can-decoder.hpp"
 
 
@@ -28,7 +28,7 @@ void myLooper() {
 
 // <<<<< handlers.cpp <<<<<
 
-configuration_t::configuration_t()
+application_t::application_t()
 	: can_message_set_{0, "example", 2, 2, 7, 1, 3}
 	, can_message_definition_
 	{

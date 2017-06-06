@@ -109,7 +109,7 @@ template <>
 std::ostream& operator<<(std::ostream& o, const generator<openxc::message_set>& v)
 {
 	o	<< v.line_prefix_
-		<< "can_message_set_t{"
+		<< "{std::make_shared<can_message_set_t>(can_message_set_t{"
 		<< "0,"
 		<< gen(v.v_.name()) << ",\n"
 		<< "\t\t\t{ // beginning can_message_definition_ vector\n"
@@ -118,7 +118,7 @@ std::ostream& operator<<(std::ostream& o, const generator<openxc::message_set>& 
 		<< "\t\t\t{ // beginning diagnostic_messages_ vector\n"
 		<< gen(v.v_.diagnostic_messages(),"\t\t\t") << "\n"
 		<< "\t\t\t} // end diagnostic_messages_ vector\n"
-		<< "\t\t} // end can_message_set entry\n";
+		<< "\t\t})} // end can_message_set entry\n";
 	return o;
 }
 
@@ -208,25 +208,44 @@ std::ostream& operator<<(std::ostream& o, const generator<openxc::diagnostic_mes
 	return o;
 }
 
-/// @brief Generate the configuration code.
+/// @brief Generate the application code.
 /// @param[in] header Content to be inserted as a header.
 /// @param[in] footer Content to be inserted as a footer.
-/// @param[in] message_set Configuration read from the json file.
+/// @param[in] message_set application read from the json file.
 /// @param[in] out Stream to write on.
 void generate(const std::string& header, const std::string& footer, const openxc::message_set& message_set, std::ostream& out)
 {
-	out << "#include \"configuration.hpp\"\n"
+	out << "#include \"application.hpp\"\n"
 		<< "#include \"../can/can-decoder.hpp\"\n\n";
 
 	if (header.size()) out << header << "\n";
 
-	out	<< "configuration_t::configuration_t()\n"
+	out	<< "application_t::application_t()\n"
 		<< "	: can_bus_manager_{utils::config_parser_t{\"/etc/dev-mapping.conf\"}}\n"
 		<< "	, can_message_set_{\n"
 		<< gen(message_set, "\t\t")
 		<< "\t} // end can_message_set vector\n"
-		<< "{}\n\n"
-		<< "const std::string configuration_t::get_diagnostic_bus() const\n"
+		<< "{\n"
+		<< "	for(auto& cms: can_message_set_)\n"
+		<< "	{\n"
+		<< "		std::vector<std::shared_ptr<can_message_definition_t> >& can_messages_definition = cms->get_can_message_definition();\n"
+		<< "		for(auto& cmd : can_messages_definition)\n"
+		<< "		{\n"
+		<< "			cmd->set_parent(cms.get());\n"
+		<< "			std::vector<std::shared_ptr<can_signal_t> >& can_signals = cmd->get_can_signals();\n"
+		<< "			for(auto& sig: can_signals)\n"
+		<< "			{\n"
+		<< "				sig->set_parent(cmd.get());\n"
+		<< "			}\n"
+		<< "		}\n\n"
+		<< "		std::vector<std::shared_ptr<diagnostic_message_t> >& diagnostic_messages = cms->get_diagnostic_messages();\n"
+		<< "		for(auto& dm : diagnostic_messages)\n"
+		<< "		{\n"
+		<< "			dm->set_parent(cms.get());\n"
+		<< "		}\n"
+		<< "	}\n"
+		<< "		}\n\n"
+		<< "const std::string application_t::get_diagnostic_bus() const\n"
 		<< "{\n";
 
 		std::string active_bus = "";
@@ -286,11 +305,11 @@ nlohmann::json read_json(const std::string& file)
 // function that show the help information
 void showhelpinfo(char *s)
 {
-std::cout<<"Usage:   "<<s<<" <-m inpout.json> [-o configuration-generated.cpp]"<< std::endl;
+std::cout<<"Usage:   "<<s<<" <-m inpout.json> [-o application-generated.cpp]"<< std::endl;
 std::cout<<"option:  "<<"-m  input.json : JSON file describing CAN messages and signals"<< std::endl;
 std::cout<<"         "<<"-h header.cpp : header source file insert at the beginning of generated file"<< std::endl;
 std::cout<<"         "<<"-f footer.cpp : footer source file append to generated file."<< std::endl;
-std::cout<<"         "<<"-o configuration-generated.cpp : output source file. Name has to be configuration-generated.cpp"<< std::endl;
+std::cout<<"         "<<"-o application-generated.cpp : output source file. Name has to be application-generated.cpp"<< std::endl;
 }
 
 /// @brief Entry point.
