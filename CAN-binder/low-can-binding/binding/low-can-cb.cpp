@@ -208,6 +208,8 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, boo
 		}
 		else
 		{
+			diag_m.cleanup_request(
+					diag_m.find_recurring_request(*diag_req), true);
 			if(sig->get_supported())
 			{DEBUG(binder_interface, "%s: %s cancelled due to unsubscribe", __FUNCTION__, sig->get_name().c_str());}
 			else
