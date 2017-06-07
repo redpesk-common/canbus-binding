@@ -242,13 +242,13 @@ static int subscribe_unsubscribe_can_signals(struct afb_req request, bool subscr
 			 can_subscription = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
 			if(can_subscription->create_rx_filter(sig) < 0)
 				{return -1;}
+			if(add_to_event_loop(can_subscription) < 0)
+				{return -1;}
 		}
 
 		if(subscribe_unsubscribe_signal(request, subscribe, can_subscription, s) < 0)
 			{return -1;}
 
-		if(add_to_event_loop(can_subscription) < 0)
-			{return -1;}
 		rets++;
 		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
 	}
