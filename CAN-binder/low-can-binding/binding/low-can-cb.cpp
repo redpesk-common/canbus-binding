@@ -47,7 +47,7 @@ extern "C"
 ///
 ///*******************************************************************************/
 
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid)
+void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	if( ! can_subscription->get_diagnostic_message().empty() && can_subscription->get_diagnostic_message(pid) != nullptr)
 	{
@@ -57,14 +57,11 @@ void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uin
 			application_t::instance().get_diagnostic_manager().cleanup_request(adr, true);
 	}
 
-	on_no_clients(can_subscription);
+	on_no_clients(can_subscription, s);
 }
 
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription)
+void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
-	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
-	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-	std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
 	auto it = s.find(can_subscription->get_index());
 	s.erase(it);
 }
@@ -208,8 +205,6 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, boo
 		}
 		else
 		{
-			diag_m.cleanup_request(
-					diag_m.find_recurring_request(*diag_req), true);
 			if(sig->get_supported())
 			{DEBUG(binder_interface, "%s: %s cancelled due to unsubscribe", __FUNCTION__, sig->get_name().c_str());}
 			else

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <cstddef>
+#include <map>
 #include <string>
 #include <memory>
 #include <systemd/sd-event.h>
@@ -34,8 +35,8 @@ extern const struct afb_binding_interface *binder_interface;
 
 class low_can_subscription_t;
 
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription);
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid);
+void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
+void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
 int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata);
 
 void subscribe(struct afb_req request);
