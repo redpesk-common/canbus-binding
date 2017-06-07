@@ -134,7 +134,7 @@ static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subs
 /// against the application framework using that event handle.
 static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, std::shared_ptr<low_can_subscription_t>& can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
-	int ret;
+	int ret = -1;
 	int sub_index = can_subscription->get_index();
 
 	if (can_subscription && s.find(sub_index) != s.end())
@@ -144,6 +144,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 			NOTICE(binder_interface, "%s: Event isn't valid, no need to unsubscribed.", __FUNCTION__);
 			ret = -1;
 		}
+		ret = 0;
 	}
 	else
 	{
