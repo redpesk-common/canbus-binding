@@ -85,10 +85,12 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 		utils::socketcan_bcm_t& s = can_subscription->get_socket();
 		s >> cm;
 
-		push_n_notify(cm);
+		// Sure we got a valid CAN message ?
+		if(! cm.get_id() == 0 && ! cm.get_length() == 0)
+			{push_n_notify(cm);}
 	}
 
-	/* check if error or hangup */
+	// check if error or hangup
 	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
 	{
 		sd_event_source_unref(event_source);
