@@ -30,12 +30,6 @@
 #include "can-message.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 
-extern "C"
-{
-	#include <afb/afb-binding.h>
-	#include <afb/afb-event-itf.h>
-}
-
 #define MESSAGE_SET_ID 0
 
 class can_signal_t;

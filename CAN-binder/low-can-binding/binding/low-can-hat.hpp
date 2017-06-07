@@ -26,6 +26,7 @@
 
 extern "C"
 {
+	#define AFB_BINDING_VERSION 1
 	#include <afb/afb-binding.h>
 };
 

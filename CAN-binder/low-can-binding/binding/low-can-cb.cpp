@@ -35,11 +35,6 @@
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/openxc-utils.hpp"
 
-extern "C"
-{
-	#include <afb/afb-service-itf.h>
-};
-
 
 ///******************************************************************************
 ///

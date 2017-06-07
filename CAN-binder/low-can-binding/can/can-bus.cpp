@@ -33,11 +33,6 @@
 #include "../utils/signals.hpp"
 #include "../utils/openxc-utils.hpp"
 
-extern "C"
-{
-	#include <afb/afb-binding.h>
-}
-
 /// @brief Class constructor
 ///
 /// @param[in] conf_file - handle to the json configuration file.

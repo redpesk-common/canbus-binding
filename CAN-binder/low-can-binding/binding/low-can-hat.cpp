@@ -28,11 +28,6 @@
 #include "application.hpp"
 #include "../can/can-bus.hpp"
 
-extern "C"
-{
-	#include <afb/afb-service-itf.h>
-};
-
 // Interface between the daemon and the binding
 const struct afb_binding_interface *binder_interface;
 
