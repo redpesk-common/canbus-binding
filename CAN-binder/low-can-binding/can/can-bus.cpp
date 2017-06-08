@@ -40,6 +40,14 @@ can_bus_t::can_bus_t(utils::config_parser_t conf_file)
 	: conf_file_{conf_file}
 {}
 
+/// @brief Take a decoded message to determine if its value comply with the wanted
+/// filtering values.
+///
+/// @param[in] vehicle_message - A decoded message to analyze
+/// @param[in] can_subscription - the subscription which will be notified depending
+///  on its filtering values. Filtering values are stored in the event_filtermember.
+///
+/// @return True if the value is compliant with event filter values, false if not...
 bool can_bus_t::apply_filter(const openxc_VehicleMessage& vehicle_message, std::shared_ptr<low_can_subscription_t> can_subscription)
 {
 	bool send = false;
@@ -283,12 +291,8 @@ void can_bus_t::push_new_vehicle_message(int subscription_id, const openxc_Vehic
 	vehicle_message_q_.push(std::make_pair(subscription_id, v_msg));
 }
 
-/// @brief Return the shared pointer on the can_bus_dev_t initialized 
-/// with device_name "bus"
-///
-/// @param[in] bus - CAN bus device name to retrieve.
-///
-/// @return A shared pointer on an object can_bus_dev_t
+/// @brief Fills the CAN device map member with value from device
+/// mapping configuration file read at initialization.
 void can_bus_t::set_can_devices()
 {
 	can_devices_ = conf_file_.get_devices_name();
@@ -300,6 +304,9 @@ void can_bus_t::set_can_devices()
 	}
 }
 
+
+/// @brief Return the CAN device index from the map
+/// map are sorted so index depend upon alphabetical sorting.
 int can_bus_t::get_can_device_index(const std::string& bus_name) const
 {
 	int i = 0;
@@ -312,6 +319,9 @@ int can_bus_t::get_can_device_index(const std::string& bus_name) const
 	return i;
 }
 
+/// @brief Return CAN device name from a logical CAN device name gotten from
+/// the signals.json description file which comes from a CAN databases file in
+/// general.
 const std::string can_bus_t::get_can_device_name(const std::string& id_name) const
 {
 	std::string ret;

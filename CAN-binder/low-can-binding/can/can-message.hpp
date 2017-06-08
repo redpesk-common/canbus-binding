@@ -31,28 +31,26 @@
  * @brief The ID format for a CAN message.
  */
 enum class can_message_format_t {
-	STANDARD, /*!< STANDARD - standard 11-bit CAN arbitration ID. */
-	EXTENDED, /*!< EXTENDED - an extended frame, with a 29-bit arbitration ID. */
-	INVALID,    /*!< INVALID - INVALID code used at initialization to signify that it isn't usable'*/
+	STANDARD, ///< STANDARD - standard 11-bit CAN arbitration ID. */
+	EXTENDED, ///< EXTENDED - an extended frame, with a 29-bit arbitration ID. */
+	INVALID,    ///< INVALID - INVALID code used at initialization to signify that it isn't usable'*/
 };
 
-/**
- * @class can_message_t
- *
- * @brief A compact representation of a single CAN message, meant to be used in in/out
- * buffers.
- */
+/// @class can_message_t
+///
+/// @brief A compact representation of a single CAN message, meant to be used in in/out
+/// buffers. It is a wrapper of a can_frame struct with some sugar around it for binding purposes.
 class can_message_t {
 private:
-	uint8_t maxdlen_; /*!< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
-	uint32_t id_; /*!< id_ - The ID of the message. */
-	uint8_t length_; /*!< length_ - the length of the data array (max 8). */
-	can_message_format_t format_; /*!< format_ - the format of the message's ID.*/
-	bool rtr_flag_; /*!< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
-	uint8_t flags_; /*!< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
-	std::vector<uint8_t> data_; /*!< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
-	uint64_t timestamp_; /*!< timestamp_ - timestamp of the received message*/
-	int sub_id_; /*!< sub_id_ - Subscription index. */
+	uint8_t maxdlen_; ///< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
+	uint32_t id_; ///< id_ - The ID of the message. */
+	uint8_t length_; ///< length_ - the length of the data array (max 8). */
+	can_message_format_t format_; ///< format_ - the format of the message's ID.*/
+	bool rtr_flag_; ///< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
+	uint8_t flags_; ///< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
+	std::vector<uint8_t> data_; ///< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
+	uint64_t timestamp_; ///< timestamp_ - timestamp of the received message*/
+	int sub_id_; ///< sub_id_ - Subscription index. */
 
 public:
 	can_message_t();

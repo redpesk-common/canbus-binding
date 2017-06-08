@@ -76,6 +76,8 @@ float frequency_clock_t::frequency_to_period() const
 	return frequency_ == 0 ? 0 : 1 / frequency_;
 }
 
+/// @brief Return a timeval struct based on the frequency_ member. used to 
+/// specified CAN BCM timers.
 const struct timeval frequency_clock_t::get_timeval_from_period() const
 {
 	struct timeval freq = {0, 0};

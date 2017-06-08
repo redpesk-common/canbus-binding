@@ -27,8 +27,8 @@ class can_signal_t;
 class can_message_definition_t;
 class diagnostic_message_t;
 
-/// @brief A parent wrapper for a particular set of CAN messages and associated
-/// CAN buses(e.g. a vehicle or program).
+/// @brief A parent wrapper for a particular set of CAN messages and diagnostic messages 
+/// (e.g. a vehicle or program).
 class can_message_set_t
 {
 private:

@@ -22,12 +22,6 @@
 #include "application.hpp"
 #include "canutil/write.h"
 
-///******************************************************************************
-///
-///	low_can_subscription_t object
-///
-///*******************************************************************************/
-
 low_can_subscription_t::low_can_subscription_t()
 	: index_{-1},
 	event_filter_{event_filter_t()},
@@ -44,7 +38,7 @@ low_can_subscription_t::low_can_subscription_t( low_can_subscription_t&& s)
 	socket_{std::move(s.socket_)}
 {}
 
-	low_can_subscription_t& low_can_subscription_t::operator=(const low_can_subscription_t& s)
+low_can_subscription_t& low_can_subscription_t::operator=(const low_can_subscription_t& s)
 {
 	socket_ = std::move(s.socket_);
 	return *this;
@@ -80,6 +74,11 @@ const std::vector<std::shared_ptr<diagnostic_message_t> > low_can_subscription_t
 	return diagnostic_message_;
 }
 
+/// @brief Retrieve a diagnostic_message subscribed from a pid
+/// 
+/// @param[in] pid - Diagnostic messages PID to search for
+///
+/// @return shared_ptr diagnostic_message_ if found and nullptr if not found
 const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnostic_message(uint32_t pid) const
 {
 	for(const auto& diag: diagnostic_message_)
@@ -92,6 +91,9 @@ const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnost
 	return nullptr;
 }
 
+/// @brief Retrieve a diagnostic message search from its name
+///
+/// @return shared_ptr diagnostic_message_ if found and nullptr if not found
 const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnostic_message(const std::string& name) const
 {
 	for(const auto& diag: diagnostic_message_)
@@ -104,6 +106,8 @@ const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnost
 	return nullptr;
 }
 
+/// @brief Return the CAN signal name and empty string if not found
+/// or no CAN signal subscribed
 const std::string low_can_subscription_t::get_name() const
 {
 	if (can_signal_ != nullptr)
@@ -112,6 +116,9 @@ const std::string low_can_subscription_t::get_name() const
 	return "";
 }
 
+/// @brief Return name from a diagnostic message from a PID
+///
+/// @param[in] pid - Diagnostic message PID
 const std::string low_can_subscription_t::get_name(uint32_t pid) const
 {
 	if (!diagnostic_message_.empty())
@@ -160,6 +167,10 @@ void low_can_subscription_t::set_max(float max)
 	event_filter_.max = max;
 }
 
+/// @brief Based upon which object is subscribed CAN signal or diagnostic message
+/// this will open the socket with the required CAN bus device name.
+///
+/// @return INVALID_SOCKET on failure else positive integer
 int low_can_subscription_t::open_socket()
 {
 	int ret = 0;
@@ -174,6 +185,10 @@ int low_can_subscription_t::open_socket()
 	return ret;
 }
 
+/// @brief Build a BCM message head but don't set can_frame.
+///
+/// @return a simple_bcm_msg with the msg_head parts set and can_frame
+/// zeroed.
 struct utils::simple_bcm_msg low_can_subscription_t::make_bcm_head(uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning) const
 {
 	struct utils::simple_bcm_msg bcm_msg;
@@ -191,6 +206,9 @@ struct utils::simple_bcm_msg low_can_subscription_t::make_bcm_head(uint32_t can_
 	return bcm_msg;
 }
 
+/// @brief Take an existing simple_bcm_msg struct and add a can_frame to it.
+/// Only possible for now to add 1 uniq can_frame, it isn't possible to build
+/// a multiplexed message with several can_frame.
 void low_can_subscription_t::add_bcm_frame(const struct can_frame& cfd, struct utils::simple_bcm_msg& bcm_msg) const
 {
 	for(int i=0; i < CAN_MAX_DLEN; i++)
@@ -204,21 +222,8 @@ void low_can_subscription_t::add_bcm_frame(const struct can_frame& cfd, struct u
 	}
 }
 
-/// @brief Create a RX_SETUP receive job used by the BCM socket.
-///
-/// @return 0 if ok else -1
-int low_can_subscription_t::create_rx_filter()
-{
-	int ret = -1;
-	if ( can_signal_ != nullptr)
-		{ret = create_rx_filter(can_signal_);}
-	else if (! diagnostic_message_ .empty())
-		{ret = create_rx_filter(diagnostic_message_.front());}
-
-	return ret;
-}
-
-/// @brief Create a RX_SETUP receive job used by the BCM socket.
+/// @brief Create a RX_SETUP receive job used by the BCM socket for a CAN signal
+/// subscription
 ///
 /// @return 0 if ok else -1
 int low_can_subscription_t::create_rx_filter(std::shared_ptr<can_signal_t> sig)
@@ -247,7 +252,8 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<can_signal_t> sig)
 	return create_rx_filter(bcm_msg);
 }
 
-/// @brief Create a RX_SETUP receive job used by the BCM socket.
+/// @brief Create a RX_SETUP receive job used by the BCM socket for a
+/// diagnostic message subscription.
 ///
 /// @return 0 if ok else -1
 int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_t> sig)
@@ -262,7 +268,12 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 	return create_rx_filter(bcm_msg);
 }
 
-/// @brief Create a RX_SETUP receive job used by the BCM socket.
+/// @brief Create a RX_SETUP receive job used by the BCM socket directly from
+/// a simple_bcm_msg. You will not use this method directly but rather use the
+/// two previous method with can_signal_t or diagnostic_message_t object.
+///
+/// If the CAN arbitration ID is the OBD2 functional broadcast id the subscribed
+/// to the 8 classics OBD2 functional response ID
 ///
 /// @return 0 if ok else -1
 int low_can_subscription_t::create_rx_filter(utils::simple_bcm_msg& bcm_msg) 

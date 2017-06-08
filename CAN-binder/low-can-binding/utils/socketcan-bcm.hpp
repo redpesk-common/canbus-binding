@@ -35,6 +35,7 @@ namespace utils
 		canfd_bcm_msg() { msg_head.flags |= CAN_FD_FRAME; }
 	};
 
+	/// @brief derivated socketcan class specialized for BCM CAN socket.
 	class socketcan_bcm_t : public socketcan_t
 	{
 	public:

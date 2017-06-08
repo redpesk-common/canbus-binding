@@ -67,6 +67,9 @@ namespace utils
 		return socket_;
 	}
 
+	/// Read the socket to retrieve the associated CAN message. All the hard work is do into
+	/// convert_from_frame method and if there isn't CAN message retrieve, only BCM head struct,
+	/// then CAN message will be zeroed and must be handled later.
 	socketcan_bcm_t& operator>>(socketcan_bcm_t& s, can_message_t& cm)
 	{
 		struct utils::simple_bcm_msg msg;

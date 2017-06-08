@@ -25,28 +25,35 @@
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/socketcan-bcm.hpp"
 
+/// @brief Filtering values. Theses values has to be tested into
+/// can_bus_t::apply_filter method.
 struct event_filter_t
 {
-	float frequency;
-	float min;
-	float max;
+	float frequency; ///< frequency - Maximum frequency which will be received and pushed a subscribed event.
+	float min; ///< min - Minimum value that the signal don't have to go below to be pushed.
+	float max; ///< max - Maximum value that the signal don't have to go above to be pushed.
 	event_filter_t() : frequency{NAN}, min{NAN}, max{NAN} {}
 };
 
+/// @brief A subscription object used has a context that handle all needed values to describe a subscription
+/// to the low-can binding. It can holds a CAN signal or diagnostic message. Diagnostic message for OBD2 is a kind
+/// of special because there is only 1 listener to retrieve OBD2 requests. So it's needed that all diagnostic messages
+/// subscriptions is to be in 1 object.
 class low_can_subscription_t
 {
 private:
-	int index_;
-	struct afb_event event_;
+	int index_; ///< index_ - index number is the socket (int) casted
+	struct afb_event event_; ///< event_ - application framework event used to push on client
 
 	/// Signal part
-	std::shared_ptr<can_signal_t> can_signal_;
-	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_;
+	std::shared_ptr<can_signal_t> can_signal_; ///< can_signal_ - the CAN signal subscribed
+	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to received OBD2 responses.
+				/// normal diagnostic request and response not tested for now.
 
 	/// Filtering part
-	struct event_filter_t event_filter_;
+	struct event_filter_t event_filter_; ///< event_filter_ - filtering values applied to a subscription
 
-	utils::socketcan_bcm_t socket_;
+	utils::socketcan_bcm_t socket_; ///< socket_ - socket_ that receives CAN messages.
 public:
 	low_can_subscription_t();
 	low_can_subscription_t(struct event_filter_t event_filter);
@@ -78,7 +85,6 @@ public:
 	struct utils::simple_bcm_msg make_bcm_head(uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning) const;
 	void add_bcm_frame(const struct can_frame& cfd, struct utils::simple_bcm_msg& bcm_msg) const;
 	int open_socket();
-	int create_rx_filter();
 	int create_rx_filter(std::shared_ptr<can_signal_t> sig);
 	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
 	int create_rx_filter(utils::simple_bcm_msg& bcm_msg);

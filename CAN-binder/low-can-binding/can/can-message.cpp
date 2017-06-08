@@ -84,7 +84,7 @@ bool can_message_t::get_rtr_flag_() const
 ///
 /// @brief Retrieve format_ member value.
 ///
-/// @return format_ class member
+/// @return format_ class member. Default to INVALID.
 ///
 can_message_format_t can_message_t::get_format() const
 {
@@ -149,12 +149,10 @@ void can_message_t::set_timestamp(uint64_t timestamp)
 	timestamp_ = timestamp;
 }
 
-///
 /// @brief Control whether the object is correctly initialized
 ///  to be sent over the CAN bus
 ///
-/// @return true if object correctly initialized and false if not.
-///
+/// @return True if object correctly initialized and false if not.
 bool can_message_t::is_correct_to_send()
 {
 	if (id_ != 0 && length_ != 0 && format_ != can_message_format_t::INVALID)
@@ -167,14 +165,12 @@ bool can_message_t::is_correct_to_send()
 	return false;
 }
 
-///
 /// @brief Set format_ member value.
 ///
 /// Preferred way to initialize these members by using
 /// convert_from_canfd_frame method.
 ///
 /// @param[in] new_format - class member
-///
 void can_message_t::set_format(const can_message_format_t new_format)
 {
 	if(new_format == can_message_format_t::STANDARD || new_format == can_message_format_t::EXTENDED || new_format == can_message_format_t::INVALID)
@@ -191,7 +187,6 @@ void can_message_t::set_format(const can_message_format_t new_format)
 /// @param[in] nbytes - bytes read from socket read operation.
 ///
 /// @return A can_message_t object fully initialized with canfd_frame values.
-///
 can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes, uint64_t timestamp)
 {
 	uint8_t maxdlen, length, flags = (uint8_t)NULL;
@@ -272,6 +267,14 @@ can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame,
 	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data, timestamp);
 }
 
+/// @brief Take a can_frame struct to initialize class members
+///
+/// This is the preferred way to initialize class members.
+///
+/// @param[in] frame - can_frame to convert coming from a read of CAN socket
+/// @param[in] nbytes - bytes read from socket read operation.
+///
+/// @return A can_message_t object fully initialized with can_frame values.
 can_message_t can_message_t::convert_from_frame(const struct can_frame& frame, size_t nbytes, uint64_t timestamp)
 {
 	uint8_t maxdlen, length, flags = (uint8_t)NULL;
@@ -343,13 +346,11 @@ can_message_t can_message_t::convert_from_frame(const struct can_frame& frame, s
 	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data, timestamp);
 }
 
-///
 /// @brief Take all initialized class's members and build an
 /// canfd_frame struct that can be use to send a CAN message over
 /// the bus.
 ///
 /// @return canfd_frame struct built from class members.
-///
 struct canfd_frame can_message_t::convert_to_canfd_frame()
 {
 	canfd_frame frame;
@@ -366,6 +367,11 @@ struct canfd_frame can_message_t::convert_to_canfd_frame()
 	return frame;
 }
 
+/// @brief Take all initialized class's members and build an
+/// can_frame struct that can be use to send a CAN message over
+/// the bus.
+///
+/// @return can_frame struct built from class members.
 struct can_frame can_message_t::convert_to_can_frame()
 {
 	can_frame frame;

@@ -37,11 +37,15 @@ namespace utils
 		std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages;
 	};
 
+	/// @brief Signal manager singleton hold subscription object with attached afb_event and its mutex 
+	/// to read and write it safely.
+	/// It can be used to browse CAN signals and Diagnostic messages vectors and find a particular signal to
+	/// subscribe to.
 	class signals_manager_t
 	{
 	private:
 		std::mutex subscribed_signals_mutex_;
-		std::map<int, std::shared_ptr<low_can_subscription_t> > subscribed_signals_;
+		std::map<int, std::shared_ptr<low_can_subscription_t> > subscribed_signals_; ///< Map containing all subscribed signals, key is the socket int value.
 
 		signals_manager_t(); ///< Private constructor to make singleton class.
 

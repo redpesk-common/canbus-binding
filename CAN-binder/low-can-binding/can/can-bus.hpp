@@ -72,7 +72,7 @@ private:
 	std::mutex decoded_can_message_mutex_;  ///< mutex protecting the vehicle_message_q_ queue.
 	std::queue <std::pair<int, openxc_VehicleMessage> > vehicle_message_q_; ///< queue that'll store openxc_VehicleMessage to pushed
 
-	std::vector<std::pair<std::string, std::string> > can_devices_;
+	std::vector<std::pair<std::string, std::string> > can_devices_; ///< can_devices_ - holds a mapping between logical CAN devices names and linux CAN devices names.
 public:
 	explicit can_bus_t(utils::config_parser_t conf_file);
 	can_bus_t(can_bus_t&&);

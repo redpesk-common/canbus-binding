@@ -35,22 +35,24 @@
 
 class can_message_set_t;
 
+/// @brief The definition of a CAN message. This includes a lot of metadata, so
+///  to save memory this class gets the can_signal_t object related to a CAN message.
 class can_message_definition_t
 {
 private:
-	can_message_set_t* parent_; /*!< parent_ - Pointer to the CAN message set holding this CAN message definition */
-	std::string bus_; /*!< bus_ - Address of CAN bus device. */
-	uint32_t id_; /*!< id_ - The ID of the message.*/
-	can_message_format_t format_; /*!< format_ - the format of the message's ID.*/
-	frequency_clock_t frequency_clock_; /*!<  clock_ - an optional frequency clock to control the output of this
-							*      message, if sent raw, or simply to mark the max frequency for custom
-							*      handlers to retrieve.*/
-	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send CAN
-							*	message if it has changed when using raw passthrough.*/
-	std::vector<uint8_t> last_value_; /*!< last_value_ - The last received value of the message. Defaults to undefined.
-										*	This is required for the forceSendChanged functionality, as the stack
-										*	needs to compare an incoming CAN message with the previous frame.*/
-	std::vector<std::shared_ptr<can_signal_t> > can_signals_; /*!< can_signals_ - Vector holding can_signal_t object which share the same arbitration ID */
+	can_message_set_t* parent_; ///< parent_ - Pointer to the CAN message set holding this CAN message definition */
+	std::string bus_; ///< bus_ - Address of CAN bus device. */
+	uint32_t id_; ///< id_ - The ID of the message.*/
+	can_message_format_t format_; ///< format_ - the format of the message's ID.*/
+	frequency_clock_t frequency_clock_; ///<  clock_ - an optional frequency clock to control the output of this
+							///      message, if sent raw, or simply to mark the max frequency for custom
+							///      handlers to retrieve.*/
+	bool force_send_changed_; ///< force_send_changed_ - If true, regardless of the frequency, it will send CAN
+							///	message if it has changed when using raw passthrough.*/
+	std::vector<uint8_t> last_value_; ///< last_value_ - The last received value of the message. Defaults to undefined.
+										///	This is required for the forceSendChanged functionality, as the stack
+										///	needs to compare an incoming CAN message with the previous frame.*/
+	std::vector<std::shared_ptr<can_signal_t> > can_signals_; ///< can_signals_ - Vector holding can_signal_t object which share the same arbitration ID */
 
 public:
 	//can_message_definition_t(const can_message_definition_t& b);

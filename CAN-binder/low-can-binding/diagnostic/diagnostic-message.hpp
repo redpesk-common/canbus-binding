@@ -41,9 +41,7 @@ enum UNIT {
 
 class can_message_set_t;
 
-///
 /// @brief - A representation of an OBD-II PID.
-///
 class diagnostic_message_t
 {
 	private:

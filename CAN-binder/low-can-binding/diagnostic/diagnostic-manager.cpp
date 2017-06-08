@@ -72,9 +72,8 @@ void diagnostic_manager_t::reset()
 	cleanup_active_requests(true);
 }
 
-/// @brief send function use by diagnostic library. Only one bus used for now
-///  so diagnostic request is sent using the default diagnostic bus not matter of
-///  which is specified in the diagnostic message definition.
+/// @brief send function use by diagnostic library. It will open a BCM CAN socket TX_SETUP type.
+/// That socket will send cyclic messages configured from a diagnostic request.
 ///
 /// @param[in] arbitration_id - CAN arbitration ID to use when send message. OBD2 broadcast ID
 ///  is 0x7DF by example.
@@ -163,15 +162,6 @@ DiagnosticShims& diagnostic_manager_t::get_shims()
 	return shims_;
 }
 
-bool diagnostic_manager_t::is_active_requests_running()
-{
-	if(non_recurring_requests_.empty() && recurring_requests_.empty())
-	{
-		return true;
-	}
-	return false;
-}
-
 /// @brief Search for a specific active diagnostic request in the provided requests list
 /// and erase it from the vector. This is useful at unsubscription to clean up the list otherwize
 /// all received CAN messages will be passed to DiagnosticRequestHandle of all active diagnostic request
@@ -186,7 +176,7 @@ void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t* entry, st
 		requests_list.erase(i);
 }
 
-// @brief TODO: implement cancel_request if needed... Don't know.
+/// @brief Free memory allocated on active_diagnostic_request_t object and close the socket.
 void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 {
 	entry->get_socket().close();
@@ -259,7 +249,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(Diagno
 	return nullptr;
 }
 
-/// @brief Add and send a new one-time diagnostic request.
+/// @brief Add and send a new one-time diagnostic request. DON'T USED AT THIS TIME
 ///
 /// A one-time (aka non-recurring) request can existing in parallel with a
 /// recurring request for the same PID or mode, that's not a problem.
@@ -320,6 +310,12 @@ active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest
 	return entry;
 }
 
+/// @brief Validate frequency asked don't get higher than the maximum of a classical
+/// CAN bus OBD2 request.
+///
+/// @param[in] frequencyHz - frequency asked for sending diagnostic requests.
+///
+/// @return True if frequency is below the Maximum false if not.
 bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyHz)
 {
 	if(frequencyHz > MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ) {
@@ -334,32 +330,7 @@ bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyH
 ///
 /// At most one recurring request can be active for the same arbitration ID, mode
 /// and (if set) PID on the same bus at one time. If you try and call
-/// addRecurringRequest with the same key, it will return an error.
-///
-/// TODO: This also adds any neccessary CAN acceptance filters so we can receive the
-/// response. If the request is to the functional broadcast ID (0x7df) filters
-/// are added for all functional addresses (0x7e8 to 0x7f0).
-///
-/// Example:
-///
-///     // Creating a functional broadcast, mode 1 request for PID 2.
-///     DiagnosticRequest request = {
-///         arbitration_id: 0x7df,
-///         mode: 1,
-///         has_pid: true,
-///         pid: 2
-///     };
-///
-///     // Add a recurring request, to be sent at 1Hz, and published with the
-///     // name "my_pid_request"
-///     addRecurringRequest(&getConfiguration()->diagnosticsManager,
-///          canBus,
-///          &request,
-///          "my_pid_request",
-///          false,
-///          NULL,
-///          NULL,
-///          1);
+/// add_recurring_request with the same key, it will return an error.
 ///
 /// @param[in] request - The parameters for the request.
 /// @param[in] name - An optional human readable name this response, to be used when

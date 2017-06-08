@@ -52,6 +52,7 @@ std::vector<std::shared_ptr<can_signal_t> > can_message_set_t::get_all_can_signa
 	return can_signals;
 }
 
+/// @brief Return vector holding all diagnostic messages definitions handled by this message set.
 std::vector<std::shared_ptr<diagnostic_message_t> >& can_message_set_t::get_diagnostic_messages()
 {
 	return diagnostic_messages_;
