@@ -91,7 +91,7 @@ void can_bus_t::process_can_signals(const can_message_t& can_message, std::map<i
 		{
 			std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 			push_new_vehicle_message(subscription_id, vehicle_message);
-			DEBUG(binder_interface, "%s: %s CAN signals processed.", __FUNCTION__,  sig->get_name().c_str());
+			DEBUG("%s CAN signals processed.",  sig->get_name().c_str());
 		}
 	}
 }
@@ -116,7 +116,7 @@ void can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const 
 		{
 			std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 			push_new_vehicle_message(subscription_id, vehicle_message);
-			DEBUG(binder_interface, "%s: %s CAN signals processed.", __FUNCTION__,  s[subscription_id]->get_name().c_str());
+			DEBUG("%s CAN signals processed.",  s[subscription_id]->get_name().c_str());
 		}
 	}
 }
@@ -249,7 +249,7 @@ const can_message_t can_bus_t::next_can_message()
 	{
 		can_msg = can_message_q_.front();
 		can_message_q_.pop();
-		DEBUG(binder_interface, "%s: Here is the next can message : id %X, length %X, data %02X%02X%02X%02X%02X%02X%02X%02X", __FUNCTION__, can_msg.get_id(), can_msg.get_length(),
+		DEBUG("Here is the next can message : id %X, length %X, data %02X%02X%02X%02X%02X%02X%02X%02X", can_msg.get_id(), can_msg.get_length(),
 			can_msg.get_data()[0], can_msg.get_data()[1], can_msg.get_data()[2], can_msg.get_data()[3], can_msg.get_data()[4], can_msg.get_data()[5], can_msg.get_data()[6], can_msg.get_data()[7]);
 		return can_msg;
 	}
@@ -276,7 +276,7 @@ std::pair<int, openxc_VehicleMessage> can_bus_t::next_vehicle_message()
 	{
 		v_msg = vehicle_message_q_.front();
 		vehicle_message_q_.pop();
-		DEBUG(binder_interface, "%s: next vehicle message poped", __FUNCTION__);
+		DEBUG("next vehicle message poped");
 		return v_msg;
 	}
 
@@ -299,7 +299,7 @@ void can_bus_t::set_can_devices()
 
 	if(can_devices_.empty())
 	{
-		ERROR(binder_interface, "%s: No mapping found in config file: '%s'. Check it that it have a CANbus-mapping section.",
+		ERROR("No mapping found in config file: '%s'. Check it that it have a CANbus-mapping section.",
 			__FUNCTION__, conf_file_.filepath().c_str());
 	}
 }

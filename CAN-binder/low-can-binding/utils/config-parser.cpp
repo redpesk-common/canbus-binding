@@ -39,10 +39,10 @@ namespace utils
 	{
 		if (config_content_.size() <= 0)
 		{
-			ERROR(binder_interface, "%s: Can't load the INI config file.", __FUNCTION__);
+			ERROR("Can't load the INI config file.");
 			return false;
 		}
-			DEBUG(binder_interface, "%s: Configuration file parsed", __FUNCTION__);
+			DEBUG("Configuration file parsed");
 			return true;
 	}
 

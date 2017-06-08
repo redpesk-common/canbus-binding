@@ -105,7 +105,7 @@ static int make_subscription_unsubscription(struct afb_req request, std::shared_
 	/* Make the subscription or unsubscription to the event */
 	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[can_subscription->get_index()]->get_event())) < 0)
 	{
-		ERROR(binder_interface, "%s: Operation goes wrong for signal: %s", __FUNCTION__, can_subscription->get_name().c_str());
+		ERROR("Operation goes wrong for signal: %s", can_subscription->get_name().c_str());
 		return -1;
 	}
 	return 0;
@@ -114,11 +114,11 @@ static int make_subscription_unsubscription(struct afb_req request, std::shared_
 static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int sub_index = can_subscription->get_index();
-	can_subscription->set_event(afb_daemon_make_event(binder_interface->daemon, can_subscription->get_name().c_str()));
+	can_subscription->set_event(afb_daemon_make_event(can_subscription->get_name().c_str()));
 	s[sub_index] = can_subscription;
 	if (!afb_event_is_valid(s[sub_index]->get_event()))
 	{
-		ERROR(binder_interface, "%s: Can't create an event for %s, something goes wrong.", __FUNCTION__, can_subscription->get_name().c_str());
+		ERROR("Can't create an event for %s, something goes wrong.", can_subscription->get_name().c_str());
 		return -1;
 	}
 	return 0;
@@ -136,7 +136,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 	{
 		if (!afb_event_is_valid(s[sub_index]->get_event()) && !subscribe)
 		{
-			NOTICE(binder_interface, "%s: Event isn't valid, no need to unsubscribed.", __FUNCTION__);
+			NOTICE("Event isn't valid, no need to unsubscribed.");
 			ret = -1;
 		}
 		ret = 0;
@@ -159,7 +159,7 @@ static int subscribe_unsubscribe_signal(struct afb_req request, bool subscribe, 
 static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscription)
 {
 		struct sd_event_source* event_source = nullptr;
-		return ( sd_event_add_io(afb_daemon_get_event_loop(binder_interface->daemon),
+		return ( sd_event_add_io(afb_daemon_get_event_loop(),
 			&event_source,
 			can_subscription->get_socket().socket(),
 			EPOLLIN,
@@ -192,22 +192,22 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, boo
 			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency);
 			if(can_subscription->create_rx_filter(sig) < 0)
 				{return -1;}
-			DEBUG(binder_interface, "%s: Signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
+			DEBUG("Signal: %s subscribed", sig->get_name().c_str());
 			if(it == s.end() && add_to_event_loop(can_subscription) < 0)
 			{
 				diag_m.cleanup_request(
 					diag_m.find_recurring_request(*diag_req), true);
-				WARNING(binder_interface, "%s: signal: %s isn't supported. Canceling operation.", __FUNCTION__,  sig->get_name().c_str());
+				WARNING("signal: %s isn't supported. Canceling operation.",  sig->get_name().c_str());
 				return -1;
 			}
 		}
 		else
 		{
 			if(sig->get_supported())
-			{DEBUG(binder_interface, "%s: %s cancelled due to unsubscribe", __FUNCTION__, sig->get_name().c_str());}
+			{DEBUG("%s cancelled due to unsubscribe", sig->get_name().c_str());}
 			else
 			{
-				WARNING(binder_interface, "%s: signal: %s isn't supported. Canceling operation.", __FUNCTION__, sig->get_name().c_str());
+				WARNING("signal: %s isn't supported. Canceling operation.", sig->get_name().c_str());
 				return -1;
 			}
 		}
@@ -245,7 +245,7 @@ static int subscribe_unsubscribe_can_signals(struct afb_req request, bool subscr
 			{return -1;}
 
 		rets++;
-		DEBUG(binder_interface, "%s: signal: %s subscribed", __FUNCTION__, sig->get_name().c_str());
+		DEBUG("signal: %s subscribed", sig->get_name().c_str());
 	}
 	return rets;
 }
@@ -307,7 +307,7 @@ static int one_subscribe_unsubscribe(struct afb_req request, bool subscribe, con
 	openxc_DynamicField search_key = build_DynamicField(tag);
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
 	if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
-		NOTICE(binder_interface, "%s: No signal(s) found for %s.", __FUNCTION__, tag.c_str());
+		NOTICE("No signal(s) found for %s.", tag.c_str());
 	else
 		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);
 

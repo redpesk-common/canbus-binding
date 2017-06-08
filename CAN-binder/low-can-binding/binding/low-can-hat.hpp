@@ -26,13 +26,9 @@
 
 extern "C"
 {
-	#define AFB_BINDING_VERSION 1
+	#define AFB_BINDING_VERSION 2
 	#include <afb/afb-binding.h>
 };
-
-extern "C" struct afb_binding_interface;
-
-extern const struct afb_binding_interface *binder_interface;
 
 class low_can_subscription_t;
 

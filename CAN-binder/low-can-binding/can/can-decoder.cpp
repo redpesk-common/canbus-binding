@@ -132,7 +132,7 @@ openxc_DynamicField decoder_t::stateDecoder(can_signal_t& signal,
 	if(signal_state.size() <= 0)
 	{
 		*send = false;
-		ERROR(binder_interface, "%s: No state found with index: %d", __FUNCTION__, (int)value);
+		ERROR("No state found with index: %d", (int)value);
 	}
 	return decoded_value;
 }
@@ -157,7 +157,7 @@ openxc_DynamicField decoder_t::translateSignal(can_signal_t& signal, const can_m
 	const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send)
 {
 	float value = decoder_t::parseSignalBitfield(signal, message);
-	DEBUG(binder_interface, "%s: Decoded message from parseSignalBitfield: %f", __FUNCTION__, value);
+	DEBUG("Decoded message from parseSignalBitfield: %f", value);
 
 	// Must call the decoders every time, regardless of if we are going to
 	// decide to send the signal or not.

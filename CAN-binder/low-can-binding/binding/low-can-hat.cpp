@@ -28,39 +28,33 @@
 #include "application.hpp"
 #include "../can/can-bus.hpp"
 
-// Interface between the daemon and the binding
-const struct afb_binding_interface *binder_interface;
-
 extern "C"
 {
-	static const struct afb_verb_desc_v1 verbs[]=
+	static int initv2();
+
+	static const struct afb_verb_v2 verbs[]=
 	{
-		{ .name= "subscribe",	.session= AFB_SESSION_NONE, .callback= subscribe,	.info= "subscribe to notification of CAN bus messages." },
-		{ .name= "unsubscribe",	.session= AFB_SESSION_NONE, .callback= unsubscribe,	.info= "unsubscribe a previous subscription." }
+		{ .verb= "subscribe", .callback= subscribe, .auth= NULL, .session= AFB_SESSION_NONE},
+		{ .verb= "unsubscribe", .callback= unsubscribe, .auth= NULL, .session= AFB_SESSION_NONE},
+		{ .verb= NULL, .callback= NULL, .auth= NULL, .session= 0}
 	};
 
-	static const struct afb_binding binding_desc {
-		AFB_BINDING_VERSION_1,
-		{
-			"Low level CAN bus service",
-			"low-can",
-			verbs
-		}
+	const struct afb_binding_v2 afbBindingV2 {
+		.api = "low-can",
+		.specification = NULL,
+		.verbs = verbs,
+		.preinit = NULL,
+		.init = initv2,
+		.onevent = NULL,
+		.noconcurrency = 0
 	};
-
-	const struct afb_binding *afbBindingV1Register (const struct afb_binding_interface *itf)
-	{
-		binder_interface = itf;
-
-		return &binding_desc;
-	}
 
 	/// @brief Initialize the binding.
 	///
 	/// @param[in] service Structure which represent the Application Framework Binder.
 	///
 	/// @return Exit code, zero if success.
-	int afbBindingV1ServiceInit(struct afb_service service)
+	static int initv2()
 	{
 		can_bus_t& can_bus_manager = application_t::instance().get_can_bus_manager();
 
@@ -73,7 +67,7 @@ extern "C"
 		if(application_t::instance().get_diagnostic_manager().initialize())
 			return 0;
 
-		ERROR(binder_interface, "%s: There was something wrong with CAN device Initialization.", __FUNCTION__);
+		ERROR("There was something wrong with CAN device Initialization.");
 		return 1;
 	}
 };
