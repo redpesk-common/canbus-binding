@@ -1,86 +1,32 @@
-# Install AFB Websocket CLI client to test the binding.
+# Configure the AGL system
 
-You can test it using afb-client-demo CLI tool provided by the RPM package _libafbwsc-dev_.
-
-You can find this package in your build environment, using docker SDK recommended setup the file is `/xdt/build/tmp/deploy/rpm/<your-target-arch>/`.
-
-After a successful bitbake build and using Renesas RCar Gen2, Porter, you have to copy the file if your board is connected to your network and you know its IP address:
-
-```bash
-$ scp /xdt/build/tmp/deploy/rpm/cortex15hf_neon/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm root@<target_IP>:~
-```
-
-Else, you have to copy into the SDcard with the AGL image installed on it.
-
-From the docker image copy RPM to the shared directory between docker image and your host:
-
-```bash
-$ cp /xdt/build/tmp/deploy/rpm/cortex15hf_neon/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm ~/share
-```
-
-Then plugin you SDcard in your Linux host \(Windows can't read ext4 filesystem AGL runs on\) and copy RPM file on it.
-
-From your host, identify SDcard block device node here it is **sdc** with the correct capacity automounted by the desktop manager:
-
-```bash
-$ lsblk
-loop1                                                                                     7:1    0     2G  0 loop
-└─docker-253:0-3146365-pool                                                             253:3    0   100G  0 dm
-  └─docker-253:0-3146365-e9f80849a2681e18549d3a4238cbf031e44052e36cd88a0abf041804b799b61c
-    253:4    0    10G  0 dm   /var/lib/docker/devicemapper/mnt/e9f80849a2681e18549d3a4238cbf031e44052e36cd88a0abf041804b799b61c
-sdb                                                                                       8:16   0 238.5G  0 disk
-├─sdb2                                                                                    8:18   0   238G  0 part
-│ └─agl                                                                         253:1    0   238G  0 lvm  /home/claneys/Workspace/agl-docker
-└─sdb1                                                                                    8:17   0   500M  0 part /boot
-sr0                                                                                      11:0    1  1024M  0 rom
-loop0                                                                                     7:0    0   100G  0 loop
-└─docker-253:0-3146365-pool                                                             253:3    0   100G  0 dm
-  └─docker-253:0-3146365-e9f80849a2681e18549d3a4238cbf031e44052e36cd88a0abf041804b799b61c
-    253:4    0    10G  0 dm   /var/lib/docker/devicemapper/mnt/e9f80849a2681e18549d3a4238cbf031e44052e36cd88a0abf041804b799b61c
-sdc                                                                                       8:32   1  14.9G  0 disk
-└─sdc1                                                                                    8:33   1     2G  0 part /run/media/claneys/97f418a5-612f-44e9-b968-a19505695151
-sda                                                                                       8:0    0 931.5G  0 disk
-├─sda2                                                                                    8:2    0   500G  0 part
-│ ├─home                                                                        253:2    0   150G  0 lvm  /home
-│ └─root                                                                        253:0    0    50G  0 lvm  /
-└─sda1                                                                                    8:1    0    16G  0 part [SWAP]
-```
-
-Copy, still from your host:
-
-> **CAUTION:** Make sure to sync IO with sync command before unplug your SDcard. It could be corrupted if removed before all pending IO aren't done.
-
-```bash
-$ sudo umount /dev/sdc1
-$ export SDCARD=/mnt
-$ sudo mount /dev/sdc1 $SDCARD
-$ sudo cp ~/devel/docker/share/libafbwsc-dev-1.0-r0.cortexa15hf_neon.rpm $SDCARD/home/root
-$ sync
-$ sudo umount $SDCARD
-```
-
-Insert the modified SDcard in your Porter board and boot from it. You are ready to go.
-
-## Configure the AGL system
-
-### Virtual CAN device
+## Virtual CAN device
 
 Connected to the target, here is how to load the virtual CAN device driver and set up a new vcan device :
 
 ```bash
-# modprobe vcan
-# ip link add vcan0 type vcan
-# ip link set vcan0 up
+modprobe vcan
+ip link add vcan0 type vcan
+ip link set vcan0 up
 ```
 
-### CAN device using the USB CAN adapter
+You also can named your linux CAN device like you want and if you need name it `can0` :
+
+
+```bash
+modprobe vcan
+ip link add can0 type vcan
+ip link set can0 up
+```
+
+## CAN device using the USB CAN adapter
 
 Using real connection to CAN bus of your car using the USB CAN adapter connected to the OBD2 connector.
 
 Once connected, launch `dmesg` command and search which device to use :
 
 ```bash
-# dmesg
+dmesg
 [...]
 [  131.871441] usb 1-3: new full-speed USB device number 4 using ohci-pci
 [  161.860504] can: controller area network core (rev 20120528 abi 9)
@@ -100,9 +46,9 @@ Here device is named `can0`.
 This instruction assuming a speed of 500000kbps for your CAN bus, you can try others supported bitrate like 125000, 250000 if 500000 doesn't work:
 
 ```bash
-# ip link set can0 type can bitrate 500000
-# ip link set can0 up
-# ip link show can0
+ip link set can0 type can bitrate 500000
+ip link set can0 up
+ip link show can0
   can0: <NOARP,UP,LOWER_UP,ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
     link/can
     can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
@@ -112,14 +58,14 @@ This instruction assuming a speed of 500000kbps for your CAN bus, you can try ot
     clock 16000000
 ```
 
-For a Porter board, you'll have your CAN device as `can1` because `can0` already exists as an embedded device.
+On a Rcar Gen3 board, you'll have your CAN device as `can1` because `can0` already exists as an embedded device.
 
 The instructions will be the same:
 
 ```bash
-# ip link set can1 type can bitrate 500000
-# ip link set can1 up
-# ip link show can1
+ip link set can1 type can bitrate 500000
+ip link set can1 up
+ip link show can1
   can0: <NOARP,UP,LOWER_UP,ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
     link/can
     can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
@@ -129,28 +75,40 @@ The instructions will be the same:
     clock 16000000
 ```
 
-## Configure the binding
+## Rename an existing CAN device
+
+You can rename an existing CAN device using following command and doing so move an existing `can0` device to anything else and then use another device as `can0`. For a Rcar Gen3 board do the following by example:
+
+```bash
+sudo ip link set can0 down
+sudo ip link set can0 name bsp-can0
+sudo ip link set bsp-can0 up
+```
+
+Then connect your USB CAN device that will be named `can0` by default.
+
+# Configure the binding
 
 The binding reads system configuration file _/etc/dev-mapping.conf_ at start to map logical name from signals described in JSON file to linux devices name initialized by the system.
-Edit file _/etc/dev-mappping.conf_ and add mapping in section `CANbus-mapping` :
+Edit file _/etc/dev-mappping.conf_ and add mapping in section `CANbus-mapping`.
 
-Using virtual CAN device as described in the previous chapter:
+Default binding configuration use a CAN bus named `hs` so you need to map it to the real one, here are some examples:
+
+* Using virtual CAN device as described in the previous chapter:
 ```ini
 [CANbus-mapping]
 hs="vcan0"
 ls="vcan1"
 ```
 
-Using real CAN device, this example assume CAN bus traffic will be on can0.
+* Using real CAN device, this example assume CAN bus traffic will be on can0.
 ```ini
 [CANbus-mapping]
 hs="can0"
 ls="can1"
 ```
 
-On a Porter board there is an embedded CAN device so `can0` already exists.
-
-So you might want to use your USB CAN adapter plugged to the OBD2 connector, in this case use `can1`:
+* On a Rcar Gen3 board there is an embedded CAN device so `can0` already exists. So you might want to use your USB CAN adapter plugged to the OBD2 connector, in this case use `can1`:
 ```ini
 [CANbus-mapping]
 hs="can1"
@@ -158,12 +116,12 @@ hs="can1"
 
 > **CAUTION VERY IMPORTANT:** Make sure the CAN bus\(es\) you specify in your configuration file match those specified in your generated source file with the `CAN-config-generator`.
 
-## Run it, test it, use it !
+# Run it, test it, use it !
 
 You can run the binding using **afm-util** tool, here is the classic way to go :
 
 ```bash
-# afm-util run low-can-binding@1.0
+afm-util run low-can-service@2.0
 1
 ```
 
@@ -174,23 +132,21 @@ But you can't control nor interact with it because you don't know security token
 So, to test it, it is better to launch the binding manually. In the following example, we will use port **1234** and left empty security token for testing purpose:
 
 ```bash
-# afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-binding/1.0/libs/ --rootdir=/var/lib/afm/applications/low-can-binding/1.0/ --port=1234 --token=1
+afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-service/2.0/lib/ --rootdir=/var/lib/afm/applications/low-can-service/2.0/ --port=1234 --token=1
 NOTICE: binding [/usr/lib/afb/afb-dbus-binding.so] calling registering function afbBindingV1Register
 NOTICE: binding /usr/lib/afb/afb-dbus-binding.so loaded with API prefix dbus
 NOTICE: binding [/usr/lib/afb/authLogin.so] calling registering function afbBindingV1Register
 NOTICE: binding /usr/lib/afb/authLogin.so loaded with API prefix auth
-NOTICE: binding [/var/lib/afm/applications/low-can-binding/1.0/libs//low-can-binding.so] calling registering function afbBindingV1Register
-NOTICE: binding /var/lib/afm/applications/low-can-binding/1.0/libs//low-can-binding.so loaded with API prefix low-can
-NOTICE: Waiting port=1234 rootdir=/var/lib/afm/applications/low-can-binding/1.0/
+NOTICE: binding [/var/lib/afm/applications/low-can-service/2.0/libs//low-can-binding.so] calling registering function afbBindingV1Register
+NOTICE: binding /var/lib/afm/applications/low-can-service/2.0/libs//low-can-binding.so loaded with API prefix low-can
+NOTICE: Waiting port=1234 rootdir=/var/lib/afm/applications/low-can-service/2.0/
 NOTICE: Browser URL= http:/*localhost:1234
-NOTICE: vcan0 device opened and reading {binding low-can}
-NOTICE: Initialized 1/1 can bus device(s) {binding low-can}
 ```
 
 On another terminal, connect to the binding using previously installed _**AFB Websocket CLI**_ tool:
 
 ```bash
-# afb-client-demo ws://localhost:1234/api?token=1
+afb-client-demo ws://localhost:1234/api?token=1
 ```
 
 You will be on an interactive session where you can communicate directly with the binding API.
@@ -211,7 +167,7 @@ Where:
 * Verb : _**subscribe**_ or _**unsubscribe**_
 * Arguments : _**{ "event": "driver.doors.open" }**_
 
-### Subscription and unsubscription
+## Subscription and unsubscription
 
 You can ask to subscribe to chosen CAN event with a call to _subscribe_ API verb with the CAN messages name as JSON argument.
 
@@ -263,26 +219,44 @@ low-can unsubscribe { "event" : "doors*" }
 ON-REPLY 3:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
 ```
 
-### Using CAN utils to monitor CAN activity
+### Filtering capabilities
+
+It is possible to limits received event notifications into minimum and maximum boundaries as well as doing frequency thinning. This is possible using the argument filter with one or more of the filters available :
+
+* frequency: specify in Hertz the frequency which will be used to getting notified of new CAN events for the designated signal. If, during the blocked time, further changed CAN messages are received, the last valid one will be transferred after the lockout with a RX_CHANGED. 
+* min: Minimum value that the decoded value needs to be above to get pushed to the subscribed client(s).
+* max: Maximum value that the decoded value needs to be below to get pushed to the subscribed client(s)
+
+Order doesn't matter neither the number of filters chosen, you can use one, two or all of them at once.
+
+Usage examples :
+
+```json
+low-can subscribe {"event": "messages.engine.speed", "filter": { "frequency": 3, "min": 1250, "max": 3500}}
+low-can subscribe {"event": "messages.engine.load", "filter": { "min": 30, "max": 100}}
+low-can subscribe {"event": "messages.vehicle.speed", "filter": { "frequency": 2}}
+```
+
+## Using CAN utils to monitor CAN activity
 
 You can watch CAN traffic and send custom CAN messages using can-utils preinstalled on AGL target.
 
 To watch watch going on a CAN bus use:
 
 ```bash
-# candump can0
+candump can0
 ```
 
 Or for an USB CAN adapter connected to porter board:
 
 ```bash
-# candump can1
+candump can1
 ```
 
 Send a custom message:
 
 ```bash
-# cansend can0 ID#DDDDAAAATTTTAAAA
+cansend can0 ID#DDDDAAAATTTTAAAA
 ```
 
 You can also replay a previously dumped CAN logfiles. These logfiles can be found in _can_samples_ directory under Git repository. Following examples use a real trip from an Auris Toyota car.
@@ -291,15 +265,15 @@ Trace has been recorded from a CAN device `can0` so you have to map it to the co
 
 Replay on a virtual CAN device `vcan0`:
 ```bash
-# canplayer -I trip_test_with_obd2_vehicle_speed_requests vcan0=can0
+canplayer -I trip_test_with_obd2_vehicle_speed_requests vcan0=can0
 ```
 
 Replay on a CAN device `can0`:
 ```bash
-# canplayer -I trip_test_with_obd2_vehicle_speed_requests can0
+canplayer -I trip_test_with_obd2_vehicle_speed_requests can0
 ```
 
 Replay on a CAN device `can1` (porter by example):
 ```bash
-# canplayer -I trip_test_with_obd2_vehicle_speed_requests can1=can0
+canplayer -I trip_test_with_obd2_vehicle_speed_requests can1=can0
 ```
