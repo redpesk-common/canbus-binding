@@ -4,8 +4,8 @@
     "keywords": "AGL, Development, CAN, binding, binder, OpenXC",
     "author": "IoT.Bzh Team",
     "website": "http://iot.bzh",
-    "published": "March 2017",
-    "version": "1.0",
+    "published": "June 2017",
+    "version": "2.0",
 
     "gitbook": "3.2.2",
     "root": "docs",
