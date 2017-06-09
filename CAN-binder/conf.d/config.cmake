@@ -18,8 +18,8 @@
 
 # Project Info
 # ------------------
-set(PROJECT_NAME low-can-project)
-set(PROJECT_VERSION "1.0")
+set(PROJECT_NAME low-can-service)
+set(PROJECT_VERSION "2.0")
 set(PROJECT_PRETTY_NAME "Low level CAN binding")
 set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
 set(PROJECT_URL "https://github.com/iotbzh/CAN_signaling")
