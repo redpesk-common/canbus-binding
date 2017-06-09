@@ -92,9 +92,9 @@ set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 # -------------------------
 #set(EXTRA_LINK_LIBRARIES)
 
-# Optional force binding installation
+# Optional force installation prefix
 # ------------------------------------
-set(BINDINGS_INSTALL_PREFIX /opt )
+set(INSTALL_PREFIX /opt )
 # set(WIDGET_PREFIX DestinationPath)
 
 # Optional force binding Linking flag

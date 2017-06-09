@@ -1,4 +1,3 @@
 [submodule "CAN-binder/conf.d/default"]
 	path = CAN-binder/conf.d/default
 	url = https://gerrit.automotivelinux.org/gerrit/apps/app-templates
-	branch = reference
