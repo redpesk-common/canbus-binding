@@ -300,7 +300,7 @@ void can_bus_t::set_can_devices()
 	if(can_devices_.empty())
 	{
 		ERROR("No mapping found in config file: '%s'. Check it that it have a CANbus-mapping section.",
-			__FUNCTION__, conf_file_.filepath().c_str());
+			conf_file_.filepath().c_str());
 	}
 }
 
