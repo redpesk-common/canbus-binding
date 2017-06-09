@@ -23,7 +23,7 @@ The reference documentation of the JSON file can be found [here](https://github.
 ```bash
 $ export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
 $ export WD=$(pwd)
-$ git clone https://github.com/iotbzh/can-config-generator.git
+$ git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-service
 $ cd can-config-generator
 $ mkdir -p build
 $ cd build

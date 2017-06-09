@@ -37,7 +37,7 @@ prepare_meta -f iotbzh -o /xdt -l /home/devel/mirror -p /home/devel/share/propri
 ```bash
 export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
 export WD=$(pwd)
-git clone https://github.com/iotbzh/low-level-can-service
+git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-service
 export GENERATOR=${WD}/CAN-signaling/CAN-config-generator
 cd ${GENERATOR}
 mkdir -p build
