@@ -31,7 +31,7 @@ set(PROJECT_LANGUAGES,"C")
 
 # Where are stored default templates files from submodule or subtree app-templates in your project tree
 # relative to the root project directory
-set(PROJECT_APP_TEMPLATES_DIR "conf.d/default")
+set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
 
 # Where are stored your external libraries for your project. This is 3rd party library that you don't maintain
 # but used and must be built and linked.

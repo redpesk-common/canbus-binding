@@ -15,7 +15,7 @@
 # limitations under the License.
 
 BUILD_DIR   := build
-PACKAGING_DIR := conf.d/default/wgt
+PACKAGING_DIR := conf.d/app-templates/wgt
 
 VPATH = etc:$(PACKAGING_DIR):$(PACKAGING_DIR)/etc:$(BUILD_DIR)
 
@@ -29,7 +29,7 @@ clean:
 mrproper:
 	@rm -rf ${BUILD_DIR} package packaging
 
-build: conf.d/default/cmake config.xml.in icon-default.png ${BUILD_DIR}/Makefile
+build: conf.d/app-templates/cmake config.xml.in icon-default.png ${BUILD_DIR}/Makefile
 	@cmake --build ${BUILD_DIR} --target all
 
 package: build | $(PKG_FILELIST)
@@ -47,9 +47,9 @@ ${BUILD_DIR}/Makefile:
 	@[ -f ${BUILD_DIR}/Makefile ] || (cd ${BUILD_DIR} && cmake ${CMAKE_OPTS} ..)
 
 submodule:
-	@[ -d conf.d/default/cmake ] || git submodule init
-	@[ -d conf.d/default/cmake ] || git submodule update
+	@[ -d conf.d/app-templates/cmake ] || git submodule init
+	@[ -d conf.d/app-templates/cmake ] || git submodule update
 
-conf.d/default/cmake: submodule
+conf.d/app-templates/cmake: submodule
 config.xml.in: submodule
 icon-default.png: submodule
