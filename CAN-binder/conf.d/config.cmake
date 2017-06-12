@@ -80,6 +80,31 @@ set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
 set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX}/lib64/pkgconfig ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
+# Optional location for config.xml.in
+# -----------------------------------
+set(WIDGET_CONFIG_TEMPLATE ${CMAKE_CURRENT_SOURCE_DIR}/conf.d/wgt/config.xml.in)
+
+# Mandatory widget Mimetype specification
+# --------------------------------------------------
+# Choose between :
+# - application/vnd.agl.service
+# - application/vnd.agl.native
+# - application/x-executable
+# - text/html
+#
+set(WIDGET_TYPE application/vnd.agl.service)
+
+# Mandatory Widget entry point file.
+# ----------------------------------------------------
+# This is the file that will be executed, loaded,...
+# at launch time by the application framework
+#
+# !IMPORTANT! : Service Widget Mimetype has to specified
+# the WIDGET_ENTRY_POINT "lib" which is the default directory
+# that holds the bindings.
+#
+set(WIDGET_ENTRY_POINT lib/afs-low-can.so)
+
 # Optional dependencies order
 # ---------------------------
 #set(EXTRA_DEPENDENCIES_ORDER)
@@ -92,12 +117,20 @@ set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 # -------------------------
 #set(EXTRA_LINK_LIBRARIES)
 
-# Optional force installation prefix
+# Optional force binding installation
 # ------------------------------------
-set(INSTALL_PREFIX /opt )
-# set(WIDGET_PREFIX DestinationPath)
+# set(BINDINGS_INSTALL_PREFIX PrefixPath )
 
 # Optional force binding Linking flag
 # ------------------------------------
 # set(BINDINGS_LINK_FLAG LinkOptions )
 
+# Optional force package prefix generation, like widget
+# -----------------------------------------------------
+# set(PACKAGE_PREFIX DestinationPath)
+
+# Optional Application Framework security token
+# and port use for remote debugging.
+#------------------------------------------------------------
+#set(AFB_TOKEN   ""      CACHE PATH "Default AFB_TOKEN")
+#set(AFB_REMPORT "1234" CACHE PATH "Default AFB_TOKEN")
