@@ -32,9 +32,8 @@ prepare_meta -f iotbzh -o /xdt -l /home/devel/mirror -p /home/devel/share/propri
 
 ### Compile
 
-> **CAUTION** It is **very important** that you do not source the SDK environment file to compile this project because some build requirements aren't installed in the AGL SDK for now.
-
 ```bash
+source /xdt/sdk/environment-setup-aarch64-agl-linux
 export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
 export WD=$(pwd)
 git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-service
