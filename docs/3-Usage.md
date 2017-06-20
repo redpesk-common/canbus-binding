@@ -121,7 +121,7 @@ hs="can1"
 You can run the binding using **afm-util** tool, here is the classic way to go :
 
 ```bash
-afm-util run low-can-service@2.0
+afm-util run low-can-service@4.0
 1
 ```
 
@@ -132,14 +132,14 @@ But you can't control nor interact with it because you don't know security token
 So, to test it, it is better to launch the binding manually. In the following example, we will use port **1234** and left empty security token for testing purpose:
 
 ```bash
-afb-daemon --ldpaths=/usr/lib/afb:/var/lib/afm/applications/low-can-service/2.0/lib/ --rootdir=/var/lib/afm/applications/low-can-service/2.0/ --port=1234 --token=1
+afb-daemon --binding=/var/lib/afm/applications/low-can-service/4.0/lib/afb-low-can.so --rootdir=/var/lib/afm/applications/low-can-service/4.0/ --port=1234 --token=1
 NOTICE: binding [/usr/lib/afb/afb-dbus-binding.so] calling registering function afbBindingV1Register
 NOTICE: binding /usr/lib/afb/afb-dbus-binding.so loaded with API prefix dbus
 NOTICE: binding [/usr/lib/afb/authLogin.so] calling registering function afbBindingV1Register
 NOTICE: binding /usr/lib/afb/authLogin.so loaded with API prefix auth
-NOTICE: binding [/var/lib/afm/applications/low-can-service/2.0/libs//low-can-binding.so] calling registering function afbBindingV1Register
-NOTICE: binding /var/lib/afm/applications/low-can-service/2.0/libs//low-can-binding.so loaded with API prefix low-can
-NOTICE: Waiting port=1234 rootdir=/var/lib/afm/applications/low-can-service/2.0/
+NOTICE: binding [/var/lib/afm/applications/low-can-service/4.0/libs//low-can-binding.so] calling registering function afbBindingV1Register
+NOTICE: binding /var/lib/afm/applications/low-can-service/4.0/libs//low-can-binding.so loaded with API prefix low-can
+NOTICE: Waiting port=1234 rootdir=/var/lib/afm/applications/low-can-service/4.0/
 NOTICE: Browser URL= http:/*localhost:1234
 ```
 

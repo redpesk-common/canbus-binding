@@ -19,7 +19,7 @@
 # Project Info
 # ------------------
 set(PROJECT_NAME low-can-service)
-set(PROJECT_VERSION "2.0")
+set(PROJECT_VERSION "4.0")
 set(PROJECT_PRETTY_NAME "Low level CAN binding")
 set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
 set(PROJECT_URL "https://github.com/iotbzh/CAN_signaling")
@@ -71,7 +71,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
-set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/package --ldpaths=\$\$(pwd)/package/lib --port=1234 --roothttp=\$\$(pwd)/package/htdocs --tracereq=common --token=\"1\" --verbose")
+set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/package --binding=\$\$(pwd)/package/lib/afb-low-can.so --port=1234 --tracereq=common --token=\"1\" --verbose")
 set(WIDGET_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
@@ -103,7 +103,7 @@ set(WIDGET_TYPE application/vnd.agl.service)
 # the WIDGET_ENTRY_POINT "lib" which is the default directory
 # that holds the bindings.
 #
-set(WIDGET_ENTRY_POINT lib/afs-low-can.so)
+set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
 
 # Optional dependencies order
 # ---------------------------

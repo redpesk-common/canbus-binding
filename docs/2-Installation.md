@@ -1,6 +1,7 @@
 # Prerequisites
 
-* An AGL system installed with latest Daring Dab version.
+* An AGL system installed with latest Daring Dab version with latest Application
+framework version >= 0.6.
 
 * Make sure you built the AGL generator else you will not be able to generate custom low-level CAN binding.
 
@@ -8,7 +9,7 @@ It will produce a _application-generated.cpp_ file to paste in the source, _CAN-
 
 * Make sure you already set up the AGL SDK using the following [SDK Quick Setup Guide](http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html). Alternatively, please refer to official guides available on [AGL Developer Site](http://docs.automotivelinux.org/docs/devguides/en/dev/#guides).
 
-To get the correct SDK version installed, you **must** prepare your environment with the **iotbzh** flavor using _prepare_meta_ tool. To do so, run the following command in your docker image in the step 4 in place of `... [ prepare build environment ] ...`:
+If you need to have the graphic stack inside your SDK, you have to prepare your environment with the **iotbzh**, or **Daring Dab** flavor using _prepare_meta_ tool. To do so, run the following command in your docker image in the step 4 in place of `... [ prepare build environment ] ...`:
 
 > **NOTE** These commands assume that proprietary graphic drivers for Renesas Porter board are located in _/home/devel/share/proprietary-renesas-rcar_ directory.
 
@@ -37,7 +38,8 @@ source /xdt/sdk/environment-setup-aarch64-agl-linux
 export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
 export WD=$(pwd)
 git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-service
-export GENERATOR=${WD}/CAN-signaling/CAN-config-generator
+git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-generator
+export GENERATOR=${WD}/low-level-can-generator
 cd ${GENERATOR}
 mkdir -p build
 cd build
@@ -174,5 +176,5 @@ On the target, assuming _**wgt**_ file is in the root home directory:
 
 ```bash
 afm-util install low-can-service.wgt
-{ "added": "low-can-service@2.0" }
+{ "added": "low-can-service@4.0" }
 ```
