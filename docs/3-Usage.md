@@ -129,7 +129,7 @@ You can find instructions to use afm-util tool [here](http://docs.iot.bzh/docs/a
 
 But you can't control nor interact with it because you don't know security token that **Application Framework** gaves it at launch.
 
-So, to test it, it is better to launch the binding manually. In the following example, we will use port **1234** and left empty security token for testing purpose:
+So, to test it, it is better to launch the binding manually. In the following example, it will use port **1234** and left empty security token for testing purpose:
 
 ```bash
 afb-daemon --binding=/var/lib/afm/applications/low-can-service/4.0/lib/afb-low-can.so --rootdir=/var/lib/afm/applications/low-can-service/4.0/ --port=1234 --token=1

@@ -1,6 +1,6 @@
 # AGL CAN binding architecture proposal
 
-It's meant to generate from a JSON file describing CAN messages and diagnostic message \(OBD2 for now\), a cpp file to integrate with the project.
+It's meant to generate, from a JSON file describing CAN messages and diagnostic message \(OBD2 for now\), a cpp file to integrate with the project.
 
 Once generated binding is built with it and result will be a widget file to install on an AGL target system.
 
@@ -22,4 +22,4 @@ It will provides valuable access to the CAN bus by aggregate signals or providin
 
 ![Communication between CAN bindings and third applications](images/CAN_bindings_communication.png)
 
-Last be not least, the low level binding can be shipped as binary only using OpenXC inspired [AGL low level CAN binding Generator](http://github.com/iotbzh/can-config-generator).
+Last but not least, the low level binding can be shipped as binary only using OpenXC inspired [AGL low level CAN binding Generator](http://github.com/iotbzh/can-config-generator).

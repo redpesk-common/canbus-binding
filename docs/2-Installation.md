@@ -18,17 +18,17 @@ prepare_meta -f iotbzh -o /xdt -l /home/devel/mirror -p /home/devel/share/propri
 /xdt/build/m3ulcb/agl-init-build-env
 ```
 
-* An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)).
+* (Optionnal) An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)) if you want to connect to a real car through the OBD2 connector.
 
 <!-- pagebreak -->
 
 # Getting started
 
-## Use of CAN config generator
+## CAN config generator usage
 
 ### Build requirements
 
-* CMake version 3.0 or later
+* CMake version 3.3 or later
 * G++, Clang++ or any C++11 compliant compiler.
 
 ### Compile
@@ -92,7 +92,7 @@ You can use some basic decoder provided by default by the binding which are:
 
 ### Generating JSON from Vector CANoe Database
 
-> **CAUTION** This chapter has not been tested since we haven't necessary automotive tools for that.
+> **CAUTION** This chapter has not been tested since it haven't necessary automotive tools for that.
 
 If you use CANoe to store your `gold standard` CAN signal definitions, you may be able to use the OpenXC `xml_to_json.py` script to make your JSON for you. First, export the Canoe .dbc file as XML - you can do this with Vector CANdb++. Next, create a JSON file according to the format defined above, but only define:
 
@@ -143,19 +143,27 @@ This generator will follow OpenXC support status of the low level CAN signaling 
 
 ## Compile and install the binding
 
+### Build requirements
+
+* Kernel >= 4.8
+* CMake version 3.3 or later
+* G++, Clang++ or any C++11 compliant compiler.
+
+### Compile
+
 Clone the binding repository, copy the generated file and updated the git submodules.
 
 Execute the following commands from this repository:
 
 ```bash
-cd $WD/low-level-can-service/CAN-binder
-cp ${GENERATOR}/build/application-generated.cpp ../low-can-binding/binding
+cd ${WD}/low-level-can-service
+cp ${WD}/low-level-can-generator/build/application-generated.cpp ../low-can-binding/binding
 ```
 
 ### Installation
 
 ```bash
-cd $CAN_/CAN-binder
+cd ${WD}/low-level-can-service
 mkdir build
 cd build
 cmake ..
