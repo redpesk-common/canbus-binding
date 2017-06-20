@@ -37,10 +37,9 @@ prepare_meta -f iotbzh -o /xdt -l /home/devel/mirror -p /home/devel/share/propri
 source /xdt/sdk/environment-setup-aarch64-agl-linux
 export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
 export WD=$(pwd)
-git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-service
+git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-service -b Renesas_delivery_Q2
 git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-generator
-export GENERATOR=${WD}/low-level-can-generator
-cd ${GENERATOR}
+cd ${WD}/low-level-can-generator
 mkdir -p build
 cd build
 cmake -G "Unix Makefiles" ..
@@ -156,7 +155,7 @@ cp ${GENERATOR}/build/application-generated.cpp ../low-can-binding/binding
 ### Installation
 
 ```bash
-cd $WD/low-level-can-service/CAN-binder
+cd $CAN_/CAN-binder
 mkdir build
 cd build
 cmake ..
