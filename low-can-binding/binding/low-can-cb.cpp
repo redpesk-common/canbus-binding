@@ -221,6 +221,7 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, boo
 	return rets;
 }
 
+// TODO: Create separate subscrition object if event_filter isn't the same.
 static int subscribe_unsubscribe_can_signals(struct afb_req request, bool subscribe, std::vector<std::shared_ptr<can_signal_t> > can_signals, struct event_filter_t& event_filter, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int rets = 0;
