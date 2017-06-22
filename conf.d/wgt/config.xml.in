@@ -8,13 +8,10 @@
 	<license>@PROJECT_LICENSE@</license>
 
 	<feature name="urn:AGL:widget:required-permission">
-		<param name="#target" value="main" />
 		<param name="urn:AGL:permission::public:no-htdocs" value="required" />
-		<param name="urn:AGL:permission::owner:car:*" value="required" />
 	</feature>
 
 	<feature name="urn:AGL:widget:provided-api">
-		<param name="#target" value="main" />
 		<param name="low-can" value="ws" />
 	</feature>
 
