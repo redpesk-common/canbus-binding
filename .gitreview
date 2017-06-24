@@ -2,5 +2,4 @@
 host=gerrit.automotivelinux.org
 port=29418
 project=apps/low-level-can-service
-defaultbranch=master
-
+defaultbranch=dab
