@@ -46,7 +46,7 @@ set(CMAKE_BUILD_TYPE "DEBUG")
 
 # Kernel selection if needed. Overload the detected compiler.
 # -----------------------------------------------
-#set (kernel_minimal_version 4.8)
+set (kernel_minimal_version 4.8)
 
 # Compiler selection if needed. Overload the detected compiler.
 # -----------------------------------------------
