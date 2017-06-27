@@ -40,6 +40,9 @@ set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
 # Where are stored data for your application. Pictures, static resources must be placed in that folder.
 # set(PROJECT_RESOURCES "data")
 
+# Which directories inspect to find CMakeLists.txt target files
+# set(PROJECT_SRC_DIR_PATTERN "*")
+
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
 set(CMAKE_BUILD_TYPE "DEBUG")
@@ -134,3 +137,8 @@ set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
 #------------------------------------------------------------
 #set(AFB_TOKEN   ""      CACHE PATH "Default AFB_TOKEN")
 #set(AFB_REMPORT "1234" CACHE PATH "Default AFB_TOKEN")
+
+# This include is mandatory and MUST happens at the end
+# of this file, else you expose you to unexpected behavior
+# -----------------------------------------------------------
+include(${PROJECT_APP_TEMPLATES_DIR}/cmake/common.cmake)
