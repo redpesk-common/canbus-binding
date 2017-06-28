@@ -23,10 +23,10 @@ set(PROJECT_VERSION "4.0")
 set(PROJECT_PRETTY_NAME "Low level CAN binding")
 set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
 set(PROJECT_URL "https://github.com/iotbzh/CAN_signaling")
+set(PROJECT_ICON "icon.png")
 set(PROJECT_AUTHOR "Romain Forlot")
 set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
-set(PROJECT_ICON "icon.png")
-set(PROJECT_LICENCE "APL2.0")
+set(PROJECT_LICENSE "APL2.0")
 set(PROJECT_LANGUAGES,"C")
 
 # Where are stored default templates files from submodule or subtree app-templates in your project tree
@@ -47,11 +47,13 @@ set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
 # ----------------------------------
 set(CMAKE_BUILD_TYPE "DEBUG")
 
-# Kernel selection if needed. Overload the detected compiler.
+# Kernel selection if needed. Impose a minimal version.
+# NOTE FOR NOW IT CHECKS KERNEL Yocto SDK Kernel version
+# else only HOST VERSION
 # -----------------------------------------------
 set (kernel_minimal_version 4.8)
 
-# Compiler selection if needed. Overload the detected compiler.
+# Compiler selection if needed. Impose a minimal version.
 # -----------------------------------------------
 set (gcc_minimal_version 4.9)
 
@@ -59,8 +61,9 @@ set (gcc_minimal_version 4.9)
 # -----------------------------
 set (PKG_REQUIRED_LIST
 	json-c
-	libsystemd
+	libsystemd>=222
 	afb-daemon
+	libmicrohttpd>=0.9.55
 )
 
 # Static constante definition
@@ -75,7 +78,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
 set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/package --binding=\$\$(pwd)/package/lib/afb-low-can.so --port=1234 --tracereq=common --token=\"1\" --verbose")
-set(WIDGET_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
+set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
 # ---------------------------------------------------------------------
@@ -87,24 +90,27 @@ set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 # -----------------------------------
 set(WIDGET_CONFIG_TEMPLATE ${CMAKE_CURRENT_SOURCE_DIR}/conf.d/wgt/config.xml.in)
 
-# Mandatory widget Mimetype specification
-# --------------------------------------------------
+# Mandatory widget Mimetype specification of the main unit
+# --------------------------------------------------------------------------
 # Choose between :
-# - application/vnd.agl.service
-# - application/vnd.agl.native
-# - application/x-executable
-# - text/html
+#- text/html : HTML application,
+#	content.src designates the home page of the application
+#
+#- application/vnd.agl.native : AGL compatible native,
+#	content.src designates the relative path of the binary.
+#
+# - application/vnd.agl.service: AGL service, content.src is not used.
+#
+#- ***application/x-executable***: Native application,
+#	content.src designates the relative path of the binary.
+#	For such application, only security setup is made.
 #
 set(WIDGET_TYPE application/vnd.agl.service)
 
-# Mandatory Widget entry point file.
-# ----------------------------------------------------
-# This is the file that will be executed, loaded,...
-# at launch time by the application framework
-#
-# !IMPORTANT! : Service Widget Mimetype has to specified
-# the WIDGET_ENTRY_POINT "lib" which is the default directory
-# that holds the bindings.
+# Mandatory Widget entry point file of the main unit
+# --------------------------------------------------------------
+# This is the file that will be executed, loaded,
+# at launch time by the application framework.
 #
 set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
 
@@ -130,7 +136,7 @@ set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
 
 # Optional force package prefix generation, like widget
 # -----------------------------------------------------
-# set(PACKAGE_PREFIX DestinationPath)
+# set(PKG_PREFIX DestinationPath)
 
 # Optional Application Framework security token
 # and port use for remote debugging.
