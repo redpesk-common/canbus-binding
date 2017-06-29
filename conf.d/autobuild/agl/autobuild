@@ -38,9 +38,9 @@ package: build
 	@mkdir -p ${BUILD_DIR}/$@/lib
 	@mkdir -p ${BUILD_DIR}/$@/htdocs
 	@mkdir -p ${BUILD_DIR}/$@/data
-	@mkdir -p ${DEST}
+	@[ "${DEST}" ] && mkdir -p ${DEST}
 	@cmake --build ${BUILD_DIR} --target widget
-	@cp ${BUILD_DIR}/*wgt ${DEST}
+	@[ "${DEST}" ] && cp ${BUILD_DIR}/*wgt ${DEST}
 
 ${BUILD_DIR}/Makefile:
 	@[ -d ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
