@@ -2,18 +2,15 @@
 
 CAN bus binder, based upon OpenXC vi-firmware project.
 
-There are 2 separated projects here, one with the CAN-binder that is installed
-on an AGL target and the CAN config generator used to generate a source file for
-the low level binding.
-
 Full document can be found under `docs` directory.
 
 # Fast build procedure
 
-Just use build.sh script:
+Just use autobuild script:
 
 ```bash
-./build.sh
+./conf.d/autobuild/agl/autobuild build
+./conf.d/autobuild/agl/autobuild package
 ```
 
 This will build both projects under build directory for each of them with default configuration.
