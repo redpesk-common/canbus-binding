@@ -39,10 +39,10 @@ namespace utils
 	{
 		if (config_content_.size() <= 0)
 		{
-			ERROR("Can't load the INI config file.");
+			AFB_ERROR("Can't load the INI config file.");
 			return false;
 		}
-			DEBUG("Configuration file parsed");
+			AFB_DEBUG("Configuration file parsed");
 			return true;
 	}
 

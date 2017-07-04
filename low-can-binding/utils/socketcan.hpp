@@ -65,7 +65,7 @@ namespace utils
 	socketcan_t& operator<<(socketcan_t& s, const T& obj)
 	{
 		if (::sendto(s.socket(), &obj, sizeof(obj), 0, (const struct sockaddr*)&s.get_tx_address(), sizeof(s.get_tx_address())) < 0)
-			ERROR("Error sending : %i %s", errno, ::strerror(errno));
+			AFB_ERROR("Error sending : %i %s", errno, ::strerror(errno));
 		return s;
 	}
 }

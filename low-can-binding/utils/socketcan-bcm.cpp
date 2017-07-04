@@ -45,10 +45,10 @@ namespace utils
 
 		// Attempts to open a socket to CAN bus
 		::strcpy(ifr.ifr_name, device_name.c_str());
-		DEBUG("BCM socket ifr_name is : %s", ifr.ifr_name);
+		AFB_DEBUG("BCM socket ifr_name is : %s", ifr.ifr_name);
 		if(::ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
 		{
-			ERROR("ioctl failed. Error was : %s", strerror(errno));
+			AFB_ERROR("ioctl failed. Error was : %s", strerror(errno));
 			close();
 		}
 		else
@@ -58,7 +58,7 @@ namespace utils
 
 			if(connect((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
 			{
-				ERROR("Connect failed. %s", strerror(errno));
+				AFB_ERROR("Connect failed. %s", strerror(errno));
 				close();
 			}
 			// Needed because of using systemD event loop. See sd_event_add_io manual.
@@ -84,8 +84,8 @@ namespace utils
 		ioctl(s.socket(), SIOCGIFNAME, &ifr);
 		long unsigned int frame_size = nbytes-sizeof(struct bcm_msg_head);
 
-		DEBUG("Data available: %li bytes read. BCM head, opcode: %i, can_id: %i, nframes: %i", frame_size, msg.msg_head.opcode, msg.msg_head.can_id, msg.msg_head.nframes);
-		DEBUG("read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, msg.msg_head.can_id, msg.frames.can_dlc,
+		AFB_DEBUG("Data available: %li bytes read. BCM head, opcode: %i, can_id: %i, nframes: %i", frame_size, msg.msg_head.opcode, msg.msg_head.can_id, msg.msg_head.nframes);
+		AFB_DEBUG("read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, msg.msg_head.can_id, msg.frames.can_dlc,
 			msg.frames.data[0], msg.frames.data[1], msg.frames.data[2], msg.frames.data[3], msg.frames.data[4], msg.frames.data[5], msg.frames.data[6], msg.frames.data[7]);
 
 		struct timeval tv;

@@ -67,7 +67,7 @@ extern "C"
 		if(application_t::instance().get_diagnostic_manager().initialize())
 			return 0;
 
-		ERROR("There was something wrong with CAN device Initialization.");
+		AFB_ERROR("There was something wrong with CAN device Initialization.");
 		return 1;
 	}
 };
