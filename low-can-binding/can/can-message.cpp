@@ -189,7 +189,7 @@ void can_message_t::set_format(const can_message_format_t new_format)
 /// @return A can_message_t object fully initialized with canfd_frame values.
 can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes, uint64_t timestamp)
 {
-	uint8_t maxdlen, length, flags = (uint8_t)NULL;
+	uint8_t maxdlen = 0, length = 0, flags = 0;
 	uint32_t id;
 	can_message_format_t format;
 	bool rtr_flag;
@@ -277,7 +277,7 @@ can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame,
 /// @return A can_message_t object fully initialized with can_frame values.
 can_message_t can_message_t::convert_from_frame(const struct can_frame& frame, size_t nbytes, uint64_t timestamp)
 {
-	uint8_t maxdlen, length, flags = (uint8_t)NULL;
+	uint8_t maxdlen = 0, length = 0, flags = 0;
 	uint32_t id;
 	can_message_format_t format;
 	bool rtr_flag;
