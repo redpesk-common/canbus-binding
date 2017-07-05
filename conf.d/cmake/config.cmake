@@ -70,10 +70,8 @@ set (PKG_REQUIRED_LIST
 # -----------------------------
 add_compile_options(-D_REENTRANT)
 add_compile_options(-DPB_FIELD_16BIT)
-
-# LANG Specific compile flags set for all build types
-set(CMAKE_C_FLAGS "")
-set(CMAKE_CXX_FLAGS "-std=c++11 -pthread")
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-std=c++11>)
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pthread>)
 
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
