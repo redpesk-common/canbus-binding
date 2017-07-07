@@ -34,14 +34,15 @@ extern "C"
 
 	static const struct afb_verb_v2 verbs[]=
 	{
-		{ .verb= "subscribe", .callback= subscribe, .auth= NULL, .session= AFB_SESSION_NONE},
-		{ .verb= "unsubscribe", .callback= unsubscribe, .auth= NULL, .session= AFB_SESSION_NONE},
-		{ .verb= NULL, .callback= NULL, .auth= NULL, .session= 0}
+		{ .verb= "subscribe", .callback= subscribe, .auth= NULL, .info="Let subscribe to signals", .session= AFB_SESSION_NONE},
+		{ .verb= "unsubscribe", .callback= unsubscribe, .auth= NULL, .info="Let unsubscribe signals", .session= AFB_SESSION_NONE},
+		{ .verb= NULL, .callback= NULL, .auth= NULL, .info=NULL, .session= 0}
 	};
 
 	const struct afb_binding_v2 afbBindingV2 {
 		.api = "low-can",
 		.specification = NULL,
+		.info = "API to Low level CAN service, read and decode the bus",
 		.verbs = verbs,
 		.preinit = NULL,
 		.init = initv2,
