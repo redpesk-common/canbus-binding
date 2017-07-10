@@ -295,12 +295,15 @@ void can_bus_t::push_new_vehicle_message(int subscription_id, const openxc_Vehic
 /// mapping configuration file read at initialization.
 void can_bus_t::set_can_devices()
 {
-	can_devices_ = conf_file_.get_devices_name();
-
-	if(can_devices_.empty())
+	if(conf_file_.check_conf())
 	{
-		AFB_ERROR("No mapping found in config file: '%s'. Check it that it have a CANbus-mapping section.",
-			conf_file_.filepath().c_str());
+		can_devices_ = conf_file_.get_devices_name();
+
+		if(can_devices_.empty())
+		{
+			AFB_ERROR("No mapping found in config file: '%s'. Check it that it have a CANbus-mapping section.",
+				conf_file_.filepath().c_str());
+		}
 	}
 }
 
