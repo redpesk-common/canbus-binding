@@ -1,0 +1,95 @@
+{   "name": "example",
+    "extra_sources": [
+        "handlers.cpp"
+    ],
+    "initializers": [
+        "initializeMyStuff"
+    ],
+    "loopers": [
+        "myLooper"
+    ],
+    "buses": {
+        "hs": {
+            "controller": 1,
+            "speed": 500000
+        },
+        "ms": {
+            "controller": 2,
+            "speed": 125000
+        }
+    },
+    "commands": [
+        { "name": "turn_signal_status",
+            "handler": "handleTurnSignalCommand"
+        }
+    ],
+    "messages": {
+        "0x128": {
+            "name": "ECM_z_5D2",
+            "bus": "hs",
+            "signals": {
+                "StrAnglAct": {
+                    "generic_name": "SteeringWheelAngle",
+                    "bit_position": 52,
+                    "bit_size": 12,
+                    "factor": 0.15392,
+                    "offset": 0,
+                    "decoder": "handleUnsignedSteeringWheelAngle"},
+                "StrAnglSign": {
+                    "generic_name": "steering_angle_sign",
+                    "decoder": "ignoreDecoder",
+                    "bit_position": 52,
+                    "bit_size": 12},
+                "EngSpd": {
+                    "generic_name": "engine_speed",
+                    "max_frequency": 15,
+                    "bit_position": 12,
+                    "bit_size": 8},
+                "GrshftPos": {
+                    "generic_name": "GearshiftPosition",
+                    "bit_position": 41,
+                    "bit_size": 3,
+                    "states": {
+                        "FIRST": [1],
+                        "SECOND": [2],
+                        "THIRD": [3],
+                        "FOURTH": [4],
+                        "REVERSE": [5],
+                        "NEUTRAL": [6]}
+                },
+                "StrAnglErr": {
+                    "decoder": "ignoreDecoder",
+                    "generic_name": "steering_wheel_angle_error",
+                    "bit_position": 44,
+                    "bit_size": 12
+                }
+            },
+            "handlers": ["handleSteeringWheelMessage"]
+        }
+    },
+    "diagnostic_messages": [
+        {
+            "bus": "hs",
+            "id": 2015,
+            "mode": 1,
+            "pid": 12,
+            "frequency": 1,
+            "decoder": "handleObd2Pid"
+        },
+        {
+            "bus": "hs",
+            "id": 2016,
+            "mode": 2,
+            "pid": 12,
+            "frequency": 1
+        },
+        {
+            "bus": "hs",
+            "id": 2016,
+            "mode": 22,
+            "pid": 6,
+            "frequency": 1,
+            "decoder": "handleMyDiagRequest"
+        }
+    ]
+}
