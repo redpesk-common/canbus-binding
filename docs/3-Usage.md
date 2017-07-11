@@ -264,16 +264,19 @@ You can also replay a previously dumped CAN logfiles. These logfiles can be foun
 Trace has been recorded from a CAN device `can0` so you have to map it to the correct one you use for your tests.
 
 Replay on a virtual CAN device `vcan0`:
+
 ```bash
 canplayer -I trip_test_with_obd2_vehicle_speed_requests vcan0=can0
 ```
 
 Replay on a CAN device `can0`:
+
 ```bash
 canplayer -I trip_test_with_obd2_vehicle_speed_requests can0
 ```
 
 Replay on a CAN device `can1` (porter by example):
+
 ```bash
 canplayer -I trip_test_with_obd2_vehicle_speed_requests can1=can0
 ```
