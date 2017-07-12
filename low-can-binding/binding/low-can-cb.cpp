@@ -360,3 +360,63 @@ void unsubscribe(struct afb_req request)
 {
 	do_subscribe_unsubscribe(request, false);
 }
+
+void swrite(struct afb_req request)
+{
+	int rc = 0;
+	struct can_frame cf;
+	struct utils::signals_found sf;
+	struct json_object *args, *json_can_socket, *json_can_id, *json_can_dlc, *json_can_data;
+
+	::memset(&cf, 0, sizeof(cf));
+
+	args = afb_req_json(request);
+	if (args == NULL || (
+		((!json_object_object_get_ex(args, "canbus_name", &json_can_socket)) && json_object_get_type(json_can_socket) == json_type_string) &&
+		((!json_object_object_get_ex(args, "can_id", &json_can_id)) && json_object_get_type(json_can_id) == json_type_int) &&
+		((!json_object_object_get_ex(args, "can_dlc", &json_can_dlc)) && json_object_get_type(json_can_dlc) == json_type_int)))
+	{
+		cf.can_id = json_object_get_int(json_can_id);
+		cf.can_dlc = (uint8_t)json_object_get_int(json_can_dlc);
+		openxc_DynamicField search_key = build_DynamicField((double)cf.can_id);
+		sf = utils::signals_manager_t::instance().find_signals(search_key);
+	}
+
+	if((args == NULL || !json_object_object_get_ex(args, "can_data", &json_can_data)) && json_object_get_type(json_can_data) == json_type_array)
+	{
+		struct json_object *x;
+
+		int n = json_object_array_length(json_can_data);
+		if(n < 8)
+		{
+			for (int i = 0 ; i < n ; i++)
+			{
+				x = json_object_array_get_idx(json_can_data, i);
+				cf.data[i] = json_object_get_type(x) == json_type_int ? (uint8_t)json_object_get_int(x) : 0;
+			}
+		}
+	}
+
+	if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
+	{
+		AFB_WARNING("No signal(s) found for id %d. Message not sent.", cf.can_id);
+		rc = -1;
+	}
+	else
+	{
+		std::map<std::string, std::shared_ptr<low_can_socket_t> >& cd = application_t::instance().get_can_devices();
+		const char* can_socket = json_object_get_string(json_can_socket);
+		for(const auto& sig: sf.can_signals)
+		{
+			if (sig->get_message()->get_bus_name().c_str() == can_socket)
+			{
+				rc = cd[can_socket]->tx_send(cf, sig);
+			}
+		}
+	}
+
+	if (rc >= 0)
+		afb_req_success(request, NULL, NULL);
+	else
+		afb_req_fail(request, "error", NULL);
+}
