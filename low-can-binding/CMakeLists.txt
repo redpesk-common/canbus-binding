@@ -24,6 +24,7 @@ PROJECT_TARGET_ADD(low-can)
 	add_library(${TARGET_NAME} MODULE
 		binding/${TARGET_NAME}-hat.cpp
 		binding/${TARGET_NAME}-cb.cpp
+		binding/${TARGET_NAME}-socket.cpp
 		binding/${TARGET_NAME}-subscription.cpp
 		binding/application.cpp
 		binding/application-generated.cpp
@@ -40,7 +41,7 @@ PROJECT_TARGET_ADD(low-can)
 		utils/openxc-utils.cpp
 		utils/timer.cpp
 		utils/socketcan.cpp
-		utils/socketcan-raw.cpp
+		#utils/socketcan-raw.cpp
 		utils/socketcan-bcm.cpp
 		utils/config-parser.cpp)
 

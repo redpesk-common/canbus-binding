@@ -67,9 +67,7 @@ set (PKG_REQUIRED_LIST
 
 # Static constante definition
 # -----------------------------
-add_compile_options(-D_REENTRANT)
 add_compile_options(-DPB_FIELD_16BIT)
-add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-std=c++11>)
 add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pthread>)
 
 # Customize link option
