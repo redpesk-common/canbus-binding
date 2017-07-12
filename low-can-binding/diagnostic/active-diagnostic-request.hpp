@@ -67,7 +67,6 @@ private:
 	DiagnosticRequestHandle* handle_; ///< handle_ - A handle for the request to keep track of it between
 									  ///< sending the frames of the request and receiving all frames of the response.
 	std::string name_; ///< name_ - Human readable name, to be used when publishing received responses.
-					   ///< TODO: If the name is NULL, the published output will use the raw OBD-II response format.
 	static std::string prefix_; ///< prefix_ - It has to reflect the JSON object which it comes from. It makes easier sorting 
 								///< incoming CAN messages.
 	DiagnosticResponseDecoder decoder_; ///< decoder_ - An optional DiagnosticResponseDecoder to parse the payload of responses

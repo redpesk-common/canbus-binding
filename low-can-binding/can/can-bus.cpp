@@ -83,7 +83,7 @@ void can_bus_t::process_can_signals(const can_message_t& can_message, std::map<i
 	if( s.find(subscription_id) != s.end() && afb_event_is_valid(s[subscription_id]->get_event()))
 	{
 		bool send = true;
-		decoded_message = decoder_t::translateSignal(*sig->get_can_signal(), can_message, application_t::instance().get_all_can_signals(), &send);
+		decoded_message = decoder_t::translate_signal(*sig->get_can_signal(), can_message, &send);
 		openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
 		vehicle_message = build_VehicleMessage(s_message, can_message.get_timestamp());
 
@@ -128,7 +128,7 @@ void can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const 
 ///
 /// It will take from the can_message_q_ queue the next can message to process then it search
 ///  about signal subscribed if there is a valid afb_event for it. We only decode signal for which a
-///  subscription has been made. Can message will be decoded using translateSignal that will pass it to the
+///  subscription has been made. Can message will be decoded using translate_signal that will pass it to the
 ///  corresponding decoding function if there is one assigned for that signal. If not, it will be the default
 ///  noopDecoder function that will operate on it.
 ///
@@ -297,9 +297,9 @@ void can_bus_t::set_can_devices()
 {
 	if(conf_file_.check_conf())
 	{
-		can_devices_ = conf_file_.get_devices_name();
+		can_devices_mapping_ = conf_file_.get_devices_name();
 
-		if(can_devices_.empty())
+		if(can_devices_mapping_.empty())
 		{
 			AFB_ERROR("No mapping found in config file: '%s'. Check it that it have a CANbus-mapping section.",
 				conf_file_.filepath().c_str());
@@ -313,7 +313,7 @@ void can_bus_t::set_can_devices()
 int can_bus_t::get_can_device_index(const std::string& bus_name) const
 {
 	int i = 0;
-	for(const auto& d: can_devices_)
+	for(const auto& d: can_devices_mapping_)
 	{
 		if(d.first == bus_name)
 			break;
@@ -327,8 +327,8 @@ int can_bus_t::get_can_device_index(const std::string& bus_name) const
 /// general.
 const std::string can_bus_t::get_can_device_name(const std::string& id_name) const
 {
-	std::string ret;
-	for(const auto& d: can_devices_)
+	std::string ret = "";
+	for(const auto& d: can_devices_mapping_)
 	{
 		if(d.first == id_name)
 		{

@@ -42,8 +42,8 @@ can_signal_t::can_signal_t(
 	bool force_send_changed,
 	std::map<uint8_t, std::string> states,
 	bool writable,
-	SignalDecoder decoder,
-	SignalEncoder encoder,
+	signal_decoder decoder,
+	signal_encoder encoder,
 	bool received)
 	: parent_{nullptr},
 	 generic_name_{ generic_name }
@@ -151,12 +151,12 @@ bool can_signal_t::get_writable() const
 	return writable_;
 }
 
-SignalDecoder& can_signal_t::get_decoder()
+signal_decoder& can_signal_t::get_decoder()
 {
 	return decoder_;
 }
 
-SignalEncoder& can_signal_t::get_encoder()
+signal_encoder& can_signal_t::get_encoder()
 {
 	return encoder_;
 }

@@ -30,7 +30,6 @@
 ///  Each CAN bus needs its own set of shim functions, so this should
 /// match the maximum CAN controller count.
 ///
-#define MAX_SHIM_COUNT can_bus_t.get_can_devices().size()
 #define DIAGNOSTIC_RESPONSE_ARBITRATION_ID_OFFSET 0x8
 
 class active_diagnostic_request_t;

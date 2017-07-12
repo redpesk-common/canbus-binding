@@ -86,9 +86,9 @@ engine.torque
 
 You can use some basic decoder provided by default by the binding which are:
 
-* ***decoder_t::noopDecoder*** : Default decoder if not specified, return raw value from signal's bitfield.
-* ***decoder_t::booleanDecoder*** : Coerces a numerical value to a boolean.
-* ***decoder_t::stateDecoder***s : Find and return the corresponding string state for a CAN signal's raw integer value.
+* ***decoder_t::decode_noop*** : Default decoder if not specified, return raw value from signal's bitfield.
+* ***decoder_t::decode_boolean*** : Coerces a numerical value to a boolean.
+* ***decoder_t::decode_state*** : Find and return the corresponding string state for a CAN signal's raw integer value.
 
 ### Generating JSON from Vector CANoe Database
 

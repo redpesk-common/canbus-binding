@@ -24,26 +24,18 @@
 class decoder_t
 {
 public:
-	static float parseSignalBitfield(can_signal_t& signal, const can_message_t& message);
+	static float parse_signal_bitfield(can_signal_t& signal, const can_message_t& message);
 
-	static openxc_DynamicField stateDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> >& signals,
-			float value, bool* send);
-	static openxc_DynamicField booleanDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> >& signals,
-			float value, bool* send);
-	static openxc_DynamicField ignoreDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> >& signals,
-			float value, bool* send);
-	static openxc_DynamicField noopDecoder(can_signal_t& signal, const std::vector<std::shared_ptr<can_signal_t> >& signals,
-			float value, bool* send);
+	static openxc_DynamicField decode_state(can_signal_t& signal, float value, bool* send);
+	static openxc_DynamicField decode_boolean(can_signal_t& signal, float value, bool* send);
+	static openxc_DynamicField decode_ignore(can_signal_t& signal, float value, bool* send);
+	static openxc_DynamicField decode_noop(can_signal_t& signal, float value, bool* send);
 
-	static openxc_DynamicField translateSignal(can_signal_t& signal, const can_message_t& message,
-		const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send);
+	static openxc_DynamicField translate_signal(can_signal_t& signal, const can_message_t& messag, bool* send);
 
-	static openxc_DynamicField decodeSignal(can_signal_t& signal, const can_message_t& message,
-			const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send);
+	static openxc_DynamicField decode_signal(can_signal_t& signal, const can_message_t& message, bool* send);
 
-	static openxc_DynamicField decodeSignal(can_signal_t& signal, float value,
-		const std::vector<std::shared_ptr<can_signal_t> >& signals, bool* send);
+	static openxc_DynamicField decode_signal(can_signal_t& signal, float value, bool* send);
 
 	static float decode_obd2_response(const DiagnosticResponse* response, float parsed_payload);
-
 };

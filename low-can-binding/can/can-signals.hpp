@@ -36,11 +36,10 @@ class can_signal_t;
 ///
 /// @brief The type signature for a CAN signal decoder.
 ///
-/// A SignalDecoder transforms a raw floating point CAN signal into a number,
+/// A signal_decoder transforms a raw floating point CAN signal into a number,
 /// string or boolean.
 ///
 /// @param[in] signal - The CAN signal that we are decoding.
-/// @param[in] signals - The list of all signals.
 /// @param[in] signalCount - The length of the signals array.
 /// @param[in] value - The CAN signal parsed from the message as a raw floating point
 ///	value.
@@ -49,13 +48,12 @@ class can_signal_t;
 ///
 /// @return a decoded value in an openxc_DynamicField struct.
 ///
-typedef openxc_DynamicField (*SignalDecoder)(can_signal_t& signal,
-		const std::vector<std::shared_ptr<can_signal_t> >& signals, float value, bool* send);
+typedef openxc_DynamicField (*signal_decoder)(can_signal_t& signal, float value, bool* send);
 
 ///
 /// @brief: The type signature for a CAN signal encoder.
 ///
-/// A SignalEncoder transforms a number, string or boolean into a raw floating
+/// A signal_encoder transforms a number, string or boolean into a raw floating
 /// point value that fits in the CAN signal.
 ///
 /// @param[in] signal - The CAN signal to encode. 
@@ -63,7 +61,7 @@ typedef openxc_DynamicField (*SignalDecoder)(can_signal_t& signal,
 /// @param[out] send - An output parameter. If the encoding failed or the CAN signal should
 /// not be encoded for some other reason, this will be flipped to false.
 ///
-typedef uint64_t (*SignalEncoder)(can_signal_t* signal,
+typedef uint64_t (*signal_encoder)(can_signal_t* signal,
 		openxc_DynamicField* value, bool* send);
 
 class can_signal_t
@@ -93,9 +91,9 @@ private:
 										 * between numerical and string values for valid states. */
 	bool writable_; /*!< writable - True if the signal is allowed to be written from the USB host
 					 *	back to CAN. Defaults to false.*/
-	SignalDecoder decoder_; /*!< decoder_ - An optional function to decode a signal from the bus to a human
+	signal_decoder decoder_; /*!< decoder_ - An optional function to decode a signal from the bus to a human
 							 * readable value. If NULL, the default numerical decoder is used. */
-	SignalEncoder encoder_; /*!< encoder_ - An optional function to encode a signal value to be written to
+	signal_encoder encoder_; /*!< encoder_ - An optional function to encode a signal value to be written to
 							 * CAN into a byte array. If NULL, the default numerical encoder
 							 * is used. */
 	bool received_; /*!< received_ - True if this signal has ever been received.*/
@@ -116,8 +114,8 @@ public:
 		bool force_send_changed,
 		std::map<uint8_t, std::string> states,
 		bool writable,
-		SignalDecoder decoder,
-		SignalEncoder encoder,
+		signal_decoder decoder,
+		signal_encoder encoder,
 		bool received);
 
 	can_message_definition_t* get_message() const;
@@ -137,8 +135,8 @@ public:
 	const std::string get_states(uint8_t value);
 	size_t get_state_count() const;
 	bool get_writable() const;
-	SignalDecoder& get_decoder();
-	SignalEncoder& get_encoder();
+	signal_decoder& get_decoder();
+	signal_encoder& get_encoder();
 	bool get_received() const;
 	float get_last_value() const;
 	std::pair<float, uint64_t> get_last_value_with_timestamp() const;

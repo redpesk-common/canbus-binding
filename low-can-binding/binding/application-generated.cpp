@@ -40,7 +40,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})},
@@ -120,7 +120,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})}
@@ -142,7 +142,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})},
@@ -160,7 +160,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})},
@@ -178,7 +178,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})},
@@ -196,7 +196,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})},
@@ -214,7 +214,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})}
@@ -236,7 +236,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})},
@@ -254,7 +254,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})},
@@ -272,7 +272,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})},
@@ -290,7 +290,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::booleanDecoder,
+							decoder_t::decode_boolean,
 							nullptr,
 							false
 						})}
