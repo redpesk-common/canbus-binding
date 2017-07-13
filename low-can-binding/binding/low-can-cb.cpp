@@ -28,6 +28,7 @@
 
 #include "openxc.pb.h"
 #include "application.hpp"
+#include "../can/can-encoder.hpp"
 #include "../can/can-bus.hpp"
 #include "../can/can-signals.hpp"
 #include "../can/can-message.hpp"
@@ -372,53 +373,86 @@ void swrite(struct afb_req request)
 	int rc = 0;
 	struct can_frame cf;
 	struct utils::signals_found sf;
-	struct json_object *args, *json_can_socket, *json_can_id, *json_can_dlc, *json_can_data;
+	struct json_object* args = nullptr,
+		*json_name = nullptr,
+		*json_value = nullptr;
+	std::map<std::string, std::shared_ptr<low_can_socket_t> >& cd = application_t::instance().get_can_devices();
 
 	::memset(&cf, 0, sizeof(cf));
 
 	args = afb_req_json(request);
-	if (args == NULL || (
-		((!json_object_object_get_ex(args, "canbus_name", &json_can_socket)) && json_object_get_type(json_can_socket) == json_type_string) &&
-		((!json_object_object_get_ex(args, "can_id", &json_can_id)) && json_object_get_type(json_can_id) == json_type_int) &&
-		((!json_object_object_get_ex(args, "can_dlc", &json_can_dlc)) && json_object_get_type(json_can_dlc) == json_type_int)))
-	{
-		cf.can_id = json_object_get_int(json_can_id);
-		cf.can_dlc = (uint8_t)json_object_get_int(json_can_dlc);
-		openxc_DynamicField search_key = build_DynamicField((double)cf.can_id);
-		sf = utils::signals_manager_t::instance().find_signals(search_key);
-	}
 
-	if((args == NULL || !json_object_object_get_ex(args, "can_data", &json_can_data)) && json_object_get_type(json_can_data) == json_type_array)
+	// Process about Raw CAN message on CAN bus directly
+	if (args != NULL &&
+		(json_object_object_get_ex(args, "bus_name", &json_name) && json_object_is_type(json_name, json_type_string) ) &&
+		(json_object_object_get_ex(args, "frame", &json_value) && json_object_is_type(json_value, json_type_object) ))
 	{
-		struct json_object *x;
+		struct json_object* json_can_id = nullptr,
+			*json_can_dlc = nullptr,
+			*json_can_data = nullptr;
 
-		int n = json_object_array_length(json_can_data);
-		if(n < 8)
+		if( (json_object_object_get_ex(json_value, "can_id", &json_can_id) && (json_object_is_type(json_can_id, json_type_double) || json_object_is_type(json_can_id, json_type_int))) &&
+			(json_object_object_get_ex(json_value, "can_dlc", &json_can_dlc) && (json_object_is_type(json_can_dlc, json_type_double) || json_object_is_type(json_can_dlc, json_type_int))) &&
+			(json_object_object_get_ex(json_value, "can_data", &json_can_data) && json_object_is_type(json_can_data, json_type_array) ))
 		{
-			for (int i = 0 ; i < n ; i++)
+			cf.can_id = json_object_get_int(json_can_id);
+			cf.can_dlc = (uint8_t)json_object_get_int(json_can_dlc);
+
+			struct json_object *x;
+			int n = json_object_array_length(json_can_data);
+			if(n <= 8)
 			{
-				x = json_object_array_get_idx(json_can_data, i);
-				cf.data[i] = json_object_get_type(x) == json_type_int ? (uint8_t)json_object_get_int(x) : 0;
+				for (int i = 0 ; i < n ; i++)
+				{
+					x = json_object_array_get_idx(json_can_data, i);
+					cf.data[i] = json_object_get_type(x) == json_type_int ? (uint8_t)json_object_get_int(x) : 0;
+				}
+			}
+
+			const std::string bus_name = json_object_get_string(json_name);
+			const std::string found_device = application_t::instance().get_can_bus_manager().get_can_device_name(bus_name);
+			if( ! found_device.empty())
+			{
+				if( cd.count(bus_name) == 0)
+					{cd[bus_name] = std::make_shared<low_can_socket_t>(low_can_socket_t());}
+				rc = cd[bus_name]->tx_send(cf, found_device);
 			}
 		}
+		else
+		{
+			AFB_ERROR("Frame object malformed (must be \n \"frame\": {\"can_id\": int, \"can_dlc\": int, \"can_data\": [ int, int , int, int ,int , int ,int ,int]}");
+			rc = -1;
+		}
 	}
-
-	if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
+	// Search signal then encode value.
+	else if(args != NULL &&
+		(json_object_object_get_ex(args, "signal_name", &json_name) && json_object_is_type(json_name, json_type_string)) &&
+		(json_object_object_get_ex(args, "signal_value", &json_value) && (json_object_is_type(json_value, json_type_double) || json_object_is_type(json_value, json_type_int))))
 	{
-		AFB_WARNING("No signal(s) found for id %d. Message not sent.", cf.can_id);
-		rc = -1;
+		openxc_DynamicField search_key = build_DynamicField(json_object_get_string(json_name));
+		sf = utils::signals_manager_t::instance().find_signals(search_key);
+
+		if (sf.can_signals.empty())
+		{
+			AFB_WARNING("No signal(s) found for id %d. Message not sent.", cf.can_id);
+			rc = -1;
+		}
+		else
+		{
+			for(const auto& sig: sf.can_signals)
+			{
+				cf = encoder_t::build_frame(sig, (uint64_t)json_object_get_double(json_value));
+				const std::string bus_name = sig->get_message()->get_bus_name();
+				if( cd.count(bus_name) == 0)
+					{cd[bus_name] = std::make_shared<low_can_socket_t>(low_can_socket_t());}
+				rc = cd[bus_name]->tx_send(cf, sig);
+			}
+		}
 	}
 	else
 	{
-		std::map<std::string, std::shared_ptr<low_can_socket_t> >& cd = application_t::instance().get_can_devices();
-		const char* can_socket = json_object_get_string(json_can_socket);
-		for(const auto& sig: sf.can_signals)
-		{
-			if (sig->get_message()->get_bus_name().c_str() == can_socket)
-			{
-				rc = cd[can_socket]->tx_send(cf, sig);
-			}
-		}
+		AFB_ERROR("Request argument malformed. Please use the following syntax:");
+		rc = -1;
 	}
 
 	if (rc >= 0)

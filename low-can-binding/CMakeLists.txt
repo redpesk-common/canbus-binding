@@ -34,6 +34,7 @@ PROJECT_TARGET_ADD(low-can)
 		can/can-message.cpp
 		can/can-signals.cpp
 		can/can-decoder.cpp
+		can/can-encoder.cpp
 		diagnostic/diagnostic-message.cpp
 		diagnostic/diagnostic-manager.cpp
 		diagnostic/active-diagnostic-request.cpp

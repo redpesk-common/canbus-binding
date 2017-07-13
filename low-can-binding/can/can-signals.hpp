@@ -133,6 +133,7 @@ public:
 	bool get_force_send_changed() const;
 	const std::map<uint8_t, std::string>& get_states() const;
 	const std::string get_states(uint8_t value);
+	uint64_t get_states(const std::string& value) const;
 	size_t get_state_count() const;
 	bool get_writable() const;
 	signal_decoder& get_decoder();

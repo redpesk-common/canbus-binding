@@ -141,6 +141,20 @@ const std::string can_signal_t::get_states(uint8_t value)
 	return std::string();
 }
 
+uint64_t can_signal_t::get_states(const std::string& value) const
+{
+	uint64_t ret = -1;
+	for( const auto& state: states_)
+	{
+		if(state.second == value)
+		{
+			ret = (uint64_t)state.first;
+			break;
+		}
+	}
+	return ret;
+}
+
 size_t can_signal_t::get_state_count() const
 {
 	return states_.size();
