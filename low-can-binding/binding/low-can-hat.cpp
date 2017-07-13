@@ -40,13 +40,23 @@ extern "C"
 		return a;
 	}
 
-	static const struct afb_auth loa_1 = { loa_afb_auth(1) };
+	static constexpr struct afb_auth perm_afb_auth(const char* permission)
+	{
+		struct afb_auth a = {};
+		a.type = afb_auth_Permission;
+		a.text = permission;
+		return a;
+	}
+
+	static const struct afb_auth afb_auth_loa_1 = { loa_afb_auth(1) };
+	static const struct afb_auth afb_auth_perm = { perm_afb_auth("urn:AGL:permission::platform:can:write") };
 
 	static const struct afb_verb_v2 verbs[]=
 	{
+		{ .verb= "auth", .callback= auth, .auth= &afb_auth_perm, .info="Authentification against service to get the required level of confidence", .session= AFB_SESSION_NONE},
 		{ .verb= "subscribe", .callback= subscribe, .auth= NULL, .info="Let subscribe to signals", .session= AFB_SESSION_NONE},
 		{ .verb= "unsubscribe", .callback= unsubscribe, .auth= NULL, .info="Let unsubscribe signals", .session= AFB_SESSION_NONE},
-		{ .verb= "swrite", .callback= swrite, .auth= &loa_1, .info="Write a single CAN message on a CAN bus", .session= AFB_SESSION_LOA_1},
+		{ .verb= "swrite", .callback= swrite, .auth= &afb_auth_loa_1, .info="Write a single CAN message on a CAN bus", .session= AFB_SESSION_LOA_1},
 		{ .verb= NULL, .callback= NULL, .auth= NULL, .info=NULL, .session= 0}
 	};
 

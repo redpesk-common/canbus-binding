@@ -36,6 +36,7 @@ void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
 int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata);
 
+void auth(struct afb_req request);
 void subscribe(struct afb_req request);
 void unsubscribe(struct afb_req request);
 void swrite(struct afb_req request);

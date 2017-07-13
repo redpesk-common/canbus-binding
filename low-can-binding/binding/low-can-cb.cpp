@@ -351,6 +351,12 @@ static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
 		afb_req_fail(request, "error", NULL);
 }
 
+void auth(struct afb_req request)
+{
+	afb_req_session_set_LOA(request, 1);
+	afb_req_success(request, NULL, NULL);
+}
+
 void subscribe(struct afb_req request)
 {
 	do_subscribe_unsubscribe(request, true);
