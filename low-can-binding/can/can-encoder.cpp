@@ -30,18 +30,18 @@
 /// @param[in] length - The length of the destination buffer.
 ///
 /// @return Returns a can_frame struct initialized and ready to be send.
-const can_frame build_frame(const can_signal_t& signal, uint64_t value)
+const can_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& signal, uint64_t value)
 {
 	struct can_frame cf;
 	::memset(&cf, 0, sizeof(cf));
 
-	cf.can_id = signal.get_message()->get_id();
+	cf.can_id = signal->get_message()->get_id();
 	cf.can_dlc = CAN_MAX_DLEN;
 	bitfield_encode_float((float)value,
-						signal.get_bit_position(),
-						signal.get_bit_size(),
-						signal.get_factor(),
-						signal.get_offset(),
+						signal->get_bit_position(),
+						signal->get_bit_size(),
+						signal->get_factor(),
+						signal->get_offset(),
 						cf.data,
 						CAN_MAX_DLEN);
 
