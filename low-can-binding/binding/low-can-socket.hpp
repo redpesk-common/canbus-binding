@@ -80,11 +80,12 @@ public:
 	struct utils::simple_bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0,0}, const struct timeval& frequency_thinning = {0,0}) const;
 	void add_bcm_frame(const struct can_frame& cfd, struct utils::simple_bcm_msg& bcm_msg) const;
 
-	int open_socket();
+	int open_socket(const std::string& bus_name = "");
 
 	int create_rx_filter(std::shared_ptr<can_signal_t> sig);
 	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
 	int create_rx_filter(utils::simple_bcm_msg& bcm_msg);
 
-	int tx_send(const struct can_frame& cf, std::shared_ptr<can_signal_t> sig = nullptr);
+	int tx_send(const struct can_frame& cf, std::shared_ptr<can_signal_t> sig);
+	int tx_send(const struct can_frame& cf, const std::string& bus_name);
 };

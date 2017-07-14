@@ -160,7 +160,7 @@ void low_can_socket_t::set_max(float max)
 /// this will open the socket with the required CAN bus device name.
 ///
 /// @return INVALID_SOCKET on failure else positive integer
-int low_can_socket_t::open_socket()
+int low_can_socket_t::open_socket(const std::string& bus_name)
 {
 	int ret = 0;
 	if(! socket_)
@@ -169,6 +169,8 @@ int low_can_socket_t::open_socket()
 			{ret = socket_.open(can_signal_->get_message()->get_bus_device_name());}
 		else if (! diagnostic_message_ .empty())
 			{ret = socket_.open(application_t::instance().get_diagnostic_manager().get_bus_device_name());}
+		else if ( ! bus_name.empty())
+			{ ret = socket_.open(bus_name);}
 		index_ = (int)socket_.socket();
 	}
 	return ret;
@@ -181,6 +183,7 @@ int low_can_socket_t::open_socket()
 struct utils::simple_bcm_msg low_can_socket_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning) const
 {
 	struct utils::simple_bcm_msg bcm_msg;
+	::memset(&bcm_msg, 0, sizeof(bcm_msg));
 
 	bcm_msg.msg_head.opcode  = opcode;
 	bcm_msg.msg_head.can_id  = can_id;
@@ -304,6 +307,27 @@ int low_can_socket_t::tx_send(const struct can_frame& cf, std::shared_ptr<can_si
 	add_bcm_frame(cf, bcm_msg);
 
 	if(open_socket() < 0)
+		{return -1;}
+
+	socket_ << bcm_msg;
+	if(! socket_)
+		return -1;
+
+	return 0;
+}
+
+/// @brief Create a TX_SEND job used by the BCM socket to
+/// simply send message
+///
+/// @return 0 if ok else -1
+int low_can_socket_t::tx_send(const struct can_frame& cf, const std::string& bus_name)
+{
+	can_signal_ = nullptr;
+
+	utils::simple_bcm_msg bcm_msg =  make_bcm_head(TX_SEND);
+	add_bcm_frame(cf, bcm_msg);
+
+	if(open_socket(bus_name) < 0)
 		{return -1;}
 
 	socket_ << bcm_msg;
