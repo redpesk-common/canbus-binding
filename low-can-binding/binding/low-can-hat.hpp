@@ -39,4 +39,4 @@ int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata);
 void auth(struct afb_req request);
 void subscribe(struct afb_req request);
 void unsubscribe(struct afb_req request);
-void swrite(struct afb_req request);
+void write(struct afb_req request);

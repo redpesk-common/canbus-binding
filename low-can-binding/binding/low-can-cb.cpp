@@ -368,17 +368,80 @@ void unsubscribe(struct afb_req request)
 	do_subscribe_unsubscribe(request, false);
 }
 
-void swrite(struct afb_req request)
+static int send_frame(const std::string& bus_name, const struct can_frame& cf)
+{
+	std::map<std::string, std::shared_ptr<low_can_socket_t> >& cd = application_t::instance().get_can_devices();
+
+	if( cd.count(bus_name) == 0)
+		{cd[bus_name] = std::make_shared<low_can_socket_t>(low_can_socket_t());}
+
+	return cd[bus_name]->tx_send(cf, bus_name);
+}
+
+static int write_raw_frame(const std::string& bus_name, uint32_t can_id, uint8_t can_dlc, struct json_object* can_data)
+{
+	int rc = 0;
+	struct can_frame cf;
+
+	::memset(&cf, 0, sizeof(cf));
+
+	cf.can_id = can_id;
+	cf.can_dlc = can_dlc;
+
+	struct json_object *x;
+	int n = json_object_array_length(can_data);
+	if(n <= 8)
+	{
+		for (int i = 0 ; i < n ; i++)
+		{
+			x = json_object_array_get_idx(can_data, i);
+			cf.data[i] = json_object_get_type(x) == json_type_int ? (uint8_t)json_object_get_int(x) : 0;
+		}
+	}
+
+	const std::string found_device = application_t::instance().get_can_bus_manager().get_can_device_name(bus_name);
+	if( ! found_device.empty())
+	{
+		rc = send_frame(found_device, cf);
+	}
+
+	return rc;
+}
+static int write_signal(const std::string& name, uint64_t value)
 {
 	int rc = 0;
 	struct can_frame cf;
 	struct utils::signals_found sf;
+
+	::memset(&cf, 0, sizeof(cf));
+
+	openxc_DynamicField search_key = build_DynamicField(name);
+	sf = utils::signals_manager_t::instance().find_signals(search_key);
+
+	if (sf.can_signals.empty())
+	{
+		AFB_WARNING("No signal(s) found for %s. Message not sent.", name.c_str());
+		rc = -1;
+	}
+	else
+	{
+		for(const auto& sig: sf.can_signals)
+		{
+			cf = encoder_t::build_frame(sig, value);
+			const std::string bus_name = sig->get_message()->get_bus_name();
+			rc = send_frame(bus_name, cf);
+		}
+	}
+
+	return rc;
+}
+
+void write(struct afb_req request)
+{
+	int rc = 0;
 	struct json_object* args = nullptr,
 		*json_name = nullptr,
 		*json_value = nullptr;
-	std::map<std::string, std::shared_ptr<low_can_socket_t> >& cd = application_t::instance().get_can_devices();
-
-	::memset(&cf, 0, sizeof(cf));
 
 	args = afb_req_json(request);
 
@@ -395,28 +458,10 @@ void swrite(struct afb_req request)
 			(json_object_object_get_ex(json_value, "can_dlc", &json_can_dlc) && (json_object_is_type(json_can_dlc, json_type_double) || json_object_is_type(json_can_dlc, json_type_int))) &&
 			(json_object_object_get_ex(json_value, "can_data", &json_can_data) && json_object_is_type(json_can_data, json_type_array) ))
 		{
-			cf.can_id = json_object_get_int(json_can_id);
-			cf.can_dlc = (uint8_t)json_object_get_int(json_can_dlc);
-
-			struct json_object *x;
-			int n = json_object_array_length(json_can_data);
-			if(n <= 8)
-			{
-				for (int i = 0 ; i < n ; i++)
-				{
-					x = json_object_array_get_idx(json_can_data, i);
-					cf.data[i] = json_object_get_type(x) == json_type_int ? (uint8_t)json_object_get_int(x) : 0;
-				}
-			}
-
-			const std::string bus_name = json_object_get_string(json_name);
-			const std::string found_device = application_t::instance().get_can_bus_manager().get_can_device_name(bus_name);
-			if( ! found_device.empty())
-			{
-				if( cd.count(bus_name) == 0)
-					{cd[bus_name] = std::make_shared<low_can_socket_t>(low_can_socket_t());}
-				rc = cd[bus_name]->tx_send(cf, found_device);
-			}
+			write_raw_frame(json_object_get_string(json_name),
+				json_object_get_int(json_can_id),
+				(uint8_t)json_object_get_int(json_can_dlc),
+				json_can_data);
 		}
 		else
 		{
@@ -429,25 +474,8 @@ void swrite(struct afb_req request)
 		(json_object_object_get_ex(args, "signal_name", &json_name) && json_object_is_type(json_name, json_type_string)) &&
 		(json_object_object_get_ex(args, "signal_value", &json_value) && (json_object_is_type(json_value, json_type_double) || json_object_is_type(json_value, json_type_int))))
 	{
-		openxc_DynamicField search_key = build_DynamicField(json_object_get_string(json_name));
-		sf = utils::signals_manager_t::instance().find_signals(search_key);
-
-		if (sf.can_signals.empty())
-		{
-			AFB_WARNING("No signal(s) found for id %d. Message not sent.", cf.can_id);
-			rc = -1;
-		}
-		else
-		{
-			for(const auto& sig: sf.can_signals)
-			{
-				cf = encoder_t::build_frame(sig, (uint64_t)json_object_get_double(json_value));
-				const std::string bus_name = sig->get_message()->get_bus_name();
-				if( cd.count(bus_name) == 0)
-					{cd[bus_name] = std::make_shared<low_can_socket_t>(low_can_socket_t());}
-				rc = cd[bus_name]->tx_send(cf, sig);
-			}
-		}
+		write_signal(json_object_get_string(json_name),
+			(uint64_t)json_object_get_double(json_value));
 	}
 	else
 	{

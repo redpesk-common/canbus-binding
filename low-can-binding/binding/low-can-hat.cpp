@@ -56,7 +56,7 @@ extern "C"
 		{ .verb= "auth", .callback= auth, .auth= &afb_auth_perm, .info="Authentification against service to get the required level of confidence", .session= AFB_SESSION_NONE},
 		{ .verb= "subscribe", .callback= subscribe, .auth= NULL, .info="Let subscribe to signals", .session= AFB_SESSION_NONE},
 		{ .verb= "unsubscribe", .callback= unsubscribe, .auth= NULL, .info="Let unsubscribe signals", .session= AFB_SESSION_NONE},
-		{ .verb= "swrite", .callback= swrite, .auth= &afb_auth_loa_1, .info="Write a single CAN message on a CAN bus", .session= AFB_SESSION_LOA_1},
+		{ .verb= "write", .callback= write, .auth= &afb_auth_loa_1, .info="Write a single CAN message on a CAN bus", .session= AFB_SESSION_LOA_1},
 		{ .verb= NULL, .callback= NULL, .auth= NULL, .info=NULL, .session= 0}
 	};
 
