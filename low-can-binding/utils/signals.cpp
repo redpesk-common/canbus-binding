@@ -37,7 +37,7 @@ namespace utils
 
 	///
 	/// @brief return the subscribed_signals map.
-	/// 
+	///
 	/// @return Map of subscribed signals.
 	std::map<int, std::shared_ptr<low_can_subscription_t> >& signals_manager_t::get_subscribed_signals()
 	{
@@ -48,10 +48,10 @@ namespace utils
 	/// @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
 	/// @brief return signals name found searching through CAN_signals and OBD2 pid
 	///
-	/// @param[in] key : can contain numeric or string value in order to search against 
+	/// @param[in] key : can contain numeric or string value in order to search against
 	///   can signals or obd2 signals name.
 	///
-	/// @return Vector of signals name found. 
+	/// @return Vector of signals name found.
 	///
 	struct signals_found signals_manager_t::find_signals(const openxc_DynamicField &key)
 	{

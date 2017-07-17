@@ -17,7 +17,7 @@
 
 #include "ini-config.hpp"
 
-bool starts_with(const std::string& text, const std::string& token) 
+bool starts_with(const std::string& text, const std::string& token)
 {
 	if(text.length() < token.length()) return false;
 	return (text.compare(0, token.length(), token) == 0);
@@ -62,7 +62,7 @@ ini_config::map ini_config::get_keys(const std::string& section, bool wo_prefix)
 {
 	map ret;
 	std::string key;
-	
+
 	std::string prefix = section + '/';
 	for(auto i = config_.begin();
 		i != config_.end();

@@ -56,7 +56,7 @@ typedef openxc_DynamicField (*signal_decoder)(can_signal_t& signal, float value,
 /// A signal_encoder transforms a number, string or boolean into a raw floating
 /// point value that fits in the CAN signal.
 ///
-/// @param[in] signal - The CAN signal to encode. 
+/// @param[in] signal - The CAN signal to encode.
 /// @param[in] value - The dynamic field to encode.
 /// @param[out] send - An output parameter. If the encoding failed or the CAN signal should
 /// not be encoded for some other reason, this will be flipped to false.

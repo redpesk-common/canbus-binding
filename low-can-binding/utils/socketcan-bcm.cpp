@@ -39,7 +39,7 @@ namespace utils
 	int socketcan_bcm_t::open(std::string device_name)
 	{
 		close();
-		
+
 		struct ifreq ifr;
 		socket_ = socketcan_t::open(PF_CAN, SOCK_DGRAM, CAN_BCM);
 

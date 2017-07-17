@@ -36,7 +36,7 @@ namespace utils
 	int socketcan_raw_t::open(std::string device_name)
 	{
 		close();
-		
+
 		struct ifreq ifr;
 		socket_ = socketcan_t::open(PF_CAN, SOCK_RAW, CAN_RAW);
 

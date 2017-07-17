@@ -182,7 +182,7 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request, boo
 
 		auto it =  std::find_if(s.begin(), s.end(), [&sig](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub){ return (! sub.second->get_diagnostic_message().empty());});
 		can_subscription = it != s.end() ?
-			it->second : 
+			it->second :
 			std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
 		// If the requested diagnostic message isn't supported by the car then unsubcribe it
 		// no matter what we want, worse case will be a fail unsubscription but at least we don't

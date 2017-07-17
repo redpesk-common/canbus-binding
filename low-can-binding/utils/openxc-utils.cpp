@@ -28,7 +28,7 @@
 ///  and put into the DiagnosticResponse of the VehicleMessage.
 /// @param[in] parsed_value - raw parsed value of the payload from CAN message
 ///
-/// @return a vehicle message including simple message that will be convert into 
+/// @return a vehicle message including simple message that will be convert into
 /// a JSON object before being pushed to the subscribers
 ///
 const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value)
@@ -92,13 +92,13 @@ const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* re
 /// @param[in] message - simple message to include into openxc_VehicleMessage
 /// @param[in] timestamp - timestamp from ioctl when reading the socket
 ///
-/// @return a vehicle message including simple message that will be convert into 
+/// @return a vehicle message including simple message that will be convert into
 /// a JSON object before being pushed to the subscribers
 ///
 const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message, uint64_t timestamp)
 {
 	openxc_VehicleMessage v;
-	
+
 	v.has_type = true,
 	v.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE;
 	v.has_simple_message = true;
@@ -114,13 +114,13 @@ const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& mes
 ///
 /// @param[in] message - simple message to include into openxc_VehicleMessage
 ///
-/// @return a vehicle message including simple message that will be convert into 
+/// @return a vehicle message including simple message that will be convert into
 /// a JSON object before being pushed to the subscribers
 ///
 const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message)
 {
 	openxc_VehicleMessage v;
-	
+
 	v.has_type = true,
 	v.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE;
 	v.has_simple_message = true;
@@ -162,7 +162,7 @@ bool is_valid(const openxc_VehicleMessage& v)
 /// @brief Build an openxc_SimpleMessage associating a name to an openxc_DynamicField
 ///
 /// @param[in] name - const string reference name to assign to the created SimpleMessage
-///  this will set has_name member to true and assign name to the name member. Maximum size for name is 
+///  this will set has_name member to true and assign name to the name member. Maximum size for name is
 ///  set to 100 char.
 /// @param[in] value - const reference with DynamicField to assign to SimpleMessage
 ///  value.
@@ -216,12 +216,12 @@ const openxc_DynamicField build_DynamicField(const std::string& value)
 	openxc_DynamicField d;
 	d.has_type = true;
 	d.type = openxc_DynamicField_Type_STRING;
-	
+
 	d.has_string_value = true;
 	d.has_numeric_value = false;
 	d.has_boolean_value = false;
 	::strncpy(d.string_value, value.c_str(), 100);
-	
+
 	return d;
 }
 
@@ -239,12 +239,12 @@ const openxc_DynamicField build_DynamicField(double value)
 	openxc_DynamicField d;
 	d.has_type = true;
 	d.type = openxc_DynamicField_Type_NUM;
-	
+
 	d.has_string_value = false;
 	d.has_numeric_value = true;
 	d.has_boolean_value = false;
 	d.numeric_value = value;
-	
+
 	return d;
 }
 
@@ -260,12 +260,12 @@ const openxc_DynamicField build_DynamicField(bool value)
 	openxc_DynamicField d;
 	d.has_type = true;
 	d.type = openxc_DynamicField_Type_BOOL;
-	
+
 	d.has_string_value = false;
 	d.has_numeric_value = false;
 	d.has_boolean_value = true;
 	d.boolean_value = value;
-	
+
 	return d;
 }
 
@@ -306,7 +306,7 @@ const openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg
 {
 	if (v_msg.has_simple_message)
 		return v_msg.simple_message;
-	
+
 	openxc_SimpleMessage s_msg = { false, "", false, build_DynamicField(false), false, build_DynamicField(false)};
 	return s_msg;
 }
@@ -331,10 +331,10 @@ void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value)
 ///
 /// @brief Make a JSON object from a SimpleMessage
 ///
-/// @param[in] s_msg - const reference to an openxc_SimpleMessage 
+/// @param[in] s_msg - const reference to an openxc_SimpleMessage
 /// struct to convert into a json object.
 /// @param[out] json - pointer with the DynamicField converted into json object
-/// 
+///
 /// @return True if SimpleMessage has been transformed into json object
 ///  and false if not. In such case, a json object is returned { "error": "error msg"}
 ///

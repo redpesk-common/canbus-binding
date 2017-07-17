@@ -41,7 +41,7 @@ diagnostic_manager_t::diagnostic_manager_t()
 ///  to have 1 diagnostic bus which are the first bus declared in the JSON
 ///  description file. Configuration instance will return it.
 ///
-/// this will initialize DiagnosticShims and cancel all active requests 
+/// this will initialize DiagnosticShims and cancel all active requests
 ///  if there are any.
 bool diagnostic_manager_t::initialize()
 {
@@ -80,7 +80,7 @@ void diagnostic_manager_t::reset()
 /// @param[in] data - The data payload for the message. NULL is valid if size is also 0.
 /// @param[in] size - The size of the data payload, in bytes.
 ///
-/// @return true if the CAN message was sent successfully. 
+/// @return true if the CAN message was sent successfully.
 bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size)
 {
 	diagnostic_manager_t& dm = application_t::instance().get_diagnostic_manager();
@@ -185,7 +185,7 @@ void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 }
 
 /// @brief Cleanup a specific request if it isn't running and get complete. As it is almost
-/// impossible to get that state for a recurring request without waiting for that, you can 
+/// impossible to get that state for a recurring request without waiting for that, you can
 /// force the cleaning operation.
 ///
 /// @param[in] entry - the request to clean
@@ -373,7 +373,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 			recurring_requests_.push_back(entry);
 
 			entry->set_handle(shims_, request);
-			start_diagnostic_request(&shims_, entry->get_handle()); 
+			start_diagnostic_request(&shims_, entry->get_handle());
 		}
 		else
 		{
@@ -440,7 +440,7 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 }
 
 /// @brief Will take the CAN message and pass it to the receive functions that will process
-/// diagnostic handle for each active diagnostic request then depending on the result we will 
+/// diagnostic handle for each active diagnostic request then depending on the result we will
 /// return pass the diagnostic response to decode it.
 ///
 /// @param[in] entry - A pointer to an active diagnostic request holding a valid diagnostic handle
@@ -494,7 +494,7 @@ openxc_VehicleMessage diagnostic_manager_t::find_and_decode_adr(const can_messag
 }
 
 /// @brief Tell if the CAN message received is a diagnostic response.
-/// Request broadcast ID use 0x7DF and assigned ID goes from 0x7E0 to Ox7E7. That allows up to 8 ECU to respond 
+/// Request broadcast ID use 0x7DF and assigned ID goes from 0x7E0 to Ox7E7. That allows up to 8 ECU to respond
 /// at the same time. The response is the assigned ID + 0x8, so response ID can goes from 0x7E8 to 0x7EF.
 ///
 /// @param[in] cm - CAN message received from the socket.

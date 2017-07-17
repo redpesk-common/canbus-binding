@@ -107,7 +107,7 @@ float can_signal_t::get_offset() const
 float can_signal_t::get_min_value() const
 {
 	return min_value_;
-}	
+}
 
 float can_signal_t::get_max_value() const
 {

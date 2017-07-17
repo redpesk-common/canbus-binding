@@ -41,13 +41,13 @@ active_diagnostic_request_t& active_diagnostic_request_t::operator=(const active
 		name_ = adr.name_;
 		decoder_ = adr.decoder_;
 		callback_ = adr.callback_;
-		recurring_ = adr.recurring_; 
+		recurring_ = adr.recurring_;
 		wait_for_multiple_responses_ = adr.wait_for_multiple_responses_;
 		frequency_clock_ = adr.frequency_clock_;
 		timeout_clock_ = adr.timeout_clock_;
 		socket_ = adr.socket_;
 	}
-	
+
 	return *this;
 }
 
