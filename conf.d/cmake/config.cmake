@@ -75,6 +75,10 @@ add_compile_options(-DPB_FIELD_16BIT)
 set(CMAKE_C_FLAGS "")
 set(CMAKE_CXX_FLAGS "-std=c++11 -pthread")
 
+# Customize link option
+# -----------------------------
+list (APPEND link_libraries -pthread)
+
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
 set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/package --binding=\$\$(pwd)/package/lib/afb-low-can.so --port=1234 --tracereq=common --token=\"1\" --verbose")
