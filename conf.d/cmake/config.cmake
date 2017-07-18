@@ -73,6 +73,10 @@ add_compile_options(-DPB_FIELD_16BIT)
 add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-std=c++11>)
 add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pthread>)
 
+# Customize link option
+# -----------------------------
+list (APPEND link_libraries -pthread)
+
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
 set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/package --binding=\$\$(pwd)/package/lib/afb-low-can.so --port=1234 --tracereq=common --token=\"1\" --verbose")
