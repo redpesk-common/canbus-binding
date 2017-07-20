@@ -308,9 +308,12 @@ static int one_subscribe_unsubscribe(struct afb_req request, bool subscribe, con
 	openxc_DynamicField search_key = build_DynamicField(tag);
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
 	if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
+	{
 		AFB_NOTICE("No signal(s) found for %s.", tag.c_str());
+		ret = -1;
+	}
 	else
-		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);
+		{ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);}
 
 	return ret;
 }
