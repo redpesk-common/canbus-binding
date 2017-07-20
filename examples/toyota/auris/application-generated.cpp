@@ -6,83 +6,7 @@ application_t::application_t()
 	, can_message_set_{
 		{std::make_shared<can_message_set_t>(can_message_set_t{0,"example",
 			{ // beginning can_message_definition_ vector
-				{std::make_shared<can_message_definition_t>(can_message_definition_t{"ls",0x30,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
-					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"hvac.fan.speed",
-							32,
-							8,
-							23.5294f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
-							{
-							},
-							false,
-							nullptr,
-							nullptr,
-							false
-						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"hvac.temperature.left",
-							0,
-							8,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
-							{
-							},
-							false,
-							nullptr,
-							nullptr,
-							false
-						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"hvac.temperature.right",
-							8,
-							8,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
-							{
-							},
-							false,
-							nullptr,
-							nullptr,
-							false
-						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"hvac.temperature.average",
-							16,
-							8,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
-							{
-							},
-							false,
-							nullptr,
-							nullptr,
-							false
-						})}
-					} // end can_signals vector
-				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x3D9,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x3D9,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning can_signals vector
 						{std::make_shared<can_signal_t> (can_signal_t{
 							"engine.speed",
@@ -116,7 +40,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})},
@@ -196,7 +120,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})}
@@ -218,7 +142,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})},
@@ -236,7 +160,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})},
@@ -254,7 +178,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})},
@@ -272,7 +196,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})},
@@ -290,7 +214,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})}
@@ -312,7 +236,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})},
@@ -330,7 +254,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})},
@@ -348,7 +272,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})},
@@ -366,7 +290,7 @@ application_t::application_t()
 							{
 							},
 							false,
-							decoder_t::decode_boolean,
+							decoder_t::booleanDecoder,
 							nullptr,
 							false
 						})}

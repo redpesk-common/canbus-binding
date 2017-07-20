@@ -1,0 +1,158 @@
+{   "name": "example",
+    "extra_sources": [],
+    "initializers": [],
+    "loopers": [],
+    "buses": {},
+    "commands": [],
+    "messages": {
+  },
+"diagnostic_messages": [
+        {
+            "bus": "hs",
+			"pid": 4,
+			"name": "engine.load",
+			"frequency": 5,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 5,
+			"name": "engine.coolant.temperature",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 10,
+			"name": "fuel.pressure",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 11,
+			"name": "intake.manifold.pressure",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 12,
+			"name": "engine.speed",
+			"frequency": 5,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 13,
+			"name": "vehicle.speed",
+			"frequency": 5,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 15,
+			"name": "intake.air.temperature",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 16,
+			"name": "mass.airflow",
+			"frequency": 5,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 17,
+			"name": "throttle.position",
+			"frequency": 5,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 31,
+			"name": "running.time",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 45,
+			"name": "EGR.error",
+			"frequency": 0,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 47,
+			"name": "fuel.level",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 51,
+			"name": "barometric.pressure",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 70,
+			"name": "ambient.air.temperature",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 76,
+			"name": "commanded.throttle.position",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 82,
+			"name": "ethanol.fuel.percentage",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 90,
+			"name": "accelerator.pedal.position",
+			"frequency": 5,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 91,
+			"name": "hybrid.battery-pack.remaining.life",
+			"frequency": 5,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 92,
+			"name": "engine.oil.temperature",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 94,
+			"name": "engine.fuel.rate",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        },
+		{
+            "bus": "hs",
+			"pid": 99,
+			"name": "engine.torque",
+			"frequency": 1,
+            "decoder": "decoder_t::decode_obd2_response"
+        }
+    ]
+}

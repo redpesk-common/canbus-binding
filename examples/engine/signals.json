@@ -1,0 +1,68 @@
+{   "name": "example",
+	"extra_sources": [],
+	"initializers": [],
+	"loopers": [],
+	"buses": {},
+	"commands": [],
+	"messages": {
+	"0x3D9": {
+	"bus": "hs",
+	"signals": {
+		"PT_FuelLevelPct": {
+			"generic_name": "fuel.level",
+			"bit_position": 8,
+			"bit_size": 8,
+			"factor": 0.392157,
+			"offset": 0
+		},
+		"PT_EngineSpeed": {
+			"generic_name": "engine.speed",
+			"bit_position": 16,
+			"bit_size": 16,
+			"factor": 0.25,
+			"offset": 0
+		},
+		"PT_FuelLevelLow": {
+			"generic_name": "fuel.level.low",
+			"bit_position": 55,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::booleanDecoder"
+		}
+	}
+	},
+		"0x4D1": {
+		"bus": "hs",
+		"signals": {
+			"PT_EngineOilTempHigh": {
+				"generic_name": "engine.oil.temp.high",
+				"bit_position": 7,
+				"bit_size": 1,
+				"factor": 1,
+				"offset": 0,
+				"decoder": "decoder_t::booleanDecoder"
+			},
+			"PT_EngineOilTemp": {
+				"generic_name": "engine.oil.temp",
+				"bit_position": 16,
+				"bit_size": 8,
+				"factor": 1,
+				"offset": 0
+			}
+		}
+		},
+		"0x3E9": {
+		"bus": "hs",
+		"signals": {
+			"PT_VehicleAvgSpeed": {
+				"generic_name": "vehicle.average.speed",
+				"bit_position": 0,
+				"bit_size": 15,
+				"factor": 0.015625,
+				"offset": 0
+			}
+		}
+	}
+}
+}

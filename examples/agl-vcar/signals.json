@@ -1,0 +1,323 @@
+{   "name": "AGL Virtual Car",
+	"extra_sources": [],
+	"initializers": [],
+	"loopers": [],
+	"buses": {},
+	"commands": [],
+	"messages": {
+		"0x620": {
+			"bus": "hs",
+			"signals": {
+				"doors.driver.open": {
+					"generic_name": "doors.front_left.open",
+					"bit_position": 43,
+					"bit_size": 1,
+					"factor": 1.0,
+					"offset": 0,
+					"decoder": "decoder_t::decode_boolean"},
+				"doors.passenger.open": {
+					"generic_name": "doors.front_right.open",
+					"bit_position": 44,
+					"bit_size": 1,
+					"factor": 1.0,
+					"offset": 0,
+					"decoder": "decoder_t::booleanDecoder"},
+				"doors.rearleft.open": {
+					"generic_name": "doors.rear_left.open",
+					"bit_position": 46,
+					"bit_size": 1,
+					"factor": 1.0,
+					"offset": 0,
+					"decoder": "decoder_t::booleanDecoder"},
+				"doors.rearright.open": {
+					"generic_name": "doors.rear_right.open",
+					"bit_position": 45,
+					"bit_size": 4,
+					"factor": 1.0,
+					"offset": 0,
+					"decoder": "decoder_t::booleanDecoder"},
+				"doors.coffer.open": {
+					"generic_name": "doors.boot.open",
+					"bit_position": 47,
+					"bit_size": 1,
+					"factor": 1.0,
+					"offset": 0,
+					"decoder": "decoder_t::booleanDecoder"}
+		}
+	},
+		"0x799": {
+			"bus": "hs",
+			"signals": {
+				"windows.driver.open": {
+					"generic_name": "windows.front_left.open",
+					"bit_position": 43,
+					"bit_size": 1,
+					"factor": 1.0,
+					"offset": 0,
+					"decoder": "decoder_t::booleanDecoder"},
+				"windows.passenger.open": {
+					"generic_name": "windows.front_right.open",
+					"bit_position": 44,
+					"bit_size": 1,
+					"factor": 1.0,
+					"offset": 0,
+					"decoder": "decoder_t::booleanDecoder"},
+				"windows.rearleft.open": {
+					"generic_name": "windows.rear_left.open",
+					"bit_position": 46,
+					"bit_size": 1,
+					"factor": 1.0,
+					"offset": 0,
+					"decoder": "decoder_t::booleanDecoder"},
+				"windows.rearright.open": {
+					"generic_name": "windows.rear_right.open",
+					"bit_position": 45,
+					"bit_size": 4,
+					"factor": 1.0,
+					"offset": 0,
+					"decoder": "decoder_t::booleanDecoder"}
+		}
+	},
+	"0x3D9": {
+	"bus": "hs",
+	"signals": {
+		"PT_FuelLevelPct": {
+			"generic_name": "fuel.level",
+			"bit_position": 8,
+			"bit_size": 8,
+			"factor": 0.392157,
+			"offset": 0
+		},
+		"PT_EngineSpeed": {
+			"generic_name": "engine.speed",
+			"bit_position": 16,
+			"bit_size": 16,
+			"factor": 0.25,
+			"offset": 0
+		},
+		"PT_FuelLevelLow": {
+			"generic_name": "fuel.level.low",
+			"bit_position": 55,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::booleanDecoder"
+		}
+	}
+	},
+	"0x4D1": {
+	"bus": "hs",
+	"signals": {
+		"PT_EngineOilTempHigh": {
+			"generic_name": "engine.oil.temp.high",
+			"bit_position": 7,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::booleanDecoder"
+		},
+		"PT_EngineOilTemp": {
+			"generic_name": "engine.oil.temp",
+			"bit_position": 16,
+			"bit_size": 8,
+			"factor": 1,
+			"offset": 0
+		}
+	}
+	},
+	"0x3E9": {
+	"bus": "hs",
+	"signals": {
+		"PT_VehicleAvgSpeed": {
+			"generic_name": "vehicle.average.speed",
+			"bit_position": 0,
+			"bit_size": 15,
+			"factor": 0.015625,
+			"offset": 0
+		}
+	}
+	},
+	"0x30": {
+	"bus": "ls",
+	"signals": {
+		"LeftTemperature": {
+			"generic_name": "hvac.temperature.left",
+			"bit_position": 0,
+			"bit_size": 8,
+			"factor": 1,
+			"offset": 0
+		},
+		"RightTemperature": {
+			"generic_name": "hvac.temperature.right",
+			"bit_position": 8,
+			"bit_size": 8,
+			"factor": 1,
+			"offset": 0
+		},
+		"Temperature": {
+			"generic_name": "hvac.temperature.average",
+			"bit_position": 16,
+			"bit_size": 8,
+			"factor": 1,
+			"offset": 0
+		},
+		"FanSpeed": {
+			"generic_name": "hvac.fan.speed",
+			"bit_position": 32,
+			"bit_size": 8,
+			"factor": 23.529411765,
+			"offset": 0
+		}
+	}
+	}
+},
+"diagnostic_messages": [
+		{
+			"bus": "hs",
+			"pid": 4,
+			"name": "engine.load",
+			"frequency": 5,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 5,
+			"name": "engine.coolant.temperature",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 10,
+			"name": "fuel.pressure",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 11,
+			"name": "intake.manifold.pressure",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 12,
+			"name": "engine.speed",
+			"frequency": 5,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 13,
+			"name": "vehicle.speed",
+			"frequency": 5,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 15,
+			"name": "intake.air.temperature",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 16,
+			"name": "mass.airflow",
+			"frequency": 5,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 17,
+			"name": "throttle.position",
+			"frequency": 5,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 31,
+			"name": "running.time",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 45,
+			"name": "EGR.error",
+			"frequency": 0,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 47,
+			"name": "fuel.level",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 51,
+			"name": "barometric.pressure",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 70,
+			"name": "ambient.air.temperature",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 76,
+			"name": "commanded.throttle.position",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 82,
+			"name": "ethanol.fuel.percentage",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 90,
+			"name": "accelerator.pedal.position",
+			"frequency": 5,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 91,
+			"name": "hybrid.battery-pack.remaining.life",
+			"frequency": 5,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 92,
+			"name": "engine.oil.temperature",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 94,
+			"name": "engine.fuel.rate",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		},
+		{
+			"bus": "hs",
+			"pid": 99,
+			"name": "engine.torque",
+			"frequency": 1,
+			"decoder": "decoder_t::decode_obd2_response"
+		}
+	]
+}
