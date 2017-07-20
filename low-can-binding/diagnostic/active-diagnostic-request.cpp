@@ -22,7 +22,7 @@
 
 #include "../binding/application.hpp"
 
-#define ERROR_PID 0xFF
+#define AFB_ERROR_PID 0xFF
 
 std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
 
@@ -100,7 +100,7 @@ uint16_t active_diagnostic_request_t::get_pid() const
 {
 	if (handle_->request.has_pid)
 		return handle_->request.pid;
-	return ERROR_PID;
+	return AFB_ERROR_PID;
 }
 
 DiagnosticRequestHandle* active_diagnostic_request_t::get_handle()

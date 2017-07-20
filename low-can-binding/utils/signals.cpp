@@ -68,10 +68,10 @@ namespace utils
 					lookup_signals_by_id(key.numeric_value, application_t::instance().get_diagnostic_messages(), sf.diagnostic_messages);
 				break;
 			default:
-				ERROR("wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
+				AFB_ERROR("wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 				break;
 		}
-		DEBUG("Found %d signal(s)", (int)(sf.can_signals.size() + sf.diagnostic_messages.size()));
+		AFB_DEBUG("Found %d signal(s)", (int)(sf.can_signals.size() + sf.diagnostic_messages.size()));
 		return sf;
 	}
 }

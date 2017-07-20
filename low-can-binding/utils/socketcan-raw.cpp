@@ -42,10 +42,10 @@ namespace utils
 
 		// Attempts to open a socket to CAN bus
 		::strcpy(ifr.ifr_name, device_name.c_str());
-		DEBUG("ifr_name is : %s", ifr.ifr_name);
+		AFB_DEBUG("ifr_name is : %s", ifr.ifr_name);
 		if(::ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
 		{
-			ERROR("ioctl failed. Error was : %s", strerror(errno));
+			AFB_ERROR("ioctl failed. Error was : %s", strerror(errno));
 			close();
 		}
 		else
@@ -55,7 +55,7 @@ namespace utils
 
 			if(bind((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
 			{
-				ERROR("Bind failed. %s", strerror(errno));
+				AFB_ERROR("Bind failed. %s", strerror(errno));
 				close();
 			}
 		}
@@ -74,8 +74,8 @@ namespace utils
 		ifr.ifr_ifindex = addr.can_ifindex;
 		ioctl(s.socket(), SIOCGIFNAME, &ifr);
 
-		DEBUG("Data available: %i bytes read", (int)nbytes);
-		DEBUG("read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, frame.can_id, frame.len,
+		AFB_DEBUG("Data available: %i bytes read", (int)nbytes);
+		AFB_DEBUG("read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, frame.can_id, frame.len,
 			frame.data[0], frame.data[1], frame.data[2], frame.data[3], frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
 
 		struct timeval tv;
