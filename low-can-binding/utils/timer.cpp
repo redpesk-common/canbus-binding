@@ -59,7 +59,7 @@ frequency_clock_t::frequency_clock_t(float frequency)
 	: unit_{1000000}, frequency_{frequency}, last_tick_{0}, time_function_{nullptr}
 {
 	if(frequency_ <= 0)
-		frequency_ = 1;
+		frequency_ = 2000;
 }
 
 frequency_clock_t::frequency_clock_t(float frequency, uint64_t last_tick, time_function_t time_function)
