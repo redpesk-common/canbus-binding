@@ -63,7 +63,6 @@ set (PKG_REQUIRED_LIST
 	json-c
 	libsystemd>=222
 	afb-daemon
-	libmicrohttpd>=0.9.55
 )
 
 # Static constante definition
