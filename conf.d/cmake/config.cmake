@@ -47,11 +47,19 @@ set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
 # ----------------------------------
 set(CMAKE_BUILD_TYPE "DEBUG")
 
-# Kernel selection if needed. Impose a minimal version.
-# NOTE FOR NOW IT CHECKS KERNEL Yocto SDK Kernel version
-# else only HOST VERSION
+# Kernel selection if needed. You can choose between a
+# mandatory version to impose a minimal version.
+# Or check Kernel minimal version and just print a Warning
+# about missing features and define a preprocessor variable
+# to be used as preprocessor condition in code to disable
+# incompatibles features. Preprocessor define is named
+# KERNEL_MINIMAL_VERSION_OK.
+#
+# NOTE*** FOR NOW IT CHECKS KERNEL Yocto environment and
+# Yocto SDK Kernel version.
 # -----------------------------------------------
-set (kernel_minimal_version 4.8)
+#set(kernel_mandatory_version 4.8)
+set(kernel_minimal_version 4.8)
 
 # Compiler selection if needed. Impose a minimal version.
 # -----------------------------------------------

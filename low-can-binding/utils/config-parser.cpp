@@ -39,7 +39,7 @@ namespace utils
 	{
 		if (config_content_.size() <= 0)
 		{
-			AFB_ERROR("Can't load the INI config file.");
+			AFB_ERROR("Can't load the INI config file: /etc/dev-mapping.conf.");
 			return false;
 		}
 			AFB_DEBUG("Configuration file parsed");
