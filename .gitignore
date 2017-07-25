@@ -17,3 +17,4 @@ _book/
 packaging/
 CAN-binder/package/
 compile_commands.json
+.stfolder
