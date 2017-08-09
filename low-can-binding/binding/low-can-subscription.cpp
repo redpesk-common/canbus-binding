@@ -108,22 +108,26 @@ const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnost
 
 /// @brief Return the CAN signal name and empty string if not found
 /// or no CAN signal subscribed
-const std::string low_can_subscription_t::get_name() const
+const std::string low_can_socket_t::get_name() const
 {
 	if (can_signal_ != nullptr)
 		return can_signal_->get_name();
+	else if (!diagnostic_message_.empty())
+		return "diagnostic_messages";
 
+	AFB_WARNING("No diagnostics messages nor CAN signals registered in that subscription. Name empty ! It's a bug to be reported.");
 	return "";
 }
 
 /// @brief Return name from a diagnostic message from a PID
 ///
 /// @param[in] pid - Diagnostic message PID
-const std::string low_can_subscription_t::get_name(uint32_t pid) const
+const std::string low_can_socket_t::get_name(uint32_t pid) const
 {
 	if (!diagnostic_message_.empty())
 		return get_diagnostic_message(pid)->get_name() ;
 
+	AFB_WARNING("No diagnostics messages nor CAN signals registered in that subscription. Name empty ! It's a bug to be reported.");
 	return "";
 }
 
