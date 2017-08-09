@@ -107,7 +107,10 @@ const std::string low_can_socket_t::get_name() const
 {
 	if (can_signal_ != nullptr)
 		return can_signal_->get_name();
+	else if (!diagnostic_message_.empty())
+		return "diagnostic_messages";
 
+	AFB_WARNING("No diagnostics messages nor CAN signals registered in that subscription. Name empty ! It's a bug to be reported.");
 	return "";
 }
 
@@ -119,6 +122,7 @@ const std::string low_can_socket_t::get_name(uint32_t pid) const
 	if (!diagnostic_message_.empty())
 		return get_diagnostic_message(pid)->get_name() ;
 
+	AFB_WARNING("No diagnostics messages nor CAN signals registered in that subscription. Name empty ! It's a bug to be reported.");
 	return "";
 }
 
