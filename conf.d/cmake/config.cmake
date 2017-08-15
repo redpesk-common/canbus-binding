@@ -73,14 +73,21 @@ set (PKG_REQUIRED_LIST
 	afb-daemon
 )
 
-# Static constante definition
-# -----------------------------
-add_compile_options(-DPB_FIELD_16BIT)
-add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-pthread>)
-
 # Customize link option
 # -----------------------------
 list (APPEND link_libraries -pthread)
+
+# Compilation options definition
+# Use CMake generator expressions to specify only for a specific language
+# Values are prefilled with default options that is currently used.
+# -----------------------------------------------------------------------
+set(COMPILE_OPTIONS "-Wall" "-Wextra" "-Wconversion" "-Wno-unused-parameter" "-Wno-sign-compare" "-Wno-sign-conversion" "-Werror=maybe-uninitialized" "-Werror=implicit-function-declaration" "-ffunction-sections" "-fdata-sections" "-fPIC" "-DPB_FIELD_16BIT" CACHE STRING "Compilation flags")
+#set(C_COMPILE_OPTIONS "" CACHE STRING "Compilation flags for C language.")
+set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ language.")
+#set(PROFILING_COMPILE_OPTIONS "-g -O0 -pg -Wp,-U_FORTIFY_SOURCE" CACHE STRING "Compilation flags for PROFILING build type.")
+#set(DEBUG_COMPILE_OPTIONS "-g -ggdb -Wp,-U_FORTIFY_SOURCE" CACHE STRING "Compilation flags for DEBUG build type.")
+#set(CCOV_COMPILE_OPTIONS "-g -O2 --coverage" CACHE STRING "Compilation flags for CCOV build type.")
+#set(RELEASE_COMPILE_OPTIONS "-g -O2" CACHE STRING "Compilation flags for RELEASE build type.")
 
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
