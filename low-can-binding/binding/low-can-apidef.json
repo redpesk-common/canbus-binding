@@ -81,9 +81,6 @@
       }
     },
     "x-permissions": {
-        "config": {
-          "permission": "urn:AGL:permission:low-can:public:config"
-        },
         "monitor": {
           "permission": "urn:AGL:permission:low-can:public:monitor"
         },
@@ -118,8 +115,7 @@
         "responses": {
           "200": {"$ref": "#/components/responses/200"}
         }
-      }
-    },
+      },
     "/unsubscribe": {
       "description": "Unsubscribe previously suscribed signals.",
         "parameters": [
@@ -149,7 +145,7 @@
       "description": "Write a CAN messages to the CAN bus.",
       "get": {
         "x-permissions": {
-          "$ref": "#/components/x-permissions/write"
+          "LOA": 1
         },
         "parameters": [
           {
@@ -203,5 +199,4 @@
       }
     }
   }
-
-
+}
