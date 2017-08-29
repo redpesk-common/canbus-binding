@@ -89,11 +89,6 @@ set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ languag
 #set(CCOV_COMPILE_OPTIONS "-g -O2 --coverage" CACHE STRING "Compilation flags for CCOV build type.")
 #set(RELEASE_COMPILE_OPTIONS "-g -O2" CACHE STRING "Compilation flags for RELEASE build type.")
 
-# Print a helper message when every thing is finished
-# ----------------------------------------------------
-set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/package --binding=\$\$(pwd)/package/lib/afb-low-can.so --port=1234 --tracereq=common --token=\"1\" --verbose")
-set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
-
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
 # ---------------------------------------------------------------------
 set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
@@ -102,6 +97,7 @@ set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Optional location for config.xml.in
 # -----------------------------------
+set(WIDGET_ICON ${PROJECT_APP_TEMPLATES_DIR}/wgt/${PROJECT_ICON})
 set(WIDGET_CONFIG_TEMPLATE ${CMAKE_CURRENT_SOURCE_DIR}/conf.d/wgt/config.xml.in)
 
 # Mandatory widget Mimetype specification of the main unit
@@ -157,6 +153,18 @@ set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
 #------------------------------------------------------------
 #set(AFB_TOKEN   ""      CACHE PATH "Default AFB_TOKEN")
 #set(AFB_REMPORT "1234" CACHE PATH "Default AFB_TOKEN")
+
+# Optional schema validator about now only XML, LUA and JSON
+# are supported
+#------------------------------------------------------------
+#set(LUA_CHECKER "luac" "-p" CACHE STRING "LUA compiler")
+#set(XML_CHECKER "xmllint" CACHE STRING "XML linter")
+#set(JSON_CHECKER "json_verify" CACHE STRING "JSON linter")
+
+# Print a helper message when every thing is finished
+# ----------------------------------------------------
+set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/package --binding=\$\$(pwd)/package/lib/afb-low-can.so --port=1234 --tracereq=common --token=\"1\" --verbose")
+set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
 
 # This include is mandatory and MUST happens at the end
 # of this file, else you expose you to unexpected behavior

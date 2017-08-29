@@ -63,7 +63,3 @@ PROJECT_TARGET_ADD(low-can)
 		bitfield-c
 		${link_libraries})
 
-	# installation directory
-	INSTALL(TARGETS ${TARGET_NAME}
-		LIBRARY DESTINATION ${BINDINGS_INSTALL_DIR})
-
