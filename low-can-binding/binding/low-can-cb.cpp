@@ -514,3 +514,113 @@ void write(struct afb_req request)
 	else
 		afb_req_fail(request, "error", NULL);
 }
+
+static struct json_object *get_signals_value(const std::string& name)
+{
+	struct utils::signals_found sf;
+	struct json_object *ans = nullptr;
+
+	openxc_DynamicField search_key = build_DynamicField(name);
+	sf = utils::signals_manager_t::instance().find_signals(search_key);
+
+	if (sf.can_signals.empty())
+	{
+		AFB_WARNING("No signal(s) found for %s.", name.c_str());
+		return NULL;
+	}
+	ans = json_object_new_array();
+	for(const auto& sig: sf.can_signals)
+	{
+		struct json_object *jobj = json_object_new_object();
+		json_object_object_add(jobj, "event", json_object_new_string(sig->get_name().c_str()));
+		json_object_object_add(jobj, "value", json_object_new_double(sig->get_last_value()));
+		json_object_array_add(ans, jobj);
+	}
+
+	return ans;
+}
+void get(struct afb_req request)
+{
+	int rc = 0;
+	struct json_object* args = nullptr,
+		*json_name = nullptr;
+	json_object *ans = nullptr;
+
+	args = afb_req_json(request);
+
+	// Process about Raw CAN message on CAN bus directly
+	if (args != nullptr &&
+		(json_object_object_get_ex(args, "event", &json_name) && json_object_is_type(json_name, json_type_string) ))
+	{
+		ans = get_signals_value(json_object_get_string(json_name));
+		if (!ans)
+			rc = -1;
+	}
+	else
+	{
+		AFB_ERROR("Request argument malformed. Please use the following syntax:");
+		rc = -1;
+	}
+
+	if (rc >= 0)
+		afb_req_success(request, ans, NULL);
+	else
+		afb_req_fail(request, "error", NULL);
+}
+
+
+static struct json_object *list_can_message(const std::string& name)
+{
+	struct utils::signals_found sf;
+	struct json_object *ans = nullptr;
+
+	openxc_DynamicField search_key = build_DynamicField(name);
+	sf = utils::signals_manager_t::instance().find_signals(search_key);
+
+	if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
+	{
+		AFB_WARNING("No signal(s) found for %s.", name.c_str());
+		return NULL;
+	}
+	ans = json_object_new_array();
+	for(const auto& sig: sf.can_signals)
+	{
+		json_object_array_add(ans,
+			json_object_new_string(sig->get_name().c_str()));
+	}
+	for(const auto& sig: sf.diagnostic_messages)
+	{
+		json_object_array_add(ans,
+			json_object_new_string(sig->get_name().c_str()));
+	}
+
+	return ans;
+}
+
+void list(struct afb_req request)
+{
+	int rc = 0;
+	json_object *ans = nullptr;
+	struct json_object* args = nullptr,
+		*json_name = nullptr;
+	args = afb_req_json(request);
+	const char *name;
+	if ((args != nullptr) &&
+		(json_object_object_get_ex(args, "event", &json_name) && json_object_is_type(json_name, json_type_string)))
+	{
+		name = json_object_get_string(json_name);
+	}
+	else
+	{
+		name = "*";
+	}
+
+	ans = list_can_message(name);
+	if (!ans)
+		rc = -1;
+
+	if (rc >= 0)
+		afb_req_success(request, ans, NULL);
+	else
+		afb_req_fail(request, "error", NULL);
+}

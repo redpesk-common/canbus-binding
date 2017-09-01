@@ -57,6 +57,8 @@ extern "C"
 		{ .verb= "subscribe", .callback= subscribe, .auth= NULL, .info="Let subscribe to signals", .session= AFB_SESSION_NONE},
 		{ .verb= "unsubscribe", .callback= unsubscribe, .auth= NULL, .info="Let unsubscribe signals", .session= AFB_SESSION_NONE},
 		{ .verb= "write", .callback= write, .auth= &afb_auth_loa_1, .info="Write a single CAN message on a CAN bus", .session= AFB_SESSION_LOA_1},
+		{ .verb= "get", .callback= get, .auth=NULL, .info="get a current value of CAN message", .session= AFB_SESSION_NONE},
+		{ .verb= "list",.callback= list, .auth=NULL, .info="get a supported CAN message list", .session= AFB_SESSION_NONE},
 		{ .verb= NULL, .callback= NULL, .auth= NULL, .info=NULL, .session= 0}
 	};
 

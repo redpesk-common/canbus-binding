@@ -40,3 +40,5 @@ void auth(struct afb_req request);
 void subscribe(struct afb_req request);
 void unsubscribe(struct afb_req request);
 void write(struct afb_req request);
+void get(struct afb_req request);
+void list(struct afb_req request);
