@@ -451,7 +451,7 @@ static int write_signal(const std::string& name, uint64_t value)
 			if(sig->get_writable())
 			{
 				cf = encoder_t::build_frame(sig, value);
-				const std::string bus_name = sig->get_message()->get_bus_name();
+				const std::string bus_name = sig->get_message()->get_bus_device_name();
 				rc = send_frame(bus_name, cf);
 			}
 			else
