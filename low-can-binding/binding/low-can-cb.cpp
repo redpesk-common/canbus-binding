@@ -484,7 +484,7 @@ void write(struct afb_req request)
 			(json_object_object_get_ex(json_value, "can_dlc", &json_can_dlc) && (json_object_is_type(json_can_dlc, json_type_double) || json_object_is_type(json_can_dlc, json_type_int))) &&
 			(json_object_object_get_ex(json_value, "can_data", &json_can_data) && json_object_is_type(json_can_data, json_type_array) ))
 		{
-			write_raw_frame(json_object_get_string(json_name),
+			rc = write_raw_frame(json_object_get_string(json_name),
 				json_object_get_int(json_can_id),
 				(uint8_t)json_object_get_int(json_can_dlc),
 				json_can_data);
@@ -500,7 +500,7 @@ void write(struct afb_req request)
 		(json_object_object_get_ex(args, "signal_name", &json_name) && json_object_is_type(json_name, json_type_string)) &&
 		(json_object_object_get_ex(args, "signal_value", &json_value) && (json_object_is_type(json_value, json_type_double) || json_object_is_type(json_value, json_type_int))))
 	{
-		write_signal(json_object_get_string(json_name),
+		rc = write_signal(json_object_get_string(json_name),
 			(uint64_t)json_object_get_double(json_value));
 	}
 	else
