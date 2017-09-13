@@ -165,7 +165,6 @@ void can_bus_t::can_decode_message()
 /// which are events that has to be pushed.
 void can_bus_t::can_event_push()
 {
-	openxc_SimpleMessage s_message;
 	json_object* jo;
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
@@ -180,11 +179,10 @@ void can_bus_t::can_event_push()
 			{
 				std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
 				std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
-				s_message = get_simple_message(v_message.second);
 				if(s.find(v_message.first) != s.end() && afb_event_is_valid(s[v_message.first]->get_event()))
 				{
 					jo = json_object_new_object();
-					jsonify_simple(s_message, jo);
+					jsonify_vehicle(v_message.second, jo);
 					if(afb_event_push(s[v_message.first]->get_event(), jo) == 0)
 					{
 						if(v_message.second.has_diagnostic_response)

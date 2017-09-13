@@ -349,3 +349,28 @@ bool jsonify_simple(const openxc_SimpleMessage& s_msg, json_object* json)
 	json_object_object_add(json, "error", json_object_new_string("openxc_SimpleMessage doesn't have name'"));
 	return false;
 }
+
+///
+/// @brief Make a JSON object from a VehicleMessage
+///
+/// @param[in] v_msg - const reference to an openxc_VehicleMessage
+/// struct to convert into a json object.
+/// @param[out] json - pointer with the DynamicField converted into json object
+///
+/// @return True if VehicleMessage has been transformed into json object
+///  and false if not. In such case, a json object is returned { "error": "error msg"}
+///
+bool jsonify_vehicle(const openxc_VehicleMessage& v_msg, json_object* json)
+{
+	if(jsonify_simple(get_simple_message(v_msg), json))
+	{
+		if(v_msg.has_timestamp)
+		{
+			json_object_object_add(json, "timestamp", json_object_new_double(v_msg.timestamp));
+			return true;
+		}
+		return true;
+	}
+	json_object_object_add(json, "error", json_object_new_string("openxc_SimpleMessage doesn't have name'"));
+	return false;
+}

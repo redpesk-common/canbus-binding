@@ -45,3 +45,5 @@ const openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg
 void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value);
 
 bool jsonify_simple(const openxc_SimpleMessage& s_msg, json_object* json);
+
+bool jsonify_vehicle(const openxc_VehicleMessage& v_msg, json_object* json);
