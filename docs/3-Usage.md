@@ -189,10 +189,10 @@ low-can subscribe { "event" : "doors*" }
 ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"511c872e-d7f3-4f3b-89c2-aa9a3e9fbbdb"}}
 ```
 
-Then you will receive an event each time a CAN message is decoded for the event named _doors.driver.open_
+Then you will receive an event each time a CAN message is decoded for the event named _doors.driver.open_ with its received timestamp if available:
 
 ```json
-ON-EVENT low-can/messages.doors.driver.open({"event":"low-can\/messages.doors.driver.open","data":{"name":"messages.doors.driver.open","value":true},"jtype":"afb-event"})
+ON-EVENT low-can/messages.doors.driver.open({"event":"low-can\/messages.doors.driver.open","data":{"name":"messages.doors.driver.open","value":true, "timestamp": 1505812906020023},"jtype":"afb-event"})
 ```
 
 Notice that event shows you that the CAN event is named _messages.doors.driver.open_ but you ask for event about _doors.driver.open_.
@@ -223,7 +223,7 @@ ON-REPLY 3:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"succes
 
 It is possible to limits received event notifications into minimum and maximum boundaries as well as doing frequency thinning. This is possible using the argument filter with one or more of the filters available :
 
-* frequency: specify in Hertz the frequency which will be used to getting notified of new CAN events for the designated signal. If, during the blocked time, further changed CAN messages are received, the last valid one will be transferred after the lockout with a RX_CHANGED. 
+* frequency: specify in Hertz the frequency which will be used to getting notified of new CAN events for the designated signal. If, during the blocked time, further changed CAN messages are received, the last valid one will be transferred after the lockout with a RX_CHANGED.
 * min: Minimum value that the decoded value needs to be above to get pushed to the subscribed client(s).
 * max: Maximum value that the decoded value needs to be below to get pushed to the subscribed client(s)
 
