@@ -237,6 +237,40 @@ low-can subscribe {"event": "messages.engine.load", "filter": { "min": 30, "max"
 low-can subscribe {"event": "messages.vehicle.speed", "filter": { "frequency": 2}}
 ```
 
+## Get last signal value and list of configured signals
+
+You can also ask for a particular signal value on one shot using **get** verb, like
+this:
+
+```json
+low-can get {"event": "messages.engine.speed"}
+ON-REPLY 1:low-can/get: {"response":[{"event":"messages.engine.speed","value":0}],"jtype":"afb-reply","request":{"status":"success"}}
+```
+
+> **CAUTION** Only one event could be requested.
+
+Also, if you want to know the supported CAN signals loaded by **low-can**, use verb
+**list**
+
+```json
+low-can list
+ON-REPLY 2:low-can/list: {"response":["messages.hvac.fan.speed","messages.hvac.temperature.left","messages.hvac.temperature.right","messages.hvac.temperature.average","messages.engine.speed","messages.fuel.level.low","messages.fuel.level","messages.vehicle.average.speed","messages.engine.oil.temp","messages.engine.oil.temp.high","messages.doors.boot.open","messages.doors.front_left.open","messages.doors.front_right.open","messages.doors.rear_left.open","messages.doors.rear_right.open","messages.windows.front_left.open","messages.windows.front_right.open","messages.windows.rear_left.open","messages.windows.rear_right.open","diagnostic_messages.engine.load","diagnostic_messages.engine.coolant.temperature","diagnostic_messages.fuel.pressure","diagnostic_messages.intake.manifold.pressure","diagnostic_messages.engine.speed","diagnostic_messages.vehicle.speed","diagnostic_messages.intake.air.temperature","diagnostic_messages.mass.airflow","diagnostic_messages.throttle.position","diagnostic_messages.running.time","diagnostic_messages.EGR.error","diagnostic_messages.fuel.level","diagnostic_messages.barometric.pressure","diagnostic_messages.ambient.air.temperature","diagnostic_messages.commanded.throttle.position","diagnostic_messages.ethanol.fuel.percentage","diagnostic_messages.accelerator.pedal.position","diagnostic_messages.hybrid.battery-pack.remaining.life","diagnostic_messages.engine.oil.temperature","diagnostic_messages.engine.fuel.rate","diagnostic_messages.engine.torque"],"jtype":"afb-reply","request":{"status":"success","uuid":"32df712a-c7fa-4d58-b70b-06a87f03566b"}}
+```
+
+## Write on CAN buses
+
+A new capability as been introcuded to be able to write on handled CAN buses. Two modes could be used for that which is either specifying the CAN bus and a *RAW* CAN message either by specifying a defined signal and its value.
+
+Examples:
+
+```json
+# Write a raw can frame to the CAN id 0x620
+low-can write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc":
+8, "can_data": [ 255,255,255,255,255,255,255,255]} }
+# Write a signal's value.
+low-can write { "signal_name": "engine.speed", "value": 1256}
+```
+
 ## Using CAN utils to monitor CAN activity
 
 You can watch CAN traffic and send custom CAN messages using can-utils preinstalled on AGL target.

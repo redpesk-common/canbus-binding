@@ -130,6 +130,26 @@
           "200": {"$ref": "#/components/responses/200"}
         }
       },
+      "/get": {
+        "description": "get a current value of CAN message",
+          "parameters": [
+            {
+              "in": "query",
+              "name": "event",
+              "required": false,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": {"$ref": "#/components/responses/200"}
+          }
+        },
+      "/list": {
+        "description": "get a supported CAN message list",
+          "responses": {
+            "200": {"$ref": "#/components/responses/200"}
+          }
+        },
     "/auth": {
       "description": "Authenticate session to be raise Level Of Assurance.",
       "get": {
