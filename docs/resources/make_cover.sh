@@ -3,8 +3,8 @@
 cat cover.svg | sed -e 's/{title}/Low Level CAN binding/' \
     -e 's/font-size:87.5px/font-size:50px/g' \
     -e 's/{subtitle}//g' \
-    -e 's/{version}/Version 4.0/g' \
-    -e 's/{date}/June 2017/g' \
+    -e 's/{version}/Version 4.99-EERC1/g' \
+    -e 's/{date}/September 2017/g' \
     > /tmp/cover.svg
 
 # use  imagemagick convert tool  (cover size must be 1800x2360)
