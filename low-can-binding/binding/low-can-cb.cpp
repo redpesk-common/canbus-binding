@@ -308,22 +308,13 @@ static int one_subscribe_unsubscribe(struct afb_req request,
 	{
 		if (json_object_object_get_ex(filter, "frequency", &obj)
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
-		{
-			event_filter.frequency = (float)json_object_get_double(obj);
-			ret += 1;
-		}
+			{event_filter.frequency = (float)json_object_get_double(obj);}
 		if (json_object_object_get_ex(filter, "min", &obj)
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
-		{
-			event_filter.min = (float)json_object_get_double(obj);
-			ret += 2;
-		}
+			{event_filter.min = (float)json_object_get_double(obj);}
 		if (json_object_object_get_ex(filter, "max", &obj)
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
-		{
-			event_filter.max = (float)json_object_get_double(obj);
-			ret += 4;
-		}
+			{event_filter.max = (float)json_object_get_double(obj);}
 	}
 
 	// subscribe or unsubscribe
@@ -339,14 +330,12 @@ static int one_subscribe_unsubscribe(struct afb_req request,
 
 	return ret;
 }
-
-static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
+static int process_one_subscribe_args(struct afb_req request, bool subscribe, json_object *args)
 {
-	int i, n, rc, rc2;
-	struct json_object *args, *event, *x;
-
-	args = afb_req_json(request);
-	if (args == NULL || !json_object_object_get_ex(args, "event", &event))
+	int rc = 0, rc2=0;
+	json_object *x = nullptr, *event = nullptr;
+	if(args == NULL ||
+		!json_object_object_get_ex(args, "event", &event))
 	{
 		rc = one_subscribe_unsubscribe(request, subscribe, "*", args);
 	}
@@ -356,15 +345,34 @@ static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
 	}
 	else
 	{
-		rc = 0;
-		n = json_object_array_length(event);
-		for (i = 0 ; i < n ; i++)
+		for (int i = 0 ; i < json_object_array_length(event); i++)
 		{
 			x = json_object_array_get_idx(event, i);
 			rc2 = one_subscribe_unsubscribe(request, subscribe, json_object_get_string(x), args);
 			if (rc >= 0)
 				rc = rc2 >= 0 ? rc + rc2 : rc2;
 		}
+	}
+	return rc;
+}
+
+static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
+{
+	int rc = 0;
+	struct json_object *args, *x;
+
+	args = afb_req_json(request);
+	if (json_object_get_type(args) == json_type_array)
+	{
+		for(int i = 0; i < json_object_array_length(args); i++)
+		{
+			x = json_object_array_get_idx(args, i);
+			rc += process_one_subscribe_args(request, subscribe, x);
+		}
+	}
+	else
+	{
+		rc += process_one_subscribe_args(request, subscribe, args);
 	}
 
 	if (rc >= 0)
