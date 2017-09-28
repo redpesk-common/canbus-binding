@@ -17,6 +17,7 @@
  */
 
 #include "low-can-hat.hpp"
+#include "low-can-apidef.h"
 
 #include <map>
 #include <queue>
@@ -35,7 +36,6 @@
 #include "../utils/signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/openxc-utils.hpp"
-
 
 ///******************************************************************************
 ///
@@ -631,4 +631,26 @@ void list(struct afb_req request)
 		afb_req_success(request, ans, NULL);
 	else
 		afb_req_fail(request, "error", NULL);
+}
+
+/// @brief Initialize the binding.
+///
+/// @param[in] service Structure which represent the Application Framework Binder.
+///
+/// @return Exit code, zero if success.
+int initv2()
+{
+	can_bus_t& can_bus_manager = application_t::instance().get_can_bus_manager();
+
+	can_bus_manager.set_can_devices();
+	can_bus_manager.start_threads();
+
+	/// Initialize Diagnostic manager that will handle obd2 requests.
+	/// We pass by default the first CAN bus device to its Initialization.
+	/// TODO: be able to choose the CAN bus device that will be use as Diagnostic bus.
+	if(application_t::instance().get_diagnostic_manager().initialize())
+		return 0;
+
+	AFB_ERROR("There was something wrong with CAN device Initialization.");
+	return 1;
 }

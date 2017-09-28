@@ -22,7 +22,7 @@ PROJECT_TARGET_ADD(low-can)
 
 	# Define project Targets
 	add_library(${TARGET_NAME} MODULE
-		binding/${TARGET_NAME}-hat.cpp
+		#binding/${TARGET_NAME}-hat.cpp
 		binding/${TARGET_NAME}-cb.cpp
 		binding/${TARGET_NAME}-socket.cpp
 		binding/${TARGET_NAME}-subscription.cpp

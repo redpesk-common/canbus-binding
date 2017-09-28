@@ -32,13 +32,15 @@ extern "C"
 
 class low_can_subscription_t;
 
+int initv2();
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
 int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata);
-
+/*
 void auth(struct afb_req request);
 void subscribe(struct afb_req request);
 void unsubscribe(struct afb_req request);
 void write(struct afb_req request);
 void get(struct afb_req request);
 void list(struct afb_req request);
+*/
