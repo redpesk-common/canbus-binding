@@ -109,6 +109,8 @@ void can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const 
 	int subscription_id = can_message.get_sub_id();
 
 	openxc_VehicleMessage vehicle_message = manager.find_and_decode_adr(can_message);
+	if (can_message.get_timestamp())
+		{vehicle_message.timestamp = can_message.get_timestamp();}
 	if( (vehicle_message.has_simple_message && vehicle_message.simple_message.has_name) &&
 		s.find(subscription_id) != s.end() && afb_event_is_valid(s[subscription_id]->get_event()))
 	{

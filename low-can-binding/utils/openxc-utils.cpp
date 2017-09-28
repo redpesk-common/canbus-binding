@@ -366,7 +366,7 @@ bool jsonify_vehicle(const openxc_VehicleMessage& v_msg, json_object* json)
 	{
 		if(v_msg.has_timestamp)
 		{
-			json_object_object_add(json, "timestamp", json_object_new_double(v_msg.timestamp));
+			json_object_object_add(json, "timestamp", json_object_new_int64(v_msg.timestamp));
 			return true;
 		}
 		return true;
