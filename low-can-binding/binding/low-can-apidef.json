@@ -85,7 +85,7 @@
           "permission": "urn:AGL:permission:low-can:public:monitor"
         },
         "write": {
-          "permission": "urn:AGL:permission:low-can:platform:write"
+          "permission": "urn:AGL:permission::platform:can:write "
         }
     },
     "responses": {

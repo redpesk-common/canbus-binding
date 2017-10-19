@@ -57,10 +57,10 @@ static const char _afb_description_v2_low_can[] =
 #include <afb/afb-binding>
 #endif
 /*static const struct afb_auth _afb_auths_v2_low_can[] = {
-	{ .type = afb_auth_Permission, .text = "urn:AGL:permission:low-can:platform:write", .next = NULL}
+	{ .type = afb_auth_Permission, .text = "urn:AGL:permission:*:*platform:can:write ", .next = NULL}
 };*/
 
-const struct afb_auth _afb_auths_v2_low_can[] = {afb::auth_permission("urn:AGL:permission:low-can:platform:write")};
+const struct afb_auth _afb_auths_v2_low_can[] = {afb::auth_permission("urn:AGL:permission:*:*platform:can:write ")};
 
  void subscribe(struct afb_req req);
  void unsubscribe(struct afb_req req);

@@ -315,7 +315,7 @@ low-can write { "signal_name": "engine.speed", "value": 1256}
 ```
 
 To be able to use write capability, you need to add the permission
- ```urn:AGL:permission:low-can:platform:write``` to your package configuration
+ ```urn:AGL:permission::platform:can:write``` to your package configuration
  file that need to write on CAN bus through **low-can** api.
 
 Then in order to write on bus, your app needs to call verb **auth**
