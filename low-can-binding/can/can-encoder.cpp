@@ -37,13 +37,19 @@ const can_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& sign
 
 	cf.can_id = signal->get_message()->get_id();
 	cf.can_dlc = CAN_MAX_DLEN;
-	bitfield_encode_float((float)value,
-						signal->get_bit_position(),
-						signal->get_bit_size(),
-						signal->get_factor(),
-						signal->get_offset(),
-						cf.data,
-						CAN_MAX_DLEN);
+
+	signal->set_last_value((float)value);
+
+	for(const auto& sig: signal->get_message()->get_can_signals())
+	{
+		bitfield_encode_float((float)value,
+							signal->get_bit_position(),
+							signal->get_bit_size(),
+							signal->get_factor(),
+							signal->get_offset(),
+							cf.data,
+							CAN_MAX_DLEN);
+	}
 
 	return cf;
 }
