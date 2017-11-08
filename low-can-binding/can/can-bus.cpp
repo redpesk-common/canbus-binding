@@ -56,7 +56,7 @@ bool can_bus_t::apply_filter(const openxc_VehicleMessage& vehicle_message, std::
 		float min = std::isnan(can_subscription->get_min()) ? -INFINITY : can_subscription->get_min();
 		float max = std::isnan(can_subscription->get_max()) ? INFINITY : can_subscription->get_max();
 		double value = get_numerical_from_DynamicField(vehicle_message);
-		send = (value < min && value > max) ? false : true;
+		send = (value < min || value > max) ? false : true;
 	}
 	return send;
 }
