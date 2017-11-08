@@ -29,8 +29,9 @@ help:
 	@echo "- clean"
 	@echo "- distclean"
 	@echo "- configure"
-	@echo "- build"
-	@echo "- package"
+	@echo "- build: compilation, link and prepare files for package into a widget"
+	@echo "- package: output a widget file '*.wgt'"
+	@echo "- install: install in your ${CMAKE_INSTALL_DIR} directory"
 	@echo ""
 	@echo "Usage: ./conf.d/autobuild/agl/autobuild package DEST=${HOME}/opt"
 	@echo "Don't use your build dir as DEST as wgt file is generated at this location"
@@ -57,6 +58,9 @@ package: build
 	@mkdir -p ${BUILD_DIR}/$@/data
 	@cmake --build ${BUILD_DIR} --target widget
 	@mkdir -p ${DEST} && cp ${BUILD_DIR}/*wgt ${DEST}
+
+install: build
+	@cmake --build ${BUILD_DIR} --target install
 
 ${BUILD_DIR}/Makefile:
 	@[ -d ${BUILD_DIR} ] || mkdir -p ${BUILD_DIR}
