@@ -18,16 +18,15 @@
 
 # Project Info
 # ------------------
-set(PROJECT_NAME example)
-set(PROJECT_VERSION "0.0")
-set(PROJECT_PRETTY_NAME "Example")
-set(PROJECT_DESCRIPTION "AGL application example")
-set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/apps/app-templates")
+set(PROJECT_NAME low-can-service)
+set(PROJECT_PRETTY_NAME "Low level CAN binding")
+set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
+set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-service")
 set(PROJECT_ICON "icon.png")
-set(PROJECT_AUTHOR "Last Name, First Name")
-set(PROJECT_AUTHOR_MAIL "example.man@bigouden.bzh")
+set(PROJECT_AUTHOR "Romain Forlot")
+set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
 set(PROJECT_LICENSE "APL2.0")
-set(PROJECT_LANGUAGES,"C")
+set(PROJECT_LANGUAGES,"C CXX")
 
 # Where are stored default templates files from submodule or subtree app-templates in your project tree
 # relative to the root project directory
@@ -46,7 +45,6 @@ set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
 set(CMAKE_BUILD_TYPE "DEBUG")
-set(USE_EFENCE 1)
 
 # Kernel selection if needed. You can choose between a
 # mandatory version to impose a minimal version.
@@ -60,7 +58,7 @@ set(USE_EFENCE 1)
 # Yocto SDK Kernel version.
 # -----------------------------------------------
 #set (kernel_mandatory_version 4.8)
-#set (kernel_minimal_version 4.8)
+set (kernel_minimal_version 4.8)
 
 # Compiler selection if needed. Impose a minimal version.
 # -----------------------------------------------
@@ -78,11 +76,11 @@ set (PKG_REQUIRED_LIST
 # Prefix path where will be installed the files
 # Default: /usr/local (need root permission to write in)
 # ------------------------------------------------------
-#set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
+set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
 
 # Customize link option
 # -----------------------------
-#list(APPEND link_libraries -an-option)
+list (APPEND link_libraries -pthread)
 
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language
@@ -90,22 +88,22 @@ set (PKG_REQUIRED_LIST
 # Either separate options with ";", or each options must be quoted separately
 # DO NOT PUT ALL OPTION QUOTED AT ONCE , COMPILATION COULD FAILED !
 # ----------------------------------------------------------------------------
-#set(COMPILE_OPTIONS
-# -Wall
-# -Wextra
-# -Wconversion
-# -Wno-unused-parameter
-# -Wno-sign-compare
-# -Wno-sign-conversion
-# -Werror=maybe-uninitialized
-# -Werror=implicit-function-declaration
-# -ffunction-sections
-# -fdata-sections
-# -fPIC
-# CACHE STRING "Compilation flags")
+set(COMPILE_OPTIONS
+ -Wall
+ -Wextra
+ -Wconversion
+ -Wno-unused-parameter
+ -Wno-sign-compare
+ -Wno-sign-conversion
+ -Werror=maybe-uninitialized
+ -Werror=implicit-function-declaration
+ -ffunction-sections
+ -fdata-sections
+ -fPIC
+ -DPB_FIELD_16BIT
+ CACHE STRING "Compilation flags")
 #set(C_COMPILE_OPTIONS "" CACHE STRING "Compilation flags for C language.")
-#set(CXX_COMPILE_OPTIONS "" CACHE STRING "Compilation flags for C++ language.")
-#set(PROFILING_COMPILE_OPTIONS
+set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ language.")#set(PROFILING_COMPILE_OPTIONS
 # -g
 # -O0
 # -pg
@@ -151,14 +149,14 @@ set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 #	content.src designates the relative path of the binary.
 #	For such application, only security setup is made.
 #
-set(WIDGET_TYPE MimeType_Not_Set)
+set(WIDGET_TYPE application/vnd.agl.service)
 
 # Mandatory Widget entry point file of the main unit
 # --------------------------------------------------------------
 # This is the file that will be executed, loaded,
 # at launch time by the application framework.
 #
-set(WIDGET_ENTRY_POINT EntryPoint_Path_Not_Set)
+set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
 
 # Optional dependencies order
 # ---------------------------
