@@ -18,14 +18,14 @@
 
 # Project Info
 # ------------------
-set(PROJECT_NAME low-can-service)
-set(PROJECT_VERSION "4.0")
-set(PROJECT_PRETTY_NAME "Low level CAN binding")
-set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
-set(PROJECT_URL "https://github.com/iotbzh/CAN_signaling")
+set(PROJECT_NAME example)
+set(PROJECT_VERSION "0.0")
+set(PROJECT_PRETTY_NAME "Example")
+set(PROJECT_DESCRIPTION "AGL application example")
+set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/apps/app-templates")
 set(PROJECT_ICON "icon.png")
-set(PROJECT_AUTHOR "Romain Forlot")
-set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
+set(PROJECT_AUTHOR "Last Name, First Name")
+set(PROJECT_AUTHOR_MAIL "example.man@bigouden.bzh")
 set(PROJECT_LICENSE "APL2.0")
 set(PROJECT_LANGUAGES,"C")
 
@@ -46,6 +46,7 @@ set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
 set(CMAKE_BUILD_TYPE "DEBUG")
+set(USE_EFENCE 1)
 
 # Kernel selection if needed. You can choose between a
 # mandatory version to impose a minimal version.
@@ -58,8 +59,8 @@ set(CMAKE_BUILD_TYPE "DEBUG")
 # NOTE*** FOR NOW IT CHECKS KERNEL Yocto environment and
 # Yocto SDK Kernel version.
 # -----------------------------------------------
-#set(kernel_mandatory_version 4.8)
-set(kernel_minimal_version 4.8)
+#set (kernel_mandatory_version 4.8)
+#set (kernel_minimal_version 4.8)
 
 # Compiler selection if needed. Impose a minimal version.
 # -----------------------------------------------
@@ -71,34 +72,69 @@ set (PKG_REQUIRED_LIST
 	json-c
 	libsystemd>=222
 	afb-daemon
+	libmicrohttpd>=0.9.55
 )
+
+# Prefix path where will be installed the files
+# Default: /usr/local (need root permission to write in)
+# ------------------------------------------------------
+#set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
 
 # Customize link option
 # -----------------------------
-list (APPEND link_libraries -pthread)
+#list(APPEND link_libraries -an-option)
 
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language
 # Values are prefilled with default options that is currently used.
-# -----------------------------------------------------------------------
-set(COMPILE_OPTIONS "-Wall" "-Wextra" "-Wconversion" "-Wno-unused-parameter" "-Wno-sign-compare" "-Wno-sign-conversion" "-Werror=maybe-uninitialized" "-Werror=implicit-function-declaration" "-ffunction-sections" "-fdata-sections" "-fPIC" "-DPB_FIELD_16BIT" CACHE STRING "Compilation flags")
+# Either separate options with ";", or each options must be quoted separately
+# DO NOT PUT ALL OPTION QUOTED AT ONCE , COMPILATION COULD FAILED !
+# ----------------------------------------------------------------------------
+#set(COMPILE_OPTIONS
+# -Wall
+# -Wextra
+# -Wconversion
+# -Wno-unused-parameter
+# -Wno-sign-compare
+# -Wno-sign-conversion
+# -Werror=maybe-uninitialized
+# -Werror=implicit-function-declaration
+# -ffunction-sections
+# -fdata-sections
+# -fPIC
+# CACHE STRING "Compilation flags")
 #set(C_COMPILE_OPTIONS "" CACHE STRING "Compilation flags for C language.")
-set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ language.")
-#set(PROFILING_COMPILE_OPTIONS "-g -O0 -pg -Wp,-U_FORTIFY_SOURCE" CACHE STRING "Compilation flags for PROFILING build type.")
-#set(DEBUG_COMPILE_OPTIONS "-g -ggdb -Wp,-U_FORTIFY_SOURCE" CACHE STRING "Compilation flags for DEBUG build type.")
-#set(CCOV_COMPILE_OPTIONS "-g -O2 --coverage" CACHE STRING "Compilation flags for CCOV build type.")
-#set(RELEASE_COMPILE_OPTIONS "-g -O2" CACHE STRING "Compilation flags for RELEASE build type.")
+#set(CXX_COMPILE_OPTIONS "" CACHE STRING "Compilation flags for C++ language.")
+#set(PROFILING_COMPILE_OPTIONS
+# -g
+# -O0
+# -pg
+# -Wp,-U_FORTIFY_SOURCE
+# CACHE STRING "Compilation flags for PROFILING build type.")
+#set(DEBUG_COMPILE_OPTIONS
+# -g
+# -ggdb
+# -Wp,-U_FORTIFY_SOURCE
+# CACHE STRING "Compilation flags for DEBUG build type.")
+#set(CCOV_COMPILE_OPTIONS
+# -g
+# -O2
+# --coverage
+# CACHE STRING "Compilation flags for CCOV build type.")
+#set(RELEASE_COMPILE_OPTIONS
+# -g
+# -O2
+# CACHE STRING "Compilation flags for RELEASE build type.")
 
 # (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
 # ---------------------------------------------------------------------
-set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
 set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX}/lib64/pkgconfig ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Optional location for config.xml.in
 # -----------------------------------
-set(WIDGET_ICON ${PROJECT_APP_TEMPLATES_DIR}/wgt/${PROJECT_ICON})
-set(WIDGET_CONFIG_TEMPLATE ${CMAKE_CURRENT_SOURCE_DIR}/conf.d/wgt/config.xml.in CACHE PATH "Path to config.xml template file to use")
+#set(WIDGET_ICON "\"${CMAKE_SOURCE_DIR}conf.d/wgt/${PROJECT_ICON}\"" CACHE PATH "Path to the widget icon")
+#set(WIDGET_CONFIG_TEMPLATE "\"${CMAKE_SOURCE_DIR}/conf.d/wgt/config.xml.in\"" CACHE PATH "Path to widget config file template (config.xml.in)")
 
 # Mandatory widget Mimetype specification of the main unit
 # --------------------------------------------------------------------------
@@ -115,14 +151,14 @@ set(WIDGET_CONFIG_TEMPLATE ${CMAKE_CURRENT_SOURCE_DIR}/conf.d/wgt/config.xml.in 
 #	content.src designates the relative path of the binary.
 #	For such application, only security setup is made.
 #
-set(WIDGET_TYPE application/vnd.agl.service)
+set(WIDGET_TYPE MimeType_Not_Set)
 
 # Mandatory Widget entry point file of the main unit
 # --------------------------------------------------------------
 # This is the file that will be executed, loaded,
 # at launch time by the application framework.
 #
-set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
+set(WIDGET_ENTRY_POINT EntryPoint_Path_Not_Set)
 
 # Optional dependencies order
 # ---------------------------
@@ -136,10 +172,6 @@ set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
 # -------------------------
 #set(EXTRA_LINK_LIBRARIES)
 
-# Optional force binding installation
-# ------------------------------------
-# set(BINDINGS_INSTALL_PREFIX PrefixPath )
-
 # Optional force binding Linking flag
 # ------------------------------------
 # set(BINDINGS_LINK_FLAG LinkOptions )
@@ -151,8 +183,13 @@ set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
 # Optional Application Framework security token
 # and port use for remote debugging.
 #------------------------------------------------------------
-#set(AFB_TOKEN   ""      CACHE PATH "Default AFB_TOKEN")
-#set(AFB_REMPORT "1234" CACHE PATH "Default AFB_TOKEN")
+set(AFB_TOKEN   ""     CACHE PATH "Default binder security token")
+set(AFB_REMPORT "1234" CACHE PATH "Default binder listening port")
+
+# Print a helper message when every thing is finished
+# ----------------------------------------------------
+set(CLOSING_MESSAGE "Typical binding launch: afb-daemon --port=${AFB_REMPORT} --workdir=${CMAKE_BINARY_DIR}/package --ldpaths=lib --roothttp=htdocs  --token=\"${AFB_TOKEN}\" --tracereq=common --verbose")
+set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
 
 # Optional schema validator about now only XML, LUA and JSON
 # are supported
@@ -160,11 +197,6 @@ set(WIDGET_ENTRY_POINT lib/afb-low-can.so)
 #set(LUA_CHECKER "luac" "-p" CACHE STRING "LUA compiler")
 #set(XML_CHECKER "xmllint" CACHE STRING "XML linter")
 #set(JSON_CHECKER "json_verify" CACHE STRING "JSON linter")
-
-# Print a helper message when every thing is finished
-# ----------------------------------------------------
-set(CLOSING_MESSAGE "Test with: afb-daemon --rootdir=\$\$(pwd)/package --binding=\$\$(pwd)/package/lib/afb-low-can.so --port=1234 --tracereq=common --token=\"1\" --verbose")
-set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
 
 # This include is mandatory and MUST happens at the end
 # of this file, else you expose you to unexpected behavior
