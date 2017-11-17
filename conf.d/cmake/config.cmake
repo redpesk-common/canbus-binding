@@ -183,8 +183,8 @@ set(WIDGET_ENTRY_POINT EntryPoint_Path_Not_Set)
 # Optional Application Framework security token
 # and port use for remote debugging.
 #------------------------------------------------------------
-set(AFB_TOKEN   ""     CACHE PATH "Default binder security token")
-set(AFB_REMPORT "1234" CACHE PATH "Default binder listening port")
+set(AFB_TOKEN   ""     CACHE STRING "Default binder security token")
+set(AFB_REMPORT "1234" CACHE STRING "Default binder listening port")
 
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
