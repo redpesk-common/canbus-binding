@@ -23,9 +23,9 @@ PROJECT_TARGET_ADD(openxc-message-format)
 	# Define project Target
 	add_library(${TARGET_NAME} STATIC 
 		gen/cpp/openxc.pb.c
-		${PROJECT_LIBDIR}/nanopb/pb_encode.c
-		${PROJECT_LIBDIR}/nanopb/pb_decode.c
-		${PROJECT_LIBDIR}/nanopb/pb_common.c)
+		${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_encode.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_decode.c
+		${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_common.c)
 
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES

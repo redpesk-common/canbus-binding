@@ -32,13 +32,6 @@ set(PROJECT_LANGUAGES,"C CXX")
 # relative to the root project directory
 set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
 
-# Where are stored your external libraries for your project. This is 3rd party library that you don't maintain
-# but used and must be built and linked.
-# set(PROJECT_LIBDIR "libs")
-
-# Where are stored data for your application. Pictures, static resources must be placed in that folder.
-# set(PROJECT_RESOURCES "data")
-
 # Which directories inspect to find CMakeLists.txt target files
 # set(PROJECT_SRC_DIR_PATTERN "*")
 
