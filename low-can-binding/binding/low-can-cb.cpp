@@ -463,7 +463,10 @@ static int write_signal(const std::string& name, uint64_t value)
 				rc = send_frame(bus_name, cf);
 			}
 			else
-				{AFB_NOTICE("%s isn't writable. Message not sent.", sig->get_name().c_str());}
+			{
+				AFB_WARNING("%s isn't writable. Message not sent.", sig->get_name().c_str());
+				return -1;
+			}
 		}
 	}
 
