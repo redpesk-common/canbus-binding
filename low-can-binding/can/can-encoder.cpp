@@ -42,11 +42,12 @@ const can_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& sign
 
 	for(const auto& sig: signal->get_message()->get_can_signals())
 	{
-		bitfield_encode_float((float)value,
-							signal->get_bit_position(),
-							signal->get_bit_size(),
-							signal->get_factor(),
-							signal->get_offset(),
+		float last_value = sig->get_last_value();
+		bitfield_encode_float(last_value,
+							sig->get_bit_position(),
+							sig->get_bit_size(),
+							sig->get_factor(),
+							sig->get_offset(),
 							cf.data,
 							CAN_MAX_DLEN);
 	}
