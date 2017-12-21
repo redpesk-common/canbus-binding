@@ -29,7 +29,9 @@ namespace utils
 	/// @brief Construct a default, invalid, socket.
 	socketcan_t::socketcan_t()
 		: socket_{INVALID_SOCKET}
-	{}
+	{
+		::memset(&tx_address_, 0, sizeof(tx_address_));
+	}
 
 	/// @brief Construct a socket by moving an existing one.
 	socketcan_t::socketcan_t(socketcan_t&& s)

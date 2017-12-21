@@ -59,6 +59,7 @@ private:
 	static void shims_timer();
 public:
 	diagnostic_manager_t();
+	~diagnostic_manager_t();
 
 	bool initialize();
 

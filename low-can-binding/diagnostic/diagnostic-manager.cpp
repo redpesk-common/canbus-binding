@@ -36,6 +36,19 @@ diagnostic_manager_t::diagnostic_manager_t()
 	: initialized_{false}
 {}
 
+
+diagnostic_manager_t::~diagnostic_manager_t()
+{
+	for(auto r: recurring_requests_)
+	{
+		delete(r);
+	}
+	for(auto r: non_recurring_requests_)
+	{
+		delete(r);
+	}
+}
+
 /// @brief Diagnostic manager isn't initialized at launch but after
 ///  CAN bus devices initialization. For the moment, it is only possible
 ///  to have 1 diagnostic bus which are the first bus declared in the JSON
