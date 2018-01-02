@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-#include "low-can-hat.hpp"
-
 #include "low-can-subscription.hpp"
 #include "application.hpp"
 #include "canutil/write.h"

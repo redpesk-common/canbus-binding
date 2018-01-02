@@ -28,7 +28,6 @@
 #include "openxc.pb.h"
 #include "can-message.hpp"
 #include "../utils/config-parser.hpp"
-#include "../binding/low-can-hat.hpp"
 #include "../binding/low-can-subscription.hpp"
 
 /// @brief A container for a CAN module paried with a certain bus.

@@ -28,7 +28,6 @@
 #include "openxc.pb.h"
 #include "can-message.hpp"
 #include "../utils/config-parser.hpp"
-#include "../binding/low-can-hat.hpp"
 #include "../binding/low-can-subscription.hpp"
 
 // TODO actual max is 32 but dropped to 24 for memory considerations

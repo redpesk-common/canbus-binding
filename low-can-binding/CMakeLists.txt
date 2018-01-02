@@ -46,10 +46,11 @@ PROJECT_TARGET_ADD(low-can)
 		utils/socketcan-bcm.cpp
 		utils/config-parser.cpp)
 
+	set(OPENAPI_DEF "binding/low-can-apidef" CACHE STRING "name and path to the JSON API definition without extension")
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 		PREFIX "afb-"
-		LABELS "BINDING"
+		LABELS "BINDINGV2"
 		LINK_FLAGS ${BINDINGS_LINK_FLAG}
 		OUTPUT_NAME ${TARGET_NAME}
 	)

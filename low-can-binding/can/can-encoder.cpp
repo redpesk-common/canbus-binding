@@ -20,7 +20,6 @@
 #include "canutil/write.h"
 #include "../utils/openxc-utils.hpp"
 #include "can-message-definition.hpp"
-#include "../binding/low-can-hat.hpp"
 
 /// @brief Write a value into a CAN signal in the destination buffer.
 ///

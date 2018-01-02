@@ -27,8 +27,6 @@
 #include "../can/can-signals.hpp"
 #include "../diagnostic/diagnostic-manager.hpp"
 
-#include "low-can-hat.hpp"
-
 ///
 /// @brief Class representing a configuration attached to the binding.
 ///

@@ -21,46 +21,42 @@ static const char _afb_description_v2_low_can[] =
     "properties\":{\"jtype\":{\"type\":\"string\",\"const\":\"afb-event\"},\""
     "event\":{\"type\":\"string\"},\"data\":{\"type\":\"object\"}}}},\"x-perm"
     "issions\":{\"monitor\":{\"permission\":\"urn:AGL:permission:low-can:publ"
-    "ic:monitor\"},\"write\":{\"permission\":\"urn:AGL:permission:low-can:pla"
-    "tform:write\"}},\"responses\":{\"200\":{\"description\":\"A complex obje"
-    "ct array response\",\"content\":{\"application/json\":{\"schema\":{\"$re"
-    "f\":\"#/components/schemas/afb-reply\"}}}}}},\"paths\":{\"/subscribe\":{"
-    "\"description\":\"Subscribe to CAN signals events\",\"parameters\":[{\"i"
-    "n\":\"query\",\"name\":\"event\",\"required\":false,\"schema\":{\"type\""
-    ":\"string\"}}],\"responses\":{\"200\":{\"$ref\":\"#/components/responses"
-    "/200\"}}},\"/unsubscribe\":{\"description\":\"Unsubscribe previously sus"
-    "cribed signals.\",\"parameters\":[{\"in\":\"query\",\"name\":\"event\",\""
-    "required\":false,\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200"
-    "\":{\"$ref\":\"#/components/responses/200\"}}},\"/get\":{\"description\""
-    ":\"get a current value of CAN message\",\"parameters\":[{\"in\":\"query\""
-    ",\"name\":\"event\",\"required\":false,\"schema\":{\"type\":\"string\"}}"
-    "],\"responses\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}},\"/"
-    "list\":{\"description\":\"get a supported CAN message list\",\"responses"
-    "\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}},\"/auth\":{\"des"
-    "cription\":\"Authenticate session to be raise Level Of Assurance.\",\"ge"
-    "t\":{\"x-permissions\":{\"$ref\":\"#/components/x-permissions/write\"},\""
-    "responses\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}}},\"/wri"
-    "te\":{\"description\":\"Write a CAN messages to the CAN bus.\",\"get\":{"
-    "\"x-permissions\":{\"LOA\":1},\"parameters\":[{\"in\":\"query\",\"name\""
-    ":\"bus_name\",\"required\":false,\"schema\":{\"type\":\"string\"}},{\"in"
-    "\":\"query\",\"name\":\"frame\",\"required\":false,\"schema\":{\"type\":"
-    "\"array\"},\"parameters\":[{\"in\":\"query\",\"name\":\"can_id\",\"requi"
-    "red\":false,\"schema\":{\"type\":\"string\"}},{\"in\":\"query\",\"name\""
-    ":\"can_dlc\",\"required\":false,\"schema\":{\"type\":\"string\"}},{\"in\""
-    ":\"query\",\"name\":\"can_data\",\"required\":false,\"schema\":{\"type\""
-    ":\"string\"}}]},{\"in\":\"query\",\"name\":\"signal_name\",\"required\":"
-    "false,\"schema\":{\"type\":\"string\"}},{\"in\":\"query\",\"name\":\"sig"
-    "nal_value\",\"required\":false,\"schema\":{\"type\":\"integer\"}}],\"res"
-    "ponses\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}}}}}"
+    "ic:monitor\"},\"write\":{\"permission\":\"urn:AGL:permission::platform:c"
+    "an:write \"}},\"responses\":{\"200\":{\"description\":\"A complex object"
+    " array response\",\"content\":{\"application/json\":{\"schema\":{\"$ref\""
+    ":\"#/components/schemas/afb-reply\"}}}}}},\"paths\":{\"/subscribe\":{\"d"
+    "escription\":\"Subscribe to CAN signals events\",\"parameters\":[{\"in\""
+    ":\"query\",\"name\":\"event\",\"required\":false,\"schema\":{\"type\":\""
+    "string\"}}],\"responses\":{\"200\":{\"$ref\":\"#/components/responses/20"
+    "0\"}}},\"/unsubscribe\":{\"description\":\"Unsubscribe previously suscri"
+    "bed signals.\",\"parameters\":[{\"in\":\"query\",\"name\":\"event\",\"re"
+    "quired\":false,\"schema\":{\"type\":\"string\"}}],\"responses\":{\"200\""
+    ":{\"$ref\":\"#/components/responses/200\"}}},\"/get\":{\"description\":\""
+    "get a current value of CAN message\",\"parameters\":[{\"in\":\"query\",\""
+    "name\":\"event\",\"required\":false,\"schema\":{\"type\":\"string\"}}],\""
+    "responses\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}},\"/list"
+    "\":{\"description\":\"get a supported CAN message list\",\"responses\":{"
+    "\"200\":{\"$ref\":\"#/components/responses/200\"}}},\"/auth\":{\"descrip"
+    "tion\":\"Authenticate session to be raise Level Of Assurance.\",\"get\":"
+    "{\"x-permissions\":{\"$ref\":\"#/components/x-permissions/write\"},\"res"
+    "ponses\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}}},\"/write\""
+    ":{\"description\":\"Write a CAN messages to the CAN bus.\",\"get\":{\"x-"
+    "permissions\":{\"LOA\":1},\"parameters\":[{\"in\":\"query\",\"name\":\"b"
+    "us_name\",\"required\":false,\"schema\":{\"type\":\"string\"}},{\"in\":\""
+    "query\",\"name\":\"frame\",\"required\":false,\"schema\":{\"type\":\"arr"
+    "ay\"},\"parameters\":[{\"in\":\"query\",\"name\":\"can_id\",\"required\""
+    ":false,\"schema\":{\"type\":\"string\"}},{\"in\":\"query\",\"name\":\"ca"
+    "n_dlc\",\"required\":false,\"schema\":{\"type\":\"string\"}},{\"in\":\"q"
+    "uery\",\"name\":\"can_data\",\"required\":false,\"schema\":{\"type\":\"s"
+    "tring\"}}]},{\"in\":\"query\",\"name\":\"signal_name\",\"required\":fals"
+    "e,\"schema\":{\"type\":\"string\"}},{\"in\":\"query\",\"name\":\"signal_"
+    "value\",\"required\":false,\"schema\":{\"type\":\"integer\"}}],\"respons"
+    "es\":{\"200\":{\"$ref\":\"#/components/responses/200\"}}}}}}"
 ;
-#ifdef __cplusplus
-#include <afb/afb-binding>
-#endif
-/*static const struct afb_auth _afb_auths_v2_low_can[] = {
-	{ .type = afb_auth_Permission, .text = "urn:AGL:permission::platform:can:write", .next = NULL}
-};*/
 
-const struct afb_auth _afb_auths_v2_low_can[] = {afb::auth_permission("urn:AGL:permission::platform:can:write")};
+static const struct afb_auth _afb_auths_v2_low_can[] = {
+	afb::auth_permission("urn:AGL:permission::platform:can:write ")
+};
 
  void subscribe(struct afb_req req);
  void unsubscribe(struct afb_req req);

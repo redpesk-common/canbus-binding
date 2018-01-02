@@ -26,7 +26,6 @@
 #include "../can/can-signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 
-#include "../binding/low-can-hat.hpp"
 #include "../binding/low-can-subscription.hpp"
 
 namespace utils
