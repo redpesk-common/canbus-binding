@@ -96,10 +96,6 @@ class application_t
 		/// TODO: implement this function as method into can_bus class
 		/// @brief Check if the device is connected to an active CAN bus, i.e. it's received a message in the recent past.
 		/// @return true if a message was received on the CAN bus within CAN_ACTIVE_TIMEOUT_S seconds.
-		void logBusStatistics(can_bus_dev_t* buses, const int busCount);
-		/// TODO: implement this function as method into can_bus class
-		/// @brief Log transfer statistics about all active CAN buses to the debug log.
-		/// @param[in] buses An array of active CAN buses.
 		bool isBusActive(can_bus_dev_t* bus);
 		*/
 };

@@ -56,7 +56,6 @@ private:
 
 	static bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
 	static void shims_logger(const char* m, ...);
-	static void shims_timer();
 public:
 	diagnostic_manager_t();
 	~diagnostic_manager_t();

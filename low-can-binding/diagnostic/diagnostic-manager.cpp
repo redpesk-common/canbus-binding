@@ -149,10 +149,6 @@ void diagnostic_manager_t::shims_logger(const char* format, ...)
 	va_end(args);
 }
 
-/// @brief The type signature for a... OpenXC TODO: not used yet.
-void diagnostic_manager_t::shims_timer()
-{}
-
 const std::string diagnostic_manager_t::get_bus_name() const
 {
 	return bus_;
@@ -272,8 +268,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(Diagno
 ///
 /// @param[in] request - The parameters for the request.
 /// @param[in] name - Human readable name this response, to be used when
-///      publishing received responses. TODO: If the name is NULL, the published output
-///      will use the raw OBD-II response format.
+///      publishing received responses.
 /// @param[in] wait_for_multiple_responses - If false, When any response is received
 ///      for this request it will be removed from the active list. If true, the
 ///      request will remain active until the timeout clock expires, to allow it
@@ -286,8 +281,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(Diagno
 ///      response is received for this request.
 ///
 /// @return true if the request was added successfully. Returns false if there
-/// wasn't a free active request entry, if the frequency was too high or if the
-/// CAN acceptance filters could not be configured,
+/// wasn't a free active request entry.
 active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest* request, const std::string& name,
 	bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 	const DiagnosticResponseCallback callback)
@@ -298,22 +292,20 @@ active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest
 
 	if (non_recurring_requests_.size() <= MAX_SIMULTANEOUS_DIAG_REQUESTS)
 	{
-		// TODO: implement Acceptance Filter
-		//	if(updateRequiredAcceptanceFilters(bus, request)) {
-			active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request->arbitration_id, name,
-					wait_for_multiple_responses, decoder, callback, 0);
-			entry->set_handle(shims_, request);
+		active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request->arbitration_id, name,
+				wait_for_multiple_responses, decoder, callback, 0);
+		entry->set_handle(shims_, request);
 
-			char request_string[128] = {0};
-			diagnostic_request_to_string(&entry->get_handle()->request, request_string,
-					sizeof(request_string));
+		char request_string[128] = {0};
+		diagnostic_request_to_string(&entry->get_handle()->request, request_string,
+				sizeof(request_string));
 
-			// Erase any existing request not already cleaned.
-			cleanup_request(entry, true);
-			AFB_DEBUG("Added one-time diagnostic request on bus %s: %s",
-					bus_.c_str(), request_string);
+		// Erase any existing request not already cleaned.
+		cleanup_request(entry, true);
+		AFB_DEBUG("Added one-time diagnostic request on bus %s: %s",
+				bus_.c_str(), request_string);
 
-			non_recurring_requests_.push_back(entry);
+		non_recurring_requests_.push_back(entry);
 	}
 	else
 	{
@@ -364,8 +356,7 @@ bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyH
 ///      function return false.
 ///
 /// @return true if the request was added successfully. Returns false if there
-/// was too much already running requests, if the frequency was too high TODO:or if the
-/// CAN acceptance filters could not be configured,
+/// was too much already running requests, or if the frequency was too high.
 active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback, float frequencyHz)

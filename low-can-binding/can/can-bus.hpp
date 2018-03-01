@@ -30,11 +30,6 @@
 #include "../utils/config-parser.hpp"
 #include "../binding/low-can-subscription.hpp"
 
-// TODO actual max is 32 but dropped to 24 for memory considerations
-#define MAX_ACCEPTANCE_FILTERS 24
-// TODO this takes up a ton of memory
-#define MAX_DYNAMIC_MESSAGE_COUNT 12
-
 #define CAN_ACTIVE_TIMEOUT_S 30
 
 class diagnostic_manager_t;
