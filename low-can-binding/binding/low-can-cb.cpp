@@ -188,7 +188,7 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request,
 	for(const auto& sig : diagnostic_messages)
 	{
 		DiagnosticRequest* diag_req = new DiagnosticRequest(sig->build_diagnostic_request());
-		event_filter.frequency = std::isnan(event_filter.frequency) ? sig->get_frequency() : event_filter.frequency;
+		event_filter.frequency = event_filter.frequency == 0 ? sig->get_frequency() : event_filter.frequency;
 		std::shared_ptr<low_can_subscription_t> can_subscription;
 
 		auto it =  std::find_if(s.begin(), s.end(), [&sig](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub){ return (! sub.second->get_diagnostic_message().empty());});
@@ -233,7 +233,6 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request,
 	return rets;
 }
 
-// TODO: Create separate subscrition object if event_filter isn't the same.
 static int subscribe_unsubscribe_can_signals(struct afb_req request,
 											bool subscribe,
 											std::vector<std::shared_ptr<can_signal_t> > can_signals,
@@ -243,7 +242,7 @@ static int subscribe_unsubscribe_can_signals(struct afb_req request,
 	int rets = 0;
 	for(const auto& sig: can_signals)
 	{
-		auto it =  std::find_if(s.begin(), s.end(), [&sig](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub){ return sub.second->get_can_signal() == sig; });
+		auto it =  std::find_if(s.begin(), s.end(), [&sig, &event_filter](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub){ return sub.second->is_signal_subscription_corresponding(sig, event_filter) ; });
 		std::shared_ptr<low_can_subscription_t> can_subscription;
 		if(it != s.end())
 		{

@@ -62,6 +62,11 @@ const std::shared_ptr<can_signal_t> low_can_socket_t::get_can_signal() const
 	return can_signal_;
 }
 
+bool low_can_socket_t::is_signal_subscription_corresponding(const std::shared_ptr<can_signal_t> can_signal, const struct event_filter_t& event_filter) const
+{
+	return can_signal_ == can_signal && event_filter_ == event_filter;
+}
+
 const std::vector<std::shared_ptr<diagnostic_message_t> > low_can_socket_t::get_diagnostic_message() const
 {
 	return diagnostic_message_;
@@ -235,7 +240,7 @@ int low_can_socket_t::create_rx_filter(std::shared_ptr<can_signal_t> sig)
 							CAN_MAX_DLEN);
 
 	struct timeval freq, timeout = {0, 0};
-	frequency_clock_t f = std::isnan(event_filter_.frequency) ? can_signal_->get_frequency() : frequency_clock_t(event_filter_.frequency);
+	frequency_clock_t f = event_filter_.frequency == 0 ? can_signal_->get_frequency() : frequency_clock_t(event_filter_.frequency);
 	freq = f.get_timeval_from_period();
 
 	utils::simple_bcm_msg bcm_msg = make_bcm_head(RX_SETUP, can_signal_->get_message()->get_id(), SETTIMER|RX_NO_AUTOTIMER, timeout, freq);

@@ -32,7 +32,10 @@ struct event_filter_t
 	float frequency; ///< frequency - Maximum frequency which will be received and pushed a subscribed event.
 	float min; ///< min - Minimum value that the signal don't have to go below to be pushed.
 	float max; ///< max - Maximum value that the signal don't have to go above to be pushed.
-	event_filter_t() : frequency{NAN}, min{NAN}, max{NAN} {}
+	event_filter_t() : frequency{0}, min{-__FLT_MAX__}, max{__FLT_MAX__} {};
+	bool operator==(const event_filter_t& ext) const {
+		return frequency == ext.frequency && min == ext.min && max == ext.max;
+	}
 };
 
 /// @brief An object storing socket to CAN to be used to write on it.
@@ -62,6 +65,7 @@ public:
 
 	int get_index() const;
 	const std::shared_ptr<can_signal_t> get_can_signal() const;
+	bool is_signal_subscription_corresponding(const std::shared_ptr<can_signal_t>, const struct event_filter_t& event_filter) const;
 	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(uint32_t pid) const;
 	const std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_message() const;
 	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(const std::string& name) const;
