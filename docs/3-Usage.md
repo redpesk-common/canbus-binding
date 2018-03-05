@@ -99,7 +99,7 @@ The binding reads system configuration file _/etc/dev-mapping.conf_ at start to
 map logical name from signals described in JSON file to linux devices name
 initialized by the system.
 
-Edit file _/etc/dev-mappping.conf_ and add mapping in section `CANbus-mapping`.
+Edit file _/etc/dev-mapping.conf_ and add mapping in section `CANbus-mapping`.
 
 Default binding configuration use a CAN bus named `hs` so you need to map it to
 the real one, here are some examples:
