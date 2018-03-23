@@ -21,7 +21,7 @@
 set(PROJECT_NAME low-can-service)
 set(PROJECT_PRETTY_NAME "Low level CAN binding")
 set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
-set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-service")
+set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/apps/agl-service-can-low-level")
 set(PROJECT_ICON "icon.png")
 set(PROJECT_AUTHOR "Romain Forlot")
 set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
@@ -96,7 +96,8 @@ set(COMPILE_OPTIONS
  -DPB_FIELD_16BIT
  CACHE STRING "Compilation flags")
 #set(C_COMPILE_OPTIONS "" CACHE STRING "Compilation flags for C language.")
-set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ language.")#set(PROFILING_COMPILE_OPTIONS
+set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ language.")
+#set(PROFILING_COMPILE_OPTIONS
 # -g
 # -O0
 # -pg

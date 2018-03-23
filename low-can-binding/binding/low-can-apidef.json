@@ -3,7 +3,7 @@
   "$schema": "http:iot.bzh/download/openapi/schema-3.0/default-schema.json",
   "info": {
     "description": "",
-    "title": "low-level-can-service",
+    "title": "low-can",
     "version": "4.0",
     "x-binding-c-generator": {
       "api": "low-can",
