@@ -41,7 +41,7 @@ enum UNIT {
 
 class can_message_set_t;
 
-/// @brief - A representation of an OBD-II PID.
+/// @brief - A representation of an OBD-II PID Mode 01 (Note : An OBD-II PID mode 01 contains only one information).
 class diagnostic_message_t
 {
 	private:

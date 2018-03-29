@@ -75,7 +75,7 @@ private:
 	DiagnosticResponseCallback callback_; ///< callback_ - An optional DiagnosticResponseCallback to be notified whenever a
 										  ///< response is received for this request.
 	bool recurring_; ///< bool recurring_ - If true, this is a recurring request and it will remain as active until explicitly cancelled.
-					 ///< The frequencyClock attribute controls how often a recurrin request is made.
+					 ///< The frequencyClock attribute controls how often a recurring request is made.
 	bool wait_for_multiple_responses_; ///< wait_for_multiple_responses_ - False by default, when any response is received for a request
 									   ///< it will be removed from the active list. If true, the request will remain active until the timeout
 									   ///< clock expires, to allow it to receive multiple response (e.g. to a functional broadcast request).

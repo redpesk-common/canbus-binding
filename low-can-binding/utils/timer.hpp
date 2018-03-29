@@ -37,7 +37,7 @@ class frequency_clock_t
 private:
 	float unit_; ///< unit_ - multiplicator to make operation to be in the right unit (milli, micro, nano, etc)
 	float frequency_; ///< the clock frequency in Hz.
-	uint64_t last_tick_; ///< the last time (in microseconds since startup) that the clock ticked.
+	uint64_t last_tick_; ///< the last time (in microseconds since epoch) that the clock ticked.
 	time_function_t time_function_; ///<  a function returning current time
 
 public:
