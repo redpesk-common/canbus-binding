@@ -80,7 +80,7 @@ public:
 	bool validate_optional_request_attributes(float frequencyHz);
 	active_diagnostic_request_t* add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
-		const DiagnosticResponseCallback callback, float frequencyHz);
+		const DiagnosticResponseCallback callback, float frequencyHz, bool permanent);
 
 	// Decoding part
 	openxc_VehicleMessage relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response, const uint64_t timestamp);

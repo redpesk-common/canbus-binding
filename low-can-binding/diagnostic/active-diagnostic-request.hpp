@@ -76,6 +76,7 @@ private:
 										  ///< response is received for this request.
 	bool recurring_; ///< bool recurring_ - If true, this is a recurring request and it will remain as active until explicitly cancelled.
 					 ///< The frequencyClock attribute controls how often a recurring request is made.
+	bool permanent_; ///< bool permanent_ - If true, this a	permanent recurring request and will remain as active indefinitely (can't be cancelled).
 	bool wait_for_multiple_responses_; ///< wait_for_multiple_responses_ - False by default, when any response is received for a request
 									   ///< it will be removed from the active list. If true, the request will remain active until the timeout
 									   ///< clock expires, to allow it to receive multiple response (e.g. to a functional broadcast request).
@@ -93,7 +94,7 @@ public:
 	active_diagnostic_request_t(const std::string& bus, uint32_t id,
 		const std::string& name, bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
-		const DiagnosticResponseCallback callback, float frequencyHz);
+		const DiagnosticResponseCallback callback, float frequencyHz, bool permanent);
 	~active_diagnostic_request_t();
 
 	uint32_t get_id() const;
@@ -104,6 +105,7 @@ public:
 	DiagnosticResponseDecoder& get_decoder();
 	DiagnosticResponseCallback& get_callback();
 	bool get_recurring() const;
+	bool get_permanent() const;
 	frequency_clock_t& get_frequency_clock();
 	frequency_clock_t& get_timeout_clock();
 	utils::socketcan_bcm_t& get_socket();

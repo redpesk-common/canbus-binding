@@ -45,15 +45,23 @@
 
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
+	bool is_permanent_recurring_request = false;
+
 	if( ! can_subscription->get_diagnostic_message().empty() && can_subscription->get_diagnostic_message(pid) != nullptr)
 	{
 		DiagnosticRequest diag_req = can_subscription->get_diagnostic_message(pid)->build_diagnostic_request();
 		active_diagnostic_request_t* adr = application_t::instance().get_diagnostic_manager().find_recurring_request(diag_req);
 		if( adr != nullptr)
-			application_t::instance().get_diagnostic_manager().cleanup_request(adr, true);
+		{
+			is_permanent_recurring_request = adr->get_permanent();
+
+			if(! is_permanent_recurring_request)
+				application_t::instance().get_diagnostic_manager().cleanup_request(adr, true);
+		}
 	}
 
-	on_no_clients(can_subscription, s);
+	if(! is_permanent_recurring_request)
+		on_no_clients(can_subscription, s);
 }
 
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
@@ -106,8 +114,9 @@ static int make_subscription_unsubscription(struct afb_req request,
 											std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
 											bool subscribe)
 {
-	/* Make the subscription or unsubscription to the event */
-	if (((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[can_subscription->get_index()]->get_event())) < 0)
+	/* Make the subscription or unsubscription to the event (if request contents are not null) */
+	if(request.itf && request.closure &&
+	   ((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[can_subscription->get_index()]->get_event())) < 0)
 	{
 		AFB_ERROR("Operation goes wrong for signal: %s", can_subscription->get_name().c_str());
 		return -1;
@@ -179,7 +188,8 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request,
 													bool subscribe,
 													std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages,
 													struct event_filter_t& event_filter,
-													std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+													std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
+													bool perm_rec_diag_req)
 {
 	int rets = 0;
 	application_t& app = application_t::instance();
@@ -198,10 +208,9 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request,
 		// If the requested diagnostic message isn't supported by the car then unsubcribe it
 		// no matter what we want, worse case will be a fail unsubscription but at least we don't
 		// poll a PID for nothing.
-		//TODO: Adding callback requesting ignition status:	diag_req, sig.c_str(), false, diagnostic_message_t::decode_obd2_response, diagnostic_message_t::check_ignition_status, frequency);
 		if(sig->get_supported() && subscribe)
 		{
-			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency);
+			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency, perm_rec_diag_req);
 			if(can_subscription->create_rx_filter(sig) < 0)
 				{return -1;}
 			AFB_DEBUG("Signal: %s subscribed", sig->get_name().c_str());
@@ -286,7 +295,7 @@ static int subscribe_unsubscribe_signals(struct afb_req request,
 	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
 	std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
 
-	rets += subscribe_unsubscribe_diagnostic_messages(request, subscribe, signals.diagnostic_messages, event_filter, s);
+	rets += subscribe_unsubscribe_diagnostic_messages(request, subscribe, signals.diagnostic_messages, event_filter, s, false);
 	rets += subscribe_unsubscribe_can_signals(request, subscribe, signals.can_signals, event_filter, s);
 
 	return rets;

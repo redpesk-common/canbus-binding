@@ -293,7 +293,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest
 	if (non_recurring_requests_.size() <= MAX_SIMULTANEOUS_DIAG_REQUESTS)
 	{
 		active_diagnostic_request_t* entry = new active_diagnostic_request_t(bus_, request->arbitration_id, name,
-				wait_for_multiple_responses, decoder, callback, 0);
+				wait_for_multiple_responses, decoder, callback, 0, false);
 		entry->set_handle(shims_, request);
 
 		char request_string[128] = {0};
@@ -359,7 +359,7 @@ bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyH
 /// was too much already running requests, or if the frequency was too high.
 active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool wait_for_multiple_responses, const DiagnosticResponseDecoder decoder,
-		const DiagnosticResponseCallback callback, float frequencyHz)
+		const DiagnosticResponseCallback callback, float frequencyHz, bool permanent)
 {
 	active_diagnostic_request_t* entry = nullptr;
 
@@ -373,7 +373,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 		if(recurring_requests_.size() <= MAX_SIMULTANEOUS_DIAG_REQUESTS)
 		{
 			entry = new active_diagnostic_request_t(bus_, request->arbitration_id, name,
-					wait_for_multiple_responses, decoder, callback, frequencyHz);
+					wait_for_multiple_responses, decoder, callback, frequencyHz, permanent);
 			recurring_requests_.push_back(entry);
 
 			entry->set_handle(shims_, request);

@@ -42,6 +42,7 @@ active_diagnostic_request_t& active_diagnostic_request_t::operator=(const active
 		decoder_ = adr.decoder_;
 		callback_ = adr.callback_;
 		recurring_ = adr.recurring_;
+		permanent_ = adr.permanent_;
 		wait_for_multiple_responses_ = adr.wait_for_multiple_responses_;
 		frequency_clock_ = adr.frequency_clock_;
 		timeout_clock_ = adr.timeout_clock_;
@@ -59,6 +60,7 @@ active_diagnostic_request_t::active_diagnostic_request_t()
 	  decoder_{nullptr},
 	  callback_{nullptr},
 	  recurring_{false},
+	  permanent_{false},
 	  wait_for_multiple_responses_{false},
 	  frequency_clock_{frequency_clock_t()},
 	  timeout_clock_{frequency_clock_t()},
@@ -70,7 +72,8 @@ active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus,
 		bool wait_for_multiple_responses,
 		const DiagnosticResponseDecoder decoder,
 		const DiagnosticResponseCallback callback,
-		float frequencyHz)
+		float frequencyHz,
+		bool permanent)
 	: bus_{bus},
 	  id_{id},
 	  handle_{nullptr},
@@ -78,6 +81,7 @@ active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus,
 	  decoder_{decoder},
 	  callback_{callback},
 	  recurring_{frequencyHz ? true : false},
+	  permanent_{permanent},
 	  wait_for_multiple_responses_{wait_for_multiple_responses},
 	  frequency_clock_{frequency_clock_t(frequencyHz)},
 	  timeout_clock_{frequency_clock_t(10)},
@@ -131,6 +135,11 @@ DiagnosticResponseCallback& active_diagnostic_request_t::get_callback()
 bool active_diagnostic_request_t::get_recurring() const
 {
 	return recurring_;
+}
+
+bool active_diagnostic_request_t::get_permanent() const
+{
+	return permanent_;
 }
 
 frequency_clock_t& active_diagnostic_request_t::get_frequency_clock()
