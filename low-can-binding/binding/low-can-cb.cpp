@@ -210,6 +210,9 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request,
 		// poll a PID for nothing.
 		if(sig->get_supported() && subscribe)
 		{
+			if (!app.isEngineOn())
+				AFB_WARNING("signal: Engine is off, %s won't received responses until it's on",  sig->get_name().c_str());
+
 			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency, perm_rec_diag_req);
 			if(can_subscription->create_rx_filter(sig) < 0)
 				{return -1;}
@@ -651,6 +654,7 @@ void list(struct afb_req request)
 /// @return Exit code, zero if success.
 int initv2()
 {
+	uint32_t ret = 1;
 	can_bus_t& can_bus_manager = application_t::instance().get_can_bus_manager();
 
 	can_bus_manager.set_can_devices();
@@ -660,8 +664,29 @@ int initv2()
 	/// We pass by default the first CAN bus device to its Initialization.
 	/// TODO: be able to choose the CAN bus device that will be use as Diagnostic bus.
 	if(application_t::instance().get_diagnostic_manager().initialize())
-		return 0;
+		ret = 0;
 
-	AFB_ERROR("There was something wrong with CAN device Initialization.");
-	return 1;
+	// Add a recurring dignostic message request to get engine speed continuously
+	openxc_DynamicField search_key = build_DynamicField("diagnostic_messages.engine.speed");
+	struct utils::signals_found sf = utils::signals_manager_t::instance().find_signals(search_key);
+
+	if(sf.can_signals.empty() && sf.diagnostic_messages.size() == 1)
+	{
+		struct afb_req request;
+		request.itf = nullptr;
+		request.closure = nullptr;
+
+		struct event_filter_t event_filter;
+		event_filter.frequency = sf.diagnostic_messages.front()->get_frequency();
+
+		utils::signals_manager_t& sm = utils::signals_manager_t::instance();
+		std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
+
+		subscribe_unsubscribe_diagnostic_messages(request, true, sf.diagnostic_messages, event_filter, s, true);
+	}
+
+	if(ret)
+		AFB_ERROR("There was something wrong with CAN device Initialization.");
+
+	return ret;
 }

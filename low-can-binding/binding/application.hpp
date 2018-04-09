@@ -78,6 +78,8 @@ class application_t
 
 		uint32_t get_signal_id(can_signal_t& sig) const;
 
+		bool isEngineOn();
+
 		void set_active_message_set(uint8_t id);
 
 /*

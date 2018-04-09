@@ -14,11 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <ctime>
+
 #include "application.hpp"
 
 #include "../utils/signals.hpp"
 #include "../utils/openxc-utils.hpp"
 #include "low-can-socket.hpp"
+
+#define MICROSECONDS_IN_SECOND	1000000
+#define ENGINE_VALUE_TIMEOUT	5
 
 /// @brief Return singleton instance of configuration object.
 application_t& application_t::instance()
@@ -80,4 +85,55 @@ uint32_t application_t::get_signal_id(can_signal_t& sig) const
 void application_t::set_active_message_set(uint8_t id)
 {
 	active_message_set_ = id;
+}
+
+bool application_t::isEngineOn()
+{
+	struct utils::signals_found sf;
+	openxc_DynamicField search_key = build_DynamicField("engine.speed");
+	sf = utils::signals_manager_t::instance().find_signals(search_key);
+	bool engine_on = false;
+	uint64_t last_timestamp_in_s;
+
+	if(sf.can_signals.size() == 1)
+	{
+		last_timestamp_in_s = sf.can_signals.front()->get_last_value_with_timestamp().second
+						/ MICROSECONDS_IN_SECOND;
+
+		if(sf.can_signals.front()->get_last_value_with_timestamp().first > 0 &&
+		   std::difftime(std::time(nullptr), last_timestamp_in_s) < ENGINE_VALUE_TIMEOUT)
+		{
+			engine_on = true;
+		}
+		else
+		{
+			AFB_NOTICE("is_engine_on: engine.speed CAN signal found, but engine seems off");
+		}
+	}
+	else
+	{
+		AFB_NOTICE("is_engine_on: Can't identify a useable engine.speed CAN signal");
+	}
+
+	if(sf.diagnostic_messages.size() == 1)
+	{
+		last_timestamp_in_s = sf.diagnostic_messages.front()->get_last_value_with_timestamp().second
+						/ MICROSECONDS_IN_SECOND;
+
+		if(sf.diagnostic_messages.front()->get_last_value_with_timestamp().first > 0 &&
+		   std::difftime(std::time(nullptr), last_timestamp_in_s) < ENGINE_VALUE_TIMEOUT)
+		{
+			engine_on = true;
+		}
+		else
+		{
+			AFB_NOTICE("is_engine_on: engine.speed diagnostic message found, but engine seems off");
+		}
+	}
+	else
+	{
+		AFB_NOTICE("is_engine_on: Can't identify a useable engine.speed diagnostic message");
+	}
+
+	return engine_on;
 }
