@@ -34,11 +34,30 @@ const char *UNIT_NAMES[10] = {
 	"NM"
 };
 
-diagnostic_message_t::diagnostic_message_t(uint8_t pid, const std::string& generic_name, const int min,
-	const int max, enum UNIT unit, float frequency,	DiagnosticResponseDecoder decoder,
-	DiagnosticResponseCallback callback, bool supported)
-	: parent_{nullptr}, pid_{pid}, generic_name_{generic_name}, min_{min}, max_{max}, unit_{unit},
-	frequency_{frequency}, decoder_{decoder}, callback_{callback}, supported_{supported}
+diagnostic_message_t::diagnostic_message_t(
+		uint8_t pid,
+		const std::string& generic_name,
+		const int min,
+		const int max,
+		enum UNIT unit,
+		float frequency,
+		DiagnosticResponseDecoder decoder,
+		DiagnosticResponseCallback callback,
+		bool supported,
+		bool received)
+		: parent_{nullptr},
+		pid_{pid},
+		generic_name_{generic_name},
+		min_{min},
+		max_{max},
+		unit_{unit},
+		frequency_{frequency},
+		decoder_{decoder},
+		callback_{callback},
+		supported_{supported},
+		last_timestamp_{0},
+		received_{received},
+		last_value_{.0f}
 {}
 
 uint32_t diagnostic_message_t::get_pid()
@@ -75,6 +94,21 @@ bool diagnostic_message_t::get_supported() const
 	return supported_;
 }
 
+bool diagnostic_message_t::get_received() const
+{
+	return received_;
+}
+
+float diagnostic_message_t::get_last_value() const
+{
+	return last_value_;
+}
+
+std::pair<float, uint64_t> diagnostic_message_t::get_last_value_with_timestamp() const
+{
+	return std::make_pair(last_value_, last_timestamp_);
+}
+
 void diagnostic_message_t::set_supported(bool value)
 {
 	supported_ = value;
@@ -83,6 +117,21 @@ void diagnostic_message_t::set_supported(bool value)
 void diagnostic_message_t::set_parent(can_message_set_t* parent)
 {
 	parent_ = parent;
+}
+
+void diagnostic_message_t::set_received(bool r)
+{
+	received_ = r;
+}
+
+void diagnostic_message_t::set_last_value(float val)
+{
+	last_value_ = val;
+}
+
+void diagnostic_message_t::set_timestamp(uint64_t timestamp)
+{
+	last_timestamp_ = timestamp;
 }
 
 ///

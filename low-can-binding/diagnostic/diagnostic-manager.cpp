@@ -396,10 +396,14 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 /// @param[in] response - The response to decode from which the Vehicle message will be built and returned
 ///
 /// @return A filled openxc_VehicleMessage or a zeroed struct if there is an error.
-openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response)
+openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_diagnostic_request_t* adr, const DiagnosticResponse& response, const uint64_t timestamp)
 {
 	openxc_VehicleMessage message = build_VehicleMessage();
 	float value = (float)diagnostic_payload_to_integer(&response);
+
+	struct utils::signals_found found_signals;
+	found_signals = utils::signals_manager_t::instance().find_signals(build_DynamicField((double) adr->get_pid()));
+
 	if(adr->get_decoder() != nullptr)
 	{
 		value = adr->get_decoder()(&response, value);
@@ -425,8 +429,6 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 	// If not success but completed then the pid isn't supported
 	if(!response.success)
 	{
-		struct utils::signals_found found_signals;
-		found_signals = utils::signals_manager_t::instance().find_signals(build_DynamicField(adr->get_name()));
 		found_signals.diagnostic_messages.front()->set_supported(false);
 		cleanup_request(adr, true);
 		AFB_NOTICE("PID not supported or ill formed. Please unsubscribe from it. Error code : %d", response.negative_response_code);
@@ -440,6 +442,20 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 
 	// Reset the completed flag handle to make sure that it will be reprocessed the next time.
 	adr->get_handle()->success = false;
+
+	// Save value and timestamp of diagnostic message
+	if(!found_signals.diagnostic_messages.empty())
+	{
+		// Then, for each diag_message found
+		for(const auto& diag_mess: found_signals.diagnostic_messages)
+		{
+			// Save value and timestamp for this message
+			diag_mess->set_received(true);
+			diag_mess->set_last_value(value);
+			diag_mess->set_timestamp(timestamp);
+		}
+	}
+
 	return message;
 }
 
@@ -457,7 +473,7 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_handle(active_diagn
 	if(response.completed && entry->get_handle()->completed)
 	{
 		if(entry->get_handle()->success)
-			return relay_diagnostic_response(entry, response);
+			return relay_diagnostic_response(entry, response, cm.get_timestamp());
 	}
 	else if(!response.completed && response.multi_frame)
 	{

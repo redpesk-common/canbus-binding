@@ -308,7 +308,8 @@ application_t::application_t()
 					5.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					5,
@@ -319,7 +320,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					10,
@@ -330,7 +332,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					11,
@@ -341,7 +344,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					12,
@@ -352,7 +356,8 @@ application_t::application_t()
 					5.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					13,
@@ -363,7 +368,8 @@ application_t::application_t()
 					5.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					15,
@@ -374,7 +380,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					16,
@@ -385,7 +392,8 @@ application_t::application_t()
 					5.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					17,
@@ -396,7 +404,8 @@ application_t::application_t()
 					5.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					31,
@@ -407,7 +416,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					45,
@@ -418,7 +428,8 @@ application_t::application_t()
 					0.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					47,
@@ -429,7 +440,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					51,
@@ -440,7 +452,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					70,
@@ -451,7 +464,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					76,
@@ -462,7 +476,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					82,
@@ -473,7 +488,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					90,
@@ -484,7 +500,8 @@ application_t::application_t()
 					5.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					91,
@@ -495,7 +512,8 @@ application_t::application_t()
 					5.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					92,
@@ -506,7 +524,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					94,
@@ -517,7 +536,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					99,
@@ -528,7 +548,8 @@ application_t::application_t()
 					1.00000f,
 					decoder_t::decode_obd2_response,
 					nullptr,
-					true
+					true,
+					false
 				})}
 
 			} // end diagnostic_messages_ vector

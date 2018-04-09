@@ -60,10 +60,25 @@ class diagnostic_message_t
 
 		bool supported_; /*!< supported_ - boolean indicating whether this pid is supported by the vehicle or not.*/
 
+		uint64_t last_timestamp_; /*!< last_timestamp_ - the last time (in microseconds since epoch)
+								* that the message has been received. */
+
+		bool received_; /*!< received_ - True if this signal has ever been received. */
+		float last_value_; /*!< last_value_ - The last received value of the diagnostic message.
+								* If 'received_' is false, this value is undefined. */
+
 	public:
 		const char* generic_name = generic_name_.c_str();
-		diagnostic_message_t(uint8_t pid, const std::string& generic_name, const int min, const int max, enum UNIT unit, float frequency,
-											DiagnosticResponseDecoder decoder, DiagnosticResponseCallback callback, bool supported);
+		diagnostic_message_t(uint8_t pid,
+				     const std::string& generic_name,
+				     const int min,
+				     const int max,
+				     enum UNIT unit,
+				     float frequency,
+				     DiagnosticResponseDecoder decoder,
+				     DiagnosticResponseCallback callback,
+				     bool supported,
+				     bool received);
 
 		uint32_t get_pid();
 		const std::string get_generic_name() const;
@@ -72,6 +87,14 @@ class diagnostic_message_t
 		DiagnosticResponseDecoder get_decoder() const;
 		DiagnosticResponseCallback get_callback() const;
 		bool get_supported() const;
+
+		bool get_received() const;
+		float get_last_value() const;
+		std::pair<float, uint64_t> get_last_value_with_timestamp() const;
+
+		void set_received(bool r);
+		void set_last_value(float val);
+		void set_timestamp(uint64_t timestamp);
 
 		void set_supported(bool value);
 		void set_parent(can_message_set_t* parent);

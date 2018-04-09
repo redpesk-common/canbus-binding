@@ -145,7 +145,8 @@ application_t::application_t()
 					1.00000f,
 					handleObd2Pid,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					12,
@@ -156,7 +157,8 @@ application_t::application_t()
 					1.00000f,
 					nullptr,
 					nullptr,
-					true
+					true,
+					false
 				})}
 ,				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					6,
@@ -167,7 +169,8 @@ application_t::application_t()
 					1.00000f,
 					handleMyDiagRequest,
 					nullptr,
-					true
+					true,
+					false
 				})}
 
 			} // end diagnostic_messages_ vector
