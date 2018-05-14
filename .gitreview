@@ -1,6 +1,6 @@
 [gerrit]
 host=gerrit.automotivelinux.org
 port=29418
-project=apps/low-level-can-service
+project=apps/agl-service-can-low-level
 defaultbranch=master
 
