@@ -429,7 +429,7 @@ static int write_raw_frame(const std::string& bus_name, uint32_t can_id, uint8_t
 	cf.can_dlc = can_dlc;
 
 	struct json_object *x;
-	int n = json_object_array_length(can_data);
+	size_t n = json_object_array_length(can_data);
 	if(n <= 8)
 	{
 		for (int i = 0 ; i < n ; i++)
