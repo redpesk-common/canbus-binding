@@ -43,8 +43,8 @@ class can_signal_t;
 /// @param[in] signalCount - The length of the signals array.
 /// @param[in] value - The CAN signal parsed from the message as a raw floating point
 ///	value.
-/// @param[out] send - An output parameter. If the decoding failed or the CAN signal should
-///	not send for some other reason, this should be flipped to false.
+/// @param[out] send - An output parameter. If decoding fails or CAN signal is
+///	not sending, this should be flipped to false.
 ///
 /// @return a decoded value in an openxc_DynamicField struct.
 ///

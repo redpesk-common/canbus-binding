@@ -138,8 +138,8 @@ static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subs
 	return 0;
 }
 
-/// @brief Will determine if it is needed or not to create the event handle and checks it to be sure that
-/// we got a valid afb_event to get subscribe or unsubscribe. Then launch the subscription or unsubscription
+/// @brief This will determine if an event handle needs to be created and checks if
+/// we got a valid afb_event to get subscribe or unsubscribe. After that launch the subscription or unsubscription
 /// against the application framework using that event handle.
 static int subscribe_unsubscribe_signal(struct afb_req request,
 										bool subscribe,
@@ -166,8 +166,8 @@ static int subscribe_unsubscribe_signal(struct afb_req request,
 		ret = create_event_handle(can_subscription, s);
 	}
 
-	// Check whether or not the event handler has been correctly created and
-	// make the subscription/unsubscription operation is so.
+	// Checks if the event handler is correctly created, if it is, it
+	// performs the subscription or unsubscription operations.
 	if (ret < 0)
 		return ret;
 	return make_subscription_unsubscription(request, can_subscription, s, subscribe);
@@ -205,8 +205,8 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request,
 		can_subscription = it != s.end() ?
 			it->second :
 			std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
-		// If the requested diagnostic message isn't supported by the car then unsubcribe it
-		// no matter what we want, worse case will be a fail unsubscription but at least we don't
+		// If the requested diagnostic message is not supported by the car then unsubcribe it
+		// no matter what we want, worst case will be a failed unsubscription but at least we won't
 		// poll a PID for nothing.
 		if(sig->get_supported() && subscribe)
 		{
@@ -281,8 +281,8 @@ static int subscribe_unsubscribe_can_signals(struct afb_req request,
 ///
 /// @brief subscribe to all signals in the vector signals
 ///
-/// @param[in] afb_req request : contain original request use to subscribe or unsubscribe
-/// @param[in] subscribe boolean value used to chose between a subscription operation or an unsubscription
+/// @param[in] afb_req request : contains original request use to subscribe or unsubscribe
+/// @param[in] subscribe boolean value, which chooses between a subscription operation or an unsubscription
 /// @param[in] signals -  struct containing vectors with can_signal_t and diagnostic_messages to subscribe
 ///
 /// @return Number of correctly subscribed signal
@@ -666,7 +666,7 @@ int initv2()
 	if(application_t::instance().get_diagnostic_manager().initialize())
 		ret = 0;
 
-	// Add a recurring dignostic message request to get engine speed continuously
+	// Add a recurring dignostic message request to get engine speed at all times.
 	openxc_DynamicField search_key = build_DynamicField("diagnostic_messages.engine.speed");
 	struct utils::signals_found sf = utils::signals_manager_t::instance().find_signals(search_key);
 

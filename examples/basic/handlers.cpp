@@ -17,6 +17,6 @@ void initializeMyStuff() { }
 void initializeOtherStuff() { }
 
 void myLooper() {
-    // this function will be called once each time through the main loop, after
+    // this function will be called once, each time through the main loop, after
     // all CAN message processing has been completed
 }

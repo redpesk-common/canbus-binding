@@ -22,10 +22,10 @@
 #include "can-message-definition.hpp"
 #include "../binding/low-can-hat.hpp"
 
-/// @brief Parse the signal's bitfield from the given data and return the raw
+/// @brief Parses the signal's bitfield from the given data and returns the raw
 /// value.
 ///
-/// @param[in] signal - The signal to parse from the data.
+/// @param[in] signal - The signal to be parsed from the data.
 /// @param[in] message - can_message_t to parse
 ///
 /// @return Returns the raw value of the signal parsed as a bitfield from the given byte
@@ -38,7 +38,7 @@ float decoder_t::parse_signal_bitfield(can_signal_t& signal, const can_message_t
 			signal.get_offset());
 }
 
-/// @brief Wrap a raw CAN signal value in a DynamicField without modification.
+/// @brief Wraps a raw CAN signal value in a DynamicField without modification.
 ///
 /// This is an implementation of the Signal type signature, and can be
 /// used directly in the can_signal_t.decoder field.

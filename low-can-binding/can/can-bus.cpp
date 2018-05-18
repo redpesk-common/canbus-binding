@@ -40,10 +40,10 @@ can_bus_t::can_bus_t(utils::config_parser_t conf_file)
 	: conf_file_{conf_file}
 {}
 
-/// @brief Take a decoded message to determine if its value comply with the wanted
-/// filtering values.
+/// @brief Take a decoded message to determine if its value complies with the desired
+/// filters.
 ///
-/// @param[in] vehicle_message - A decoded message to analyze
+/// @param[in] vehicle_message - The decoded message to be analyzed.
 /// @param[in] can_subscription - the subscription which will be notified depending
 ///  on its filtering values. Filtering values are stored in the event_filtermember.
 ///

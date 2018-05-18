@@ -163,10 +163,10 @@ void low_can_socket_t::set_max(float max)
 {
 	event_filter_.max = max;
 }
-/// @brief Based upon which object is subscribed CAN signal or diagnostic message
-/// this will open the socket with the required CAN bus device name.
+/// @brief Based upon which object is a subscribed CAN signal or diagnostic message
+/// it will open the socket with the required CAN bus device name.
 ///
-/// @return INVALID_SOCKET on failure else positive integer
+/// @return INVALID_SOCKET on failure, else positive integer
 int low_can_socket_t::open_socket(const std::string& bus_name)
 {
 	int ret = 0;
@@ -183,9 +183,9 @@ int low_can_socket_t::open_socket(const std::string& bus_name)
 	return ret;
 }
 
-/// @brief Build a BCM message head but don't set can_frame.
+/// @brief Builds a BCM message head but doesn't set can_frame.
 ///
-/// @return a simple_bcm_msg with the msg_head parts set and can_frame
+/// @returns a simple_bcm_msg with the msg_head parts set and can_frame
 /// zeroed.
 struct utils::simple_bcm_msg low_can_socket_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning) const
 {
@@ -203,8 +203,8 @@ struct utils::simple_bcm_msg low_can_socket_t::make_bcm_head(uint32_t opcode, ui
 	return bcm_msg;
 }
 
-/// @brief Take an existing simple_bcm_msg struct and add a can_frame to it.
-/// Only possible for now to add 1 uniq can_frame, it isn't possible to build
+/// @brief Take an existing simple_bcm_msg struct and add a can_frame.
+/// Currently only 1 uniq can_frame can be added, it's not possible to build
 /// a multiplexed message with several can_frame.
 void low_can_socket_t::add_bcm_frame(const struct can_frame& cf, struct utils::simple_bcm_msg& bcm_msg) const
 {
@@ -219,7 +219,7 @@ void low_can_socket_t::add_bcm_frame(const struct can_frame& cf, struct utils::s
 	}
 }
 
-/// @brief Create a RX_SETUP receive job used by the BCM socket for a CAN signal
+/// @brief Create a RX_SETUP receive job to be used by the BCM socket for a CAN signal
 /// subscription
 ///
 /// @return 0 if ok else -1
@@ -249,7 +249,7 @@ int low_can_socket_t::create_rx_filter(std::shared_ptr<can_signal_t> sig)
 	return create_rx_filter(bcm_msg);
 }
 
-/// @brief Create a RX_SETUP receive job used by the BCM socket for a
+/// @brief Create a RX_SETUP receive job to be used by the BCM socket for a
 /// diagnostic message subscription.
 ///
 /// @return 0 if ok else -1
@@ -266,7 +266,7 @@ int low_can_socket_t::create_rx_filter(std::shared_ptr<diagnostic_message_t> sig
 }
 
 /// @brief Create a RX_SETUP receive job used by the BCM socket directly from
-/// a simple_bcm_msg. You will not use this method directly but rather use the
+/// a simple_bcm_msg. The method should not be used directly but rather through the
 /// two previous method with can_signal_t or diagnostic_message_t object.
 ///
 /// If the CAN arbitration ID is the OBD2 functional broadcast id the subscribed
@@ -275,11 +275,11 @@ int low_can_socket_t::create_rx_filter(std::shared_ptr<diagnostic_message_t> sig
 /// @return 0 if ok else -1
 int low_can_socket_t::create_rx_filter(utils::simple_bcm_msg& bcm_msg)
 {
-	// Make sure that socket has been opened.
+	// Make sure that socket is opened.
 	if(open_socket() < 0)
 		{return -1;}
 
-	// If it isn't an OBD2 CAN ID then just add a simple RX_SETUP job
+	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
 	// else monitor all standard 8 CAN OBD2 ID response.
 	if(bcm_msg.msg_head.can_id != OBD2_FUNCTIONAL_BROADCAST_ID)
 	{
@@ -302,10 +302,10 @@ int low_can_socket_t::create_rx_filter(utils::simple_bcm_msg& bcm_msg)
 	return 0;
 }
 
-/// @brief Create a TX_SEND job used by the BCM socket to
-/// simply send message
+/// @brief Creates a TX_SEND job that is used by the BCM socket to
+/// send a message
 ///
-/// @return 0 if ok else -1
+/// @return 0 if ok, else -1
 int low_can_socket_t::tx_send(const struct can_frame& cf, std::shared_ptr<can_signal_t> sig)
 {
 	can_signal_ = sig;
@@ -323,8 +323,8 @@ int low_can_socket_t::tx_send(const struct can_frame& cf, std::shared_ptr<can_si
 	return 0;
 }
 
-/// @brief Create a TX_SEND job used by the BCM socket to
-/// simply send message
+/// @brief Creates a TX_SEND job that is used by the BCM socket to
+/// send a message
 ///
 /// @return 0 if ok else -1
 int low_can_socket_t::tx_send(const struct can_frame& cf, const std::string& bus_name)

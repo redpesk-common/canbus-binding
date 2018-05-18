@@ -49,8 +49,8 @@ diagnostic_manager_t::~diagnostic_manager_t()
 	}
 }
 
-/// @brief Diagnostic manager isn't initialized at launch but after
-///  CAN bus devices initialization. For the moment, it is only possible
+/// @brief Diagnostic manager is not initialized at launch but after
+///  the initialization of CAN bus devices. For the moment, it is only possible
 ///  to have 1 diagnostic bus which are the first bus declared in the JSON
 ///  description file. Configuration instance will return it.
 ///
