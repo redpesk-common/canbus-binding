@@ -26,10 +26,10 @@
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/socketcan-bcm.hpp"
 
-/// @brief A subscription object used has a context that handle all needed values to describe a subscription
-/// to the low-can binding. It can holds a CAN signal or diagnostic message. Diagnostic message for OBD2 is a kind
-/// of special because there is only 1 listener to retrieve OBD2 requests. So it's needed that all diagnostic messages
-/// subscriptions is to be in 1 object.
+/// @brief The subscription class has a context that can handle all needed values to describe a subscription
+/// to the low-can binding. It can hold a CAN signal or a diagnostic message. A diagnostic message for OBD2 is
+/// special because there is only 1 listener to retrieve OBD2 requests. It is required that all diagnostic message
+/// subscriptions are in 1 object.
 class low_can_subscription_t : public low_can_socket_t
 {
 private:

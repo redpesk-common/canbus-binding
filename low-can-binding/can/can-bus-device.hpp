@@ -45,12 +45,12 @@ private:
 	std::string name;
 	std::string device_name;
 	float max_message_frequency;	//<! maxMessageFrequency - the default maximum frequency for all CAN messages when
-									/// using the raw passthrough mode. To put no limit on the frequency, set
+									/// using the raw passthrough mode. To disable frequency limit, set
 									/// this to 0.
-	bool raw_writable;  //<! rawWritable - True if this CAN bus connection should allow raw CAN messages
+	bool raw_writable;  //<! rawWritable - Set to True if the CAN bus connection should allow raw CAN messages
 						/// writes. This is independent from the CanSignal 'writable' option, which
-						/// can be set to still allow translated writes back to this bus.
-	bool passthrough_can_messages; //<! passthroughCanMessages - True if low-level CAN messages should be send to the
+						/// can also be set to allow translated writes back to this bus.
+	bool passthrough_can_messages; //<! passthroughCanMessages - Set to True if low-level CAN messages should be able to send to the
 								   /// output interface, not just signals as simple vehicle messages.
 
 public:

@@ -40,7 +40,7 @@ class diagnostic_manager_t;
 /// json conf file describing the CAN devices to use. Thus, those object will read
 /// on the device the CAN frame and push them into the can_bus_t can_message_q_ queue.
 ///
-/// That queue will be later used to be decoded and pushed to subscribers.
+/// That queue will later be decoded and pushed to subscribers.
 class can_bus_t
 {
 private:
@@ -51,20 +51,20 @@ private:
 	void process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
 
 	void can_decode_message();
-	std::thread th_decoding_; ///< thread that'll handle decoding a can frame
+	std::thread th_decoding_; ///< thread that will handle decoding a can frame
 	bool is_decoding_ = false; ///< boolean member controling thread while loop
 
 	void can_event_push();
-	std::thread th_pushing_; ///< thread that'll handle pushing decoded can frame to subscribers
+	std::thread th_pushing_; ///< thread that will handle pushing decoded can frame to subscribers
 	bool is_pushing_ = false; ///< boolean member controling thread while loop
 
 	std::condition_variable new_can_message_cv_; ///< condition_variable use to wait until there is a new CAN message to read
 	std::mutex can_message_mutex_; ///< mutex protecting the can_message_q_ queue.
-	std::queue <can_message_t> can_message_q_; ///< queue that'll store can_message_t to decoded
+	std::queue <can_message_t> can_message_q_; ///< queue that will store can_message_t to be decoded
 
 	std::condition_variable new_decoded_can_message_; ///< condition_variable use to wait until there is a new vehicle message to read from the queue vehicle_message_q_
 	std::mutex decoded_can_message_mutex_;  ///< mutex protecting the vehicle_message_q_ queue.
-	std::queue <std::pair<int, openxc_VehicleMessage> > vehicle_message_q_; ///< queue that'll store openxc_VehicleMessage to pushed
+	std::queue <std::pair<int, openxc_VehicleMessage> > vehicle_message_q_; ///< queue that will store openxc_VehicleMessage to be pushed
 
 	std::vector<std::pair<std::string, std::string> > can_devices_mapping_; ///< can_devices_mapping_ - holds a mapping between logical CAN devices names and linux CAN devices names.
 public:

@@ -24,7 +24,7 @@
 ///
 /// @brief Class constructor
 ///
-/// Constructor about can_message_t class.
+/// can_message_t class constructor.
 ///
 can_message_t::can_message_t()
 	: maxdlen_{0},
@@ -167,7 +167,7 @@ bool can_message_t::is_correct_to_send()
 
 /// @brief Set format_ member value.
 ///
-/// Preferred way to initialize these members by using
+/// Preferred way to initialize these members is to use
 /// convert_from_canfd_frame method.
 ///
 /// @param[in] new_format - class member
@@ -346,7 +346,7 @@ can_message_t can_message_t::convert_from_frame(const struct can_frame& frame, s
 	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data, timestamp);
 }
 
-/// @brief Take all initialized class's members and build an
+/// @brief Take all initialized class members and build a
 /// canfd_frame struct that can be use to send a CAN message over
 /// the bus.
 ///
@@ -367,7 +367,7 @@ struct canfd_frame can_message_t::convert_to_canfd_frame()
 	return frame;
 }
 
-/// @brief Take all initialized class's members and build an
+/// @brief Take all initialized class members and build a
 /// can_frame struct that can be use to send a CAN message over
 /// the bus.
 ///

@@ -25,21 +25,21 @@
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/socketcan-bcm.hpp"
 
-/// @brief Filtering values. Theses values has to be tested into
+/// @brief Filtering values. Theses values have to be tested in
 /// can_bus_t::apply_filter method.
 struct event_filter_t
 {
-	float frequency; ///< frequency - Maximum frequency which will be received and pushed a subscribed event.
-	float min; ///< min - Minimum value that the signal don't have to go below to be pushed.
-	float max; ///< max - Maximum value that the signal don't have to go above to be pushed.
+	float frequency; ///< frequency - Maximum frequency which will be received and pushed to a subscribed event.
+	float min; ///< min - Minimum value that the signal doesn't have to go below to be pushed.
+	float max; ///< max - Maximum value that the signal doesn't have to go above to be pushed.
 	event_filter_t() : frequency{0}, min{-__FLT_MAX__}, max{__FLT_MAX__} {};
 	bool operator==(const event_filter_t& ext) const {
 		return frequency == ext.frequency && min == ext.min && max == ext.max;
 	}
 };
 
-/// @brief An object storing socket to CAN to be used to write on it.
-/// This is a simple access to a CAN bus device without subscriptions attached
+/// @brief The object stores socket to CAN to be used to write on it.
+/// This is a simple access to a CAN bus device without any subscriptions attached
 class low_can_socket_t
 {
 protected:
@@ -48,8 +48,8 @@ protected:
 
 	/// Signal part
 	std::shared_ptr<can_signal_t> can_signal_; ///< can_signal_ - the CAN signal subscribed
-	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to received OBD2 responses.
-				/// normal diagnostic request and response not tested for now.
+	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to receive OBD2 responses.
+				/// normal diagnostic request and response are not tested for now.
 
 	utils::socketcan_bcm_t socket_; ///< socket_ - socket_ that receives CAN messages.
 

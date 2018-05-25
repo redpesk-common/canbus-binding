@@ -21,10 +21,10 @@
 #include "../utils/openxc-utils.hpp"
 #include "can-message-definition.hpp"
 
-/// @brief Write a value into a CAN signal in the destination buffer.
+/// @brief Write a value in a CAN signal in the destination buffer.
 ///
 /// @param[in] signal - The CAN signal to write, including the bit position and bit size.
-/// @param[in] value - The encoded integer value to write into the CAN signal.
+/// @param[in] value - The encoded integer value to write in the CAN signal.
 /// @param[out] data - The destination buffer.
 /// @param[in] length - The length of the destination buffer.
 ///

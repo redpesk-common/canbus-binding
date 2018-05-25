@@ -32,9 +32,9 @@ class diagnostic_message_t;
 class can_message_set_t
 {
 private:
-	uint8_t index_; /// < A numerical ID for the message set, ideally the index in an array for fast lookup
+	uint8_t index_; /// < A numerical ID for the message set, ideally the index is in an array for fast lookup
 	const std::string name_; /// < The name of the message set.
-	std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition_; ///< Vector holding all message definition handled by this message set.
+	std::vector<std::shared_ptr<can_message_definition_t> > can_messages_definition_; ///< Vector holding all message definitions handled by the message set.
 	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages_; ///< Vector holding all diagnostics messages from JSON signals description file. First vector map to message set
 
 public:
