@@ -1,0 +1,22 @@
+{
+    "id": "http://iot.bzh/download/public/schema/json/ctl-schema.json#",
+    "$schema": "http://iot.bzh/download/public/schema/json/ctl-schema.json#",
+    "metadata": {
+        "uid": "Test",
+        "version": "1.0",
+        "api": "afTest",
+        "info": "AFB-test binding configuration file to test low-can api.",
+        "require": [
+            "low-can"
+        ]
+    },
+    "testVerb": {
+        "uid": "launch_all_tests",
+        "info": "Launch all the tests",
+        "action": "lua://AFT#_launch_test",
+        "args": {
+            "trace": "low-can",
+            "files": "low-can-coverage.lua"
+        }
+    }
+}

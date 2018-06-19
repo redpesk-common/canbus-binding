@@ -63,7 +63,6 @@ set (PKG_REQUIRED_LIST
 	json-c
 	libsystemd>=222
 	afb-daemon
-	libmicrohttpd>=0.9.55
 )
 
 # Prefix path where will be installed the files
@@ -73,7 +72,7 @@ set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
 
 # Customize link option
 # -----------------------------
-list (APPEND link_libraries -pthread)
+list (APPEND link_libraries -pthread --coverage)
 
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language
@@ -104,9 +103,10 @@ set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ languag
 # -Wp,-U_FORTIFY_SOURCE
 # CACHE STRING "Compilation flags for PROFILING build type.")
 #set(DEBUG_COMPILE_OPTIONS
+# -Og
 # -g
 # -ggdb
-# -Wp,-U_FORTIFY_SOURCE
+# -D_FORTIFY_SOURCE=2
 # CACHE STRING "Compilation flags for DEBUG build type.")
 #set(CCOV_COMPILE_OPTIONS
 # -g

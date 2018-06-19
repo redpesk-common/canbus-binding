@@ -16,5 +16,7 @@
 # limitations under the License.
 ###########################################################################
 
-# Add target to project dependency list
-project_subdirs_add()
+
+# Include any directory not starting with _
+# -----------------------------------------------------
+PROJECT_SUBDIRS_ADD(${PROJECT_SRC_DIR_PATTERN})

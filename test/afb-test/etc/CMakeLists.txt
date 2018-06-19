@@ -16,5 +16,16 @@
 # limitations under the License.
 ###########################################################################
 
-# Add target to project dependency list
-project_subdirs_add()
+##################################################
+# Low-CAN test configuration files
+##################################################
+PROJECT_TARGET_ADD(afb-test-config)
+
+	file(GLOB CONF_FILES "*.json")
+
+	add_input_files("${CONF_FILES}")
+
+	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
+	LABELS "BINDING-CONFIG"
+	OUTPUT_NAME ${TARGET_NAME}
+	)

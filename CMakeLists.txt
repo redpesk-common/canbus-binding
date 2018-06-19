@@ -1,5 +1,5 @@
 ###########################################################################
-# Copyright 2015, 2016, 2017 IoT.bzh
+# Copyright 2015 - 2018 IoT.bzh
 #
 # author: Romain Forlot <romain.forlot@iot.bzh>
 #
@@ -18,4 +18,6 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 
+include(CTest)
+enable_testing()
 include(${CMAKE_CURRENT_SOURCE_DIR}/conf.d/cmake/config.cmake)

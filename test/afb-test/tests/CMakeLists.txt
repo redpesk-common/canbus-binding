@@ -16,5 +16,16 @@
 # limitations under the License.
 ###########################################################################
 
-# Add target to project dependency list
-project_subdirs_add()
+
+##################################################
+# Low-CAN Lua Scripts
+##################################################
+PROJECT_TARGET_ADD(test-files)
+
+	file(GLOB LUA_FILES "*.lua" "*.sh" "*.canreplay")
+	add_input_files("${LUA_FILES}")
+
+	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
+	LABELS "DATA"
+	OUTPUT_NAME ${TARGET_NAME}
+	)
