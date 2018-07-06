@@ -33,6 +33,16 @@
 #include "../utils/signals.hpp"
 #include "../utils/openxc-utils.hpp"
 
+/// @brief Class destructor
+///
+/// @param[in] conf_file - Stop threads and unlock them to correctly finish them
+/// even without any activity on the CAN bus.
+can_bus_t::~can_bus_t()
+{
+	stop_threads();
+	new_can_message_cv_.notify_one();
+}
+
 /// @brief Class constructor
 ///
 /// @param[in] conf_file - handle to the json configuration file.
@@ -158,8 +168,8 @@ void can_bus_t::can_decode_message()
 			}
 			can_message_lock.lock();
 		}
-	new_decoded_can_message_.notify_one();
-	can_message_lock.unlock();
+		new_decoded_can_message_.notify_one();
+		can_message_lock.unlock();
 	}
 }
 

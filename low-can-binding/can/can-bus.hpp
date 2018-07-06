@@ -70,6 +70,7 @@ private:
 public:
 	explicit can_bus_t(utils::config_parser_t conf_file);
 	can_bus_t(can_bus_t&&);
+	~can_bus_t();
 
 	void set_can_devices();
 	int get_can_device_index(const std::string& bus_name) const;
