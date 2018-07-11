@@ -8,6 +8,7 @@
 	<license>@PROJECT_LICENSE@</license>
 
 	<feature name="urn:AGL:widget:required-permission">
+		<param name="urn:AGL:permission::public:hidden" value="required" />
 		<param name="urn:AGL:permission::system:run-by-default" value="required" />
 		<param name="urn:AGL:permission::public:no-htdocs" value="required" />
 	</feature>
