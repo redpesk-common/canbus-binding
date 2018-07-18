@@ -68,11 +68,11 @@ set (PKG_REQUIRED_LIST
 # Prefix path where will be installed the files
 # Default: /usr/local (need root permission to write in)
 # ------------------------------------------------------
-set(CMAKE_INSTALL_PREFIX $ENV{HOME}/opt)
+set(INSTALL_PREFIX $ENV{HOME}/opt)
 
 # Customize link option
 # -----------------------------
-list (APPEND link_libraries -pthread --coverage)
+list (APPEND link_libraries -pthread)
 
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language
@@ -108,20 +108,15 @@ set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ languag
 # -ggdb
 # -D_FORTIFY_SOURCE=2
 # CACHE STRING "Compilation flags for DEBUG build type.")
-#set(CCOV_COMPILE_OPTIONS
+#set(COVERAGE_COMPILE_OPTIONS
 # -g
 # -O2
 # --coverage
-# CACHE STRING "Compilation flags for CCOV build type.")
+# CACHE STRING "Compilation flags for COVERAGE build type.")
 #set(RELEASE_COMPILE_OPTIONS
-# -g
 # -O2
+# -D_FORTIFY_SOURCE=2
 # CACHE STRING "Compilation flags for RELEASE build type.")
-
-# (BUG!!!) as PKG_CONFIG_PATH does not work [should be an env variable]
-# ---------------------------------------------------------------------
-set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX}/lib64/pkgconfig ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
-set(LD_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64 ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Optional location for config.xml.in
 # -----------------------------------
