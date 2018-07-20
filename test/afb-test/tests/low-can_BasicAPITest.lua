@@ -28,45 +28,51 @@ _AFT.setBeforeAll(function()
     return 0
 end)
 
+_AFT.setAfterEach(function()
+    os.execute("pkill canplayer")
+    os.execute("pkill linuxcan-canpla")
+end)
+
 _AFT.testVerbStatusSuccess("low-can_list", "low-can", "list", {})
 _AFT.testVerbStatusSuccess("low-can_get", "low-can", "get", { event = "engine.speed"})
 
 _AFT.describe("Diagnostic_engine_speed_simulation", function()
-    _AFT.assertVerbStatusSuccess("low-can","subscribe", { event = "diagnostic_messages.engine.speed" })
+    
+    local api = "low-can"
+    local evt = "diagnostic_messages.engine.speed"
+    _AFT.assertVerbStatusSuccess(api,"subscribe", { event = evt })
 
-    local evt = "low-can/diagnostic_messages"
-    _AFT.addEventToMonitor(evt)
+    _AFT.addEventToMonitor(api .. "/" .. evt ,function(eventName, data)
+        _AFT.assertIsTrue(data.name == "diagnostic_messages.engine.speed")    
+    end)
 
     local ret = os.execute("./var/replay_launcher.sh ./var/test1.canreplay")
     _AFT.assertIsTrue(ret)
 
-    _AFT.assertEvtReceived(evt, function(eventName, data)
-        _AFT.assertIsTrue(data.name == "diagnostic_messages.engine.speed")
-    end)
+    _AFT.assertEvtReceived(api .. "/" .. evt, 1000000)
 
     _AFT.assertVerbStatusSuccess("low-can","unsubscribe", { event = "diagnostic_messages.engine.speed" })
 
-    local ret = os.execute("pkill canplayer")
-    _AFT.assertIsTrue(ret)
 end)
 
 _AFT.describe("Subscribe_all", function()
-    _AFT.assertVerbStatusSuccess("low-can","subscribe", { event = "*" })
+    local api = "low-can"
+    local evt = "messages.vehicle.average.speed"    
 
-    local evt = "low-can/messages.vehicle.average.speed"
-    _AFT.addEventToMonitor(evt)
+    
+    _AFT.addEventToMonitor(api .. "/" .. evt,  function(eventName, data)
+        _AFT.assertEquals(data.name,"messages.vehicle.average.speed")
+    end)
+
+    _AFT.assertVerbStatusSuccess(api,"subscribe", { event = "*" })
 
     local ret = os.execute("./var/replay_launcher.sh ./var/test2-3.canreplay")
     _AFT.assertIsTrue(ret)
 
-    _AFT.assertEvtReceived(evt, function(eventName, data)
-        _AFT.assertIsTrue(data.name == "messages.vehicle.average.speed")
-    end)
+    _AFT.assertEvtReceived(api .. "/" .. evt, 5000000);
 
-    _AFT.assertVerbStatusSuccess("low-can","unsubscribe", { event = "*" })
+    _AFT.assertVerbStatusSuccess(api,"unsubscribe", { event = "*" })
 
-    local ret = os.execute("pkill canplayer")
-    _AFT.assertIsTrue(ret)
 end)
 
 _AFT.exitAtEnd()
