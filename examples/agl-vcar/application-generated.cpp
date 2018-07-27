@@ -4,7 +4,7 @@
 application_t::application_t()
 	: can_bus_manager_{utils::config_parser_t{"/etc/dev-mapping.conf"}}
 	, can_message_set_{
-		{std::make_shared<can_message_set_t>(can_message_set_t{0,"example",
+		{std::make_shared<can_message_set_t>(can_message_set_t{0,"AGL Virtual Car",
 			{ // beginning can_message_definition_ vector
 				{std::make_shared<can_message_definition_t>(can_message_definition_t{"ls",0x30,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning can_signals vector
@@ -39,7 +39,7 @@ application_t::application_t()
 							false,
 							{
 							},
-							false,
+							true,
 							nullptr,
 							nullptr,
 							false
@@ -57,7 +57,7 @@ application_t::application_t()
 							false,
 							{
 							},
-							false,
+							true,
 							nullptr,
 							nullptr,
 							false
@@ -75,7 +75,7 @@ application_t::application_t()
 							false,
 							{
 							},
-							false,
+							true,
 							nullptr,
 							nullptr,
 							false

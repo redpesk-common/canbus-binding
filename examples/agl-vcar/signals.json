@@ -21,28 +21,28 @@
 					"bit_size": 1,
 					"factor": 1.0,
 					"offset": 0,
-					"decoder": "decoder_t::booleanDecoder"},
+					"decoder": "decoder_t::decode_boolean"},
 				"doors.rearleft.open": {
 					"generic_name": "doors.rear_left.open",
 					"bit_position": 46,
 					"bit_size": 1,
 					"factor": 1.0,
 					"offset": 0,
-					"decoder": "decoder_t::booleanDecoder"},
+					"decoder": "decoder_t::decode_boolean"},
 				"doors.rearright.open": {
 					"generic_name": "doors.rear_right.open",
 					"bit_position": 45,
 					"bit_size": 4,
 					"factor": 1.0,
 					"offset": 0,
-					"decoder": "decoder_t::booleanDecoder"},
+					"decoder": "decoder_t::decode_boolean"},
 				"doors.coffer.open": {
 					"generic_name": "doors.boot.open",
 					"bit_position": 47,
 					"bit_size": 1,
 					"factor": 1.0,
 					"offset": 0,
-					"decoder": "decoder_t::booleanDecoder"}
+					"decoder": "decoder_t::decode_boolean"}
 		}
 	},
 		"0x799": {
@@ -54,28 +54,28 @@
 					"bit_size": 1,
 					"factor": 1.0,
 					"offset": 0,
-					"decoder": "decoder_t::booleanDecoder"},
+					"decoder": "decoder_t::decode_boolean"},
 				"windows.passenger.open": {
 					"generic_name": "windows.front_right.open",
 					"bit_position": 44,
 					"bit_size": 1,
 					"factor": 1.0,
 					"offset": 0,
-					"decoder": "decoder_t::booleanDecoder"},
+					"decoder": "decoder_t::decode_boolean"},
 				"windows.rearleft.open": {
 					"generic_name": "windows.rear_left.open",
 					"bit_position": 46,
 					"bit_size": 1,
 					"factor": 1.0,
 					"offset": 0,
-					"decoder": "decoder_t::booleanDecoder"},
+					"decoder": "decoder_t::decode_boolean"},
 				"windows.rearright.open": {
 					"generic_name": "windows.rear_right.open",
 					"bit_position": 45,
 					"bit_size": 4,
 					"factor": 1.0,
 					"offset": 0,
-					"decoder": "decoder_t::booleanDecoder"}
+					"decoder": "decoder_t::decode_boolean"}
 		}
 	},
 	"0x3D9": {
@@ -101,7 +101,7 @@
 			"bit_size": 1,
 			"factor": 1,
 			"offset": 0,
-			"decoder": "decoder_t::booleanDecoder"
+			"decoder": "decoder_t::decode_boolean"
 		}
 	}
 	},
@@ -114,7 +114,7 @@
 			"bit_size": 1,
 			"factor": 1,
 			"offset": 0,
-			"decoder": "decoder_t::booleanDecoder"
+			"decoder": "decoder_t::decode_boolean"
 		},
 		"PT_EngineOilTemp": {
 			"generic_name": "engine.oil.temp",
@@ -145,21 +145,24 @@
 			"bit_position": 0,
 			"bit_size": 8,
 			"factor": 1,
-			"offset": 0
+			"offset": 0,
+			"writable": true
 		},
 		"RightTemperature": {
 			"generic_name": "hvac.temperature.right",
 			"bit_position": 8,
 			"bit_size": 8,
 			"factor": 1,
-			"offset": 0
+			"offset": 0,
+			"writable": true
 		},
 		"Temperature": {
 			"generic_name": "hvac.temperature.average",
 			"bit_position": 16,
 			"bit_size": 8,
 			"factor": 1,
-			"offset": 0
+			"offset": 0,
+			"writable": true
 		},
 		"FanSpeed": {
 			"generic_name": "hvac.fan.speed",
