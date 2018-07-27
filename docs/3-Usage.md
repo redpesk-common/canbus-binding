@@ -311,7 +311,7 @@ Examples:
 low-can write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc":
 8, "can_data": [ 255,255,255,255,255,255,255,255]} }
 # Write a signal's value.
-low-can write { "signal_name": "engine.speed", "value": 1256}
+low-can write { "signal_name": "engine.speed", "signal_value": 1256}
 ```
 
 To be able to use write capability, you need to add the permission
