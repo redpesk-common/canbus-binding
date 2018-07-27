@@ -33,35 +33,46 @@ _AFT.setAfterEach(function()
     os.execute("pkill linuxcan-canpla")
 end)
 
+_AFT.setAfterAll( function()
+    os.execute("pkill canplayer")
+    os.execute("pkill linuxcan-canpla")
+    return 0
+end)
+
+_AFT.testVerbStatusError("low-can_write_wo_auth", "low-can", "write", { signal_name = "engine.speed", signal_value = 1234})
+_AFT.testVerbStatusSuccess("low-can_auth", "low-can", "auth", {})
+_AFT.testVerbStatusError("low-can_write_unwritable_signal", "low-can", "write", { signal_name = "engine.speed", signal_value = 1234})
+_AFT.testVerbStatusSuccess("low-can_write", "low-can", "write", { signal_name = "hvac.temperature.left", signal_value = 21})
+_AFT.testVerbStatusSuccess("low-can_write_raw", "low-can", "write", { bus_name= "hs", frame= { can_id= 1568, can_dlc=8, can_data= {255,255,255,255,255,255,255,255}}})
+
 _AFT.testVerbStatusSuccess("low-can_list", "low-can", "list", {})
 _AFT.testVerbStatusSuccess("low-can_get", "low-can", "get", { event = "engine.speed"})
 
 _AFT.describe("Diagnostic_engine_speed_simulation", function()
-    
+
     local api = "low-can"
     local evt = "diagnostic_messages.engine.speed"
     _AFT.assertVerbStatusSuccess(api,"subscribe", { event = evt })
 
-    _AFT.addEventToMonitor(api .. "/" .. evt ,function(eventName, data)
-        _AFT.assertIsTrue(data.name == "diagnostic_messages.engine.speed")    
+    _AFT.addEventToMonitor(api .."/diagnostic_messages", function(eventName, data)
+        _AFT.assertIsTrue(data.name == "diagnostic_messages.engine.speed")
     end)
 
     local ret = os.execute("./var/replay_launcher.sh ./var/test1.canreplay")
     _AFT.assertIsTrue(ret)
 
-    _AFT.assertEvtReceived(api .. "/" .. evt, 1000000)
+    _AFT.assertEvtReceived(api .."/diagnostic_messages", 1000000)
 
-    _AFT.assertVerbStatusSuccess("low-can","unsubscribe", { event = "diagnostic_messages.engine.speed" })
+    _AFT.assertVerbStatusSuccess("low-can","unsubscribe", { event = evt })
 
 end)
 
 _AFT.describe("Subscribe_all", function()
     local api = "low-can"
-    local evt = "messages.vehicle.average.speed"    
+    local evt = "messages.vehicle.average.speed"
 
-    
-    _AFT.addEventToMonitor(api .. "/" .. evt,  function(eventName, data)
-        _AFT.assertEquals(data.name,"messages.vehicle.average.speed")
+    _AFT.addEventToMonitor(api .."/".. evt,  function(eventName, data)
+        _AFT.assertEquals(eventName, api .."/".. evt)
     end)
 
     _AFT.assertVerbStatusSuccess(api,"subscribe", { event = "*" })
@@ -69,7 +80,7 @@ _AFT.describe("Subscribe_all", function()
     local ret = os.execute("./var/replay_launcher.sh ./var/test2-3.canreplay")
     _AFT.assertIsTrue(ret)
 
-    _AFT.assertEvtReceived(api .. "/" .. evt, 5000000);
+    _AFT.assertEvtReceived(api .."/".. evt, 5000000);
 
     _AFT.assertVerbStatusSuccess(api,"unsubscribe", { event = "*" })
 

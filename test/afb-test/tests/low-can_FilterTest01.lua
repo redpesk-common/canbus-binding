@@ -18,9 +18,24 @@
     NOTE: strict mode: every global variables should be prefixed by '_'
 --]]
 
-_AFT.setAfterEach( function()
+_AFT.setBeforeAll(function()
+    local can = io.open("/sys/class/net/can0")
+    if can == nil then
+        print("# You do not have 'can0' device set. Please run the following command:\n### sudo modprobe vcan; sudo ip link add can0 type vcan; sudo ip link set can0 up ")
+        return -1
+    end
+    return 0
+end)
+
+_AFT.setAfterEach(function()
     os.execute("pkill canplayer")
     os.execute("pkill linuxcan-canpla")
+end)
+
+_AFT.setAfterAll( function()
+    os.execute("pkill canplayer")
+    os.execute("pkill linuxcan-canpla")
+    return 0
 end)
 
 _AFT.describe("Filter_Test_01/Step_1", function()
@@ -33,6 +48,7 @@ _AFT.describe("Filter_Test_01/Step_1", function()
 
     _AFT.assertVerbStatusSuccess(api ,"subscribe", { event = evt, filter =  { min = 30, max = 100}})
     os.execute("./var/replay_launcher.sh ./var/testFilter01filteredOut.canreplay");
+
     _AFT.assertEvtNotReceived(api .. "/" ..evt, 1000000)
 end)
 
@@ -41,16 +57,17 @@ _AFT.describe("Filter_Test_01/Step_2", function()
     local evt = "messages.engine.speed"
 
     _AFT.addEventToMonitor(api .. "/" ..evt, function(eventname,data)
-        _AFT.assertEquals(data.name,evt)
-        _AFT.assertIsTrue(data.value > min and data.value < max )
+        _AFT.assertEquals(eventname, api.."/"..evt)
+        _AFT.assertIsTrue(data.value > 30 and data.value < 100)
     end)
+
     _AFT.assertVerbStatusSuccess(api ,"subscribe", { event = evt, filter =  {min = 30, max = 100}})
     os.execute("./var/replay_launcher.sh ./var/testFilter01pass.canreplay");
 
     _AFT.assertEvtReceived(api .. "/" ..evt, 1000000)
-    _AFT.assertVerbStatusSuccess(api,"unsubscribe", { event = evt })
+    _AFT.assertVerbStatusSuccess(api,"unsubscribe", { event = evt, filter =  {min = 30, max = 100} })
 end)
-
+--[[
 _AFT.describe("Filter_Test_01/Step_3", function()
     local api = "low-can"
     local evt = "messages.engine.speed"
@@ -58,19 +75,17 @@ _AFT.describe("Filter_Test_01/Step_3", function()
     _AFT.enableEventHistory() -- You will need this to check for time intervals between two events
 
     _AFT.addEventToMonitor(api .. "/" ..evt, function(eventname,data,dataH)
-        local first = dataH[1];
-        local second = dataH[2];
-
-        _AFT.assertEquals(first.name,evt)
-        _AFT.assertIsTrue(first.value > 30 and first.value < 100 )
-        _AFT.assertEquals(second.name,evt)
-        _AFT.assertIsTrue(second.value > 30 and second.value < 100 )
-        assertIsTrue(second.timestamp-first.timestamp > 1000000000) --This is in nano-seconds as it fetchs the low-can timestamp from the data field
+        _AFT.assertEquals(dataH[1].name,evt)
+        _AFT.assertIsTrue(dataH[1].value > 30 and dataH[1].value < 100 )
+        _AFT.assertEquals(dataH[2].name,evt)
+        _AFT.assertIsTrue(dataH[2].value > 30 and dataH[2].value < 100 )
+        _AFT.assertIsTrue(dataH[2].timestamp-dataH[1].timestamp > 1000000000) --This is in nano-seconds as it fetchs the low-can timestamp from the data field
     end)
+
     _AFT.assertVerbStatusSuccess(api ,"subscribe", { event = evt, filter =  { frequency = 1 , min = 30, max = 100}})
     os.execute("./var/replay_launcher.sh ./var/testFilter01pass.canreplay");
 
-    _AFT.assertEvtGrpReceived({api .. "/" ..evt,api .. "/" ..evt}, 10000000)
-    _AFT.assertVerbStatusSuccess(api,"unsubscribe", { event = evt })
+    _AFT.assertEvtGrpReceived({[api .."/"..evt]= 2}, 5000000)
+    _AFT.assertVerbStatusSuccess(api,"unsubscribe", { event = evt, filter =  { frequency = 1 , min = 30, max = 100}})
 end)
-
+]]

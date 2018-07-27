@@ -21,6 +21,7 @@ ${BINDER} --name="${PROCNAME}" \
 --workdir="${BUILDDIR}/package" \
 --binding="lib/afb-low-can.so" \
 --binding="$AFBTEST" \
+--call="afTest/launch_all_tests:{}" \
 -vvv > ${LOGPIPE} 2>&1 &
 
 while read -r line
@@ -28,4 +29,6 @@ do
 	[ "$(echo "${line}" | grep 'NOTICE: Browser URL=')" ] && break
 done < ${LOGPIPE}
 
-${CLIENT} ws://localhost:${PORT}/api?token=${TOKEN} afTest launch_all_tests
+${CLIENT} ws://localhost:${PORT}/api?token=${TOKEN} afTest exit
+
+rm -f ${LOGPIPE}
