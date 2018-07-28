@@ -24,7 +24,6 @@
 #include <memory>
 #include <systemd/sd-event.h>
 
-#define AFB_BINDING_VERSION 2
 #include <afb/afb-binding>
 
 class low_can_subscription_t;

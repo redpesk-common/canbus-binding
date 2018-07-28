@@ -26,47 +26,6 @@
 
 std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
 
-bool active_diagnostic_request_t::operator==(const active_diagnostic_request_t& b)
-{
-	return (bus_ == b.bus_ && id_ == b.id_ && handle_ == b.handle_);
-}
-
-active_diagnostic_request_t& active_diagnostic_request_t::operator=(const active_diagnostic_request_t& adr)
-{
-	if (this != &adr)
-	{
-		bus_ = adr.bus_;
-		id_ = adr.id_;
-		handle_ = adr.handle_;
-		name_ = adr.name_;
-		decoder_ = adr.decoder_;
-		callback_ = adr.callback_;
-		recurring_ = adr.recurring_;
-		permanent_ = adr.permanent_;
-		wait_for_multiple_responses_ = adr.wait_for_multiple_responses_;
-		frequency_clock_ = adr.frequency_clock_;
-		timeout_clock_ = adr.timeout_clock_;
-		socket_ = adr.socket_;
-	}
-
-	return *this;
-}
-
-active_diagnostic_request_t::active_diagnostic_request_t()
-	: bus_{nullptr},
-	  id_{0},
-	  handle_{nullptr},
-	  name_{""},
-	  decoder_{nullptr},
-	  callback_{nullptr},
-	  recurring_{false},
-	  permanent_{false},
-	  wait_for_multiple_responses_{false},
-	  frequency_clock_{frequency_clock_t()},
-	  timeout_clock_{frequency_clock_t()},
-	  socket_{}
-{}
-
 active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus, uint32_t id,
 		const std::string& name,
 		bool wait_for_multiple_responses,

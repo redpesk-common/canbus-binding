@@ -86,10 +86,6 @@ private:
 									  ///< this request was sent.
 	utils::socketcan_bcm_t socket_; ///< socket_ - A BCM socket setup to send cyclic message to CAN ID 7DF.
 public:
-	bool operator==(const active_diagnostic_request_t& b);
-	active_diagnostic_request_t& operator=(const active_diagnostic_request_t& adr);
-
-	active_diagnostic_request_t();
 	active_diagnostic_request_t(active_diagnostic_request_t&&) = default;
 	active_diagnostic_request_t(const std::string& bus, uint32_t id,
 		const std::string& name, bool wait_for_multiple_responses,

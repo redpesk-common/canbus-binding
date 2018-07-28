@@ -119,6 +119,8 @@ set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ languag
 # -D_FORTIFY_SOURCE=2
 # CACHE STRING "Compilation flags for RELEASE build type.")
 
+add_definitions(-DAFB_BINDING_VERSION=2)
+
 # Optional location for config.xml.in
 # -----------------------------------
 #set(WIDGET_ICON "\"${CMAKE_SOURCE_DIR}conf.d/wgt/${PROJECT_ICON}\"" CACHE PATH "Path to the widget icon")
