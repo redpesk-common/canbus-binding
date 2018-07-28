@@ -18,3 +18,4 @@ packaging/
 CAN-binder/package/
 compile_commands.json
 .stfolder
+**/low-can-apidef.h
