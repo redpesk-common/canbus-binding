@@ -18,10 +18,11 @@ ${BINDER} --name="${PROCNAME}" \
 --roothttp=. \
 --tracereq=common \
 --token=${TOKEN} \
---workdir="${BUILDDIR}/package" \
---binding="lib/afb-low-can.so" \
+--workdir="${BUILDDIR}/package-test" \
+--binding="../package/lib/afb-low-can.so" \
 --binding="$AFBTEST" \
---call="afTest/launch_all_tests:{}" \
+-vvv \
+--call="aft-low-can/launch_all_tests:{}" \
 -vvv > ${LOGPIPE} 2>&1 &
 
 while read -r line
@@ -29,6 +30,6 @@ do
 	[ "$(echo "${line}" | grep 'NOTICE: Browser URL=')" ] && break
 done < ${LOGPIPE}
 
-${CLIENT} ws://localhost:${PORT}/api?token=${TOKEN} afTest exit
+${CLIENT} ws://localhost:${PORT}/api?token=${TOKEN} aft-low-can exit
 
 rm -f ${LOGPIPE}

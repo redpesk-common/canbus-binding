@@ -4,7 +4,7 @@
     "metadata": {
         "uid": "Test",
         "version": "1.0",
-        "api": "afTest",
+        "api": "aft-low-can",
         "info": "AFB-test binding configuration file to test low-can api.",
         "require": [
             "low-can"
