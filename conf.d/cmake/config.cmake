@@ -27,6 +27,7 @@ set(PROJECT_AUTHOR "Romain Forlot")
 set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
 set(PROJECT_LICENSE "APL2.0")
 set(PROJECT_LANGUAGES "C;CXX")
+set(API_NAME "low-can")
 
 # Where are stored default templates files from submodule or subtree app-templates in your project tree
 # relative to the root project directory
