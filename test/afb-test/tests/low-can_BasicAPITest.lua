@@ -58,13 +58,12 @@ _AFT.describe("Diagnostic_engine_speed_simulation", function()
         _AFT.assertIsTrue(data.name == "diagnostic_messages.engine.speed")
     end)
 
-    local ret = os.execute("./var/replay_launcher.sh ./var/test1.canreplay")
+    local ret = os.execute("bash ".._AFT.bindingRootDir.."/var/replay_launcher.sh ".._AFT.bindingRootDir.."/var/test1.canreplay")
     _AFT.assertIsTrue(ret)
 
     _AFT.assertEvtReceived(api .."/diagnostic_messages", 1000000)
 
     _AFT.assertVerbStatusSuccess("low-can","unsubscribe", { event = evt })
-
 end)
 
 _AFT.describe("Subscribe_all", function()
@@ -77,7 +76,7 @@ _AFT.describe("Subscribe_all", function()
 
     _AFT.assertVerbStatusSuccess(api,"subscribe", { event = "*" })
 
-    local ret = os.execute("./var/replay_launcher.sh ./var/test2-3.canreplay")
+    local ret = os.execute("bash ".._AFT.bindingRootDir.."/var/replay_launcher.sh ".._AFT.bindingRootDir.."/var/test2-3.canreplay")
     _AFT.assertIsTrue(ret)
 
     _AFT.assertEvtReceived(api .."/".. evt, 5000000);

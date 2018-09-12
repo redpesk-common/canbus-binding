@@ -47,7 +47,7 @@ _AFT.describe("Filter_Test_01/Step_1", function()
     end)
 
     _AFT.assertVerbStatusSuccess(api ,"subscribe", { event = evt, filter =  { min = 30, max = 100}})
-    os.execute("./var/replay_launcher.sh ./var/testFilter01filteredOut.canreplay");
+    os.execute("bash ".._AFT.bindingRootDir.."/var/replay_launcher.sh ".._AFT.bindingRootDir.."/var/testFilter01filteredOut.canreplay");
 
     _AFT.assertEvtNotReceived(api .. "/" ..evt, 1000000)
 end)
@@ -62,7 +62,7 @@ _AFT.describe("Filter_Test_01/Step_2", function()
     end)
 
     _AFT.assertVerbStatusSuccess(api ,"subscribe", { event = evt, filter =  {min = 30, max = 100}})
-    os.execute("./var/replay_launcher.sh ./var/testFilter01pass.canreplay");
+    os.execute("bash ".._AFT.bindingRootDir.."/var/replay_launcher.sh ".._AFT.bindingRootDir.."/var/testFilter01pass.canreplay");
 
     _AFT.assertEvtReceived(api .. "/" ..evt, 1000000)
     _AFT.assertVerbStatusSuccess(api,"unsubscribe", { event = evt, filter =  {min = 30, max = 100} })
@@ -83,7 +83,7 @@ _AFT.describe("Filter_Test_01/Step_3", function()
     end)
 
     _AFT.assertVerbStatusSuccess(api ,"subscribe", { event = evt, filter =  { frequency = 1 , min = 30, max = 100}})
-    os.execute("./var/replay_launcher.sh ./var/testFilter01pass.canreplay");
+    os.execute("bash ".._AFT.bindingRootDir.."/var/replay_launcher.sh ".._AFT.bindingRootDir.."/var/testFilter01pass.canreplay");
 
     _AFT.assertEvtGrpReceived({[api .."/"..evt]= 2}, 5000000)
     _AFT.assertVerbStatusSuccess(api,"unsubscribe", { event = evt, filter =  { frequency = 1 , min = 30, max = 100}})
