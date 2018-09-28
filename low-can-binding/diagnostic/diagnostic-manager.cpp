@@ -102,27 +102,26 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 
 	// Make sure that socket has been opened.
 	if(! tx_socket)
-		tx_socket.open(
-			dm.get_bus_device_name());
+		tx_socket.open(dm.get_bus_device_name());
 
-	struct utils::simple_bcm_msg bcm_msg;
-	struct can_frame cfd;
-
-	memset(&cfd, 0, sizeof(cfd));
-	memset(&bcm_msg.msg_head, 0, sizeof(bcm_msg.msg_head));
+	struct utils::bcm_msg bcm_msg;
+	struct can_frame cf;
 
 	struct timeval freq = current_adr->get_frequency_clock().get_timeval_from_period();
 
 	bcm_msg.msg_head.opcode  = TX_SETUP;
 	bcm_msg.msg_head.can_id  = arbitration_id;
 	bcm_msg.msg_head.flags = SETTIMER|STARTTIMER|TX_CP_CAN_ID;
+	bcm_msg.msg_head.count = 0;
 	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec;
 	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
 	bcm_msg.msg_head.nframes = 1;
-	cfd.can_dlc = size;
-	::memcpy(cfd.data, data, size);
+	cf.can_dlc = size;
 
-	bcm_msg.frames = cfd;
+	::memset(cf.data, 0, sizeof(cf.data));
+	::memcpy(cf.data, data, size);
+
+	bcm_msg.frames[0] = cf;
 
 	tx_socket << bcm_msg;
 	if(tx_socket)

@@ -28,14 +28,15 @@
 /// @param[out] data - The destination buffer.
 /// @param[in] length - The length of the destination buffer.
 ///
-/// @return Returns a can_frame struct initialized and ready to be send.
-const can_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& signal, uint64_t value)
+/// @return Returns a canfd_frame struct initialized and ready to be send.
+const canfd_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& signal, uint64_t value)
 {
-	struct can_frame cf;
+	struct canfd_frame cf;
 	::memset(&cf, 0, sizeof(cf));
 
 	cf.can_id = signal->get_message()->get_id();
-	cf.can_dlc = CAN_MAX_DLEN;
+	cf.len = signal->get_message()->is_fd() ?
+		 CANFD_MAX_DLEN : CAN_MAX_DLEN;
 
 	signal->set_last_value((float)value);
 
@@ -48,7 +49,7 @@ const can_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& sign
 					sig->get_factor(),
 					sig->get_offset(),
 					cf.data,
-					CAN_MAX_DLEN);
+					cf.len);
 	}
 
 	return cf;

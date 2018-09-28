@@ -43,6 +43,7 @@ private:
 	can_message_set_t* parent_; ///< parent_ - Pointer to the CAN message set holding this CAN message definition */
 	std::string bus_; ///< bus_ - Address of CAN bus device. */
 	uint32_t id_; ///< id_ - The ID of the message.*/
+	bool is_fd_; /*!< uses_fd_ - Flags to enable an FD CAN message communication*/
 	can_message_format_t format_; ///< format_ - the format of the message's ID.*/
 	frequency_clock_t frequency_clock_; ///<  clock_ - an optional frequency clock to control the output of this
 							///      message, if sent raw, or simply to mark the max frequency for custom
@@ -59,11 +60,18 @@ public:
 	can_message_definition_t(const std::string bus);
 	can_message_definition_t(const std::string bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed);
 	can_message_definition_t(const std::string bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed);
-	can_message_definition_t(const std::string bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed, const std::vector<std::shared_ptr<can_signal_t> >& can_signals);
+	can_message_definition_t(const std::string bus,
+				 uint32_t id,
+				 bool is_fd,
+				 can_message_format_t format,
+				 frequency_clock_t frequency_clock,
+				 bool force_send_changed,
+				 const std::vector<std::shared_ptr<can_signal_t> >& can_signals);
 
 	const std::string get_bus_name() const;
 	const std::string get_bus_device_name() const;
 	uint32_t get_id() const;
+	bool is_fd() const;
 	std::vector<std::shared_ptr<can_signal_t> >& get_can_signals();
 
 	void set_parent(can_message_set_t* parent);

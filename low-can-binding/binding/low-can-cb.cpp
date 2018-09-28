@@ -407,7 +407,7 @@ void unsubscribe(afb_req_t request)
 	do_subscribe_unsubscribe(request, false);
 }
 
-static int send_frame(const std::string& bus_name, const struct can_frame& cf)
+static int send_frame(struct canfd_frame& cfd, const std::string& bus_name)
 {
 	if(bus_name.empty()) {
 		return -1;
@@ -418,57 +418,54 @@ static int send_frame(const std::string& bus_name, const struct can_frame& cf)
 	if( cd.count(bus_name) == 0)
 		{cd[bus_name] = std::make_shared<low_can_socket_t>(low_can_socket_t());}
 
-	return cd[bus_name]->tx_send(cf, bus_name);
+	return cd[bus_name]->tx_send(cfd, bus_name);
 }
 
 static void write_raw_frame(afb_req_t request, const std::string& bus_name, json_object *json_value)
 {
-	struct can_frame cf;
-	struct json_object *json_can_data = nullptr;
+	struct canfd_frame cfd;
+	struct json_object *can_data = nullptr;
 
-	::memset(&cf, 0, sizeof(cf));
+	::memset(&cfd, 0, sizeof(cfd));
 
-	if(! wrap_json_unpack(json_value, "{sF, sF, so !}",
-			      "can_id", &cf.can_id,
-			      "can_dlc", &cf.can_dlc,
-			      "can_data", &json_can_data))
+	if(wrap_json_unpack(json_value, "{si, si, so !}",
+			      "can_id", &cfd.can_id,
+			      "can_dlc", &cfd.len,
+			      "can_data", &can_data))
 	{
-		struct json_object *one_can_data;
-		size_t n = json_object_array_length(json_can_data);
-
-		if(n <= 8 && n > 0)
-		{
-			for (int i = 0 ; i < n ; i++)
-			{
-				one_can_data = json_object_array_get_idx(json_can_data, i);
-				cf.data[i] = json_object_get_type(one_can_data) == json_type_int ? (uint8_t)json_object_get_int(one_can_data) : 0;
-			}
-		}
-		else
-		{
-			afb_req_fail(request, "Error", "Data array must hold 1 to 8 values.");
-			return;
-		}
-
-		if(! send_frame(application_t::instance().get_can_bus_manager().get_can_device_name(bus_name), cf))
-			afb_req_success(request, nullptr, "Message correctly sent");
-		else
-			afb_req_fail(request, "Error", "sending the message. See the log for more details.");
-
+		afb_req_fail(request, "Invalid", "Frame object malformed");
 		return;
 	}
 
-	afb_req_fail(request, "Error", "Frame object malformed (must be \n \"frame\": {\"can_id\": int, \"can_dlc\": int, \"can_data\": [ int, int , int, int ,int , int ,int ,int]}");
+	if(cfd.len <= 8 && cfd.len > 0)
+	{
+		for (int i = 0 ; i < cfd.len ; i++)
+		{
+			struct json_object *one_can_data = json_object_array_get_idx(can_data, i);
+			cfd.data[i] = (json_object_is_type(one_can_data, json_type_int)) ?
+					(uint8_t)json_object_get_int(one_can_data) : 0;
+		}
+	}
+	else
+	{
+		afb_req_fail(request, "Invalid", "Data array must hold 1 to 8 values.");
+		return;
+	}
+
+	if(! send_frame(cfd, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name)))
+		afb_req_success(request, nullptr, "Message correctly sent");
+	else
+		afb_req_fail(request, "Error", "sending the message. See the log for more details.");
 }
 
 static void write_signal(afb_req_t request, const std::string& name, json_object *json_value)
 {
-	struct can_frame cf;
+	struct canfd_frame cfd;
 	struct utils::signals_found sf;
 	signal_encoder encoder = nullptr;
 	bool send = true;
 
-	::memset(&cf, 0, sizeof(cf));
+	::memset(&cfd, 0, sizeof(cfd));
 
 	openxc_DynamicField search_key = build_DynamicField(name);
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
@@ -491,8 +488,8 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 			encoder(*sig, dynafield_value, &send) :
 			encoder_t::encode_DynamicField(*sig, dynafield_value, &send);
 
-	if(! send_frame(sig->get_message()->get_bus_device_name(), encoder_t::build_frame(sig, value)) &&
-		send)
+	cfd = encoder_t::build_frame(sig, value);
+	if(! send_frame(cfd, sig->get_message()->get_bus_device_name()) && send)
 		afb_req_success(request, nullptr, "Message correctly sent");
 	else
 		afb_req_fail(request, "Error", "Sending the message. See the log for more details.");

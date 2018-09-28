@@ -24,7 +24,7 @@
 class encoder_t
 {
 public:
-	static const can_frame build_frame(const std::shared_ptr<can_signal_t>& signal, uint64_t value);
+	static const canfd_frame build_frame(const std::shared_ptr<can_signal_t>& signal, uint64_t value);
 	static uint64_t encode_state(const can_signal_t& signal, const std::string& value, bool* send);
 	static uint64_t encode_boolean(const can_signal_t& signal, bool value, bool* send);
 	static uint64_t encode_number(const can_signal_t& signal, float value, bool* send);

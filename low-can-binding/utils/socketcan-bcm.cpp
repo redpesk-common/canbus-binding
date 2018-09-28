@@ -72,7 +72,7 @@ namespace utils
 	/// then CAN message will be zeroed and must be handled later.
 	socketcan_bcm_t& operator>>(socketcan_bcm_t& s, can_message_t& cm)
 	{
-		struct utils::simple_bcm_msg msg;
+		struct utils::bcm_msg msg;
 
 		::memset(&msg, 0, sizeof(msg));
 		const struct sockaddr_can& addr = s.get_tx_address();
@@ -85,17 +85,30 @@ namespace utils
 		long unsigned int frame_size = nbytes-sizeof(struct bcm_msg_head);
 
 		AFB_DEBUG("Data available: %li bytes read. BCM head, opcode: %i, can_id: %i, nframes: %i", frame_size, msg.msg_head.opcode, msg.msg_head.can_id, msg.msg_head.nframes);
-		AFB_DEBUG("read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, msg.msg_head.can_id, msg.frames.can_dlc,
-			msg.frames.data[0], msg.frames.data[1], msg.frames.data[2], msg.frames.data[3], msg.frames.data[4], msg.frames.data[5], msg.frames.data[6], msg.frames.data[7]);
 
 		struct timeval tv;
 		ioctl(s.socket(), SIOCGSTAMP, &tv);
 		uint64_t timestamp = 1000000 * tv.tv_sec + tv.tv_usec;
-		cm = ::can_message_t::convert_from_frame(msg.frames ,
-				frame_size,
-				timestamp);
+		cm = can_message_t::convert_from_frame(msg.fd_frames[0] , frame_size, timestamp);
 		cm.set_sub_id((int)s.socket());
 
+		return s;
+	}
+
+	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const std::vector<struct utils::bcm_msg>& vobj)
+	{
+		for(const auto& obj : vobj)
+			s << obj;
+		return s;
+	}
+
+	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const struct utils::bcm_msg& obj)
+	{
+		size_t size = (obj.msg_head.flags & CAN_FD_FRAME) ?
+			      (size_t)((char*)&obj.fd_frames[obj.msg_head.nframes] - (char*)&obj):
+			      (size_t)((char*)&obj.frames[obj.msg_head.nframes] - (char*)&obj);
+		if (::sendto(s.socket(), &obj, size, 0, (const struct sockaddr*)&s.get_tx_address(), sizeof(s.get_tx_address())) < 0)
+			AFB_API_ERROR(afbBindingV3root, "Error sending : %i %s", errno, ::strerror(errno));
 		return s;
 	}
 }

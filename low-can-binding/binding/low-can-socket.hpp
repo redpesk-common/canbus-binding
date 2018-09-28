@@ -25,6 +25,8 @@
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/socketcan-bcm.hpp"
 
+#define OBDII_MAX_SIMULTANEOUS_RESPONSES 8
+
 /// @brief Filtering values. Theses values have to be tested in
 /// can_bus_t::apply_filter method.
 struct event_filter_t
@@ -81,14 +83,14 @@ public:
 	void set_min(float min);
 	void set_max(float max);
 
-	struct utils::simple_bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0,0}, const struct timeval& frequency_thinning = {0,0}) const;
-	void add_bcm_frame(const struct can_frame& cfd, struct utils::simple_bcm_msg& bcm_msg) const;
+	struct utils::bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0,0}, const struct timeval& frequency_thinning = {0,0}) const;
+	void add_one_bcm_frame(struct canfd_frame& cfd, struct utils::bcm_msg& bcm_msg) const;
 
 	int open_socket(const std::string& bus_name = "");
 
 	int create_rx_filter(std::shared_ptr<can_signal_t> sig);
 	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
-	int create_rx_filter(utils::simple_bcm_msg& bcm_msg);
+	int create_rx_filter(utils::bcm_msg& bcm_msg);
 
-	int tx_send(const struct can_frame& cf, const std::string& bus_name);
+	int tx_send(struct canfd_frame& cfd, const std::string& bus_name);
 };

@@ -73,8 +73,4 @@ public:
 	bool is_correct_to_send();
 
 	static can_message_t convert_from_frame(const canfd_frame& frame, size_t nbytes, uint64_t timestamp);
-	static can_message_t convert_from_frame(const can_frame& frame, size_t nbytes, uint64_t timestamp);
-
-	struct canfd_frame convert_to_canfd_frame();
-	struct can_frame convert_to_can_frame();
 };

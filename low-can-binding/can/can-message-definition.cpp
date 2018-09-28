@@ -54,6 +54,7 @@ can_message_definition_t::can_message_definition_t(
 can_message_definition_t::can_message_definition_t(
 	const std::string bus,
 	uint32_t id,
+	bool is_fd,
 	can_message_format_t format,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed,
@@ -61,6 +62,7 @@ can_message_definition_t::can_message_definition_t(
 	:  parent_{nullptr},
 	bus_{bus},
 	id_{id},
+	is_fd_(is_fd),
 	format_{format},
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
@@ -82,6 +84,11 @@ const std::string can_message_definition_t::get_bus_device_name() const
 uint32_t can_message_definition_t::get_id() const
 {
 	return id_;
+}
+
+bool can_message_definition_t::is_fd() const
+{
+	return is_fd_;
 }
 
 std::vector<std::shared_ptr<can_signal_t> >& can_message_definition_t::get_can_signals()

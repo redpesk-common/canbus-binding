@@ -20,24 +20,20 @@
 #include "socketcan.hpp"
 #include "../can/can-message.hpp"
 
+#define MAX_BCM_CAN_FRAMES 257
+
 namespace utils
 {
-	struct simple_bcm_msg
+	struct bcm_msg
 	{
 		struct bcm_msg_head msg_head;
-		struct can_frame frames;
+		union {
+			struct canfd_frame fd_frames[MAX_BCM_CAN_FRAMES];
+			struct can_frame frames[MAX_BCM_CAN_FRAMES];
+		};
 	};
 
-#ifdef KERNEL_MINIMAL_VERSION_OK
-	struct canfd_bcm_msg
-	{
-		struct bcm_msg_head msg_head;
-		struct canfd_frame frames;
-		canfd_bcm_msg() { msg_head.flags |= CAN_FD_FRAME; }
-	};
-#endif
-
-	/// @brief derivated socketcan class specialized for BCM CAN socket.
+	/// @brief derivated socketcan class specialized for BCM CAN socket.make_bcm_head
 	class socketcan_bcm_t : public socketcan_t
 	{
 	public:
@@ -50,6 +46,7 @@ namespace utils
 	};
 
 	socketcan_bcm_t& operator>>(socketcan_bcm_t& s, can_message_t& cm);
-//	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const struct simple_bcm_msg& obj);
-//	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const struct canfd_bcm_msg& obj);
+
+	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const std::vector<struct bcm_msg>& obj);
+	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const struct bcm_msg& obj);
 }

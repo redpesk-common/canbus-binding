@@ -185,11 +185,11 @@ int low_can_socket_t::open_socket(const std::string& bus_name)
 
 /// @brief Builds a BCM message head but doesn't set can_frame.
 ///
-/// @returns a simple_bcm_msg with the msg_head parts set and can_frame
+/// @returns a bcm_msg with the msg_head parts set and can_frame
 /// zeroed.
-struct utils::simple_bcm_msg low_can_socket_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning) const
+struct utils::bcm_msg low_can_socket_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning) const
 {
-	struct utils::simple_bcm_msg bcm_msg;
+	struct utils::bcm_msg bcm_msg;
 	::memset(&bcm_msg, 0, sizeof(bcm_msg));
 
 	bcm_msg.msg_head.opcode  = opcode;
@@ -203,13 +203,23 @@ struct utils::simple_bcm_msg low_can_socket_t::make_bcm_head(uint32_t opcode, ui
 	return bcm_msg;
 }
 
-/// @brief Take an existing simple_bcm_msg struct and add a can_frame.
+/// @brief Take an existing bcm_msg struct and add a can_frame.
 /// Currently only 1 uniq can_frame can be added, it's not possible to build
 /// a multiplexed message with several can_frame.
-void low_can_socket_t::add_bcm_frame(const struct can_frame& cf, struct utils::simple_bcm_msg& bcm_msg) const
+void low_can_socket_t::add_one_bcm_frame(struct canfd_frame& cfd, struct utils::bcm_msg& bcm_msg) const
 {
+	struct can_frame cf;
+
+	if (bcm_msg.msg_head.flags & CAN_FD_FRAME)
+		bcm_msg.fd_frames[bcm_msg.msg_head.nframes] = cfd;
+	else
+	{
+		cf.can_id = cfd.can_id;
+		cf.can_dlc = cfd.len;
+		::memcpy(&cf.data, cfd.data, cfd.len);
+		bcm_msg.frames[bcm_msg.msg_head.nframes] = cf;
+	}
 	bcm_msg.msg_head.nframes++;
-	bcm_msg.frames = cf;
 }
 
 /// @brief Create a RX_SETUP receive job to be used by the BCM socket for a CAN signal
@@ -218,26 +228,37 @@ void low_can_socket_t::add_bcm_frame(const struct can_frame& cf, struct utils::s
 /// @return 0 if ok else -1
 int low_can_socket_t::create_rx_filter(std::shared_ptr<can_signal_t> sig)
 {
+	uint32_t flags;
+	float val;
+	struct timeval freq, timeout = {0, 0};
+	struct canfd_frame cfd;
 	can_signal_= sig;
 
-	struct can_frame cfd;
-	memset(&cfd, 0, sizeof(cfd));
+	if (sig->get_message()->is_fd())
+	{
+		flags = SETTIMER|RX_NO_AUTOTIMER|CAN_FD_FRAME;
+		cfd.len = CANFD_MAX_DLEN;
+	}
+	else
+	{
+		flags = SETTIMER|RX_NO_AUTOTIMER;
+		cfd.len = CAN_MAX_DLEN;
+	}
+	val = (float)(1 << can_signal_->get_bit_size()) - 1;
+	if(! bitfield_encode_float(val,
+				   can_signal_->get_bit_position(),
+				   can_signal_->get_bit_size(),
+				   1,
+				   can_signal_->get_offset(),
+				   cfd.data,
+				   cfd.len))
+		return -1;
 
-	float val = (float)(1 << can_signal_->get_bit_size()) - 1;
-	bitfield_encode_float(val,
-							can_signal_->get_bit_position(),
-							can_signal_->get_bit_size(),
-							can_signal_->get_factor(),
-							can_signal_->get_offset(),
-							cfd.data,
-							CAN_MAX_DLEN);
-
-	struct timeval freq, timeout = {0, 0};
 	frequency_clock_t f = event_filter_.frequency == 0 ? can_signal_->get_frequency() : frequency_clock_t(event_filter_.frequency);
 	freq = f.get_timeval_from_period();
 
-	utils::simple_bcm_msg bcm_msg = make_bcm_head(RX_SETUP, can_signal_->get_message()->get_id(), SETTIMER|RX_NO_AUTOTIMER, timeout, freq);
-	add_bcm_frame(cfd, bcm_msg);
+	utils::bcm_msg bcm_msg = make_bcm_head(RX_SETUP, can_signal_->get_message()->get_id(), flags, timeout, freq);
+	add_one_bcm_frame(cfd, bcm_msg);
 
 	return create_rx_filter(bcm_msg);
 }
@@ -254,19 +275,19 @@ int low_can_socket_t::create_rx_filter(std::shared_ptr<diagnostic_message_t> sig
 	//struct timeval timeout = frequency_clock_t(10).get_timeval_from_period();
 	struct timeval timeout = {0,0};
 
-	utils::simple_bcm_msg bcm_msg =  make_bcm_head(RX_SETUP, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER|RX_NO_AUTOTIMER|RX_FILTER_ID, timeout, freq);
+	utils::bcm_msg bcm_msg =  make_bcm_head(RX_SETUP, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER|RX_NO_AUTOTIMER|RX_FILTER_ID, timeout, freq);
 	return create_rx_filter(bcm_msg);
 }
 
 /// @brief Create a RX_SETUP receive job used by the BCM socket directly from
-/// a simple_bcm_msg. The method should not be used directly but rather through the
+/// a bcm_msg. The method should not be used directly but rather through the
 /// two previous method with can_signal_t or diagnostic_message_t object.
 ///
 /// If the CAN arbitration ID is the OBD2 functional broadcast id the subscribed
 /// to the 8 classics OBD2 functional response ID
 ///
 /// @return 0 if ok else -1
-int low_can_socket_t::create_rx_filter(utils::simple_bcm_msg& bcm_msg)
+int low_can_socket_t::create_rx_filter(utils::bcm_msg& bcm_msg)
 {
 	// Make sure that socket is opened.
 	if(open_socket() < 0)
@@ -299,12 +320,10 @@ int low_can_socket_t::create_rx_filter(utils::simple_bcm_msg& bcm_msg)
 /// send a message
 ///
 /// @return 0 if ok else -1
-int low_can_socket_t::tx_send(const struct can_frame& cf, const std::string& bus_name)
+int low_can_socket_t::tx_send(struct canfd_frame& cfd, const std::string& bus_name)
 {
-	can_signal_ = nullptr;
-
-	utils::simple_bcm_msg bcm_msg =  make_bcm_head(TX_SEND);
-	add_bcm_frame(cf, bcm_msg);
+	utils::bcm_msg bcm_msg =  make_bcm_head(TX_SEND, cfd.can_id);
+	add_one_bcm_frame(cfd, bcm_msg);
 
 	if(open_socket(bus_name) < 0)
 		{return -1;}
