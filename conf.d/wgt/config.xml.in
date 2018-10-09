@@ -17,7 +17,7 @@
 		<param name="low-can" value="ws" />
 	</feature>
 
-	<feature name="urn:AGL:widget:required-api">
+	<feature name="urn:AGL:widget:required-binding">
 		<param name="lib/afb-low-can.so" value="local" />
 	</feature>
 </widget>
