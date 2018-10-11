@@ -18,7 +18,7 @@
 
 # Project Info
 # ------------------
-set(PROJECT_NAME low-can-service)
+set(PROJECT_NAME agl-service-can-low-level)
 set(PROJECT_PRETTY_NAME "Low level CAN binding")
 set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
 set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/apps/agl-service-can-low-level")
