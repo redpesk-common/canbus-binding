@@ -20,12 +20,12 @@
 #include "application.hpp"
 #include "canutil/write.h"
 
-struct afb_event& low_can_subscription_t::get_event()
+afb_event_t low_can_subscription_t::get_event()
 {
 	return event_;
 }
 
-void low_can_subscription_t::set_event(struct afb_event event)
+void low_can_subscription_t::set_event(afb_event_t event)
 {
 	event_ = event;
 }

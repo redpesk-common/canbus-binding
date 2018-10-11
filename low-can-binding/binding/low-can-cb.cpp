@@ -109,13 +109,13 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 ///
 ///*******************************************************************************/
 
-static int make_subscription_unsubscription(struct afb_req request,
-											std::shared_ptr<low_can_subscription_t>& can_subscription,
-											std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
-											bool subscribe)
+static int make_subscription_unsubscription(afb_req_t request,
+					    std::shared_ptr<low_can_subscription_t>& can_subscription,
+					    std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
+					    bool subscribe)
 {
-	/* Make the subscription or unsubscription to the event (if request contents are not null) */
-	if(request.itf && request.closure &&
+	/* Make the subscription or unsubscription to the event (if request is not null) */
+	if(request &&
 	   ((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[can_subscription->get_index()]->get_event())) < 0)
 	{
 		AFB_ERROR("Operation goes wrong for signal: %s", can_subscription->get_name().c_str());
@@ -125,7 +125,7 @@ static int make_subscription_unsubscription(struct afb_req request,
 }
 
 static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subscription,
-							std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+			       std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int sub_index = can_subscription->get_index();
 	can_subscription->set_event(afb_daemon_make_event(can_subscription->get_name().c_str()));
@@ -141,10 +141,10 @@ static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subs
 /// @brief This will determine if an event handle needs to be created and checks if
 /// we got a valid afb_event to get subscribe or unsubscribe. After that launch the subscription or unsubscription
 /// against the application framework using that event handle.
-static int subscribe_unsubscribe_signal(struct afb_req request,
-										bool subscribe,
-										std::shared_ptr<low_can_subscription_t>& can_subscription,
-										std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+static int subscribe_unsubscribe_signal(afb_req_t request,
+					bool subscribe,
+					std::shared_ptr<low_can_subscription_t>& can_subscription,
+					std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int ret = -1;
 	int sub_index = can_subscription->get_index();
@@ -161,7 +161,6 @@ static int subscribe_unsubscribe_signal(struct afb_req request,
 	else
 	{
 		/* Event doesn't exist , so let's create it */
-		can_subscription->set_event({nullptr, nullptr});
 		s[sub_index] = can_subscription;
 		ret = create_event_handle(can_subscription, s);
 	}
@@ -184,12 +183,12 @@ static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscr
 			can_subscription.get()));
 }
 
-static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request,
-													bool subscribe,
-													std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages,
-													struct event_filter_t& event_filter,
-													std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
-													bool perm_rec_diag_req)
+static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
+						     bool subscribe,
+						     std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages,
+						     struct event_filter_t& event_filter,
+						     std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
+						     bool perm_rec_diag_req)
 {
 	int rets = 0;
 	application_t& app = application_t::instance();
@@ -245,11 +244,11 @@ static int subscribe_unsubscribe_diagnostic_messages(struct afb_req request,
 	return rets;
 }
 
-static int subscribe_unsubscribe_can_signals(struct afb_req request,
-											bool subscribe,
-											std::vector<std::shared_ptr<can_signal_t> > can_signals,
-											struct event_filter_t& event_filter,
-											std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+static int subscribe_unsubscribe_can_signals(afb_req_t request,
+					     bool subscribe,
+					     std::vector<std::shared_ptr<can_signal_t> > can_signals,
+					     struct event_filter_t& event_filter,
+					     std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int rets = 0;
 	for(const auto& sig: can_signals)
@@ -287,10 +286,10 @@ static int subscribe_unsubscribe_can_signals(struct afb_req request,
 ///
 /// @return Number of correctly subscribed signal
 ///
-static int subscribe_unsubscribe_signals(struct afb_req request,
-										bool subscribe,
-										const struct utils::signals_found& signals,
-										struct event_filter_t& event_filter)
+static int subscribe_unsubscribe_signals(afb_req_t request,
+					 bool subscribe,
+					 const struct utils::signals_found& signals,
+					 struct event_filter_t& event_filter)
 {
 	int rets = 0;
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
@@ -304,10 +303,10 @@ static int subscribe_unsubscribe_signals(struct afb_req request,
 	return rets;
 }
 
-static int one_subscribe_unsubscribe(struct afb_req request,
-									bool subscribe,
-									const std::string& tag,
-									json_object* args)
+static int one_subscribe_unsubscribe(afb_req_t request,
+				     bool subscribe,
+				     const std::string& tag,
+				     json_object* args)
 {
 	int ret = 0;
 	struct event_filter_t event_filter;
@@ -341,7 +340,7 @@ static int one_subscribe_unsubscribe(struct afb_req request,
 
 	return ret;
 }
-static int process_one_subscribe_args(struct afb_req request, bool subscribe, json_object *args)
+static int process_one_subscribe_args(afb_req_t request, bool subscribe, json_object *args)
 {
 	int rc = 0, rc2=0;
 	json_object *x = nullptr, *event = nullptr;
@@ -367,7 +366,7 @@ static int process_one_subscribe_args(struct afb_req request, bool subscribe, js
 	return rc;
 }
 
-static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
+static void do_subscribe_unsubscribe(afb_req_t request, bool subscribe)
 {
 	int rc = 0;
 	struct json_object *args, *x;
@@ -392,18 +391,18 @@ static void do_subscribe_unsubscribe(struct afb_req request, bool subscribe)
 		afb_req_fail(request, "error", NULL);
 }
 
-void auth(struct afb_req request)
+void auth(afb_req_t request)
 {
 	afb_req_session_set_LOA(request, 1);
 	afb_req_success(request, NULL, NULL);
 }
 
-void subscribe(struct afb_req request)
+void subscribe(afb_req_t request)
 {
 	do_subscribe_unsubscribe(request, true);
 }
 
-void unsubscribe(struct afb_req request)
+void unsubscribe(afb_req_t request)
 {
 	do_subscribe_unsubscribe(request, false);
 }
@@ -484,7 +483,7 @@ static int write_signal(const std::string& name, uint64_t value)
 	return rc;
 }
 
-void write(struct afb_req request)
+void write(afb_req_t request)
 {
 	int rc = 0;
 	struct json_object* args = nullptr,
@@ -561,7 +560,7 @@ static struct json_object *get_signals_value(const std::string& name)
 
 	return ans;
 }
-void get(struct afb_req request)
+void get(afb_req_t request)
 {
 	int rc = 0;
 	struct json_object* args = nullptr,
@@ -619,7 +618,7 @@ static struct json_object *list_can_message(const std::string& name)
 	return ans;
 }
 
-void list(struct afb_req request)
+void list(afb_req_t request)
 {
 	int rc = 0;
 	json_object *ans = nullptr;
@@ -652,7 +651,7 @@ void list(struct afb_req request)
 /// @param[in] service Structure which represent the Application Framework Binder.
 ///
 /// @return Exit code, zero if success.
-int initv2()
+int init_binding(afb_api_t api)
 {
 	uint32_t ret = 1;
 	can_bus_t& can_bus_manager = application_t::instance().get_can_bus_manager();
@@ -672,9 +671,7 @@ int initv2()
 
 	if(sf.can_signals.empty() && sf.diagnostic_messages.size() == 1)
 	{
-		struct afb_req request;
-		request.itf = nullptr;
-		request.closure = nullptr;
+		afb_req_t request = nullptr;
 
 		struct event_filter_t event_filter;
 		event_filter.frequency = sf.diagnostic_messages.front()->get_frequency();

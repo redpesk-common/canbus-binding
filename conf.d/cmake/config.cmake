@@ -119,7 +119,7 @@ set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ languag
 # -D_FORTIFY_SOURCE=2
 # CACHE STRING "Compilation flags for RELEASE build type.")
 
-add_definitions(-DAFB_BINDING_VERSION=2)
+add_definitions(-DAFB_BINDING_VERSION=3)
 
 # Optional location for config.xml.in
 # -----------------------------------

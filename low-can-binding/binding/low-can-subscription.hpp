@@ -33,11 +33,11 @@
 class low_can_subscription_t : public low_can_socket_t
 {
 private:
-	struct afb_event event_; ///< event_ - application framework event used to push on client
+	afb_event_t event_; ///< event_ - application framework event used to push on client
 
 public:
 	using low_can_socket_t::low_can_socket_t;
 
-	struct afb_event& get_event();
-	void set_event(struct afb_event event);
+	afb_event_t get_event();
+	void set_event(afb_event_t event);
 };

@@ -76,7 +76,7 @@ public:
 	float get_max() const;
 	utils::socketcan_bcm_t& get_socket();
 
-	void set_event(struct afb_event event);
+	void set_event(afb_event_t event);
 	void set_frequency(float freq);
 	void set_min(float min);
 	void set_max(float max);
