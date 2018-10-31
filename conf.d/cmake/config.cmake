@@ -29,16 +29,16 @@ set(PROJECT_LICENSE "APL2.0")
 set(PROJECT_LANGUAGES "C;CXX")
 set(API_NAME "low-can")
 
-# Where are stored default templates files from submodule or subtree app-templates in your project tree
+# Where are stored the project configuration files
 # relative to the root project directory
-set(PROJECT_APP_TEMPLATES_DIR "conf.d/app-templates")
+set(PROJECT_CMAKE_CONF_DIR "conf.d")
 
 # Which directories inspect to find CMakeLists.txt target files
 # set(PROJECT_SRC_DIR_PATTERN "*")
 
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
-set(CMAKE_BUILD_TYPE "DEBUG" CACHE STRING "Default Build variant chosen. (Overwritten by cli if given)")
+set(BUILD_TYPE "RELEASE" CACHE STRING "Default Build variant chosen. (Overwritten by cli if given)")
 
 # Kernel selection if needed. You can choose between a
 # mandatory version to impose a minimal version.
@@ -190,5 +190,8 @@ set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install 
 
 # This include is mandatory and MUST happens at the end
 # of this file, else you expose you to unexpected behavior
+#
+# This CMake module could be found at the following url:
+# https://gerrit.automotivelinux.org/gerrit/#/admin/projects/src/cmake-apps-module
 # -----------------------------------------------------------
-include(${PROJECT_APP_TEMPLATES_DIR}/cmake/common.cmake)
+include(CMakeAfbTemplates)
