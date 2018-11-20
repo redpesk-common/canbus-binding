@@ -24,7 +24,7 @@
 #include <mutex>
 #include <vector>
 #include <thread>
-#include <json-c/json.h>
+#include <wrap-json.h>
 #include <systemd/sd-event.h>
 
 #include "openxc.pb.h"
@@ -409,6 +409,10 @@ void unsubscribe(afb_req_t request)
 
 static int send_frame(const std::string& bus_name, const struct can_frame& cf)
 {
+	if(bus_name.empty()) {
+		return -1;
+	}
+
 	std::map<std::string, std::shared_ptr<low_can_socket_t> >& cd = application_t::instance().get_can_devices();
 
 	if( cd.count(bus_name) == 0)
@@ -417,123 +421,104 @@ static int send_frame(const std::string& bus_name, const struct can_frame& cf)
 	return cd[bus_name]->tx_send(cf, bus_name);
 }
 
-static int write_raw_frame(const std::string& bus_name, uint32_t can_id, uint8_t can_dlc, struct json_object* can_data)
+static void write_raw_frame(afb_req_t request, const std::string& bus_name, json_object *json_value)
 {
-	int rc = 0;
 	struct can_frame cf;
+	struct json_object *json_can_data = nullptr;
 
 	::memset(&cf, 0, sizeof(cf));
 
-	cf.can_id = can_id;
-	cf.can_dlc = can_dlc;
-
-	struct json_object *x;
-	size_t n = json_object_array_length(can_data);
-	if(n <= 8)
+	if(! wrap_json_unpack(json_value, "{sF, sF, so !}",
+			      "can_id", &cf.can_id,
+			      "can_dlc", &cf.can_dlc,
+			      "can_data", &json_can_data))
 	{
-		for (int i = 0 ; i < n ; i++)
+		struct json_object *one_can_data;
+		size_t n = json_object_array_length(json_can_data);
+
+		if(n <= 8 && n > 0)
 		{
-			x = json_object_array_get_idx(can_data, i);
-			cf.data[i] = json_object_get_type(x) == json_type_int ? (uint8_t)json_object_get_int(x) : 0;
+			for (int i = 0 ; i < n ; i++)
+			{
+				one_can_data = json_object_array_get_idx(json_can_data, i);
+				cf.data[i] = json_object_get_type(one_can_data) == json_type_int ? (uint8_t)json_object_get_int(one_can_data) : 0;
+			}
 		}
+		else
+		{
+			afb_req_fail(request, "Error", "Data array must hold 1 to 8 values.");
+			return;
+		}
+
+		if(! send_frame(application_t::instance().get_can_bus_manager().get_can_device_name(bus_name), cf))
+			afb_req_success(request, nullptr, "Message correctly sent");
+		else
+			afb_req_fail(request, "Error", "sending the message. See the log for more details.");
+
+		return;
 	}
 
-	const std::string found_device = application_t::instance().get_can_bus_manager().get_can_device_name(bus_name);
-	if( ! found_device.empty())
-	{
-		rc = send_frame(found_device, cf);
-	}
-
-	return rc;
+	afb_req_fail(request, "Error", "Frame object malformed (must be \n \"frame\": {\"can_id\": int, \"can_dlc\": int, \"can_data\": [ int, int , int, int ,int , int ,int ,int]}");
 }
-static int write_signal(const std::string& name, uint64_t value)
+
+static void write_signal(afb_req_t request, const std::string& name, json_object *json_value)
 {
-	int rc = 0;
 	struct can_frame cf;
 	struct utils::signals_found sf;
+	signal_encoder encoder = nullptr;
+	bool send = true;
 
 	::memset(&cf, 0, sizeof(cf));
 
 	openxc_DynamicField search_key = build_DynamicField(name);
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
+	openxc_DynamicField dynafield_value = build_DynamicField(json_value);
 
 	if (sf.can_signals.empty())
 	{
-		AFB_WARNING("No signal(s) found for %s. Message not sent.", name.c_str());
-		rc = -1;
-	}
-	else
-	{
-		for(const auto& sig: sf.can_signals)
-		{
-			if(sig->get_writable())
-			{
-				cf = encoder_t::build_frame(sig, value);
-				const std::string bus_name = sig->get_message()->get_bus_device_name();
-				rc = send_frame(bus_name, cf);
-			}
-			else
-			{
-				AFB_WARNING("%s isn't writable. Message not sent.", sig->get_name().c_str());
-				return -1;
-			}
-		}
+		afb_req_fail_f(request, "No signal(s) found for %s. Message not sent.", name.c_str());
+		return;
 	}
 
-	return rc;
+	std::shared_ptr<can_signal_t>& sig = sf.can_signals[0];
+	if(! sig->get_writable())
+	{
+		afb_req_fail_f(request, "%s isn't writable. Message not sent.", sig->get_name().c_str());
+		return;
+	}
+
+	uint64_t value = (encoder = sig->get_encoder()) ?
+			encoder(*sig, dynafield_value, &send) :
+			encoder_t::encode_DynamicField(*sig, dynafield_value, &send);
+
+	if(! send_frame(sig->get_message()->get_bus_device_name(), encoder_t::build_frame(sig, value)) &&
+		send)
+		afb_req_success(request, nullptr, "Message correctly sent");
+	else
+		afb_req_fail(request, "Error", "Sending the message. See the log for more details.");
 }
 
 void write(afb_req_t request)
 {
-	int rc = 0;
-	struct json_object* args = nullptr,
-		*json_name = nullptr,
-		*json_value = nullptr;
+	struct json_object* args = nullptr, *json_value = nullptr;
+	const char *name = nullptr;
 
 	args = afb_req_json(request);
 
 	// Process about Raw CAN message on CAN bus directly
-	if (args != NULL &&
-		(json_object_object_get_ex(args, "bus_name", &json_name) && json_object_is_type(json_name, json_type_string) ) &&
-		(json_object_object_get_ex(args, "frame", &json_value) && json_object_is_type(json_value, json_type_object) ))
-	{
-		struct json_object* json_can_id = nullptr,
-			*json_can_dlc = nullptr,
-			*json_can_data = nullptr;
+	if (args != NULL && ! wrap_json_unpack(args, "{ss, so !}",
+					       "bus_name", &name,
+					       "frame", &json_value))
+		write_raw_frame(request, name, json_value);
 
-		if( (json_object_object_get_ex(json_value, "can_id", &json_can_id) && (json_object_is_type(json_can_id, json_type_double) || json_object_is_type(json_can_id, json_type_int))) &&
-			(json_object_object_get_ex(json_value, "can_dlc", &json_can_dlc) && (json_object_is_type(json_can_dlc, json_type_double) || json_object_is_type(json_can_dlc, json_type_int))) &&
-			(json_object_object_get_ex(json_value, "can_data", &json_can_data) && json_object_is_type(json_can_data, json_type_array) ))
-		{
-			rc = write_raw_frame(json_object_get_string(json_name),
-				json_object_get_int(json_can_id),
-				(uint8_t)json_object_get_int(json_can_dlc),
-				json_can_data);
-		}
-		else
-		{
-			AFB_ERROR("Frame object malformed (must be \n \"frame\": {\"can_id\": int, \"can_dlc\": int, \"can_data\": [ int, int , int, int ,int , int ,int ,int]}");
-			rc = -1;
-		}
-	}
 	// Search signal then encode value.
 	else if(args != NULL &&
-		(json_object_object_get_ex(args, "signal_name", &json_name) && json_object_is_type(json_name, json_type_string)) &&
-		(json_object_object_get_ex(args, "signal_value", &json_value) && (json_object_is_type(json_value, json_type_double) || json_object_is_type(json_value, json_type_int))))
-	{
-		rc = write_signal(json_object_get_string(json_name),
-			(uint64_t)json_object_get_double(json_value));
-	}
+		! wrap_json_unpack(args, "{ss, so !}",
+				   "signal_name", &name,
+				   "signal_value", &json_value))
+		write_signal(request, std::string(name), json_value);
 	else
-	{
-		AFB_ERROR("Request argument malformed. Please use the following syntax:");
-		rc = -1;
-	}
-
-	if (rc >= 0)
-		afb_req_success(request, NULL, NULL);
-	else
-		afb_req_fail(request, "error", NULL);
+		afb_req_fail(request, "Error", "Request argument malformed");
 }
 
 static struct json_object *get_signals_value(const std::string& name)
