@@ -90,6 +90,5 @@ public:
 	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
 	int create_rx_filter(utils::simple_bcm_msg& bcm_msg);
 
-	int tx_send(const struct can_frame& cf, std::shared_ptr<can_signal_t> sig);
 	int tx_send(const struct can_frame& cf, const std::string& bus_name);
 };

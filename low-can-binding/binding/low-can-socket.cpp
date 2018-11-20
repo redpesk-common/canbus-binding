@@ -208,15 +208,8 @@ struct utils::simple_bcm_msg low_can_socket_t::make_bcm_head(uint32_t opcode, ui
 /// a multiplexed message with several can_frame.
 void low_can_socket_t::add_bcm_frame(const struct can_frame& cf, struct utils::simple_bcm_msg& bcm_msg) const
 {
-	for(int i=0; i < CAN_MAX_DLEN; i++)
-	{
-		if(cf.data[i] != 0)
-		{
-			bcm_msg.msg_head.nframes = 1;
-			bcm_msg.frames = cf;
-			return;
-		}
-	}
+	bcm_msg.msg_head.nframes++;
+	bcm_msg.frames = cf;
 }
 
 /// @brief Create a RX_SETUP receive job to be used by the BCM socket for a CAN signal
@@ -298,27 +291,6 @@ int low_can_socket_t::create_rx_filter(utils::simple_bcm_msg& bcm_msg)
 				return -1;
 		}
 	}
-
-	return 0;
-}
-
-/// @brief Creates a TX_SEND job that is used by the BCM socket to
-/// send a message
-///
-/// @return 0 if ok, else -1
-int low_can_socket_t::tx_send(const struct can_frame& cf, std::shared_ptr<can_signal_t> sig)
-{
-	can_signal_ = sig;
-
-	utils::simple_bcm_msg bcm_msg =  make_bcm_head(TX_SEND);
-	add_bcm_frame(cf, bcm_msg);
-
-	if(open_socket() < 0)
-		{return -1;}
-
-	socket_ << bcm_msg;
-	if(! socket_)
-		return -1;
 
 	return 0;
 }
