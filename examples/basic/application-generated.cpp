@@ -1,6 +1,6 @@
 #include "application.hpp"
 #include "../can/can-decoder.hpp"
-
+#include "../can/can-encoder.hpp"
 
 // >>>>> handlers.cpp >>>>>
 #include "can/canread.h"
