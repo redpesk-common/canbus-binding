@@ -101,7 +101,7 @@ void can_bus_t::process_can_signals(const can_message_t& can_message, std::map<i
 		{
 			std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 			push_new_vehicle_message(subscription_id, vehicle_message);
-			AFB_DEBUG("%s CAN signals processed.",  sig->get_name().c_str());
+			AFB_DEBUG("%s CAN signals processed.", sig->get_name().c_str());
 		}
 	}
 }
