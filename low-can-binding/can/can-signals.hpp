@@ -61,8 +61,8 @@ typedef openxc_DynamicField (*signal_decoder)(can_signal_t& signal, float value,
 /// @param[out] send - An output parameter. If the encoding failed or the CAN signal should
 /// not be encoded for some other reason, this will be flipped to false.
 ///
-typedef uint64_t (*signal_encoder)(can_signal_t* signal,
-		openxc_DynamicField* value, bool* send);
+typedef uint64_t (*signal_encoder)(can_signal_t& signal,
+		 const openxc_DynamicField& field, bool* send);
 
 class can_signal_t
 {
