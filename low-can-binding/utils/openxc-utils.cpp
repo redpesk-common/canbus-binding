@@ -181,6 +181,32 @@ const openxc_SimpleMessage build_SimpleMessage(const std::string& name, const op
 	return s;
 }
 
+/// @brief Build an openxc_DynamicField with a json object
+///
+/// @param[in] value - const json_object pointer to assign to convert in an
+///  openxc_DynamicField.
+///
+/// @return openxc_DynamicField initialized with a json object.
+///
+const openxc_DynamicField build_DynamicField(json_object* value)
+{
+	switch(json_object_get_type(value))
+	{
+		case json_type_string:
+			return build_DynamicField(json_object_get_string(value));
+		case json_type_double:
+			return build_DynamicField(json_object_get_double(value));
+		case json_type_int:
+			return build_DynamicField(json_object_get_double(value));
+		case json_type_boolean:
+			return build_DynamicField((bool)json_object_get_boolean(value));
+		default:
+			openxc_DynamicField d;
+			::memset(&d, 0, sizeof(openxc_DynamicField));
+			return d;
+	}
+}
+
 ///
 /// @brief Build an openxc_DynamicField with a string value
 ///
