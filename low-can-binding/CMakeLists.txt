@@ -27,7 +27,6 @@ PROJECT_TARGET_ADD(low-can)
 		binding/${TARGET_NAME}-socket.cpp
 		binding/${TARGET_NAME}-subscription.cpp
 		binding/application.cpp
-		binding/application-generated.cpp
 		can/can-bus.cpp
 		can/can-message-set.cpp
 		can/can-message-definition.cpp
@@ -44,7 +43,8 @@ PROJECT_TARGET_ADD(low-can)
 		utils/socketcan.cpp
 		#utils/socketcan-raw.cpp
 		utils/socketcan-bcm.cpp
-		utils/config-parser.cpp)
+		utils/config-parser.cpp
+		binding/application-generated.cpp)
 
 	set(OPENAPI_DEF "binding/low-can-apidef" CACHE STRING "name and path to the JSON API definition without extension")
 	# Binder exposes a unique public entry point
@@ -62,5 +62,6 @@ PROJECT_TARGET_ADD(low-can)
 		uds-c
 		isotp-c
 		bitfield-c
+		afb-helpers
 		${link_libraries})
 

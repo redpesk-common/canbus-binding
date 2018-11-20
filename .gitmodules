@@ -1,0 +1,3 @@
+[submodule "app-afb-helpers-submodule"]
+	path = app-afb-helpers-submodule
+	url = https://gerrit.automotivelinux.org/gerrit/p/apps/app-afb-helpers-submodule.git
