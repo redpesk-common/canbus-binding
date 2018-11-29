@@ -66,7 +66,7 @@ _AFT.describe("Diagnostic_engine_speed_simulation", function()
     _AFT.assertVerbStatusSuccess(api,"subscribe", { event = evt })
 
     _AFT.addEventToMonitor(api .."/diagnostic_messages", function(eventName, data)
-        _AFT.assertIsTrue(data.name == "diagnostic_messages.engine.speed")
+        _AFT.assertIsTrue(data.name == evt)
     end)
 
     local ret = os.execute("bash ".._AFT.bindingRootDir.."/var/replay_launcher.sh ".._AFT.bindingRootDir.."/var/test1.canreplay")
