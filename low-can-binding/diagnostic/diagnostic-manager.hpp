@@ -74,9 +74,9 @@ public:
 	active_diagnostic_request_t* find_recurring_request(DiagnosticRequest& request);
 
 	// Subscription parts
-	active_diagnostic_request_t* add_request(DiagnosticRequest* request, const std::string& name,
+	/*active_diagnostic_request_t* add_request(DiagnosticRequest* request, const std::string& name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,
-		const DiagnosticResponseCallback callback);
+		const DiagnosticResponseCallback callback);*/
 	bool validate_optional_request_attributes(float frequencyHz);
 	active_diagnostic_request_t* add_recurring_request(DiagnosticRequest* request, const char* name,
 		bool waitForMultipleResponses, const DiagnosticResponseDecoder decoder,

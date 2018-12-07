@@ -256,9 +256,7 @@ static int subscribe_unsubscribe_can_signals(afb_req_t request,
 		auto it =  std::find_if(s.begin(), s.end(), [&sig, &event_filter](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub){ return sub.second->is_signal_subscription_corresponding(sig, event_filter) ; });
 		std::shared_ptr<low_can_subscription_t> can_subscription;
 		if(it != s.end())
-		{
-			 can_subscription = it->second;
-		}
+			{can_subscription = it->second;}
 		else
 		{
 			 can_subscription = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));

@@ -58,9 +58,6 @@ public:
 
 	uint32_t get_id() const;
 	int get_sub_id() const;
-	bool get_rtr_flag_() const;
-	can_message_format_t get_format() const;
-	uint8_t get_flags() const;
 	const uint8_t* get_data() const;
 	const std::vector<uint8_t> get_data_vector() const;
 	uint8_t get_length() const;
@@ -68,7 +65,6 @@ public:
 
 	void set_sub_id(int sub_id);
 	void set_timestamp(uint64_t timestamp);
-	void set_format(const can_message_format_t new_format);
 
 	bool is_correct_to_send();
 

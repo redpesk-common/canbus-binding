@@ -108,7 +108,5 @@ public:
 
 	void set_handle(DiagnosticShims& shims, DiagnosticRequest* request);
 
-	static bool is_diagnostic_signal(const std::string& name);
-
 	bool response_received() const;
 };

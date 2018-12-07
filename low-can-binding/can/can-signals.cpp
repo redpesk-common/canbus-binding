@@ -79,11 +79,6 @@ const std::string can_signal_t::get_name() const
 	return prefix_ + "." + generic_name_;
 }
 
-const std::string can_signal_t::get_prefix() const
-{
-	return prefix_;
-}
-
 uint8_t can_signal_t::get_bit_position() const
 {
 	return bit_position_;
@@ -104,16 +99,6 @@ float can_signal_t::get_offset() const
 	return offset_;
 }
 
-float can_signal_t::get_min_value() const
-{
-	return min_value_;
-}
-
-float can_signal_t::get_max_value() const
-{
-	return max_value_;
-}
-
 frequency_clock_t& can_signal_t::get_frequency()
 {
 	return frequency_;
@@ -122,16 +107,6 @@ frequency_clock_t& can_signal_t::get_frequency()
 bool can_signal_t::get_send_same() const
 {
 	return send_same_;
-}
-
-bool can_signal_t::get_force_send_changed() const
-{
-	return force_send_changed_;
-}
-
-const std::map<uint8_t, std::string>& can_signal_t::get_states() const
-{
-	return states_;
 }
 
 const std::string can_signal_t::get_states(uint8_t value)
@@ -153,11 +128,6 @@ uint64_t can_signal_t::get_states(const std::string& value) const
 		}
 	}
 	return ret;
-}
-
-size_t can_signal_t::get_state_count() const
-{
-	return states_.size();
 }
 
 bool can_signal_t::get_writable() const
@@ -193,11 +163,6 @@ std::pair<float, uint64_t> can_signal_t::get_last_value_with_timestamp() const
 void can_signal_t::set_parent(can_message_definition_t* parent)
 {
 	parent_ = parent;
-}
-
-void can_signal_t::set_prefix(std::string val)
-{
-	prefix_ = val;
 }
 
 void can_signal_t::set_received(bool r)

@@ -72,38 +72,6 @@ int can_message_t::get_sub_id() const
 }
 
 ///
-/// @brief Retrieve RTR flag member.
-///
-/// @return rtr_flags_ class member
-///
-bool can_message_t::get_rtr_flag_() const
-{
-	return rtr_flag_;
-}
-
-///
-/// @brief Retrieve format_ member value.
-///
-/// @return format_ class member. Default to INVALID.
-///
-can_message_format_t can_message_t::get_format() const
-{
-	if (format_ != can_message_format_t::STANDARD || format_ != can_message_format_t::EXTENDED)
-		return can_message_format_t::INVALID;
-	return format_;
-}
-
-///
-/// @brief Retrieve flags_ member value.
-///
-/// @return flags_ class member
-///
-uint8_t can_message_t::get_flags() const
-{
-	return flags_;
-}
-
-///
 /// @brief Retrieve data_ member value.
 ///
 /// @return pointer to the first element
@@ -144,11 +112,6 @@ uint64_t can_message_t::get_timestamp() const
 	return timestamp_;
 }
 
-void can_message_t::set_timestamp(uint64_t timestamp)
-{
-	timestamp_ = timestamp;
-}
-
 /// @brief Control whether the object is correctly initialized
 ///  to be sent over the CAN bus
 ///
@@ -163,20 +126,6 @@ bool can_message_t::is_correct_to_send()
 				return true;
 	}
 	return false;
-}
-
-/// @brief Set format_ member value.
-///
-/// Preferred way to initialize these members is to use
-/// convert_from_canfd_frame method.
-///
-/// @param[in] new_format - class member
-void can_message_t::set_format(const can_message_format_t new_format)
-{
-	if(new_format == can_message_format_t::STANDARD || new_format == can_message_format_t::EXTENDED || new_format == can_message_format_t::INVALID)
-		format_ = new_format;
-	else
-		AFB_ERROR("Can set format, wrong format chosen");
 }
 
 /// @brief Take a canfd_frame struct to initialize class members

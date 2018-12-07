@@ -256,7 +256,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(Diagno
 	}
 	return nullptr;
 }
-
+/*
 /// @brief Add and send a new one-time diagnostic request. DON'T USED AT THIS TIME
 ///
 /// A one-time (aka non-recurring) request can existing in parallel with a
@@ -313,7 +313,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest
 	}
 	return entry;
 }
-
+*/
 /// @brief Validate frequency asked don't get higher than the maximum of a classical
 /// CAN bus OBD2 request.
 ///

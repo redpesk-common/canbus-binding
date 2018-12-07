@@ -70,35 +70,35 @@ private:
 	can_message_definition_t* parent_; /*!< parent_ - pointer to the parent message definition holding this signal*/
 	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
 	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
-						  * which make easier to sort message when the come in.*/
+				     * which make easier to sort message when the come in.*/
 	uint8_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
-										*	non-inverted bit numbering, i.e. the most significant bit of
-										*	each byte is 0) */
+				*	non-inverted bit numbering, i.e. the most significant bit of
+				*	each byte is 0) */
 	uint8_t bit_size_; /*!< bit_size_ - The width of the bit field in the CAN message. */
 	float factor_; /*!< factor_ - The final value will be multiplied by this factor. Use 1 if you
-							*	don't need a factor. */
+			*	don't need a factor. */
 	float offset_; /*!< offset_ - The final value will be added to this offset. Use 0 if you
-							*	don't need an offset. */
+			*	don't need an offset. */
 	float min_value_; /*!< min_value_ - The minimum value for the processed signal.*/
 	float max_value_; /*!< max_value_ - The maximum value for the processed signal. */
 	frequency_clock_t frequency_; /*!< frequency_ - A frequency_clock_t struct to control the maximum frequency to
-								*	process and send this signal. To process every value, set the
-								*	clock's frequency to 0. */
+				       * process and send this signal. To process every value, set the
+				       * clock's frequency to 0. */
 	bool send_same_; /*!< send_same_ - If true, will re-send even if the value hasn't changed.*/
 	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send the
-							   * value if it has changed. */
+				   * value if it has changed. */
 	std::map<uint8_t, std::string> states_; /*!< states_ - A map of CAN signal state describing the mapping
-										 * between numerical and string values for valid states. */
+						 * between numerical and string values for valid states. */
 	bool writable_; /*!< writable - True if the signal is allowed to be written from the USB host
-					 *	back to CAN. Defaults to false.*/
+			 * back to CAN. Defaults to false.*/
 	signal_decoder decoder_; /*!< decoder_ - An optional function to decode a signal from the bus to a human
-							 * readable value. If NULL, the default numerical decoder is used. */
+				  * readable value. If NULL, the default numerical decoder is used. */
 	signal_encoder encoder_; /*!< encoder_ - An optional function to encode a signal value to be written to
-							 * CAN into a byte array. If NULL, the default numerical encoder
-							 * is used. */
+				  * CAN into a byte array. If NULL, the default numerical encoder
+				  * is used. */
 	bool received_; /*!< received_ - True if this signal has ever been received.*/
 	float last_value_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
-						*	this value is undefined. */
+			    * this value is undefined. */
 
 public:
 	can_signal_t(
@@ -121,20 +121,14 @@ public:
 	can_message_definition_t* get_message() const;
 	const std::string get_generic_name() const;
 	const std::string get_name() const;
-	const std::string get_prefix() const;
 	uint8_t get_bit_position() const;
 	uint8_t get_bit_size() const;
 	float get_factor() const;
 	float get_offset() const;
-	float get_min_value() const;
-	float get_max_value() const;
 	frequency_clock_t& get_frequency();
 	bool get_send_same() const;
-	bool get_force_send_changed() const;
-	const std::map<uint8_t, std::string>& get_states() const;
 	const std::string get_states(uint8_t value);
 	uint64_t get_states(const std::string& value) const;
-	size_t get_state_count() const;
 	bool get_writable() const;
 	signal_decoder& get_decoder();
 	signal_encoder& get_encoder();
@@ -143,7 +137,6 @@ public:
 	std::pair<float, uint64_t> get_last_value_with_timestamp() const;
 
 	void set_parent(can_message_definition_t* parent);
-	void set_prefix(std::string val);
 	void set_received(bool r);
 	void set_last_value(float val);
 	void set_timestamp(uint64_t timestamp);

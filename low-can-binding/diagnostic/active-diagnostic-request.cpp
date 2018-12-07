@@ -121,22 +121,6 @@ void active_diagnostic_request_t::set_handle(DiagnosticShims& shims, DiagnosticR
 	handle_ = new DiagnosticRequestHandle(generate_diagnostic_request(&shims, request, nullptr));
 }
 
-///
-/// @brief Check if requested signal name is a diagnostic message. If the name
-///  begin with the diagnostic message prefix then true else false.
-///
-/// @param[in] name - A signal name.
-///
-/// @return true if name began with the diagnostic message prefix else false.
-///
-bool active_diagnostic_request_t::is_diagnostic_signal(const std::string& name)
-{
-	const std::string p = active_diagnostic_request_t::prefix_ + "*";
-	if(::fnmatch(p.c_str(), name.c_str(), FNM_CASEFOLD) == 0)
-		return true;
-	return false;
-}
-
 /// @brief Returns true if a sufficient response has been received for a
 /// diagnostic request.
 ///

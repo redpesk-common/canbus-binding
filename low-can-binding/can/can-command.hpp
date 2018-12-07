@@ -51,5 +51,5 @@ typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
 typedef struct {
 	const char* generic_name; /*!< generic_name - The name of the command.*/
 	CommandHandler handler; /*!< handler - An function to process the received command's data and perform some
- 							 *	action.*/
+				 * action.*/
 } CanCommand;

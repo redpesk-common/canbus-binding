@@ -19,38 +19,6 @@
 
 #include "../binding/application.hpp"
 
-can_message_definition_t::can_message_definition_t(const std::string bus)
-	: parent_{nullptr}, bus_{bus}, last_value_{CAN_MESSAGE_SIZE}
-{}
-
-can_message_definition_t::can_message_definition_t(
-	const std::string bus,
-	uint32_t id,
-	frequency_clock_t frequency_clock,
-	bool force_send_changed)
-	: parent_{nullptr},
-	  bus_{bus},
-	  id_{id},
-	  frequency_clock_{frequency_clock},
-	  force_send_changed_{force_send_changed},
-	  last_value_{CAN_MESSAGE_SIZE}
-{}
-
-can_message_definition_t::can_message_definition_t(
-	const std::string bus,
-	uint32_t id,
-	can_message_format_t format,
-	frequency_clock_t frequency_clock,
-	bool force_send_changed)
-	: parent_{nullptr},
-	bus_{bus},
-	id_{id},
-	format_{format},
-	frequency_clock_{frequency_clock},
-	force_send_changed_{force_send_changed},
-	last_value_{CAN_MESSAGE_SIZE}
-{}
-
 can_message_definition_t::can_message_definition_t(
 	const std::string bus,
 	uint32_t id,
@@ -69,11 +37,6 @@ can_message_definition_t::can_message_definition_t(
 	last_value_{CAN_MESSAGE_SIZE},
 	can_signals_{can_signals}
 {}
-
-const std::string can_message_definition_t::get_bus_name() const
-{
-	return bus_;
-}
 
 const std::string can_message_definition_t::get_bus_device_name() const
 {

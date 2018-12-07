@@ -62,7 +62,8 @@ private:
 	std::mutex can_message_mutex_; ///< mutex protecting the can_message_q_ queue.
 	std::queue <can_message_t> can_message_q_; ///< queue that will store can_message_t to be decoded
 
-	std::condition_variable new_decoded_can_message_; ///< condition_variable use to wait until there is a new vehicle message to read from the queue vehicle_message_q_
+	std::condition_variable new_decoded_can_message_; ///< condition_variable use to wait until there is a new vehicle message
+							  /// to read from the queue vehicle_message_q_
 	std::mutex decoded_can_message_mutex_;  ///< mutex protecting the vehicle_message_q_ queue.
 	std::queue <std::pair<int, openxc_VehicleMessage> > vehicle_message_q_; ///< queue that will store openxc_VehicleMessage to be pushed
 
