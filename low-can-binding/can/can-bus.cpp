@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, 2016 "IoT.bzh"
+ * Copyright (C) 2015, 2018 "IoT.bzh"
  * Author "Romain Forlot" <romain.forlot@iot.bzh>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,12 +87,12 @@ void can_bus_t::process_can_signals(const can_message_t& can_message, std::map<i
 	openxc_DynamicField decoded_message;
 	openxc_VehicleMessage vehicle_message;
 
-	// First we have to found which can_signal_t it is
-	std::shared_ptr<low_can_subscription_t> sig = s[subscription_id];
-
 	if( s.find(subscription_id) != s.end() && afb_event_is_valid(s[subscription_id]->get_event()))
 	{
 		bool send = true;
+		// First we have to found which can_signal_t it is
+		std::shared_ptr<low_can_subscription_t> sig = s[subscription_id];
+
 		decoded_message = decoder_t::translate_signal(*sig->get_can_signal(), can_message, &send);
 		openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
 		vehicle_message = build_VehicleMessage(s_message, can_message.get_timestamp());

@@ -263,7 +263,7 @@ static int subscribe_unsubscribe_can_signals(afb_req_t request,
 			{return -1;}
 
 		rets++;
-		AFB_DEBUG("signal: %s subscribed", sig->get_name().c_str());
+		AFB_DEBUG("%s Signal: %s %ssubscribed", sig->get_message()->is_fd() ? "FD": "", sig->get_name().c_str(), subscribe ? "":"un");
 	}
 	return rets;
 }

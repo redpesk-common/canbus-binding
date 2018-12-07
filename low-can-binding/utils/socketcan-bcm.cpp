@@ -74,14 +74,22 @@ namespace utils
 	{
 		struct utils::bcm_msg msg;
 
-		::memset(&msg, 0, sizeof(msg));
 		const struct sockaddr_can& addr = s.get_tx_address();
 		socklen_t addrlen = sizeof(addr);
 		struct ifreq ifr;
 
 		ssize_t nbytes = ::recvfrom(s.socket(), &msg, sizeof(msg), 0, (struct sockaddr*)&addr, &addrlen);
+		if(nbytes < 0)
+		{
+			AFB_ERROR("Can't read the next message from socket '%d'. '%s'", s.socket(), strerror(errno));
+			return s;
+		}
 		ifr.ifr_ifindex = addr.can_ifindex;
-		ioctl(s.socket(), SIOCGIFNAME, &ifr);
+		if(ioctl(s.socket(), SIOCGIFNAME, &ifr) < 0)
+		{
+			AFB_ERROR("Can't read the interface name. '%s'", strerror(errno));
+			return s;
+		}
 		long unsigned int frame_size = nbytes-sizeof(struct bcm_msg_head);
 
 		AFB_DEBUG("Data available: %li bytes read. BCM head, opcode: %i, can_id: %i, nframes: %i", frame_size, msg.msg_head.opcode, msg.msg_head.can_id, msg.msg_head.nframes);

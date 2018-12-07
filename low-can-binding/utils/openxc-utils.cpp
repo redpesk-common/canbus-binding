@@ -34,6 +34,7 @@
 const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value)
 {
 	openxc_VehicleMessage message;
+	::memset(&message, 0, sizeof(message));
 	application_t& app = application_t::instance();
 
 	message.has_type = true;
@@ -98,6 +99,7 @@ const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* re
 const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message, uint64_t timestamp)
 {
 	openxc_VehicleMessage v;
+	::memset(&v, 0, sizeof(v));
 
 	v.has_type = true,
 	v.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE;
@@ -120,6 +122,7 @@ const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& mes
 const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message)
 {
 	openxc_VehicleMessage v;
+	::memset(&v, 0, sizeof(v));
 
 	v.has_type = true,
 	v.type = openxc_VehicleMessage_Type::openxc_VehicleMessage_Type_SIMPLE;
@@ -141,7 +144,7 @@ openxc_VehicleMessage build_VehicleMessage()
 {
 	openxc_VehicleMessage v;
 
-	::memset(&v, 0, sizeof(openxc_VehicleMessage));
+	::memset(&v, 0, sizeof(v));
 	return v;
 }
 
