@@ -21,23 +21,82 @@
 #include <cmath>
 #include <utility>
 
-#include "low-can-socket.hpp"
 #include "../can/can-signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/socketcan-bcm.hpp"
 
-/// @brief The subscription class has a context that can handle all needed values to describe a subscription
-/// to the low-can binding. It can hold a CAN signal or a diagnostic message. A diagnostic message for OBD2 is
-/// special because there is only 1 listener to retrieve OBD2 requests. It is required that all diagnostic message
-/// subscriptions are in 1 object.
-class low_can_subscription_t : public low_can_socket_t
+#define OBDII_MAX_SIMULTANEOUS_RESPONSES 8
+
+/// @brief Filtering values. Theses values have to be tested in
+/// can_bus_t::apply_filter method.
+struct event_filter_t
+{
+	float frequency; ///< frequency - Maximum frequency which will be received and pushed to a subscribed event.
+	float min; ///< min - Minimum value that the signal doesn't have to go below to be pushed.
+	float max; ///< max - Maximum value that the signal doesn't have to go above to be pushed.
+
+	event_filter_t() : frequency{0}, min{-__FLT_MAX__}, max{__FLT_MAX__} {};
+	bool operator==(const event_filter_t& ext) const {
+		return frequency == ext.frequency && min == ext.min && max == ext.max;
+	}
+};
+
+/// @brief The object stores socket to CAN to be used to write on it.
+/// This is a simple access to a CAN bus device without any subscriptions attached
+class low_can_subscription_t
 {
 private:
+	int index_; ///< index_ - index number is the socket (int) casted
+	struct event_filter_t event_filter_;
 	afb_event_t event_; ///< event_ - application framework event used to push on client
 
+	/// Signal part
+	std::shared_ptr<can_signal_t> can_signal_; ///< can_signal_ - the CAN signal subscribed
+	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to receive OBD2
+										 /// responses. Normal diagnostic request and response are not tested for now.
+	utils::socketcan_bcm_t socket_; ///< socket_ - socket_ that receives CAN messages.
+
+	int set_event();
+
 public:
-	using low_can_socket_t::low_can_socket_t;
+	low_can_subscription_t();
+	low_can_subscription_t(struct event_filter_t event_filter);
+	low_can_subscription_t(const low_can_subscription_t& s) = delete;
+	low_can_subscription_t(low_can_subscription_t&& s);
+	~low_can_subscription_t();
+
+	low_can_subscription_t& operator=(const low_can_subscription_t& s);
+	explicit operator bool() const;
 
 	afb_event_t get_event();
-	void set_event(afb_event_t event);
+	int subscribe(afb_req_t request);
+	int unsubscribe(afb_req_t request);
+
+	int get_index() const;
+	const std::shared_ptr<can_signal_t> get_can_signal() const;
+	bool is_signal_subscription_corresponding(const std::shared_ptr<can_signal_t>, const struct event_filter_t& event_filter) const;
+	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(uint32_t pid) const;
+	const std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_message() const;
+	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(const std::string& name) const;
+	const std::string get_name() const;
+	const std::string get_name(uint32_t pid) const;
+	float get_frequency() const;
+	float get_min() const;
+	float get_max() const;
+	utils::socketcan_bcm_t& get_socket();
+
+	void set_frequency(float freq);
+	void set_min(float min);
+	void set_max(float max);
+
+	struct utils::bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0,0}, const struct timeval& frequency_thinning = {0,0}) const;
+	void add_one_bcm_frame(struct canfd_frame& cfd, struct utils::bcm_msg& bcm_msg) const;
+
+	int open_socket(const std::string& bus_name = "");
+
+	int create_rx_filter(std::shared_ptr<can_signal_t> sig);
+	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
+	int create_rx_filter(utils::bcm_msg& bcm_msg);
+
+	int tx_send(struct canfd_frame& cfd, const std::string& bus_name);
 };

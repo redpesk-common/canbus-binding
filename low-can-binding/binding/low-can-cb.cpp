@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, 2016 "IoT.bzh"
+ * Copyright (C) 2015, 2018 "IoT.bzh"
  * Author "Romain Forlot" <romain.forlot@iot.bzh>
  * Author "Loic Collignon" <loic.collignon@iot.bzh>
  *
@@ -109,35 +109,6 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 ///
 ///*******************************************************************************/
 
-static int make_subscription_unsubscription(afb_req_t request,
-					    std::shared_ptr<low_can_subscription_t>& can_subscription,
-					    std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
-					    bool subscribe)
-{
-	/* Make the subscription or unsubscription to the event (if request is not null) */
-	if(request &&
-	   ((subscribe ? afb_req_subscribe : afb_req_unsubscribe)(request, s[can_subscription->get_index()]->get_event())) < 0)
-	{
-		AFB_ERROR("Operation goes wrong for signal: %s", can_subscription->get_name().c_str());
-		return -1;
-	}
-	return 0;
-}
-
-static int create_event_handle(std::shared_ptr<low_can_subscription_t>& can_subscription,
-			       std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
-{
-	int sub_index = can_subscription->get_index();
-	can_subscription->set_event(afb_daemon_make_event(can_subscription->get_name().c_str()));
-	s[sub_index] = can_subscription;
-	if (!afb_event_is_valid(s[sub_index]->get_event()))
-	{
-		AFB_ERROR("Can't create an event for %s, something goes wrong.", can_subscription->get_name().c_str());
-		return -1;
-	}
-	return 0;
-}
-
 /// @brief This will determine if an event handle needs to be created and checks if
 /// we got a valid afb_event to get subscribe or unsubscribe. After that launch the subscription or unsubscription
 /// against the application framework using that event handle.
@@ -146,30 +117,52 @@ static int subscribe_unsubscribe_signal(afb_req_t request,
 					std::shared_ptr<low_can_subscription_t>& can_subscription,
 					std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
-	int ret = -1;
+	int ret = 0;
 	int sub_index = can_subscription->get_index();
+	bool subscription_exists = s.count(sub_index);
 
-	if (can_subscription && s.find(sub_index) != s.end())
+	// Susbcription part
+	if(subscribe)
 	{
-		if (!afb_event_is_valid(s[sub_index]->get_event()) && !subscribe)
+		/* There is no valid request to subscribe so this must be an
+		 * internal permanent diagnostic request. Skip the subscription
+		 * part and don't register it into the current "low-can"
+		 * subsciptions.
+		 */
+		if(! request)
 		{
-			AFB_NOTICE("Event isn't valid, no need to unsubscribed.");
-			ret = -1;
+			return 0;
 		}
-		ret = 0;
-	}
-	else
-	{
-		/* Event doesn't exist , so let's create it */
-		s[sub_index] = can_subscription;
-		ret = create_event_handle(can_subscription, s);
+
+		// Event doesn't exist , so let's create it
+		if (! subscription_exists &&
+		    (ret = can_subscription->subscribe(request)) < 0)
+			return ret;
+
+		if(! subscription_exists)
+				s[sub_index] = can_subscription;
+
+		return ret;
 	}
 
-	// Checks if the event handler is correctly created, if it is, it
-	// performs the subscription or unsubscription operations.
-	if (ret < 0)
+	// Unsubscrition part
+	if(! subscription_exists)
+	{
+		AFB_NOTICE("There isn't any valid subscriptions for that request.");
 		return ret;
-	return make_subscription_unsubscription(request, can_subscription, s, subscribe);
+	}
+	else if (subscription_exists &&
+		 ! afb_event_is_valid(s[sub_index]->get_event()) )
+	{
+		AFB_NOTICE("Event isn't valid, no need to unsubscribed.");
+		return ret;
+	}
+
+	if( (ret = s[sub_index]->unsubscribe(request)) < 0)
+		return ret;
+	s.erase(sub_index);
+
+	return ret;
 }
 
 static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscription)
@@ -411,10 +404,10 @@ static int send_frame(struct canfd_frame& cfd, const std::string& bus_name)
 		return -1;
 	}
 
-	std::map<std::string, std::shared_ptr<low_can_socket_t> >& cd = application_t::instance().get_can_devices();
+	std::map<std::string, std::shared_ptr<low_can_subscription_t> >& cd = application_t::instance().get_can_devices();
 
 	if( cd.count(bus_name) == 0)
-		{cd[bus_name] = std::make_shared<low_can_socket_t>(low_can_socket_t());}
+		{cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());}
 
 	return cd[bus_name]->tx_send(cfd, bus_name);
 }

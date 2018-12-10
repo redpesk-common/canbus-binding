@@ -20,12 +20,373 @@
 #include "application.hpp"
 #include "canutil/write.h"
 
+low_can_subscription_t::low_can_subscription_t()
+	: index_{-1},
+	event_filter_{},
+	event_{},
+	socket_{}
+{}
+
+low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filter)
+	: index_{-1},
+	  event_filter_{event_filter},
+	  event_{},
+	  socket_{}
+ {}
+
+low_can_subscription_t::low_can_subscription_t( low_can_subscription_t&& s)
+	: index_{s.index_},
+	event_filter_{s.event_filter_},
+	event_{},
+	socket_{std::move(s.socket_)}
+{}
+
+low_can_subscription_t& low_can_subscription_t::operator=(const low_can_subscription_t& s)
+{
+	socket_ = std::move(s.socket_);
+	return *this;
+}
+
+low_can_subscription_t::~low_can_subscription_t()
+{
+	socket_.close();
+}
+
+low_can_subscription_t::operator bool() const
+{
+	return ((can_signal_ != nullptr || ! diagnostic_message_.empty()) && ! socket_);
+}
 afb_event_t low_can_subscription_t::get_event()
 {
 	return event_;
 }
 
-void low_can_subscription_t::set_event(afb_event_t event)
+/**
+ * @brief Set the event calling the afb_daemon_make_event function to
+ * create it and the checks its validity.
+ *
+ * @return int - 0 if OK, -1 if not
+ */
+int low_can_subscription_t::set_event()
 {
-	event_ = event;
+	std::string event_name = get_name();
+	event_ = afb_daemon_make_event(event_name.c_str());
+	if (! afb_event_is_valid(event_))
+	{
+		AFB_ERROR("Can't create an event for %s, something goes wrong.", event_name.c_str());
+		return -1;
+	}
+
+	return 0;
+}
+
+/**
+ * @brief Subscribe to the event member of the object
+ *
+ * @param request the subscribe AFB client request which want to
+ * subscribe
+ *
+ * @return int - 0 if OK, -1 if not
+ */
+int low_can_subscription_t::subscribe(afb_req_t request)
+{
+	if(set_event() < 0)
+		return -1;
+	return afb_req_subscribe(request, event_);
+}
+
+/**
+ * @brief Unsubscribe to the event member of the object
+ *
+ * @param request the unsubscribe AFB client request which want to
+ * unsubscribe
+ *
+ * @return int - 0 if OK, -1 if not
+ */
+int low_can_subscription_t::unsubscribe(afb_req_t request)
+{
+	return afb_req_unsubscribe(request, event_);
+}
+
+int low_can_subscription_t::get_index() const
+{
+	return index_;
+}
+
+const std::shared_ptr<can_signal_t> low_can_subscription_t::get_can_signal() const
+{
+	return can_signal_;
+}
+
+bool low_can_subscription_t::is_signal_subscription_corresponding(const std::shared_ptr<can_signal_t> can_signal, const struct event_filter_t& event_filter) const
+{
+	return can_signal_ == can_signal && event_filter_ == event_filter;
+}
+
+const std::vector<std::shared_ptr<diagnostic_message_t> > low_can_subscription_t::get_diagnostic_message() const
+{
+	return diagnostic_message_;
+}
+
+/// @brief Retrieve a diagnostic_message subscribed from a pid
+///
+/// @param[in] pid - Diagnostic messages PID to search for
+///
+/// @return shared_ptr diagnostic_message_ if found and nullptr if not found
+const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnostic_message(uint32_t pid) const
+{
+	for(const auto& diag: diagnostic_message_)
+	{
+		if(diag->get_pid() == pid)
+		{
+			return diag;
+		}
+	}
+	return nullptr;
+}
+
+/// @brief Retrieve a diagnostic message search from its name
+///
+/// @return shared_ptr diagnostic_message_ if found and nullptr if not found
+const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnostic_message(const std::string& name) const
+{
+	for(const auto& diag: diagnostic_message_)
+	{
+		if(diag->get_name() == name)
+		{
+			return diag;
+		}
+	}
+	return nullptr;
+}
+
+/// @brief Return the CAN signal name and empty string if not found
+/// or no CAN signal subscribed
+const std::string low_can_subscription_t::get_name() const
+{
+	if (can_signal_ != nullptr)
+		return can_signal_->get_name();
+	else if (!diagnostic_message_.empty())
+		return "diagnostic_messages";
+
+	AFB_WARNING("No diagnostics messages nor CAN signals registered in that subscription. Name empty ! It's a bug to be reported.");
+	return "";
+}
+
+/// @brief Return name from a diagnostic message from a PID
+///
+/// @param[in] pid - Diagnostic message PID
+const std::string low_can_subscription_t::get_name(uint32_t pid) const
+{
+	if (!diagnostic_message_.empty())
+		return get_diagnostic_message(pid)->get_name() ;
+
+	AFB_WARNING("No diagnostics messages nor CAN signals registered in that subscription. Name empty ! It's a bug to be reported.");
+	return "";
+}
+
+float low_can_subscription_t::get_frequency() const
+{
+	return event_filter_.frequency;
+}
+
+float low_can_subscription_t::get_min() const
+{
+	return event_filter_.min;
+}
+
+float low_can_subscription_t::get_max() const
+{
+	return event_filter_.max;
+}
+
+utils::socketcan_bcm_t& low_can_subscription_t::get_socket()
+{
+	return socket_;
+}
+
+void low_can_subscription_t::set_frequency(float freq)
+{
+	event_filter_.frequency = freq;
+}
+
+void low_can_subscription_t::set_min(float min)
+{
+	event_filter_.min = min;
+}
+
+void low_can_subscription_t::set_max(float max)
+{
+	event_filter_.max = max;
+}
+/// @brief Based upon which object is a subscribed CAN signal or diagnostic message
+/// it will open the socket with the required CAN bus device name.
+///
+/// @return INVALID_SOCKET on failure, else positive integer
+int low_can_subscription_t::open_socket(const std::string& bus_name)
+{
+	int ret = 0;
+	if(! socket_)
+	{
+		if( can_signal_ != nullptr)
+			{ret = socket_.open(can_signal_->get_message()->get_bus_device_name());}
+		else if (! diagnostic_message_ .empty())
+			{ret = socket_.open(application_t::instance().get_diagnostic_manager().get_bus_device_name());}
+		else if ( ! bus_name.empty())
+			{ ret = socket_.open(bus_name);}
+		index_ = (int)socket_.socket();
+	}
+	return ret;
+}
+
+/// @brief Builds a BCM message head but doesn't set can_frame.
+///
+/// @returns a bcm_msg with the msg_head parts set and can_frame
+/// zeroed.
+struct utils::bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning) const
+{
+	struct utils::bcm_msg bcm_msg;
+	::memset(&bcm_msg, 0, sizeof(bcm_msg));
+
+	bcm_msg.msg_head.opcode  = opcode;
+	bcm_msg.msg_head.can_id  = can_id;
+	bcm_msg.msg_head.flags = flags;
+	bcm_msg.msg_head.ival1.tv_sec = timeout.tv_sec ;
+	bcm_msg.msg_head.ival1.tv_usec = timeout.tv_usec;
+	bcm_msg.msg_head.ival2.tv_sec = frequency_thinning.tv_sec ;
+	bcm_msg.msg_head.ival2.tv_usec = frequency_thinning.tv_usec;
+
+	return bcm_msg;
+}
+
+/// @brief Take an existing bcm_msg struct and add a can_frame.
+/// Currently only 1 uniq can_frame can be added, it's not possible to build
+/// a multiplexed message with several can_frame.
+void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, struct utils::bcm_msg& bcm_msg) const
+{
+	struct can_frame cf;
+
+	if (bcm_msg.msg_head.flags & CAN_FD_FRAME)
+		bcm_msg.fd_frames[bcm_msg.msg_head.nframes] = cfd;
+	else
+	{
+		cf.can_id = cfd.can_id;
+		cf.can_dlc = cfd.len;
+		::memcpy(&cf.data, cfd.data, cfd.len);
+		bcm_msg.frames[bcm_msg.msg_head.nframes] = cf;
+	}
+	bcm_msg.msg_head.nframes++;
+}
+
+/// @brief Create a RX_SETUP receive job to be used by the BCM socket for a CAN signal
+/// subscription
+///
+/// @return 0 if ok else -1
+int low_can_subscription_t::create_rx_filter(std::shared_ptr<can_signal_t> sig)
+{
+	uint32_t flags;
+	float val;
+	struct timeval freq, timeout = {0, 0};
+	struct canfd_frame cfd;
+	can_signal_= sig;
+
+	if (sig->get_message()->is_fd())
+	{
+		flags = SETTIMER|RX_NO_AUTOTIMER|CAN_FD_FRAME;
+		cfd.len = CANFD_MAX_DLEN;
+	}
+	else
+	{
+		flags = SETTIMER|RX_NO_AUTOTIMER;
+		cfd.len = CAN_MAX_DLEN;
+	}
+	val = (float)(1 << can_signal_->get_bit_size()) - 1;
+	if(! bitfield_encode_float(val,
+				   can_signal_->get_bit_position(),
+				   can_signal_->get_bit_size(),
+				   1,
+				   can_signal_->get_offset(),
+				   cfd.data,
+				   cfd.len))
+		return -1;
+
+	frequency_clock_t f = event_filter_.frequency == 0 ? can_signal_->get_frequency() : frequency_clock_t(event_filter_.frequency);
+	freq = f.get_timeval_from_period();
+
+	utils::bcm_msg bcm_msg = make_bcm_head(RX_SETUP, can_signal_->get_message()->get_id(), flags, timeout, freq);
+	add_one_bcm_frame(cfd, bcm_msg);
+
+	return create_rx_filter(bcm_msg);
+}
+
+/// @brief Create a RX_SETUP receive job used by the BCM socket directly from
+/// a bcm_msg. The method should not be used directly but rather through the
+/// two previous method with can_signal_t or diagnostic_message_t object.
+///
+/// If the CAN arbitration ID is the OBD2 functional broadcast id the subscribed
+/// to the 8 classics OBD2 functional response ID
+///
+/// @return 0 if ok else -1
+int low_can_subscription_t::create_rx_filter(utils::bcm_msg& bcm_msg)
+{
+	// Make sure that socket is opened.
+	if(open_socket() < 0)
+		{return -1;}
+
+	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
+	// else monitor all standard 8 CAN OBD2 ID response.
+	if(bcm_msg.msg_head.can_id != OBD2_FUNCTIONAL_BROADCAST_ID)
+	{
+		socket_ << bcm_msg;
+			if(! socket_)
+				return -1;
+	}
+	else
+	{
+		for(uint8_t i = 0; i < 8; i++)
+		{
+			bcm_msg.msg_head.can_id  =  OBD2_FUNCTIONAL_RESPONSE_START + i;
+
+			socket_ << bcm_msg;
+			if(! socket_)
+				return -1;
+		}
+	}
+
+	return 0;
+}
+
+/// @brief Create a RX_SETUP receive job to be used by the BCM socket for a
+/// diagnostic message subscription.
+///
+/// @return 0 if ok else -1
+int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_t> sig)
+{
+	diagnostic_message_.push_back(sig);
+
+	struct timeval freq = frequency_clock_t(event_filter_.frequency).get_timeval_from_period();
+	//struct timeval timeout = frequency_clock_t(10).get_timeval_from_period();
+	struct timeval timeout = {0,0};
+
+	utils::bcm_msg bcm_msg =  make_bcm_head(RX_SETUP, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER|RX_NO_AUTOTIMER|RX_FILTER_ID, timeout, freq);
+	return create_rx_filter(bcm_msg);
+}
+
+/// @brief Creates a TX_SEND job that is used by the BCM socket to
+/// send a message
+///
+/// @return 0 if ok else -1
+int low_can_subscription_t::tx_send(struct canfd_frame& cfd, const std::string& bus_name)
+{
+	struct utils::bcm_msg bcm_msg =  make_bcm_head(TX_SEND, cfd.can_id);
+	add_one_bcm_frame(cfd, bcm_msg);
+
+	if(open_socket(bus_name) < 0)
+		{return -1;}
+
+	socket_ << bcm_msg;
+	if(! socket_)
+		return -1;
+
+	return 0;
 }

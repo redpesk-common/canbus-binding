@@ -20,7 +20,7 @@
 
 #include "../utils/signals.hpp"
 #include "../utils/openxc-utils.hpp"
-#include "low-can-socket.hpp"
+#include "low-can-subscription.hpp"
 
 #define MICROSECONDS_IN_SECOND	1000000
 #define ENGINE_VALUE_TIMEOUT	5
@@ -37,7 +37,7 @@ can_bus_t& application_t::get_can_bus_manager()
 	return can_bus_manager_;
 }
 
-std::map<std::string, std::shared_ptr<low_can_socket_t> >& application_t::get_can_devices()
+std::map<std::string, std::shared_ptr<low_can_subscription_t> >& application_t::get_can_devices()
 {
 	return can_devices_;
 }
