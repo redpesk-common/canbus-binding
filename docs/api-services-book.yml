@@ -1,0 +1,16 @@
+type: books
+books:
+-
+    id: agl-service-can-low-level
+    title: AGL Service CAN Low Level
+    description: AGL Service CAN Low Level documentation
+    keywords:
+    author: "IotBzh"
+    version: master
+    chapters:
+    - url: 1-Architecture.md
+      name: Architecture presentation
+    - url: 2-Installation.md
+      name: Installation Guide
+    - url: 3-Usage.md
+      name: Usage Guide
