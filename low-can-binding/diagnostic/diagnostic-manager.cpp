@@ -188,8 +188,6 @@ void diagnostic_manager_t::find_and_erase(active_diagnostic_request_t* entry, st
 void diagnostic_manager_t::cancel_request(active_diagnostic_request_t* entry)
 {
 	entry->get_socket().close();
-	if(entry->get_handle())
-		delete(entry->get_handle());
 	delete entry;
 	entry = nullptr;
 }
