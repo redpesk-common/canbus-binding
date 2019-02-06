@@ -229,6 +229,162 @@ application_t::application_t()
 				})} // end can_message_definition entry
 ,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
 				 "hs",
+				 0x5D1,
+				 false,
+				 can_message_format_t::STANDARD,
+				 frequency_clock_t(5.00000f),
+				 true,
+					{ // beginning can_signals vector
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"accelerator.pedal.position",
+							16,
+							8,
+							0.500000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							nullptr,
+							nullptr,
+							false
+						})},
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"steering.wheel.angle",
+							4,
+							12,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							nullptr,
+							nullptr,
+							false
+						})}
+					} // end can_signals vector
+				})} // end can_message_definition entry
+,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+				 "hs",
+				 0x5D2,
+				 false,
+				 can_message_format_t::STANDARD,
+				 frequency_clock_t(5.00000f),
+				 true,
+					{ // beginning can_signals vector
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"transmission.gearinfo",
+							20,
+							4,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							nullptr,
+							nullptr,
+							false
+						})},
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"transmission.mode",
+							16,
+							4,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							nullptr,
+							nullptr,
+							false
+						})}
+					} // end can_signals vector
+				})} // end can_message_definition entry
+,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+				 "hs",
+				 0x5D3,
+				 false,
+				 can_message_format_t::STANDARD,
+				 frequency_clock_t(5.00000f),
+				 true,
+					{ // beginning can_signals vector
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"turnsignal.status",
+							26,
+							3,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							nullptr,
+							nullptr,
+							false
+						})},
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"lightstatus.brake",
+							7,
+							1,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							decoder_t::decode_boolean,
+							nullptr,
+							false
+						})},
+						{std::make_shared<can_signal_t> (can_signal_t{
+							"parking.brake.status",
+							8,
+							1,
+							1.00000f,
+							0.00000,
+							0,
+							0,
+							frequency_clock_t(0.00000f),
+							true,
+							false,
+							{
+							},
+							false,
+							decoder_t::decode_boolean,
+							nullptr,
+							false
+						})}
+					} // end can_signals vector
+				})} // end can_message_definition entry
+,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+				 "hs",
 				 0x620,
 				 false,
 				 can_message_format_t::STANDARD,
