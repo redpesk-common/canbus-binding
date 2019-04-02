@@ -7,7 +7,7 @@ framework version >= 0.6.
 
 It will produce a _application-generated.cpp_ file to paste in the source, _CAN-binder/low-can-binding/binding/_, directory.
 
-* Make sure you already set up the AGL SDK using the following [SDK Quick Setup Guide](http://docs.iot.bzh/docs/getting_started/en/dev/reference/setup-sdk-environment.html). Alternatively, please refer to official guides available on [AGL Developer Site](http://docs.automotivelinux.org/docs/devguides/en/dev/#guides).
+* Make sure you already set up the AGL SDK using the following [SDK Quick Setup Guide](http://docs.automotivelinux.org/master/docs/getting_started/en/dev/reference/setup-sdk-environment.html). Alternatively, please refer to official guides available on [AGL Developer Site](http://docs.automotivelinux.org/master/docs/devguides/en/dev/#guides).
 
 If you need to have the graphic stack inside your SDK, you have to prepare your environment with the **iotbzh**, or **Daring Dab** flavor using _prepare_meta_ tool. To do so, run the following command in your docker image in the step 4 in place of `... [ prepare build environment ] ...`:
 
@@ -18,7 +18,7 @@ prepare_meta -f iotbzh -o /xdt -l /home/devel/mirror -p /home/devel/share/propri
 /xdt/build/m3ulcb/agl-init-build-env
 ```
 
-* (Optionnal) An [USB CAN adapter](http://shop.8devices.com/usb2can) connected to connector through the [right cable](http://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES/)) if you want to connect to a real car through the OBD2 connector.
+* (Optionnal) An [USB CAN adapter](https://shop.8devices.com/index.php?route=product/product&path=67&product_id=54) connected to connector through the [right cable](https://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES?qs=pLQRQR43dtrcAQQLCUAIxA%3D%3D) if you want to connect to a real car through the OBD2 connector.
 
 <!-- pagebreak -->
 

@@ -22,4 +22,4 @@ It will provides valuable access to the CAN bus by aggregate signals or providin
 
 ![Communication between CAN bindings and third applications](images/CAN_bindings_communication.png)
 
-Last but not least, the low level binding can be shipped as binary only using OpenXC inspired [AGL low level CAN binding Generator](http://github.com/iotbzh/can-config-generator).
+Last but not least, the low level binding can be shipped as binary only using OpenXC inspired [AGL low level CAN binding Generator](https://gerrit.automotivelinux.org/gerrit/gitweb?p=src/low-level-can-generator.git;a=summary).
