@@ -141,7 +141,7 @@ afm-util run low-can-service@4.0
 ```
 
 You can find instructions to use afm-util tool
-[here](http://docs.iot.bzh/docs/apis_services/en/dev/reference/af-main/afm-daemons.html#using-afm-util),
+[here](../../reference/af-main/1-afm-daemons.html#using-afm-util),
  as well as documentation about Application Framework.
 
 But you can't control nor interact with it because you don't know security
