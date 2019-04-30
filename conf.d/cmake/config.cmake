@@ -64,6 +64,7 @@ set (PKG_REQUIRED_LIST
 	json-c
 	libsystemd>=222
 	afb-daemon
+	afb-helpers
 )
 
 # Prefix path where will be installed the files
