@@ -127,6 +127,15 @@ ls="can1"
 hs="can1"
 ```
 
+* You can use this configuration for j1939:
+
+```ini
+[CANbus-mapping]
+hs="can0"
+ls="can1"
+j1939="can2"
+```
+
 > **CAUTION VERY IMPORTANT:** Make sure the CAN bus\(es\) you specify in your
 > configuration file match those specified in your generated source file with
 > the `CAN-config-generator`.
@@ -241,6 +250,14 @@ low-can subscribe { "event" : "messages*speed*" } --> will subscribe to all CAN 
 low-can subscribe { "event" : "messages*speed" } --> will subscribe to all CAN messages ending with speed in their name. Search will be on prefixed messages here.
 low-can subscribe { "event" : "diagnostic*speed*" } --> will subscribe to all diagnostic messages with speed in their name. Search will be on prefixed messages here.
 low-can subscribe { "event" : "diagnostic*speed" } --> will subscribe to all diagnostic messages ending with speed in their name. Search will be on prefixed messages here.
+```
+
+You can also subscribe to an event with the ID or the PGN of the message definition :
+
+
+```json
+low-can subscribe { "id" : 1568}
+low-can subscribe { "pgn" : 61442}
 ```
 
 You can stop receiving event from it by unsubscribe the signal the same way you did for subscribe
