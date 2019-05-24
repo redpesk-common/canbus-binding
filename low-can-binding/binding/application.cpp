@@ -62,7 +62,7 @@ std::vector<std::shared_ptr<signal_t> > application_t::get_all_signals()
 	return message_set_[active_message_set_]->get_all_signals();
 }
 
-std::vector<std::shared_ptr<diagnostic_message_t> > application_t::get_diagnostic_messages()
+std::vector<std::shared_ptr<diagnostic_message_t>> application_t::get_diagnostic_messages()
 {
 	return message_set_[active_message_set_]->get_diagnostic_messages();
 }
@@ -71,6 +71,23 @@ std::vector<std::shared_ptr<message_definition_t>> application_t::get_messages_d
 {
 	return message_set_[active_message_set_]->get_messages_definition();
 }
+
+
+std::shared_ptr<message_definition_t> application_t::get_message_definition(uint32_t id)
+{
+	std::shared_ptr<message_definition_t> ret = nullptr;
+	std::vector<std::shared_ptr<message_definition_t>> messages_definition = get_messages_definition();
+	for(std::shared_ptr<message_definition_t> &msg_def : messages_definition)
+	{
+		if(msg_def->get_id() == id)
+		{
+			ret = msg_def;
+			break;
+		}
+	}
+	return ret;
+}
+
 
 uint32_t application_t::get_signal_id(diagnostic_message_t& sig) const
 {

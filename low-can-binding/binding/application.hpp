@@ -74,6 +74,8 @@ class application_t
 
 		std::vector<std::shared_ptr<message_definition_t> > get_messages_definition();
 
+		std::shared_ptr<message_definition_t> get_message_definition(uint32_t id);
+
 		uint32_t get_signal_id(diagnostic_message_t& sig) const;
 
 		uint32_t get_signal_id(signal_t& sig) const;

@@ -256,7 +256,7 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 			{can_subscription = it->second;}
 		else
 		{
-			 can_subscription = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
+			can_subscription = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
 			if(can_subscription->create_rx_filter(sig) < 0)
 				{return -1;}
 			if(add_to_event_loop(can_subscription) < 0)
@@ -298,17 +298,12 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 	return rets;
 }
 
-static int one_subscribe_unsubscribe(afb_req_t request,
-				     bool subscribe,
-				     const std::string& tag,
-				     json_object* args)
+static event_filter_t generate_filter(json_object* args)
 {
-	int ret = 0;
-	struct event_filter_t event_filter;
+	event_filter_t event_filter;
 	struct json_object  *filter, *obj;
-	struct utils::signals_found sf;
 
-	// computes the filter
+		// computes the filter
 	if (json_object_object_get_ex(args, "filter", &filter))
 	{
 		if (json_object_object_get_ex(filter, "frequency", &obj)
@@ -321,6 +316,14 @@ static int one_subscribe_unsubscribe(afb_req_t request,
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
 			{event_filter.max = (float)json_object_get_double(obj);}
 	}
+	return event_filter;
+}
+
+
+static int one_subscribe_unsubscribe_events(afb_req_t request, bool subscribe, const std::string& tag, json_object* args)
+{
+	int ret = 0;
+	struct utils::signals_found sf;
 
 	// subscribe or unsubscribe
 	openxc_DynamicField search_key = build_DynamicField(tag);
@@ -331,31 +334,93 @@ static int one_subscribe_unsubscribe(afb_req_t request,
 		ret = -1;
 	}
 	else
-		{ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);}
-
+	{
+		event_filter_t event_filter = generate_filter(args);
+		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);
+	}
 	return ret;
 }
-static int process_one_subscribe_args(afb_req_t request, bool subscribe, json_object *args)
+
+static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const uint32_t& id ,json_object *args)
 {
-	int rc = 0, rc2=0;
-	json_object *x = nullptr, *event = nullptr;
-	if(args == NULL ||
-		!json_object_object_get_ex(args, "event", &event))
+	int ret = 0;
+	std::shared_ptr<message_definition_t> message_definition = application_t::instance().get_message_definition(id);
+	struct utils::signals_found sf;
+
+	if(message_definition)
 	{
-		rc = one_subscribe_unsubscribe(request, subscribe, "*", args);
+		sf.signals = message_definition->get_signals();
 	}
-	else if (json_object_get_type(event) != json_type_array)
+
+	if(sf.signals.empty())
 	{
-		rc = one_subscribe_unsubscribe(request, subscribe, json_object_get_string(event), args);
+		AFB_NOTICE("No signal(s) found for %d.", id);
+		ret = -1;
 	}
 	else
 	{
-		for (int i = 0 ; i < json_object_array_length(event); i++)
+		event_filter_t event_filter = generate_filter(args);
+		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);
+	}
+	return ret;
+}
+
+
+static int process_one_subscribe_args(afb_req_t request, bool subscribe, json_object *args)
+{
+	int rc = 0, rc2=0;
+	json_object *x = nullptr, *event = nullptr, *id = nullptr;
+
+
+	// 2 cases : ID(PGN) and event
+
+	json_bool test_event = json_object_object_get_ex(args,"event",&event);
+	json_bool test_id = json_object_object_get_ex(args,"id",&id);
+	if(!test_id)
+	{
+		json_object_object_get_ex(args,"pgn",&id);
+	}
+
+	if(	args == NULL || (!test_event && !id))
+	{
+		rc = one_subscribe_unsubscribe_events(request, subscribe, "*", args);
+	}
+	else
+	{
+		if(event)
 		{
-			x = json_object_array_get_idx(event, i);
-			rc2 = one_subscribe_unsubscribe(request, subscribe, json_object_get_string(x), args);
-			if (rc >= 0)
-				rc = rc2 >= 0 ? rc + rc2 : rc2;
+			if (json_object_get_type(event) != json_type_array) // event is set before and check if it's an array
+			{
+				rc = one_subscribe_unsubscribe_events(request, subscribe, json_object_get_string(event), args);
+			}
+			else // event is set and it's not an array
+			{
+				for (int i = 0 ; i < json_object_array_length(event); i++)
+				{
+					x = json_object_array_get_idx(event, i);
+					rc2 = one_subscribe_unsubscribe_events(request, subscribe, json_object_get_string(x), args);
+					if (rc >= 0)
+						rc = rc2 >= 0 ? rc + rc2 : rc2;
+				}
+			}
+		}
+
+		if(id)
+		{
+			if (json_object_get_type(id) != json_type_array) // id is set before and check if it's an array
+			{
+				rc = one_subscribe_unsubscribe_id(request, subscribe, json_object_get_int(id), args);
+			}
+			else // event is set and it's not an array
+			{
+				for (int i = 0 ; i < json_object_array_length(id); i++)
+				{
+					x = json_object_array_get_idx(id, i);
+					rc2 = one_subscribe_unsubscribe_id(request, subscribe, json_object_get_int(x), args);
+					if (rc >= 0)
+						rc = rc2 >= 0 ? rc + rc2 : rc2;
+				}
+			}
 		}
 	}
 	return rc;
