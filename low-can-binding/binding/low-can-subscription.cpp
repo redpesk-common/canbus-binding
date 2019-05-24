@@ -337,7 +337,7 @@ int low_can_subscription_t::create_rx_filter(utils::bcm_msg& bcm_msg)
 	// else monitor all standard 8 CAN OBD2 ID response.
 	if(bcm_msg.msg_head.can_id != OBD2_FUNCTIONAL_BROADCAST_ID)
 	{
-		socket_ << bcm_msg;
+		socket_.write_message(bcm_msg);
 			if(! socket_)
 				return -1;
 	}
@@ -347,7 +347,7 @@ int low_can_subscription_t::create_rx_filter(utils::bcm_msg& bcm_msg)
 		{
 			bcm_msg.msg_head.can_id  =  OBD2_FUNCTIONAL_RESPONSE_START + i;
 
-			socket_ << bcm_msg;
+			socket_.write_message(bcm_msg);
 			if(! socket_)
 				return -1;
 		}
@@ -384,7 +384,7 @@ int low_can_subscription_t::tx_send(struct canfd_frame& cfd, const std::string& 
 	if(open_socket(bus_name) < 0)
 		{return -1;}
 
-	socket_ << bcm_msg;
+	socket_.write_message(bcm_msg);
 	if(! socket_)
 		return -1;
 

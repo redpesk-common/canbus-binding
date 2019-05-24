@@ -70,53 +70,62 @@ namespace utils
 	/// Read the socket to retrieve the associated CAN message. All the hard work is do into
 	/// convert_from_frame method and if there isn't CAN message retrieve, only BCM head struct,
 	/// then CAN message will be zeroed and must be handled later.
-	socketcan_bcm_t& operator>>(socketcan_bcm_t& s, can_message_t& cm)
+	std::shared_ptr<can_message_t> socketcan_bcm_t::read_message()
 	{
-		struct utils::bcm_msg msg;
+		struct bcm_msg msg;
+		std::shared_ptr<can_message_t> cm = std::make_shared<can_message_t>();
 
-		const struct sockaddr_can& addr = s.get_tx_address();
+		const struct sockaddr_can& addr = get_tx_address();
 		socklen_t addrlen = sizeof(addr);
 		struct ifreq ifr;
 
-		ssize_t nbytes = ::recvfrom(s.socket(), &msg, sizeof(msg), 0, (struct sockaddr*)&addr, &addrlen);
+		ssize_t nbytes = ::recvfrom(socket(), &msg, sizeof(msg), 0, (struct sockaddr*)&addr, &addrlen);
 		if(nbytes < 0)
 		{
-			AFB_ERROR("Can't read the next message from socket '%d'. '%s'", s.socket(), strerror(errno));
-			return s;
+			AFB_ERROR("Can't read the next message from socket '%d'. '%s'", socket(), strerror(errno));
+			return cm;
 		}
 		ifr.ifr_ifindex = addr.can_ifindex;
-		if(ioctl(s.socket(), SIOCGIFNAME, &ifr) < 0)
+		if(ioctl(socket(), SIOCGIFNAME, &ifr) < 0)
 		{
 			AFB_ERROR("Can't read the interface name. '%s'", strerror(errno));
-			return s;
+			return cm;
 		}
 		long unsigned int frame_size = nbytes-sizeof(struct bcm_msg_head);
 
 		AFB_DEBUG("Data available: %li bytes read. BCM head, opcode: %i, can_id: %i, nframes: %i", frame_size, msg.msg_head.opcode, msg.msg_head.can_id, msg.msg_head.nframes);
 
 		struct timeval tv;
-		ioctl(s.socket(), SIOCGSTAMP, &tv);
+		ioctl(socket(), SIOCGSTAMP, &tv);
 		uint64_t timestamp = 1000000 * tv.tv_sec + tv.tv_usec;
-		cm = can_message_t::convert_from_frame(msg.fd_frames[0] , frame_size, timestamp);
-		cm.set_sub_id((int)s.socket());
+		*cm = can_message_t::convert_from_frame(msg.fd_frames[0] , frame_size, timestamp);
+		cm->set_sub_id((int)socket());
 
-		return s;
+		return cm;
 	}
 
-	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const std::vector<struct utils::bcm_msg>& vobj)
+	void socketcan_bcm_t::write_message(std::vector<std::shared_ptr<can_message_t>>& vobj)
 	{
 		for(const auto& obj : vobj)
-			s << obj;
-		return s;
+			write_message(obj);
 	}
 
-	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const struct utils::bcm_msg& obj)
+	void socketcan_bcm_t::write_message(std::shared_ptr<can_message_t> m)
+	{
+		struct can_frame obj;
+		obj.can_id  = m->get_id();
+		obj.can_dlc = m->get_length();
+		::memcpy(obj.data, m->get_data(), CAN_MAX_DLEN);
+		if (::sendto(socket(), &obj, sizeof(&obj), 0, (const struct sockaddr*)&get_tx_address(), sizeof(get_tx_address())) < 0)
+			AFB_API_ERROR(afbBindingV3root, "Error sending : %i %s", errno, ::strerror(errno));
+	}
+
+	void socketcan_bcm_t::write_message(struct bcm_msg& obj)
 	{
 		size_t size = (obj.msg_head.flags & CAN_FD_FRAME) ?
-			      (size_t)((char*)&obj.fd_frames[obj.msg_head.nframes] - (char*)&obj):
-			      (size_t)((char*)&obj.frames[obj.msg_head.nframes] - (char*)&obj);
-		if (::sendto(s.socket(), &obj, size, 0, (const struct sockaddr*)&s.get_tx_address(), sizeof(s.get_tx_address())) < 0)
+		(size_t)((char*)&obj.fd_frames[obj.msg_head.nframes] - (char*)&obj):
+		(size_t)((char*)&obj.frames[obj.msg_head.nframes] - (char*)&obj);
+		if (::sendto(socket(), &obj, size, 0, (const struct sockaddr*)&get_tx_address(), sizeof(get_tx_address())) < 0)
 			AFB_API_ERROR(afbBindingV3root, "Error sending : %i %s", errno, ::strerror(errno));
-		return s;
 	}
 }

@@ -24,11 +24,13 @@
 #include <string.h>
 
 #include "../binding/low-can-hat.hpp"
+#include "../can/can-message.hpp"
 
 #define INVALID_SOCKET -1
 
 namespace utils
 {
+
 	class socketcan_t
 	{
 	public:
@@ -44,28 +46,16 @@ namespace utils
 		int socket() const;
 		virtual int open(std::string device_name) = 0;
 		int setopt(int level, int optname, const void* optval, socklen_t optlen);
-		int close();
+		virtual int close();
+		virtual std::shared_ptr<can_message_t> read_message() = 0;
+		virtual void write_message(std::shared_ptr<can_message_t> obj) = 0;
+		virtual void write_message(std::vector<std::shared_ptr<can_message_t>>& vobj) = 0;
 
 	protected:
 		int socket_;
 		struct sockaddr_can tx_address_;
-
 		int open(int domain, int type, int protocol);
 	};
 
-	template <typename T>
-	socketcan_t& operator<<(socketcan_t& s, const std::vector<T>& vobj)
-	{
-		for(const auto& obj : vobj)
-			s << obj;
-		return s;
-	}
 
-	template <typename T>
-	socketcan_t& operator<<(socketcan_t& s, const T& obj)
-	{
-		if (::sendto(s.socket(), &obj, sizeof(obj), 0, (const struct sockaddr*)&s.get_tx_address(), sizeof(s.get_tx_address())) < 0)
-			AFB_API_ERROR(afbBindingV3root, "Error sending : %i %s", errno, ::strerror(errno));
-		return s;
-	}
 }

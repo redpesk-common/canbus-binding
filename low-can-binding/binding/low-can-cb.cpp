@@ -85,13 +85,13 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 	low_can_subscription_t* can_subscription = (low_can_subscription_t*)userdata;
 	if ((revents & EPOLLIN) != 0)
 	{
-		can_message_t cm;
+		std::shared_ptr<can_message_t> cm;
 		utils::socketcan_bcm_t& s = can_subscription->get_socket();
-		s >> cm;
+		cm = s.read_message();
 
 		// Sure we got a valid CAN message ?
-		if(! cm.get_id() == 0 && ! cm.get_length() == 0)
-			{push_n_notify(cm);}
+		if(! cm->get_id() == 0 && ! cm->get_length() == 0)
+			{push_n_notify(*cm);}
 	}
 
 	// check if error or hangup

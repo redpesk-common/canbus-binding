@@ -123,7 +123,7 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 
 	bcm_msg.frames[0] = cf;
 
-	tx_socket << bcm_msg;
+	tx_socket.write_message(bcm_msg);
 	if(tx_socket)
 		return true;
 	return false;

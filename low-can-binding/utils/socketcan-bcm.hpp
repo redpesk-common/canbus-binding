@@ -40,13 +40,14 @@ namespace utils
 		using socketcan_t::socketcan_t;
 
 		virtual int open(std::string device_name);
+		virtual std::shared_ptr<can_message_t> read_message();
+		virtual void write_message(std::vector<std::shared_ptr<can_message_t>>& vobj);
+		virtual void write_message(std::shared_ptr<can_message_t> obj);
+		void write_message(struct bcm_msg& obj);
 
 	private:
 		int connect(const struct sockaddr* addr, socklen_t len);
 	};
 
-	socketcan_bcm_t& operator>>(socketcan_bcm_t& s, can_message_t& cm);
 
-	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const std::vector<struct bcm_msg>& obj);
-	socketcan_bcm_t& operator<<(socketcan_bcm_t& s, const struct bcm_msg& obj);
 }

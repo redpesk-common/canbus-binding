@@ -62,27 +62,38 @@ namespace utils
 		return socket_;
 	}
 
-	socketcan_raw_t& operator>>(socketcan_raw_t& s, can_message_t& cm)
+	std::shared_ptr<message_t> socketcan_raw_t::read_message()
 	{
+		std::shared_ptr<can_message_t> cm = std::make_shared<can_message_t>();
 		struct canfd_frame frame;
 
-		const struct sockaddr_can& addr = s.get_tx_address();
+		const struct sockaddr_can& addr = get_tx_address();
 		socklen_t addrlen = sizeof(addr);
 		struct ifreq ifr;
 
-		ssize_t nbytes = ::recvfrom(s.socket(), &frame, sizeof(frame), 0, (struct sockaddr*)&addr, &addrlen);
+		ssize_t nbytes = ::recvfrom(socket(), &frame, sizeof(frame), 0, (struct sockaddr*)&addr, &addrlen);
 		ifr.ifr_ifindex = addr.can_ifindex;
-		ioctl(s.socket(), SIOCGIFNAME, &ifr);
+		ioctl(socket(), SIOCGIFNAME, &ifr);
 
 		AFB_DEBUG("Data available: %i bytes read", (int)nbytes);
 		AFB_DEBUG("read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, frame.can_id, frame.len,
 			frame.data[0], frame.data[1], frame.data[2], frame.data[3], frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
 
 		struct timeval tv;
-		ioctl(s.socket(), SIOCGSTAMP, &tv);
+		ioctl(socket(), SIOCGSTAMP, &tv);
 		uint64_t timestamp = 1000000 * tv.tv_sec + tv.tv_usec;
 		cm = ::can_message_t::convert_from_frame(frame , nbytes, timestamp);
 
-		return s;
+		return cm;
+	}
+
+	void socketcan_raw_t::write_message(std::vector<std::shared_ptr<message_t>>& vobj)
+	{
+		AFB_WARNING("Not implemented");
+	}
+
+	void socketcan_raw_t::write_message(std::shared_ptr<message_t> cm)
+	{
+		AFB_WARNING("Not implemented");
 	}
 }
