@@ -111,7 +111,7 @@ bool can_signal_t::get_send_same() const
 
 const std::string can_signal_t::get_states(uint8_t value)
 {
-	if (value < states_.size())
+	if ( states_.count(value) > 0 )
 		return states_[value];
 	return std::string();
 }
