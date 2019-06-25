@@ -54,7 +54,7 @@ private:
 	std::shared_ptr<can_signal_t> can_signal_; ///< can_signal_ - the CAN signal subscribed
 	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to receive OBD2
 										 /// responses. Normal diagnostic request and response are not tested for now.
-	utils::socketcan_bcm_t socket_; ///< socket_ - socket_ that receives CAN messages.
+	std::shared_ptr<utils::socketcan_bcm_t> socket_; ///< socket_ - socket_ that receives CAN messages.
 
 	int set_event();
 
@@ -83,7 +83,7 @@ public:
 	float get_frequency() const;
 	float get_min() const;
 	float get_max() const;
-	utils::socketcan_bcm_t& get_socket();
+	std::shared_ptr<utils::socketcan_t> get_socket();
 
 	void set_frequency(float freq);
 	void set_min(float min);

@@ -49,7 +49,7 @@ low_can_subscription_t& low_can_subscription_t::operator=(const low_can_subscrip
 
 low_can_subscription_t::~low_can_subscription_t()
 {
-	socket_.close();
+	socket_->close();
 }
 
 low_can_subscription_t::operator bool() const
@@ -200,7 +200,7 @@ float low_can_subscription_t::get_max() const
 	return event_filter_.max;
 }
 
-utils::socketcan_bcm_t& low_can_subscription_t::get_socket()
+std::shared_ptr<utils::socketcan_t> low_can_subscription_t::get_socket()
 {
 	return socket_;
 }
@@ -229,12 +229,12 @@ int low_can_subscription_t::open_socket(const std::string& bus_name)
 	if(! socket_)
 	{
 		if( can_signal_ != nullptr)
-			{ret = socket_.open(can_signal_->get_message()->get_bus_device_name());}
+			{ret = socket_->open(can_signal_->get_message()->get_bus_device_name());}
 		else if (! diagnostic_message_ .empty())
-			{ret = socket_.open(application_t::instance().get_diagnostic_manager().get_bus_device_name());}
+			{ret = socket_->open(application_t::instance().get_diagnostic_manager().get_bus_device_name());}
 		else if ( ! bus_name.empty())
-			{ ret = socket_.open(bus_name);}
-		index_ = (int)socket_.socket();
+			{ ret = socket_->open(bus_name);}
+		index_ = (int)socket_->socket();
 	}
 	return ret;
 }
@@ -337,7 +337,7 @@ int low_can_subscription_t::create_rx_filter(utils::bcm_msg& bcm_msg)
 	// else monitor all standard 8 CAN OBD2 ID response.
 	if(bcm_msg.msg_head.can_id != OBD2_FUNCTIONAL_BROADCAST_ID)
 	{
-		socket_.write_message(bcm_msg);
+		socket_->write_message(bcm_msg);
 			if(! socket_)
 				return -1;
 	}
@@ -347,7 +347,7 @@ int low_can_subscription_t::create_rx_filter(utils::bcm_msg& bcm_msg)
 		{
 			bcm_msg.msg_head.can_id  =  OBD2_FUNCTIONAL_RESPONSE_START + i;
 
-			socket_.write_message(bcm_msg);
+			socket_->write_message(bcm_msg);
 			if(! socket_)
 				return -1;
 		}
@@ -384,7 +384,7 @@ int low_can_subscription_t::tx_send(struct canfd_frame& cfd, const std::string& 
 	if(open_socket(bus_name) < 0)
 		{return -1;}
 
-	socket_.write_message(bcm_msg);
+	socket_->write_message(bcm_msg);
 	if(! socket_)
 		return -1;
 

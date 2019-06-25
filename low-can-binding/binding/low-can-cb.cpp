@@ -70,12 +70,12 @@ void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std
 	s.erase(it);
 }
 
-static void push_n_notify(const can_message_t& cm)
+static void push_n_notify(std::shared_ptr<can_message_t> m)
 {
 	can_bus_t& cbm = application_t::instance().get_can_bus_manager();
 	{
 		std::lock_guard<std::mutex> can_message_lock(cbm.get_can_message_mutex());
-	 	cbm.push_new_can_message(cm);
+		cbm.push_new_can_message(*m);
 	}
 	cbm.get_new_can_message_cv().notify_one();
 }
@@ -83,23 +83,27 @@ static void push_n_notify(const can_message_t& cm)
 int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *userdata)
 {
 	low_can_subscription_t* can_subscription = (low_can_subscription_t*)userdata;
+
+
 	if ((revents & EPOLLIN) != 0)
 	{
-		std::shared_ptr<can_message_t> cm;
-		utils::socketcan_bcm_t& s = can_subscription->get_socket();
-		cm = s.read_message();
+		std::shared_ptr<utils::socketcan_t> s = can_subscription->get_socket();
+		std::shared_ptr<can_message_t> message = s->read_message();
 
 		// Sure we got a valid CAN message ?
-		if(! cm->get_id() == 0 && ! cm->get_length() == 0)
-			{push_n_notify(*cm);}
+		if (! message->get_id() == 0 && ! message->get_length() == 0)
+		{
+			push_n_notify(message);
+		}
 	}
 
 	// check if error or hangup
 	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
 	{
 		sd_event_source_unref(event_source);
-		can_subscription->get_socket().close();
+		can_subscription->get_socket()->close();
 	}
+
 	return 0;
 }
 
@@ -170,7 +174,7 @@ static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscr
 		struct sd_event_source* event_source = nullptr;
 		return ( sd_event_add_io(afb_daemon_get_event_loop(),
 			&event_source,
-			can_subscription->get_socket().socket(),
+			can_subscription->get_socket()->socket(),
 			EPOLLIN,
 			read_message,
 			can_subscription.get()));
