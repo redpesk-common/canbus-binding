@@ -16,9 +16,10 @@
  */
 
 #pragma once
-#include <linux/can.h>
+
 #include <linux/can/j1939.h>
-#include "./message.hpp"
+#include "message.hpp"
+#include "../../utils/socketcan-j1939.hpp"
 
 #define J1939_MAX_MULTIPACKETS 255
 #define J1939_MAX_DLEN J1939_MAX_MULTIPACKETS * CAN_MAX_DLEN
@@ -69,5 +70,3 @@ class j1939_message_t : public message_t
         struct bcm_msg get_bcm_msg();
 		void set_bcm_msg(struct bcm_msg bcm_msg);
 };
-
-

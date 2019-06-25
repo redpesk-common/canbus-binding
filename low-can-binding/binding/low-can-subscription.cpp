@@ -248,14 +248,14 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 				std::shared_ptr<utils::socketcan_j1939_t> socket = std::make_shared<utils::socketcan_j1939_t>();
 				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(), name, pgn, addr);
 				subscription.socket_ = socket;
-            }
-            else if ( !bus_name.empty())
-            {
+		}
+		else if ( !bus_name.empty())
+		{
 				std::shared_ptr<utils::socketcan_j1939_t> socket = std::make_shared<utils::socketcan_j1939_t>();
 				ret = socket->open(bus_name, name, pgn, addr);
 				subscription.socket_ = socket;
-            }
-            subscription.index_ = (int)subscription.socket_->socket();
+		}
+		subscription.index_ = (int)subscription.socket_->socket();
 		}
 		else
 		{

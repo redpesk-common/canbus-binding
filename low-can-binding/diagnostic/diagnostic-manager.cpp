@@ -124,7 +124,7 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 	bcm_msg.frames[0] = cf;
 
 
-	std::shared_ptr<message_t> msg = std::make_shared<can_message_t>();
+	std::shared_ptr<can_message_t> msg = std::make_shared<can_message_t>();
 
 	msg->set_bcm_msg(bcm_msg);
 

@@ -32,8 +32,6 @@
 ///
 #define DIAGNOSTIC_RESPONSE_ARBITRATION_ID_OFFSET 0x8
 
-class active_diagnostic_request_t;
-
 ///
 /// @brief The core structure for running the diagnostics module of the binding.
 ///

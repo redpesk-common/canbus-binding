@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-#include "./j1939-message.hpp"
 #include <cstring>
 #include "../../binding/low-can-hat.hpp"
-
+#include "j1939-message.hpp"
 
 ///
 /// @brief Class constructor

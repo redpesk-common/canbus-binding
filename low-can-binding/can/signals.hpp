@@ -26,8 +26,6 @@
 #include "openxc.pb.h"
 #include "message-definition.hpp"
 #include "../utils/timer.hpp"
-#include "../utils/socketcan-bcm.hpp"
-#include "message/can-message.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 
 #define MESSAGE_SET_ID 0

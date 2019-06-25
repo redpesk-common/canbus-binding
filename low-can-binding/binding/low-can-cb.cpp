@@ -700,6 +700,7 @@ int init_binding(afb_api_t api)
 
 	can_bus_manager.set_can_devices();
 	can_bus_manager.start_threads();
+	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
 	/// Initialize Diagnostic manager that will handle obd2 requests.
 	/// We pass by default the first CAN bus device to its Initialization.
@@ -709,7 +710,7 @@ int init_binding(afb_api_t api)
 
 	// Add a recurring dignostic message request to get engine speed at all times.
 	openxc_DynamicField search_key = build_DynamicField("diagnostic_messages.engine.speed");
-	struct utils::signals_found sf = utils::signals_manager_t::instance().find_signals(search_key);
+	struct utils::signals_found sf = sm.find_signals(search_key);
 
 	if(sf.signals.empty() && sf.diagnostic_messages.size() == 1)
 	{
@@ -718,7 +719,6 @@ int init_binding(afb_api_t api)
 		struct event_filter_t event_filter;
 		event_filter.frequency = sf.diagnostic_messages.front()->get_frequency();
 
-		utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 		std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
 
 		subscribe_unsubscribe_diagnostic_messages(request, true, sf.diagnostic_messages, event_filter, s, true);
