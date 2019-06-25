@@ -4,377 +4,453 @@
 
 application_t::application_t()
 	: can_bus_manager_{utils::config_parser_t{"/etc/dev-mapping.conf"}}
-	, can_message_set_{
-		{std::make_shared<can_message_set_t>(can_message_set_t{0,"AGL Virtual Car",
-			{ // beginning can_message_definition_ vector
-				{std::make_shared<can_message_definition_t>(can_message_definition_t{"ls",0x30,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
-					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"hvac.fan.speed",
-							32,
-							8,
-							23.5294f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+	, message_set_{
+		{std::make_shared<message_set_t>(message_set_t{0,"AGL Virtual Car",
+			{ // beginning message_definition_ vector
+				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x30,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
+						{std::make_shared<signal_t> (signal_t{
+							"hvac.fan.speed",// generic_name
+							32,// bit_position
+							8,// bit_size
+							23.5294f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							nullptr,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"hvac.temperature.left",
-							0,
-							8,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"hvac.temperature.left",// generic_name
+							0,// bit_position
+							8,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							true,
-							nullptr,
-							nullptr,
-							false
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"hvac.temperature.right",
-							8,
-							8,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"hvac.temperature.right",// generic_name
+							8,// bit_position
+							8,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							true,
-							nullptr,
-							nullptr,
-							false
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"hvac.temperature.average",
-							16,
-							8,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"hvac.temperature.average",// generic_name
+							16,// bit_position
+							8,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							true,
-							nullptr,
-							nullptr,
-							false
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})}
-					} // end can_signals vector
-				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x3D9,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
-					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"engine.speed",
-							16,
-							16,
-							0.250000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+					} // end signals vector
+				})} // end message_definition entry
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3D9,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
+						{std::make_shared<signal_t> (signal_t{
+							"engine.speed",// generic_name
+							16,// bit_position
+							16,// bit_size
+							0.250000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							nullptr,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"fuel.level.low",
-							55,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"fuel.level.low",// generic_name
+							55,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"fuel.level",
-							8,
-							8,
-							0.392157f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"fuel.level",// generic_name
+							8,// bit_position
+							8,// bit_size
+							0.392157f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							nullptr,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})}
-					} // end can_signals vector
-				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x3E9,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
-					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"vehicle.average.speed",
-							0,
-							15,
-							0.0156250f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+					} // end signals vector
+				})} // end message_definition entry
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3E9,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
+						{std::make_shared<signal_t> (signal_t{
+							"vehicle.average.speed",// generic_name
+							0,// bit_position
+							15,// bit_size
+							0.0156250f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							nullptr,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})}
-					} // end can_signals vector
-				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x4D1,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
-					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"engine.oil.temp",
-							16,
-							8,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+					} // end signals vector
+				})} // end message_definition entry
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x4D1,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
+						{std::make_shared<signal_t> (signal_t{
+							"engine.oil.temp",// generic_name
+							16,// bit_position
+							8,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							nullptr,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"engine.oil.temp.high",
-							7,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"engine.oil.temp.high",// generic_name
+							7,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})}
-					} // end can_signals vector
-				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x620,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
-					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"doors.boot.open",
-							47,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+					} // end signals vector
+				})} // end message_definition entry
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x620,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
+						{std::make_shared<signal_t> (signal_t{
+							"doors.boot.open",// generic_name
+							47,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"doors.front_left.open",
-							43,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"doors.front_left.open",// generic_name
+							43,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"doors.front_right.open",
-							44,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"doors.front_right.open",// generic_name
+							44,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"doors.rear_left.open",
-							46,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"doors.rear_left.open",// generic_name
+							46,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"doors.rear_right.open",
-							45,
-							4,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"doors.rear_right.open",// generic_name
+							45,// bit_position
+							4,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})}
-					} // end can_signals vector
-				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{"hs",0x799,can_message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
-					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"windows.front_left.open",
-							43,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+					} // end signals vector
+				})} // end message_definition entry
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x799,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
+						{std::make_shared<signal_t> (signal_t{
+							"windows.front_left.open",// generic_name
+							43,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"windows.front_right.open",
-							44,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"windows.front_right.open",// generic_name
+							44,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"windows.rear_left.open",
-							46,
-							1,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"windows.rear_left.open",// generic_name
+							46,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
-							"windows.rear_right.open",
-							45,
-							4,
-							1.00000f,
-							0.00000,
-							0,
-							0,
-							frequency_clock_t(0.00000f),
-							true,
-							false,
+						{std::make_shared<signal_t> (signal_t{
+							"windows.rear_right.open",// generic_name
+							45,// bit_position
+							4,// bit_size
+							1.00000f,// factor
+							0.00000,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
 							{
-							},
-							false,
-							decoder_t::decode_boolean,
-							nullptr,
-							false
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
 						})}
-					} // end can_signals vector
-				})} // end can_message_definition entry
+					} // end signals vector
+				})} // end message_definition entry
 
-		}, // end can_message_definition vector
+		}, // end message_definition vector
 			{ // beginning diagnostic_messages_ vector
 				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					4,
@@ -630,26 +706,26 @@ application_t::application_t()
 				})}
 
 			} // end diagnostic_messages_ vector
-		})} // end can_message_set entry
-	} // end can_message_set vector
+		})} // end message_set entry
+	} // end message_set vector
 {
-	for(auto& cms: can_message_set_)
+	for(std::shared_ptr<message_set_t> cms: message_set_)
 	{
-		std::vector<std::shared_ptr<can_message_definition_t> >& can_messages_definition = cms->get_can_message_definition();
-		for(auto& cmd : can_messages_definition)
+		std::vector<std::shared_ptr<message_definition_t>> messages_definition = cms->get_messages_definition();
+		for(std::shared_ptr<message_definition_t> cmd : messages_definition)
 		{
-			cmd->set_parent(cms.get());
-			std::vector<std::shared_ptr<can_signal_t> >& can_signals = cmd->get_can_signals();
-			for(auto& sig: can_signals)
+			cmd->set_parent(cms);
+			std::vector<std::shared_ptr<signal_t>> signals = cmd->get_signals();
+			for(std::shared_ptr<signal_t> sig: signals)
 			{
-				sig->set_parent(cmd.get());
+				sig->set_parent(cmd);
 			}
 		}
 
-		std::vector<std::shared_ptr<diagnostic_message_t> >& diagnostic_messages = cms->get_diagnostic_messages();
-		for(auto& dm : diagnostic_messages)
+		std::vector<std::shared_ptr<diagnostic_message_t>> diagnostic_messages = cms->get_diagnostic_messages();
+		for(std::shared_ptr<diagnostic_message_t> dm : diagnostic_messages)
 		{
-			dm->set_parent(cms.get());
+			dm->set_parent(cms);
 		}
 	}
 		}

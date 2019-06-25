@@ -4,11 +4,11 @@
 
 application_t::application_t()
 	: can_bus_manager_{utils::config_parser_t{"/etc/dev-mapping.conf"}}
-	, can_message_set_{
-		{std::make_shared<can_message_set_t>(can_message_set_t{0,"example",
-			{ // beginning can_message_definition_ vector
+	, message_set_{
+		{std::make_shared<message_set_t>(message_set_t{0,"example",
+			{ // beginning message_definition_ vector
 
-		}, // end can_message_definition vector
+		}, // end message_definition vector
 			{ // beginning diagnostic_messages_ vector
 				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
 					4,
@@ -264,26 +264,26 @@ application_t::application_t()
 				})}
 
 			} // end diagnostic_messages_ vector
-		})} // end can_message_set entry
-	} // end can_message_set vector
+		})} // end message_set entry
+	} // end message_set vector
 {
-	for(auto& cms: can_message_set_)
+	for(std::shared_ptr<message_set_t> cms: message_set_)
 	{
-		std::vector<std::shared_ptr<can_message_definition_t> >& can_messages_definition = cms->get_can_message_definition();
-		for(auto& cmd : can_messages_definition)
+		std::vector<std::shared_ptr<message_definition_t>> messages_definition = cms->get_messages_definition();
+		for(std::shared_ptr<message_definition_t> cmd : messages_definition)
 		{
-			cmd->set_parent(cms.get());
-			std::vector<std::shared_ptr<can_signal_t> >& can_signals = cmd->get_can_signals();
-			for(auto& sig: can_signals)
+			cmd->set_parent(cms);
+			std::vector<std::shared_ptr<signal_t>> signals = cmd->get_signals();
+			for(std::shared_ptr<signal_t> sig: signals)
 			{
-				sig->set_parent(cmd.get());
+				sig->set_parent(cmd);
 			}
 		}
 
-		std::vector<std::shared_ptr<diagnostic_message_t> >& diagnostic_messages = cms->get_diagnostic_messages();
-		for(auto& dm : diagnostic_messages)
+		std::vector<std::shared_ptr<diagnostic_message_t>> diagnostic_messages = cms->get_diagnostic_messages();
+		for(std::shared_ptr<diagnostic_message_t> dm : diagnostic_messages)
 		{
-			dm->set_parent(cms.get());
+			dm->set_parent(cms);
 		}
 	}
 		}
