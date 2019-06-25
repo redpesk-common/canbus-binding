@@ -841,7 +841,7 @@ application_t::application_t()
 		std::vector<std::shared_ptr<diagnostic_message_t> >& diagnostic_messages = cms->get_diagnostic_messages();
 		for(auto& dm : diagnostic_messages)
 		{
-			dm->set_parent(cms.get());
+			dm->set_parent(cms);
 		}
 	}
 		}
