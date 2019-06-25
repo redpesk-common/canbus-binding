@@ -224,22 +224,60 @@ void low_can_subscription_t::set_max(float max)
 {
 	event_filter_.max = max;
 }
+
 /// @brief Based upon which object is a subscribed CAN signal or diagnostic message
 /// it will open the socket with the required CAN bus device name.
 ///
 /// @return INVALID_SOCKET on failure, else positive integer
-int low_can_subscription_t::open_socket(const std::string& bus_name)
+int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, const std::string& bus_name)
 {
 	int ret = 0;
-	if(! socket_)
+	if(! subscription.socket_)
 	{
-		if( signal_ != nullptr)
-			{ret = socket_->open(signal_->get_message()->get_bus_device_name());}
-		else if (! diagnostic_message_ .empty())
-			{ret = socket_->open(application_t::instance().get_diagnostic_manager().get_bus_device_name());}
-		else if ( ! bus_name.empty())
-			{ ret = socket_->open(bus_name);}
-		index_ = (int)socket_->socket();
+
+		#ifdef USE_FEATURE_J1939
+		if((subscription.signal_ != nullptr || !bus_name.empty()) && subscription.signal_->get_message()->is_j1939())
+		{
+			name_t name = J1939_NO_NAME;
+			pgn_t pgn = J1939_NO_PGN;
+			uint8_t addr = J1939_NO_ADDR;
+			pgn = subscription.signal_->get_message()->get_id();
+			if( subscription.signal_ != nullptr)
+			{
+				std::shared_ptr<utils::socketcan_j1939_t> socket = std::make_shared<utils::socketcan_j1939_t>();
+				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(), name, pgn, addr);
+				subscription.socket_ = socket;
+            }
+            else if ( !bus_name.empty())
+            {
+				std::shared_ptr<utils::socketcan_j1939_t> socket = std::make_shared<utils::socketcan_j1939_t>();
+				ret = socket->open(bus_name, name, pgn, addr);
+				subscription.socket_ = socket;
+            }
+            subscription.index_ = (int)subscription.socket_->socket();
+		}
+		else
+		{
+		#endif
+			if( subscription.signal_ != nullptr)
+			{
+					subscription.socket_ = std::make_shared<utils::socketcan_bcm_t>();
+					ret = subscription.socket_->open(subscription.signal_->get_message()->get_bus_device_name());
+			}
+			else if (! subscription.diagnostic_message_ .empty())
+			{
+					subscription.socket_ = std::make_shared<utils::socketcan_bcm_t>();
+					ret = subscription.socket_->open(application_t::instance().get_diagnostic_manager().get_bus_device_name());
+			}
+			else if ( !bus_name.empty())
+			{
+					subscription.socket_ = std::make_shared<utils::socketcan_bcm_t>();
+					ret = subscription.socket_->open(bus_name);
+			}
+			subscription.index_ = (int)subscription.socket_->socket();
+		#ifdef USE_FEATURE_J1939
+		}
+		#endif
 	}
 	return ret;
 }
@@ -248,7 +286,7 @@ int low_can_subscription_t::open_socket(const std::string& bus_name)
 ///
 /// @returns a bcm_msg with the msg_head parts set and can_frame
 /// zeroed.
-struct bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning) const
+struct bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning)
 {
 	struct bcm_msg bcm_msg;
 	::memset(&bcm_msg, 0, sizeof(bcm_msg));
@@ -267,7 +305,7 @@ struct bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t c
 /// @brief Take an existing bcm_msg struct and add a can_frame.
 /// Currently only 1 uniq can_frame can be added, it's not possible to build
 /// a multiplexed message with several can_frame.
-void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, struct bcm_msg& bcm_msg) const
+void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, struct bcm_msg& bcm_msg)
 {
 	struct can_frame cf;
 
@@ -289,7 +327,7 @@ int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subsc
 	subscription.signal_= sig;
 
 	// Make sure that socket is opened.
-	if(subscription.open_socket() < 0)
+	if(open_socket(subscription) < 0)
 	{
 			return -1;
 	}
@@ -382,13 +420,13 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscription, struct bcm_msg& bcm_msg)
 {
 	// Make sure that socket is opened.
-	if(subscription.open_socket() < 0)
+	if(subscription.open_socket(subscription) < 0)
 		{return -1;}
 
 	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
 	// else monitor all standard 8 CAN OBD2 ID response.
 
-	std::shared_ptr<message_t> msg = std::make_shared<can_message_t>();
+	std::shared_ptr<can_message_t> msg = std::make_shared<can_message_t>();
 
 	msg->set_bcm_msg(bcm_msg);
 
@@ -421,11 +459,11 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, struct
 	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cfd.can_id);
 	subscription.add_one_bcm_frame(cfd, bcm_msg);
 
-	if(subscription.open_socket(bus_name) < 0)
+	if(subscription.open_socket(subscription, bus_name) < 0)
 		{return -1;}
 
 
-	std::shared_ptr<message_t> msg = std::make_shared<can_message_t>();
+	std::shared_ptr<can_message_t> msg = std::make_shared<can_message_t>();
 
 	msg->set_bcm_msg(bcm_msg);
 
