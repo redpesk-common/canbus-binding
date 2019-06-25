@@ -54,7 +54,8 @@ low_can_subscription_t& low_can_subscription_t::operator=(const low_can_subscrip
 
 low_can_subscription_t::~low_can_subscription_t()
 {
-	socket_->close();
+	if(socket_)
+		socket_->close();
 }
 
 low_can_subscription_t::operator bool() const

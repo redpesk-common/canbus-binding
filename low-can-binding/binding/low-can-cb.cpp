@@ -478,7 +478,7 @@ static int send_frame(struct canfd_frame& cfd, const std::string& bus_name)
 	if( cd.count(bus_name) == 0)
 		{cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());}
 
-	return cd[bus_name]->tx_send(*cd[bus_name], cfd, bus_name);
+	return low_can_subscription_t::tx_send(*cd[bus_name], cfd, bus_name);
 }
 
 static void write_raw_frame(afb_req_t request, const std::string& bus_name, json_object *json_value)

@@ -23,7 +23,8 @@
 
 #include "../can/signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
-#include "../utils/socketcan-bcm.hpp"
+#include "../utils/socketcan.hpp"
+
 
 #define OBDII_MAX_SIMULTANEOUS_RESPONSES 8
 
