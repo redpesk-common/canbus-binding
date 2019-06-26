@@ -59,7 +59,7 @@ low_can_subscription_t::~low_can_subscription_t()
 
 low_can_subscription_t::operator bool() const
 {
-	return ((can_signal_ != nullptr || ! diagnostic_message_.empty()) && ! socket_);
+	return ((signal_ != nullptr || ! diagnostic_message_.empty()) && ! socket_);
 }
 afb_event_t low_can_subscription_t::get_event()
 {
@@ -118,14 +118,14 @@ int low_can_subscription_t::get_index() const
 	return index_;
 }
 
-const std::shared_ptr<can_signal_t> low_can_subscription_t::get_can_signal() const
+const std::shared_ptr<signal_t> low_can_subscription_t::get_signal() const
 {
-	return can_signal_;
+	return signal_;
 }
 
-bool low_can_subscription_t::is_signal_subscription_corresponding(const std::shared_ptr<can_signal_t> can_signal, const struct event_filter_t& event_filter) const
+bool low_can_subscription_t::is_signal_subscription_corresponding(const std::shared_ptr<signal_t> signal, const struct event_filter_t& event_filter) const
 {
-	return can_signal_ == can_signal && event_filter_ == event_filter;
+	return signal_ == signal && event_filter_ == event_filter;
 }
 
 const std::vector<std::shared_ptr<diagnostic_message_t> > low_can_subscription_t::get_diagnostic_message() const
@@ -169,8 +169,8 @@ const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnost
 /// or no CAN signal subscribed
 const std::string low_can_subscription_t::get_name() const
 {
-	if (can_signal_ != nullptr)
-		return can_signal_->get_name();
+	if (signal_ != nullptr)
+		return signal_->get_name();
 	else if (!diagnostic_message_.empty())
 		return "diagnostic_messages";
 
@@ -233,8 +233,8 @@ int low_can_subscription_t::open_socket(const std::string& bus_name)
 	int ret = 0;
 	if(! socket_)
 	{
-		if( can_signal_ != nullptr)
-			{ret = socket_->open(can_signal_->get_message()->get_bus_device_name());}
+		if( signal_ != nullptr)
+			{ret = socket_->open(signal_->get_message()->get_bus_device_name());}
 		else if (! diagnostic_message_ .empty())
 			{ret = socket_->open(application_t::instance().get_diagnostic_manager().get_bus_device_name());}
 		else if ( ! bus_name.empty())
@@ -284,9 +284,9 @@ void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, struct b
 }
 
 #ifdef USE_FEATURE_J1939
-int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<can_signal_t> sig)
+int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig)
 {
-	subscription.can_signal_= sig;
+	subscription.signal_= sig;
 
 	// Make sure that socket is opened.
 	if(subscription.open_socket() < 0)
@@ -301,13 +301,13 @@ int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subsc
 /// subscription
 ///
 /// @return 0 if ok else -1
-int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscription, std::shared_ptr<can_signal_t> sig)
+int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig)
 {
 	uint32_t flags;
 	float val;
 	struct timeval freq, timeout = {0, 0};
 	struct canfd_frame cfd;
-	subscription.can_signal_= sig;
+	subscription.signal_= sig;
 
 	if (sig->get_message()->is_fd())
 	{
@@ -319,26 +319,26 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 		flags = SETTIMER|RX_NO_AUTOTIMER;
 		cfd.len = CAN_MAX_DLEN;
 	}
-	val = (float)(1 << subscription.can_signal_->get_bit_size()) - 1;
+	val = (float)(1 << subscription.signal_->get_bit_size()) - 1;
 	if(! bitfield_encode_float(val,
-				   subscription.can_signal_->get_bit_position(),
-				   subscription.can_signal_->get_bit_size(),
+				   subscription.signal_->get_bit_position(),
+				   subscription.signal_->get_bit_size(),
 				   1,
-				   subscription.can_signal_->get_offset(),
+				   subscription.signal_->get_offset(),
 				   cfd.data,
 				   cfd.len))
 		return -1;
 
-	frequency_clock_t f = subscription.event_filter_.frequency == 0 ? subscription.can_signal_->get_frequency() : frequency_clock_t(subscription.event_filter_.frequency);
+	frequency_clock_t f = subscription.event_filter_.frequency == 0 ? subscription.signal_->get_frequency() : frequency_clock_t(subscription.event_filter_.frequency);
 	freq = f.get_timeval_from_period();
 
-	struct bcm_msg bcm_msg = subscription.make_bcm_head(RX_SETUP, subscription.can_signal_->get_message()->get_id(), flags, timeout, freq);
+	struct bcm_msg bcm_msg = subscription.make_bcm_head(RX_SETUP, subscription.signal_->get_message()->get_id(), flags, timeout, freq);
 	subscription.add_one_bcm_frame(cfd, bcm_msg);
 
 	return create_rx_filter_bcm(subscription, bcm_msg);
 }
 
-int low_can_subscription_t::create_rx_filter(std::shared_ptr<can_signal_t> sig)
+int low_can_subscription_t::create_rx_filter(std::shared_ptr<signal_t> sig)
 {
 	#ifdef USE_FEATURE_J1939
 	if(sig->get_message()->is_j1939())

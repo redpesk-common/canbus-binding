@@ -114,7 +114,7 @@ void diagnostic_message_t::set_supported(bool value)
 	supported_ = value;
 }
 
-void diagnostic_message_t::set_parent(std::shared_ptr<can_message_set_t> parent)
+void diagnostic_message_t::set_parent(std::shared_ptr<message_set_t> parent)
 {
 	parent_ = parent;
 }

@@ -18,7 +18,7 @@
 #pragma once
 
 #include "openxc.pb.h"
-#include "can-signals.hpp"
+#include "signals.hpp"
 
 ///
 /// @brief The type signature for a function to handle a custom OpenXC command.
@@ -32,7 +32,7 @@
 /// @param[in] signalCount - The length of the signals array.
 ///
 typedef void (*CommandHandler)(const char* name, openxc_DynamicField* value,
-		openxc_DynamicField* event, can_signal_t* signals, int signalCount);
+		openxc_DynamicField* event, signal_t* signals, int signalCount);
 
 /// @struct CanCommand
 /// @brief The structure to represent a supported custom OpenXC command.

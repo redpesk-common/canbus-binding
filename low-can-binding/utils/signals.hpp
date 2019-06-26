@@ -23,7 +23,7 @@
 
 #include "openxc.pb.h"
 #include "../binding/application.hpp"
-#include "../can/can-signals.hpp"
+#include "../can/signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 
 #include "../binding/low-can-subscription.hpp"
@@ -32,7 +32,7 @@ namespace utils
 {
 	struct signals_found
 	{
-		std::vector<std::shared_ptr<can_signal_t> > can_signals;
+		std::vector<std::shared_ptr<signal_t> > signals;
 		std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages;
 	};
 
@@ -56,7 +56,7 @@ namespace utils
 
 		struct signals_found find_signals(const openxc_DynamicField &key);
 		void find_diagnostic_messages(const openxc_DynamicField &key, std::vector<std::shared_ptr<diagnostic_message_t> >& found_signals);
-		void find_can_signals(const openxc_DynamicField &key, std::vector<std::shared_ptr<can_signal_t> >& found_signals);
+		void find_signals(const openxc_DynamicField &key, std::vector<std::shared_ptr<signal_t> >& found_signals);
 
 		template <typename T>
 		void lookup_signals_by_name(const std::string& key, std::vector<std::shared_ptr<T> > signals, std::vector<std::shared_ptr<T> >& found_signals)

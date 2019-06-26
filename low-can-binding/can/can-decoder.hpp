@@ -17,25 +17,25 @@
 
 #pragma once
 
-#include "can-signals.hpp"
+#include "signals.hpp"
 #include "message/can-message.hpp"
 #include "openxc.pb.h"
 
 class decoder_t
 {
 public:
-	static float parse_signal_bitfield(can_signal_t& signal, const message_t& message);
+	static float parse_signal_bitfield(signal_t& signal, std::shared_ptr<message_t> message);
 
-	static openxc_DynamicField decode_state(can_signal_t& signal, float value, bool* send);
-	static openxc_DynamicField decode_boolean(can_signal_t& signal, float value, bool* send);
-	static openxc_DynamicField decode_ignore(can_signal_t& signal, float value, bool* send);
-	static openxc_DynamicField decode_noop(can_signal_t& signal, float value, bool* send);
+	static openxc_DynamicField decode_state(signal_t& signal, float value, bool* send);
+	static openxc_DynamicField decode_boolean(signal_t& signal, float value, bool* send);
+	static openxc_DynamicField decode_ignore(signal_t& signal, float value, bool* send);
+	static openxc_DynamicField decode_noop(signal_t& signal, float value, bool* send);
 
-	static openxc_DynamicField translate_signal(can_signal_t& signal, const message_t& messag, bool* send);
+	static openxc_DynamicField translate_signal(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
 
-	static openxc_DynamicField decode_signal(can_signal_t& signal, const can_message_t& message, bool* send);
+	static openxc_DynamicField decode_signal(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
 
-	static openxc_DynamicField decode_signal(can_signal_t& signal, float value, bool* send);
+	static openxc_DynamicField decode_signal(signal_t& signal, float value, bool* send);
 
 	static float decode_obd2_response(const DiagnosticResponse* response, float parsed_payload);
 };

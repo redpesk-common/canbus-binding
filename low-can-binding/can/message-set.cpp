@@ -16,44 +16,44 @@
  * limitations under the License.
  */
 
-#include "can-message-set.hpp"
+#include "message-set.hpp"
 
-#include "../can/can-message-definition.hpp"
+#include "../can/message-definition.hpp"
 
-can_message_set_t::can_message_set_t(
+message_set_t::message_set_t(
 		uint8_t index,
 		const std::string& name,
-		const std::vector<std::shared_ptr<can_message_definition_t> >& can_messages_definition,
+		const std::vector<std::shared_ptr<message_definition_t> >& messages_definition,
 		const std::vector<std::shared_ptr<diagnostic_message_t> >& diagnostic_messages)
 	: index_{index}
 	, name_{name}
-	, can_messages_definition_{can_messages_definition}
+	, messages_definition_{messages_definition}
 	, diagnostic_messages_{diagnostic_messages}
 {}
 
 /// @brief Returns a vector holding all message definitions which are handled by this message set.
-std::vector<std::shared_ptr<can_message_definition_t> >& can_message_set_t::get_can_message_definition()
+std::vector<std::shared_ptr<message_definition_t>>& message_set_t::get_messages_definition()
 {
-	return can_messages_definition_;
+	return messages_definition_;
 }
 
-std::vector<std::shared_ptr<can_signal_t> > can_message_set_t::get_all_can_signals() const
+std::vector<std::shared_ptr<signal_t>> message_set_t::get_all_signals() const
 {
-	std::vector<std::shared_ptr<can_signal_t> > can_signals;
-	for(const auto& cmd: can_messages_definition_)
+	std::vector<std::shared_ptr<signal_t> > signals;
+	for(const auto& cmd: messages_definition_)
 	{
-		std::vector<std::shared_ptr<can_signal_t> >& cmd_signals = cmd->get_can_signals();
-		can_signals.insert( can_signals.end(),
+		std::vector<std::shared_ptr<signal_t>> cmd_signals = cmd->get_signals();
+		signals.insert( signals.end(),
 							cmd_signals.begin(),
 							cmd_signals.end()
 		);
 	}
 
-	return can_signals;
+	return signals;
 }
 
 /// @brief Returns a vector holding all diagnostic message definitions which are handled by this message set.
-std::vector<std::shared_ptr<diagnostic_message_t> >& can_message_set_t::get_diagnostic_messages()
+std::vector<std::shared_ptr<diagnostic_message_t>>& message_set_t::get_diagnostic_messages()
 {
 	return diagnostic_messages_;
 }

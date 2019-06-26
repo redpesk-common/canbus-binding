@@ -23,8 +23,8 @@
 #include <memory>
 
 #include "../can/can-bus.hpp"
-#include "../can/can-message-set.hpp"
-#include "../can/can-signals.hpp"
+#include "../can/message-set.hpp"
+#include "../can/signals.hpp"
 #include "../diagnostic/diagnostic-manager.hpp"
 
 ///
@@ -45,7 +45,7 @@ class application_t
 		diagnostic_manager_t diagnostic_manager_; ///< Diagnostic manager use to manage diagnostic message communication.
 		uint8_t active_message_set_ = 0; ///< Which is the active message set ? Default to 0.
 
-		std::vector<std::shared_ptr<can_message_set_t> > can_message_set_; ///< Vector holding all message set from JSON signals description file
+		std::vector<std::shared_ptr<message_set_t> > message_set_; ///< Vector holding all message set from JSON signals description file
 
 		std::map<std::string, std::shared_ptr<low_can_subscription_t> > can_devices_; ///< Map containing all independant opened CAN sockets, key is the socket int value.
 
@@ -64,19 +64,19 @@ class application_t
 
 		uint8_t get_active_message_set() const;
 
-		std::vector<std::shared_ptr<can_message_set_t> > get_can_message_set();
+		std::vector<std::shared_ptr<message_set_t> > get_message_set();
 
-		std::vector<std::shared_ptr<can_signal_t> > get_all_can_signals();
+		std::vector<std::shared_ptr<signal_t> > get_all_signals();
 
-		std::vector<std::shared_ptr<diagnostic_message_t> >& get_diagnostic_messages();
+		std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_messages();
 
 		const std::vector<std::string>& get_signals_prefix() const;
 
-		std::vector<std::shared_ptr<can_message_definition_t> >& get_can_message_definition();
+		std::vector<std::shared_ptr<message_definition_t> > get_messages_definition();
 
 		uint32_t get_signal_id(diagnostic_message_t& sig) const;
 
-		uint32_t get_signal_id(can_signal_t& sig) const;
+		uint32_t get_signal_id(signal_t& sig) const;
 
 		bool isEngineOn();
 

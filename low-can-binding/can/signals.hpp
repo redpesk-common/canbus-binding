@@ -24,7 +24,7 @@
 #include <memory>
 
 #include "openxc.pb.h"
-#include "can-message-definition.hpp"
+#include "message-definition.hpp"
 #include "../utils/timer.hpp"
 #include "../utils/socketcan-bcm.hpp"
 #include "message/can-message.hpp"
@@ -32,7 +32,7 @@
 
 #define MESSAGE_SET_ID 0
 
-class can_signal_t;
+class signal_t;
 ///
 /// @brief The type signature for a CAN signal decoder.
 ///
@@ -48,7 +48,7 @@ class can_signal_t;
 ///
 /// @return a decoded value in an openxc_DynamicField struct.
 ///
-typedef openxc_DynamicField (*signal_decoder)(can_signal_t& signal, float value, bool* send);
+typedef openxc_DynamicField (*signal_decoder)(signal_t& signal, float value, bool* send);
 
 ///
 /// @brief: The type signature for a CAN signal encoder.
@@ -61,13 +61,13 @@ typedef openxc_DynamicField (*signal_decoder)(can_signal_t& signal, float value,
 /// @param[out] send - An output parameter. If the encoding failed or the CAN signal should
 /// not be encoded for some other reason, this will be flipped to false.
 ///
-typedef uint64_t (*signal_encoder)(can_signal_t& signal,
+typedef uint64_t (*signal_encoder)(signal_t& signal,
 		 const openxc_DynamicField& field, bool* send);
 
-class can_signal_t
+class signal_t
 {
 private:
-	can_message_definition_t* parent_; /*!< parent_ - pointer to the parent message definition holding this signal*/
+	std::shared_ptr<message_definition_t> parent_; /*!< parent_ - pointer to the parent message definition holding this signal*/
 	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
 	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
 				     * which make easier to sort message when the come in.*/
@@ -99,9 +99,38 @@ private:
 	bool received_; /*!< received_ - True if this signal has ever been received.*/
 	float last_value_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
 			    * this value is undefined. */
+	std::pair<bool,int> multiplex_; /*!< multiplex_ - If bool is false and int is 0 is not a multiplex signal
+										If bool is true, that indicate that is a multiplexor
+										If int is different of 0, that indicate the link with a multiplexor */
+	bool is_big_endian_; /*!< is_big_endian - True if the signal's data are meant to be read as a big_endian */
+	bool is_signed_; /* !< is_signed_ - True if the data is signed */
+	std::string unit_; /* !< unit_ - The unit of the data */
 
 public:
-	can_signal_t(
+
+	signal_t(
+		std::string generic_name,
+		uint8_t bit_position,
+		uint8_t bit_size,
+		float factor,
+		float offset,
+		float min_value,
+		float max_value,
+		frequency_clock_t frequency,
+		bool send_same,
+		bool force_send_changed,
+		std::map<uint8_t, std::string> states,
+		bool writable,
+		signal_decoder decoder,
+		signal_encoder encoder,
+		bool received,
+		std::pair<bool,int> multiplex,
+		bool is_big_endian,
+		bool is_signed,
+		std::string unit);
+
+
+	signal_t(
 		std::string generic_name,
 		uint8_t bit_position,
 		uint8_t bit_size,
@@ -118,7 +147,8 @@ public:
 		signal_encoder encoder,
 		bool received);
 
-	can_message_definition_t* get_message() const;
+
+	std::shared_ptr<message_definition_t> get_message() const;
 	const std::string get_generic_name() const;
 	const std::string get_name() const;
 	uint8_t get_bit_position() const;
@@ -135,8 +165,12 @@ public:
 	bool get_received() const;
 	float get_last_value() const;
 	std::pair<float, uint64_t> get_last_value_with_timestamp() const;
+	std::pair<bool,int> get_multiplex() const;
+	bool get_is_big_endian() const;
+	bool get_is_signed() const;
+	const std::string get_unit() const;
 
-	void set_parent(can_message_definition_t* parent);
+	void set_parent(std::shared_ptr<message_definition_t> parent);
 	void set_received(bool r);
 	void set_last_value(float val);
 	void set_timestamp(uint64_t timestamp);

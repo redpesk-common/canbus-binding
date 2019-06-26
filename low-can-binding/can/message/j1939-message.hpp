@@ -58,7 +58,7 @@ class j1939_message_t : public message_t
 
     public:
         j1939_message_t();
-        j1939_message_t(uint8_t length, can_message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp, name_t name, pgn_t pgn, uint8_t addr);
+        j1939_message_t(uint8_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp, name_t name, pgn_t pgn, uint8_t addr);
         uint64_t get_name() const;
         uint32_t get_pgn() const;
         uint8_t get_addr() const;

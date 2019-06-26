@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-#include "can-message-definition.hpp"
+#include "message-definition.hpp"
 
 #include "../binding/application.hpp"
 
-can_message_definition_t::can_message_definition_t(
+message_definition_t::message_definition_t(
 	const std::string bus,
 	uint32_t id,
 	bool is_fd,
-	can_message_format_t format,
+	message_format_t format,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed,
-	const std::vector<std::shared_ptr<can_signal_t> >& can_signals)
+	const std::vector<std::shared_ptr<signal_t> >& signals)
 	:  parent_{nullptr},
 	bus_{bus},
 	id_{id},
@@ -35,18 +35,18 @@ can_message_definition_t::can_message_definition_t(
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
-	can_signals_{can_signals}
+	signals_{signals}
 {}
 
-can_message_definition_t::can_message_definition_t(const std::string bus,
+message_definition_t::message_definition_t(const std::string bus,
 	uint32_t id,
 	const std::string name,
 	uint32_t length,
 	bool is_fd,
-	can_message_format_t format,
+	message_format_t format,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed,
-	const std::vector<std::shared_ptr<can_signal_t> >& can_signals)
+	const std::vector<std::shared_ptr<signal_t> >& signals)
 	: parent_{nullptr},
 	bus_{bus},
 	id_{id},
@@ -57,28 +57,28 @@ can_message_definition_t::can_message_definition_t(const std::string bus,
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
-	can_signals_{can_signals}
+	signals_{signals}
 {}
 
-const std::string can_message_definition_t::get_bus_device_name() const
+const std::string message_definition_t::get_bus_device_name() const
 {
 	return application_t::instance().get_can_bus_manager()
 		.get_can_device_name(bus_);
 }
 
-uint32_t can_message_definition_t::get_id() const
+uint32_t message_definition_t::get_id() const
 {
 	return id_;
 }
 
-bool can_message_definition_t::is_fd() const
+bool message_definition_t::is_fd() const
 {
 	return is_fd_;
 }
 
-bool can_message_definition_t::is_j1939() const
+bool message_definition_t::is_j1939() const
 {
-	if(format_ == can_message_format_t::J1939)
+	if(format_ == message_format_t::J1939)
 	{
 		return true;
 	}
@@ -88,17 +88,17 @@ bool can_message_definition_t::is_j1939() const
 	}
 }
 
-std::vector<std::shared_ptr<can_signal_t> >& can_message_definition_t::get_can_signals()
+std::vector<std::shared_ptr<signal_t>>& message_definition_t::get_signals()
 {
-	return can_signals_;
+	return signals_;
 }
 
-void can_message_definition_t::set_parent(can_message_set_t* parent)
+void message_definition_t::set_parent(std::shared_ptr<message_set_t> parent)
 {
 	parent_= parent;
 }
 
-void can_message_definition_t::set_last_value(const message_t& cm)
+void message_definition_t::set_last_value(std::shared_ptr<message_t> m)
 {
-	last_value_= cm.get_data_vector();
+	last_value_= m->get_data_vector();
 }

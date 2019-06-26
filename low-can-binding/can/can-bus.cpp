@@ -27,7 +27,7 @@
 
 #include "can-bus.hpp"
 
-#include "can-signals.hpp"
+#include "signals.hpp"
 #include "can-decoder.hpp"
 #include "../binding/application.hpp"
 #include "../utils/signals.hpp"
@@ -81,21 +81,21 @@ bool can_bus_t::apply_filter(const openxc_VehicleMessage& vehicle_message, std::
 /// @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
 ///
 /// @return How many signals has been decoded.
-void can_bus_t::process_signals(const message_t& message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+void can_bus_t::process_signals(std::shared_ptr<message_t> message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
-	int subscription_id = message.get_sub_id();
+	int subscription_id = message->get_sub_id();
 	openxc_DynamicField decoded_message;
 	openxc_VehicleMessage vehicle_message;
 
 	if( s.find(subscription_id) != s.end() && afb_event_is_valid(s[subscription_id]->get_event()))
 	{
 		bool send = true;
-		// First we have to found which can_signal_t it is
+		// First we have to found which signal_t it is
 		std::shared_ptr<low_can_subscription_t> sig = s[subscription_id];
 
-		decoded_message = decoder_t::translate_signal(*sig->get_can_signal(), message, &send);
+		decoded_message = decoder_t::translate_signal(*sig->get_signal(), message, &send);
 		openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
-		vehicle_message = build_VehicleMessage(s_message, message.get_timestamp());
+		vehicle_message = build_VehicleMessage(s_message, message->get_timestamp());
 
 		if(send && apply_filter(vehicle_message, sig))
 		{
@@ -166,7 +166,7 @@ void can_bus_t::can_decode_message()
 					process_diagnostic_signals(application_t::instance().get_diagnostic_manager(), message, s);
 				}
 				else
-					{process_signals(*message, s);}
+					{process_signals(message, s);}
 			}
 			can_message_lock.lock();
 		}

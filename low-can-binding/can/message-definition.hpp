@@ -16,7 +16,7 @@
  */
 
 /**
- * @class can_message_definition_t
+ * @class message_definition_t
  *
  * @brief The definition of a CAN message. This includes a lot of metadata, so
  * to save memory this struct should not be used for storing incoming and
@@ -28,25 +28,25 @@
 #include <vector>
 #include <memory>
 
-#include "can-signals.hpp"
-#include "message/can-message.hpp"
-#include "can-message-set.hpp"
+#include "signals.hpp"
+#include "message-set.hpp"
 #include "../utils/timer.hpp"
+#include "message/message.hpp"
 
-class can_message_set_t;
+class message_set_t;
 
 /// @brief The definition of a CAN message. This includes a lot of metadata, so
-///  to save memory this class gets the can_signal_t object related to a CAN message.
-class can_message_definition_t
+///  to save memory this class gets the signal_t object related to a CAN message.
+class message_definition_t
 {
 private:
-	can_message_set_t* parent_; ///< parent_ - Pointer to the CAN message set holding this CAN message definition */
+	std::shared_ptr<message_set_t> parent_; ///< parent_ - Pointer to the CAN message set holding this CAN message definition */
 	std::string bus_; ///< bus_ - Address of CAN bus device. */
-	uint32_t id_; ///< id_ - The ID of the message.*/
+	uint32_t id_; ///< id_ - The ID or the PGN (if j1939) of the message.*/
 	std::string name_; ///< name_ - J1939 PGN name
 	uint32_t length_; ///< length_ - Message data length in bytes. For J1939 message, this is the expected data size
 	bool is_fd_; /*!< uses_fd_ - Flags to enable an FD CAN message communication*/
-	can_message_format_t format_; ///< format_ - the format of the message's ID.*/
+	message_format_t format_; ///< format_ - the format of the message's ID.*/
 	frequency_clock_t frequency_clock_; ///<  clock_ - an optional frequency clock to control the output of this
 							///      message, if sent raw, or simply to mark the max frequency for custom
 							///      handlers to retrieve.*/
@@ -55,37 +55,38 @@ private:
 	std::vector<uint8_t> last_value_; ///< last_value_ - The last received value of the message. Defaults to undefined.
 										///	This is required for the forceSendChanged functionality, as the stack
 										///	needs to compare an incoming CAN message with the previous frame.*/
-	std::vector<std::shared_ptr<can_signal_t> > can_signals_; ///< can_signals_ - Vector holding can_signal_t object which share the same arbitration ID */
+	std::vector<std::shared_ptr<signal_t> > signals_; ///< signals_ - Vector holding signal_t object which share the same arbitration ID */
 
 public:
-	//can_message_definition_t(const can_message_definition_t& b);
-	can_message_definition_t(const std::string bus);
-	can_message_definition_t(const std::string bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed);
-	can_message_definition_t(const std::string bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed);
-	can_message_definition_t(const std::string bus,
+	//message_definition_t(const message_definition_t& b);
+	message_definition_t(const std::string bus);
+	message_definition_t(const std::string bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed);
+	message_definition_t(const std::string bus, uint32_t id, message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed);
+	message_definition_t(const std::string bus,
 				 uint32_t id,
 				 bool is_fd,
-				 can_message_format_t format,
+				 message_format_t format,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
-				 const std::vector<std::shared_ptr<can_signal_t> >& can_signals);
-	can_message_definition_t(const std::string bus,
+				 const std::vector<std::shared_ptr<signal_t> >& signals);
+	message_definition_t(const std::string bus,
 				 uint32_t id,
 				 std::string name,
 				 uint32_t length,
 				 bool is_fd,
-				 can_message_format_t format,
+				 message_format_t format,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
-				 const std::vector<std::shared_ptr<can_signal_t> >& can_signals);
+				 const std::vector<std::shared_ptr<signal_t> >& signals);
+
 
 	const std::string get_bus_name() const;
 	const std::string get_bus_device_name() const;
 	uint32_t get_id() const;
 	bool is_fd() const;
 	bool is_j1939() const;
-	std::vector<std::shared_ptr<can_signal_t> >& get_can_signals();
+	std::vector<std::shared_ptr<signal_t>>& get_signals();
 
-	void set_parent(can_message_set_t* parent);
-	void set_last_value(const message_t& cm);
+	void set_parent(std::shared_ptr<message_set_t> parent);
+	void set_last_value(std::shared_ptr<message_t>  m);
 };

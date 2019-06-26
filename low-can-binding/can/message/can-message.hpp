@@ -34,7 +34,7 @@ class can_message_t : public message_t {
 
 	public:
 		can_message_t();
-		can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, can_message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
+		can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
 
 		uint32_t get_id() const;
 

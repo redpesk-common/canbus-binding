@@ -37,7 +37,7 @@ can_message_t::can_message_t()
 can_message_t::can_message_t(uint8_t maxdlen,
 	uint32_t id,
 	uint8_t length,
-	can_message_format_t format,
+	message_format_t format,
 	bool rtr_flag,
 	uint8_t flags,
 	std::vector<uint8_t>& data,
@@ -66,7 +66,7 @@ uint32_t can_message_t::get_id() const
 /// @return True if object correctly initialized and false if not.
 bool can_message_t::is_correct_to_send()
 {
-	if (id_ != 0 && length_ != 0 && format_ != can_message_format_t::INVALID)
+	if (id_ != 0 && length_ != 0 && format_ != message_format_t::INVALID)
 	{
 		int i;
 		for(i=0;i<CAN_MESSAGE_SIZE;i++)
@@ -88,7 +88,7 @@ std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct ca
 {
 	uint8_t maxdlen = 0, length = 0, flags = 0;
 	uint32_t id;
-	can_message_format_t format;
+	message_format_t format;
 	bool rtr_flag;
 	std::vector<uint8_t> data;
 
@@ -109,17 +109,17 @@ std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct ca
 
 	if (frame.can_id & CAN_ERR_FLAG)
 	{
-		format = can_message_format_t::INVALID;
+		format = message_format_t::INVALID;
 		id = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
 	}
 	else if (frame.can_id & CAN_EFF_FLAG)
 	{
-		format = can_message_format_t::EXTENDED;
+		format = message_format_t::EXTENDED;
 		id = frame.can_id & CAN_EFF_MASK;
 	}
 	else
 	{
-		format = can_message_format_t::STANDARD;
+		format = message_format_t::STANDARD;
 		id = frame.can_id & CAN_SFF_MASK;
 	}
 

@@ -31,7 +31,7 @@
 #include "application.hpp"
 #include "../can/can-encoder.hpp"
 #include "../can/can-bus.hpp"
-#include "../can/can-signals.hpp"
+#include "../can/signals.hpp"
 #include "../can/message/message.hpp"
 #include "../utils/signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
@@ -241,14 +241,14 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 	return rets;
 }
 
-static int subscribe_unsubscribe_can_signals(afb_req_t request,
+static int subscribe_unsubscribe_signals(afb_req_t request,
 					     bool subscribe,
-					     std::vector<std::shared_ptr<can_signal_t> > can_signals,
+					     std::vector<std::shared_ptr<signal_t> > signals,
 					     struct event_filter_t& event_filter,
 					     std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int rets = 0;
-	for(const auto& sig: can_signals)
+	for(const auto& sig: signals)
 	{
 		auto it =  std::find_if(s.begin(), s.end(), [&sig, &event_filter](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub){ return sub.second->is_signal_subscription_corresponding(sig, event_filter) ; });
 		std::shared_ptr<low_can_subscription_t> can_subscription;
@@ -277,7 +277,7 @@ static int subscribe_unsubscribe_can_signals(afb_req_t request,
 ///
 /// @param[in] afb_req request : contains original request use to subscribe or unsubscribe
 /// @param[in] subscribe boolean value, which chooses between a subscription operation or an unsubscription
-/// @param[in] signals -  struct containing vectors with can_signal_t and diagnostic_messages to subscribe
+/// @param[in] signals -  struct containing vectors with signal_t and diagnostic_messages to subscribe
 ///
 /// @return Number of correctly subscribed signal
 ///
@@ -293,7 +293,7 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 	std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
 
 	rets += subscribe_unsubscribe_diagnostic_messages(request, subscribe, signals.diagnostic_messages, event_filter, s, false);
-	rets += subscribe_unsubscribe_can_signals(request, subscribe, signals.can_signals, event_filter, s);
+	rets += subscribe_unsubscribe_signals(request, subscribe, signals.signals, event_filter, s);
 
 	return rets;
 }
@@ -325,7 +325,7 @@ static int one_subscribe_unsubscribe(afb_req_t request,
 	// subscribe or unsubscribe
 	openxc_DynamicField search_key = build_DynamicField(tag);
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
-	if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
+	if (sf.signals.empty() && sf.diagnostic_messages.empty())
 	{
 		AFB_NOTICE("No signal(s) found for %s.", tag.c_str());
 		ret = -1;
@@ -466,13 +466,13 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
 	openxc_DynamicField dynafield_value = build_DynamicField(json_value);
 
-	if (sf.can_signals.empty())
+	if (sf.signals.empty())
 	{
 		afb_req_fail_f(request, "No signal(s) found for %s. Message not sent.", name.c_str());
 		return;
 	}
 
-	std::shared_ptr<can_signal_t>& sig = sf.can_signals[0];
+	std::shared_ptr<signal_t>& sig = sf.signals[0];
 	if(! sig->get_writable())
 	{
 		afb_req_fail_f(request, "%s isn't writable. Message not sent.", sig->get_name().c_str());
@@ -521,13 +521,13 @@ static struct json_object *get_signals_value(const std::string& name)
 	openxc_DynamicField search_key = build_DynamicField(name);
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
 
-	if (sf.can_signals.empty())
+	if (sf.signals.empty())
 	{
 		AFB_WARNING("No signal(s) found for %s.", name.c_str());
 		return NULL;
 	}
 	ans = json_object_new_array();
-	for(const auto& sig: sf.can_signals)
+	for(const auto& sig: sf.signals)
 	{
 		struct json_object *jobj = json_object_new_object();
 		json_object_object_add(jobj, "event", json_object_new_string(sig->get_name().c_str()));
@@ -575,13 +575,13 @@ static struct json_object *list_can_message(const std::string& name)
 	openxc_DynamicField search_key = build_DynamicField(name);
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
 
-	if (sf.can_signals.empty() && sf.diagnostic_messages.empty())
+	if (sf.signals.empty() && sf.diagnostic_messages.empty())
 	{
 		AFB_WARNING("No signal(s) found for %s.", name.c_str());
 		return NULL;
 	}
 	ans = json_object_new_array();
-	for(const auto& sig: sf.can_signals)
+	for(const auto& sig: sf.signals)
 	{
 		json_object_array_add(ans,
 			json_object_new_string(sig->get_name().c_str()));
@@ -646,7 +646,7 @@ int init_binding(afb_api_t api)
 	openxc_DynamicField search_key = build_DynamicField("diagnostic_messages.engine.speed");
 	struct utils::signals_found sf = utils::signals_manager_t::instance().find_signals(search_key);
 
-	if(sf.can_signals.empty() && sf.diagnostic_messages.size() == 1)
+	if(sf.signals.empty() && sf.diagnostic_messages.size() == 1)
 	{
 		afb_req_t request = nullptr;
 

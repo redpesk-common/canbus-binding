@@ -19,7 +19,7 @@
 
 #include "canutil/write.h"
 #include "../utils/openxc-utils.hpp"
-#include "can-message-definition.hpp"
+#include "message-definition.hpp"
 
 /// @brief Write a value in a CAN signal in the destination buffer.
 ///
@@ -29,7 +29,7 @@
 /// @param[in] length - The length of the destination buffer.
 ///
 /// @return Returns a canfd_frame struct initialized and ready to be send.
-const canfd_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& signal, uint64_t value)
+const canfd_frame encoder_t::build_frame(const std::shared_ptr<signal_t>& signal, uint64_t value)
 {
 	struct canfd_frame cf;
 	::memset(&cf, 0, sizeof(cf));
@@ -40,7 +40,7 @@ const canfd_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& si
 
 	signal->set_last_value((float)value);
 
-	for(const auto& sig: signal->get_message()->get_can_signals())
+	for(const auto& sig: signal->get_message()->get_signals())
 	{
 		float last_value = sig->get_last_value();
 		bitfield_encode_float(last_value,
@@ -69,7 +69,7 @@ const canfd_frame encoder_t::build_frame(const std::shared_ptr<can_signal_t>& si
 /// @return Returns the encoded integer. If 'send' is changed to false, the field could
 /// not be encoded and the return value is undefined.
 ///
-uint64_t encoder_t::encode_boolean(const can_signal_t& signal, bool value, bool* send)
+uint64_t encoder_t::encode_boolean(const signal_t& signal, bool value, bool* send)
 {
 	return encode_number(signal, float(value), send);
 }
@@ -87,7 +87,7 @@ uint64_t encoder_t::encode_boolean(const can_signal_t& signal, bool value, bool*
 /// @return Returns the encoded integer. If 'send' is changed to false, the field could
 /// not be encoded and the return value is undefined.
 ///
-uint64_t encoder_t::encode_number(const can_signal_t& signal, float value, bool* send)
+uint64_t encoder_t::encode_number(const signal_t& signal, float value, bool* send)
 {
 	return float_to_fixed_point(value, signal.get_factor(), signal.get_offset());
 }
@@ -109,7 +109,7 @@ uint64_t encoder_t::encode_number(const can_signal_t& signal, float value, bool*
 /// @return Returns the encoded integer. If 'send' is changed to false, the field could
 /// not be encoded and the return value is undefined.
 ///
-uint64_t encoder_t::encode_state(const can_signal_t& signal, const std::string& state, bool* send)
+uint64_t encoder_t::encode_state(const signal_t& signal, const std::string& state, bool* send)
 {
 	uint64_t value = 0;
 	if(state == "")
@@ -133,7 +133,7 @@ uint64_t encoder_t::encode_state(const can_signal_t& signal, const std::string& 
 /// @brief Parse a signal from a CAN message and apply any required
 /// transforations to get a human readable value.
 ///
-/// If the can_signal_t has a non-NULL 'decoder' field, the raw CAN signal value
+/// If the signal_t has a non-NULL 'decoder' field, the raw CAN signal value
 /// will be passed to the decoder before returning.
 ///
 /// @param[in] signal - The details of the signal to decode and forward.
@@ -144,7 +144,7 @@ uint64_t encoder_t::encode_state(const can_signal_t& signal, const std::string& 
 /// @return The decoder returns an openxc_DynamicField, which may contain a number,
 /// string or boolean. If 'send' is false, the return value is undefined.
 ///
-uint64_t encoder_t::encode_DynamicField( can_signal_t& signal, const openxc_DynamicField& field, bool* send)
+uint64_t encoder_t::encode_DynamicField( signal_t& signal, const openxc_DynamicField& field, bool* send)
 {
 	uint64_t value = 0;
 	switch(field.type) {

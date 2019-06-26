@@ -46,7 +46,7 @@ namespace utils
 
 	///
 	/// @fn std::vector<std::string> find_signals(const openxc_DynamicField &key)
-	/// @brief return signals name found searching through CAN_signals and OBD2 pid
+	/// @brief return signals name found searching through signals and OBD2 pid
 	///
 	/// @param[in] key : can contain numeric or string value in order to search against
 	///   can signals or obd2 signals name.
@@ -60,18 +60,18 @@ namespace utils
 		switch(key.type)
 		{
 			case openxc_DynamicField_Type::openxc_DynamicField_Type_STRING:
-					lookup_signals_by_name(key.string_value, application_t::instance().get_all_can_signals(), sf.can_signals);
+					lookup_signals_by_name(key.string_value, application_t::instance().get_all_signals(), sf.signals);
 					lookup_signals_by_name(key.string_value, application_t::instance().get_diagnostic_messages(), sf.diagnostic_messages);
 				break;
 			case openxc_DynamicField_Type::openxc_DynamicField_Type_NUM:
-					lookup_signals_by_id(key.numeric_value, application_t::instance().get_all_can_signals(), sf.can_signals);
+					lookup_signals_by_id(key.numeric_value, application_t::instance().get_all_signals(), sf.signals);
 					lookup_signals_by_id(key.numeric_value, application_t::instance().get_diagnostic_messages(), sf.diagnostic_messages);
 				break;
 			default:
 				AFB_ERROR("wrong openxc_DynamicField specified. Use openxc_DynamicField_Type_NUM or openxc_DynamicField_Type_STRING type only.");
 				break;
 		}
-		AFB_DEBUG("Found %d signal(s)", (int)(sf.can_signals.size() + sf.diagnostic_messages.size()));
+		AFB_DEBUG("Found %d signal(s)", (int)(sf.signals.size() + sf.diagnostic_messages.size()));
 		return sf;
 	}
 }

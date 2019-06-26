@@ -40,10 +40,10 @@ struct bcm_msg
 };
 
 /**
- * @enum can_message_format_t
+ * @enum message_format_t
  * @brief The ID format for a CAN message.
  */
-enum class can_message_format_t {
+enum class message_format_t {
 	STANDARD, ///< STANDARD - standard 11-bit CAN arbitration ID. */
 	EXTENDED, ///< EXTENDED - an extended frame, with a 29-bit arbitration ID. */
 	J1939,	  ///< J1939 	- Format for j1939 messages
@@ -58,7 +58,7 @@ enum class can_message_format_t {
 class message_t {
 protected:
 	uint8_t length_; ///< length_ - the length of the data array (max 8). */
-	can_message_format_t format_; ///< format_ - the format of the message's ID.*/
+	message_format_t format_; ///< format_ - the format of the message's ID.*/
 	std::vector<uint8_t> data_; ///< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 	uint64_t timestamp_; ///< timestamp_ - timestamp of the received message*/
 	int sub_id_; ///< sub_id_ - Subscription index. */
@@ -66,7 +66,7 @@ protected:
 
 public:
 	message_t();
-	message_t(uint8_t length, can_message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp);
+	message_t(uint8_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp);
 
 	int get_sub_id() const;
 	const uint8_t* get_data() const;
@@ -76,7 +76,7 @@ public:
 
 	void set_sub_id(int sub_id);
 	void set_timestamp(uint64_t timestamp);
-	can_message_format_t get_msg_format();
+	message_format_t get_msg_format();
 	virtual bool is_set() = 0;
 	virtual std::string get_debug_message() = 0;
 	virtual uint32_t get_id() const = 0;

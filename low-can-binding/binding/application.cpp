@@ -52,24 +52,24 @@ uint8_t application_t::get_active_message_set() const
 	return active_message_set_;
 }
 
-std::vector<std::shared_ptr<can_message_set_t> > application_t::get_can_message_set()
+std::vector<std::shared_ptr<message_set_t> > application_t::get_message_set()
 {
-	return can_message_set_;
+	return message_set_;
 }
 
-std::vector<std::shared_ptr<can_signal_t> > application_t::get_all_can_signals()
+std::vector<std::shared_ptr<signal_t> > application_t::get_all_signals()
 {
-	return can_message_set_[active_message_set_]->get_all_can_signals();
+	return message_set_[active_message_set_]->get_all_signals();
 }
 
-std::vector<std::shared_ptr<diagnostic_message_t> >& application_t::get_diagnostic_messages()
+std::vector<std::shared_ptr<diagnostic_message_t> > application_t::get_diagnostic_messages()
 {
-	return can_message_set_[active_message_set_]->get_diagnostic_messages();
+	return message_set_[active_message_set_]->get_diagnostic_messages();
 }
 
-std::vector<std::shared_ptr<can_message_definition_t> >& application_t::get_can_message_definition()
+std::vector<std::shared_ptr<message_definition_t>> application_t::get_messages_definition()
 {
-	return can_message_set_[active_message_set_]->get_can_message_definition();
+	return message_set_[active_message_set_]->get_messages_definition();
 }
 
 uint32_t application_t::get_signal_id(diagnostic_message_t& sig) const
@@ -77,7 +77,7 @@ uint32_t application_t::get_signal_id(diagnostic_message_t& sig) const
 	return sig.get_pid();
 }
 
-uint32_t application_t::get_signal_id(can_signal_t& sig) const
+uint32_t application_t::get_signal_id(signal_t& sig) const
 {
 	return sig.get_message()->get_id();
 }
@@ -95,12 +95,12 @@ bool application_t::isEngineOn()
 	bool engine_on = false;
 	uint64_t last_timestamp_in_s;
 
-	if(sf.can_signals.size() == 1)
+	if(sf.signals.size() == 1)
 	{
-		last_timestamp_in_s = sf.can_signals.front()->get_last_value_with_timestamp().second
+		last_timestamp_in_s = sf.signals.front()->get_last_value_with_timestamp().second
 						/ MICROSECONDS_IN_SECOND;
 
-		if(sf.can_signals.front()->get_last_value_with_timestamp().first > 0 &&
+		if(sf.signals.front()->get_last_value_with_timestamp().first > 0 &&
 		   std::difftime(std::time(nullptr), last_timestamp_in_s) < ENGINE_VALUE_TIMEOUT)
 		{
 			engine_on = true;

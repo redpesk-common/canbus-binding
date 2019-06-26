@@ -21,7 +21,7 @@
 #include <cmath>
 #include <utility>
 
-#include "../can/can-signals.hpp"
+#include "../can/signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/socketcan-bcm.hpp"
 
@@ -51,7 +51,7 @@ private:
 	afb_event_t event_; ///< event_ - application framework event used to push on client
 
 	/// Signal part
-	std::shared_ptr<can_signal_t> can_signal_; ///< can_signal_ - the CAN signal subscribed
+	std::shared_ptr<signal_t> signal_; ///< signal_ - the CAN signal subscribed
 	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to receive OBD2
 										 /// responses. Normal diagnostic request and response are not tested for now.
 	std::shared_ptr<utils::socketcan_t> socket_; ///< socket_ - socket_ that receives CAN messages.
@@ -73,8 +73,8 @@ public:
 	int unsubscribe(afb_req_t request);
 
 	int get_index() const;
-	const std::shared_ptr<can_signal_t> get_can_signal() const;
-	bool is_signal_subscription_corresponding(const std::shared_ptr<can_signal_t>, const struct event_filter_t& event_filter) const;
+	const std::shared_ptr<signal_t> get_signal() const;
+	bool is_signal_subscription_corresponding(const std::shared_ptr<signal_t>, const struct event_filter_t& event_filter) const;
 	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(uint32_t pid) const;
 	const std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_message() const;
 	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(const std::string& name) const;
@@ -94,10 +94,10 @@ public:
 
 	int open_socket(const std::string& bus_name = "");
 
-	int create_rx_filter(std::shared_ptr<can_signal_t> sig);
+	int create_rx_filter(std::shared_ptr<signal_t> sig);
 	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
-	static int create_rx_filter_can(low_can_subscription_t &subscription, std::shared_ptr<can_signal_t> sig);
-	static int create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<can_signal_t> sig);
+	static int create_rx_filter_can(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig);
+	static int create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig);
 	static int create_rx_filter_bcm(low_can_subscription_t &subscription, struct bcm_msg& bcm_msg);
 
 	static int tx_send(low_can_subscription_t &subscription, struct canfd_frame& cfd, const std::string& bus_name);

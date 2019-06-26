@@ -33,7 +33,7 @@ j1939_message_t::j1939_message_t():
 {}
 
 j1939_message_t::j1939_message_t(uint8_t length,
-    can_message_format_t format,
+    message_format_t format,
     std::vector<uint8_t>& data,
     uint64_t timestamp,
     name_t name,
@@ -86,18 +86,18 @@ uint8_t j1939_message_t::get_addr() const{
 std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct sockaddr_can& addr, uint8_t (&data)[128],size_t nbytes, uint64_t timestamp)
 {
 	uint8_t length = 0;
-	can_message_format_t format;
+	message_format_t format;
 	std::vector<uint8_t> dataVector;
 
     if(nbytes > J1939_MAX_DLEN)
     {
         AFB_DEBUG("Unsupported j1939 frame");
-        format = can_message_format_t::INVALID;
+        format = message_format_t::INVALID;
     }
     else
     {
         AFB_DEBUG("Got a j1939 frame");
-        format = can_message_format_t::J1939;
+        format = message_format_t::J1939;
     }
 
     length = (uint8_t) nbytes;

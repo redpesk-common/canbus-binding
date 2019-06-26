@@ -4,18 +4,18 @@
 
 application_t::application_t()
 	: can_bus_manager_{utils::config_parser_t{"/etc/dev-mapping.conf"}}
-	, can_message_set_{
-		{std::make_shared<can_message_set_t>(can_message_set_t{0,"AGL Virtual Car",
+	, message_set_{
+		{std::make_shared<message_set_t>(message_set_t{0,"AGL Virtual Car",
 			{ // beginning can_message_definition_ vector
-				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+				{std::make_shared<message_definition_t>(message_definition_t{
 				 "ls",
 				 0x30,
 				 false,
-				 can_message_format_t::EXTENDED,
+				 message_format_t::EXTENDED,
 				 frequency_clock_t(5.00000f),
 				 true,
 					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"hvac.fan.speed",
 							32,
 							8,
@@ -33,7 +33,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"hvac.temperature.left",
 							0,
 							8,
@@ -51,7 +51,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"hvac.temperature.right",
 							8,
 							8,
@@ -69,7 +69,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"hvac.temperature.average",
 							16,
 							8,
@@ -89,15 +89,15 @@ application_t::application_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+,				{std::make_shared<message_definition_t>(message_definition_t{
 				 "hs",
 				 0x3D9,
 				 true,
-				 can_message_format_t::STANDARD,
+				 message_format_t::STANDARD,
 				 frequency_clock_t(5.00000f),
 				 true,
 					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"engine.speed",
 							16,
 							16,
@@ -115,7 +115,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"fuel.level.low",
 							55,
 							1,
@@ -133,7 +133,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"fuel.level",
 							8,
 							8,
@@ -153,15 +153,15 @@ application_t::application_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+,				{std::make_shared<message_definition_t>(message_definition_t{
 				 "hs",
 				 0x3E9,
 				 false,
-				 can_message_format_t::EXTENDED,
+				 message_format_t::EXTENDED,
 				 frequency_clock_t(5.00000f),
 				 true,
 					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"vehicle.average.speed",
 							0,
 							15,
@@ -181,15 +181,15 @@ application_t::application_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+,				{std::make_shared<message_definition_t>(message_definition_t{
 				 "hs",
 				 0x4D1,
 				 false,
-				 can_message_format_t::STANDARD,
+				 message_format_t::STANDARD,
 				 frequency_clock_t(5.00000f),
 				 true,
 					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"engine.oil.temp",
 							16,
 							8,
@@ -207,7 +207,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"engine.oil.temp.high",
 							7,
 							1,
@@ -227,15 +227,15 @@ application_t::application_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+,				{std::make_shared<message_definition_t>(message_definition_t{
 				 "hs",
 				 0x5D1,
 				 false,
-				 can_message_format_t::STANDARD,
+				 message_format_t::STANDARD,
 				 frequency_clock_t(5.00000f),
 				 true,
 					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"accelerator.pedal.position",
 							16,
 							8,
@@ -253,7 +253,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"steering.wheel.angle",
 							4,
 							12,
@@ -273,15 +273,15 @@ application_t::application_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+,				{std::make_shared<message_definition_t>(message_definition_t{
 				 "hs",
 				 0x5D2,
 				 false,
-				 can_message_format_t::STANDARD,
+				 message_format_t::STANDARD,
 				 frequency_clock_t(5.00000f),
 				 true,
 					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"transmission.gearinfo",
 							20,
 							4,
@@ -299,7 +299,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"transmission.mode",
 							16,
 							4,
@@ -319,15 +319,15 @@ application_t::application_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+,				{std::make_shared<message_definition_t>(message_definition_t{
 				 "hs",
 				 0x5D3,
 				 false,
-				 can_message_format_t::STANDARD,
+				 message_format_t::STANDARD,
 				 frequency_clock_t(5.00000f),
 				 true,
 					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"turnsignal.status",
 							26,
 							3,
@@ -345,7 +345,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"lightstatus.brake",
 							7,
 							1,
@@ -363,7 +363,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"parking.brake.status",
 							8,
 							1,
@@ -383,15 +383,15 @@ application_t::application_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+,				{std::make_shared<message_definition_t>(message_definition_t{
 				 "hs",
 				 0x620,
 				 false,
-				 can_message_format_t::STANDARD,
+				 message_format_t::STANDARD,
 				 frequency_clock_t(5.00000f),
 				 true,
 					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"doors.boot.open",
 							47,
 							1,
@@ -409,7 +409,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"doors.front_left.open",
 							43,
 							1,
@@ -427,7 +427,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"doors.front_right.open",
 							44,
 							1,
@@ -445,7 +445,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"doors.rear_left.open",
 							46,
 							1,
@@ -463,7 +463,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"doors.rear_right.open",
 							45,
 							4,
@@ -483,15 +483,15 @@ application_t::application_t()
 						})}
 					} // end can_signals vector
 				})} // end can_message_definition entry
-,				{std::make_shared<can_message_definition_t>(can_message_definition_t{
+,				{std::make_shared<message_definition_t>(message_definition_t{
 				 "hs",
 				 0x799,
 				 false,
-				 can_message_format_t::STANDARD,
+				 message_format_t::STANDARD,
 				 frequency_clock_t(5.00000f),
 				 true,
 					{ // beginning can_signals vector
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"windows.front_left.open",
 							43,
 							1,
@@ -509,7 +509,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"windows.front_right.open",
 							44,
 							1,
@@ -527,7 +527,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"windows.rear_left.open",
 							46,
 							1,
@@ -545,7 +545,7 @@ application_t::application_t()
 							nullptr,
 							false
 						})},
-						{std::make_shared<can_signal_t> (can_signal_t{
+						{std::make_shared<signal_t> (signal_t{
 							"windows.rear_right.open",
 							45,
 							4,
@@ -825,16 +825,16 @@ application_t::application_t()
 		})} // end can_message_set entry
 	} // end can_message_set vector
 {
-	for(auto& cms: can_message_set_)
+	for(auto& cms: message_set_)
 	{
-		std::vector<std::shared_ptr<can_message_definition_t> >& can_messages_definition = cms->get_can_message_definition();
+		std::vector<std::shared_ptr<message_definition_t> >& can_messages_definition = cms->get_messages_definition();
 		for(auto& cmd : can_messages_definition)
 		{
-			cmd->set_parent(cms.get());
-			std::vector<std::shared_ptr<can_signal_t> >& can_signals = cmd->get_can_signals();
+			cmd->set_parent(cms);
+			std::vector<std::shared_ptr<signal_t> >& can_signals = cmd->get_signals();
 			for(auto& sig: can_signals)
 			{
-				sig->set_parent(cmd.get());
+				sig->set_parent(cmd);
 			}
 		}
 

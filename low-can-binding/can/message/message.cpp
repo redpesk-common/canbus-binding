@@ -28,13 +28,13 @@
 ///
 message_t::message_t()
 	: length_{0},
-	 format_{can_message_format_t::INVALID},
+	 format_{message_format_t::INVALID},
 	 timestamp_{0},
 	 sub_id_{-1}
 {}
 
 message_t::message_t(uint8_t length,
-	can_message_format_t format,
+	message_format_t format,
 	std::vector<uint8_t>& data,
 	uint64_t timestamp)
 	: length_{length},
@@ -90,7 +90,7 @@ uint64_t message_t::get_timestamp() const
 	return timestamp_;
 }
 
-can_message_format_t message_t::get_msg_format()
+message_format_t message_t::get_msg_format()
 {
 	return format_;
 }

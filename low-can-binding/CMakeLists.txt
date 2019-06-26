@@ -28,11 +28,11 @@ PROJECT_TARGET_ADD(low-can)
 		binding/${TARGET_NAME}-subscription.cpp
 		binding/application.cpp
 		can/can-bus.cpp
-		can/can-message-set.cpp
-		can/can-message-definition.cpp
+		can/message-set.cpp
+		can/message-definition.cpp
 		can/message/message.cpp
 		can/message/can-message.cpp
-		can/can-signals.cpp
+		can/signals.cpp
 		can/can-decoder.cpp
 		can/can-encoder.cpp
 		diagnostic/diagnostic-message.cpp
