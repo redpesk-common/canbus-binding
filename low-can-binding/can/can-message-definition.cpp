@@ -38,6 +38,28 @@ can_message_definition_t::can_message_definition_t(
 	can_signals_{can_signals}
 {}
 
+can_message_definition_t::can_message_definition_t(const std::string bus,
+	uint32_t id,
+	const std::string name,
+	uint32_t length,
+	bool is_fd,
+	can_message_format_t format,
+	frequency_clock_t frequency_clock,
+	bool force_send_changed,
+	const std::vector<std::shared_ptr<can_signal_t> >& can_signals)
+	: parent_{nullptr},
+	bus_{bus},
+	id_{id},
+	name_{name},
+	length_{length},
+	is_fd_(is_fd),
+	format_{format},
+	frequency_clock_{frequency_clock},
+	force_send_changed_{force_send_changed},
+	last_value_{CAN_MESSAGE_SIZE},
+	can_signals_{can_signals}
+{}
+
 const std::string can_message_definition_t::get_bus_device_name() const
 {
 	return application_t::instance().get_can_bus_manager()

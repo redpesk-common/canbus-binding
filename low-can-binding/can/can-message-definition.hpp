@@ -43,6 +43,8 @@ private:
 	can_message_set_t* parent_; ///< parent_ - Pointer to the CAN message set holding this CAN message definition */
 	std::string bus_; ///< bus_ - Address of CAN bus device. */
 	uint32_t id_; ///< id_ - The ID of the message.*/
+	std::string name_; ///< name_ - J1939 PGN name
+	uint32_t length_; ///< length_ - Message data length in bytes. For J1939 message, this is the expected data size
 	bool is_fd_; /*!< uses_fd_ - Flags to enable an FD CAN message communication*/
 	can_message_format_t format_; ///< format_ - the format of the message's ID.*/
 	frequency_clock_t frequency_clock_; ///<  clock_ - an optional frequency clock to control the output of this
@@ -62,6 +64,15 @@ public:
 	can_message_definition_t(const std::string bus, uint32_t id, can_message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed);
 	can_message_definition_t(const std::string bus,
 				 uint32_t id,
+				 bool is_fd,
+				 can_message_format_t format,
+				 frequency_clock_t frequency_clock,
+				 bool force_send_changed,
+				 const std::vector<std::shared_ptr<can_signal_t> >& can_signals);
+	can_message_definition_t(const std::string bus,
+				 uint32_t id,
+				 std::string name,
+				 uint32_t length,
 				 bool is_fd,
 				 can_message_format_t format,
 				 frequency_clock_t frequency_clock,
