@@ -40,6 +40,21 @@ set(PROJECT_CMAKE_CONF_DIR "conf.d")
 # ----------------------------------
 set(BUILD_TYPE "RELEASE" CACHE STRING "Default Build variant chosen. (Overwritten by cli if given)")
 
+# Activate J1939
+# Need module in kernel
+# --------------
+
+execute_process(COMMAND ls /usr/include/linux/can/j1939.h RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+
+if(result)
+	message("Feature J1939 disabled")
+	set(WITH_FEATURE_J1939 OFF)
+else()
+	message("Feature J1939 enabled")
+	set(WITH_FEATURE_J1939 ON)
+	add_definitions(-DUSE_FEATURE_J1939)
+endif()
+
 # Kernel selection if needed. You can choose between a
 # mandatory version to impose a minimal version.
 # Or check Kernel minimal version and just print a Warning

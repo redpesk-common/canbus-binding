@@ -18,10 +18,11 @@
 ###########################################################################
 
 # Add target to project dependency list
+
 PROJECT_TARGET_ADD(low-can)
 
 	# Define project Targets
-	add_library(${TARGET_NAME} MODULE
+	set (SOURCES
 		#binding/${TARGET_NAME}-hat.cpp
 		binding/${TARGET_NAME}-cb.cpp
 		binding/${TARGET_NAME}-subscription.cpp
@@ -44,6 +45,14 @@ PROJECT_TARGET_ADD(low-can)
 		utils/socketcan-bcm.cpp
 		utils/config-parser.cpp
 		binding/application-generated.cpp)
+
+	if(WITH_FEATURE_J1939)
+		set(SOURCES_J1939
+		# Empty for the moment to not break the build until all modifications are set
+		)
+	endif()
+
+	add_library(${TARGET_NAME} MODULE ${SOURCES} ${SOURCES_J1939})
 
 	set(OPENAPI_DEF "binding/low-can-apidef" CACHE STRING "name and path to the JSON API definition without extension")
 	# Binder exposes a unique public entry point
