@@ -27,7 +27,7 @@
 #include "can-message-definition.hpp"
 #include "../utils/timer.hpp"
 #include "../utils/socketcan-bcm.hpp"
-#include "can-message.hpp"
+#include "message/can-message.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 
 #define MESSAGE_SET_ID 0

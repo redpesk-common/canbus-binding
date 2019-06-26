@@ -18,20 +18,20 @@
 #pragma once
 
 #include "can-signals.hpp"
-#include "can-message.hpp"
+#include "message/can-message.hpp"
 #include "openxc.pb.h"
 
 class decoder_t
 {
 public:
-	static float parse_signal_bitfield(can_signal_t& signal, const can_message_t& message);
+	static float parse_signal_bitfield(can_signal_t& signal, const message_t& message);
 
 	static openxc_DynamicField decode_state(can_signal_t& signal, float value, bool* send);
 	static openxc_DynamicField decode_boolean(can_signal_t& signal, float value, bool* send);
 	static openxc_DynamicField decode_ignore(can_signal_t& signal, float value, bool* send);
 	static openxc_DynamicField decode_noop(can_signal_t& signal, float value, bool* send);
 
-	static openxc_DynamicField translate_signal(can_signal_t& signal, const can_message_t& messag, bool* send);
+	static openxc_DynamicField translate_signal(can_signal_t& signal, const message_t& messag, bool* send);
 
 	static openxc_DynamicField decode_signal(can_signal_t& signal, const can_message_t& message, bool* send);
 

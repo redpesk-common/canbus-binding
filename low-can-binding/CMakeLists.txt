@@ -30,7 +30,8 @@ PROJECT_TARGET_ADD(low-can)
 		can/can-bus.cpp
 		can/can-message-set.cpp
 		can/can-message-definition.cpp
-		can/can-message.cpp
+		can/message/message.cpp
+		can/message/can-message.cpp
 		can/can-signals.cpp
 		can/can-decoder.cpp
 		can/can-encoder.cpp
@@ -44,11 +45,13 @@ PROJECT_TARGET_ADD(low-can)
 		#utils/socketcan-raw.cpp
 		utils/socketcan-bcm.cpp
 		utils/config-parser.cpp
-		binding/application-generated.cpp)
+		binding/application-generated.cpp
+		)
 
 	if(WITH_FEATURE_J1939)
 		set(SOURCES_J1939
-		# Empty for the moment to not break the build until all modifications are set
+			can/message/j1939-message.cpp
+			utils/socketcan-j1939.cpp
 		)
 	endif()
 

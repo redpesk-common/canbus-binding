@@ -31,7 +31,7 @@
 /// @return Returns the raw value of the signal parsed as a bitfield from the given byte
 /// array.
 ///
-float decoder_t::parse_signal_bitfield(can_signal_t& signal, const can_message_t& message)
+float decoder_t::parse_signal_bitfield(can_signal_t& signal, const message_t& message)
 {
 	 return bitfield_parse_float(message.get_data(), CAN_MESSAGE_SIZE,
 			signal.get_bit_position(), signal.get_bit_size(), signal.get_factor(),
@@ -144,7 +144,7 @@ openxc_DynamicField decoder_t::decode_state(can_signal_t& signal, float value, b
 /// The decoder returns an openxc_DynamicField, which may contain a number,
 /// string or boolean.
 ///
-openxc_DynamicField decoder_t::translate_signal(can_signal_t& signal, const can_message_t& message, bool* send)
+openxc_DynamicField decoder_t::translate_signal(can_signal_t& signal, const message_t& message, bool* send)
 {
 	float value = decoder_t::parse_signal_bitfield(signal, message);
 	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);

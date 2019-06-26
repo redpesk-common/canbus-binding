@@ -18,7 +18,7 @@
 #pragma once
 
 #include "can-signals.hpp"
-#include "can-message.hpp"
+#include "message/can-message.hpp"
 #include "openxc.pb.h"
 
 class encoder_t

@@ -29,7 +29,7 @@
 #include <memory>
 
 #include "can-signals.hpp"
-#include "can-message.hpp"
+#include "message/can-message.hpp"
 #include "can-message-set.hpp"
 #include "../utils/timer.hpp"
 
@@ -72,8 +72,9 @@ public:
 	const std::string get_bus_device_name() const;
 	uint32_t get_id() const;
 	bool is_fd() const;
+	bool is_j1939() const;
 	std::vector<std::shared_ptr<can_signal_t> >& get_can_signals();
 
 	void set_parent(can_message_set_t* parent);
-	void set_last_value(const can_message_t& cm);
+	void set_last_value(const message_t& cm);
 };

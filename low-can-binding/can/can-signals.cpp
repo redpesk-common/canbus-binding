@@ -22,7 +22,7 @@
 #include "../binding/application.hpp"
 #include "../utils/signals.hpp"
 #include "can-decoder.hpp"
-#include "can-message.hpp"
+#include "message/can-message.hpp"
 #include "can-bus.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 #include "canutil/write.h"

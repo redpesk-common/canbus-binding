@@ -22,7 +22,7 @@
 
 #include "uds/uds.h"
 #include "../can/can-message-set.hpp"
-#include "../can/can-message.hpp"
+#include "../can/message/can-message.hpp"
 #include "active-diagnostic-request.hpp"
 
 enum UNIT {

@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "can-message.hpp"
+#include "./can-message.hpp"
 
 #include <cstring>
 
-#include "../binding/low-can-hat.hpp"
+#include "../../binding/low-can-hat.hpp"
 
 ///
 /// @brief Class constructor
@@ -27,14 +27,11 @@
 /// can_message_t class constructor.
 ///
 can_message_t::can_message_t()
-	: maxdlen_{0},
+	: message_t(),
+	 maxdlen_{0},
 	 id_{0},
-	 length_{0},
-	 format_{can_message_format_t::INVALID},
 	 rtr_flag_{false},
-	 flags_{0},
-	 timestamp_{0},
-	 sub_id_{-1}
+	 flags_{0}
 {}
 
 can_message_t::can_message_t(uint8_t maxdlen,
@@ -45,15 +42,11 @@ can_message_t::can_message_t(uint8_t maxdlen,
 	uint8_t flags,
 	std::vector<uint8_t>& data,
 	uint64_t timestamp)
-	:  maxdlen_{maxdlen},
+	: message_t(length, format, data, timestamp),
+	maxdlen_{maxdlen},
 	id_{id},
-	length_{length},
-	format_{format},
 	rtr_flag_{rtr_flag},
-	flags_{flags},
-	data_{data},
-	timestamp_{timestamp},
-	sub_id_{-1}
+	flags_{flags}
 {}
 
 ///
@@ -66,51 +59,6 @@ uint32_t can_message_t::get_id() const
 	return id_;
 }
 
-int can_message_t::get_sub_id() const
-{
-	return sub_id_;
-}
-
-///
-/// @brief Retrieve data_ member value.
-///
-/// @return pointer to the first element
-///  of class member data_
-///
-const uint8_t* can_message_t::get_data() const
-{
-	return data_.data();
-}
-
-///
-/// @brief Retrieve data_ member whole vector
-///
-/// @return the vector as is
-///
-const std::vector<uint8_t> can_message_t::get_data_vector() const
-{
-	return data_;
-}
-
-///
-/// @brief Retrieve length_ member value.
-///
-/// @return length_ class member
-///
-uint8_t can_message_t::get_length() const
-{
-	return length_;
-}
-
-void can_message_t::set_sub_id(int sub_id)
-{
-	sub_id_ = sub_id;
-}
-
-uint64_t can_message_t::get_timestamp() const
-{
-	return timestamp_;
-}
 
 /// @brief Control whether the object is correctly initialized
 ///  to be sent over the CAN bus
@@ -136,7 +84,7 @@ bool can_message_t::is_correct_to_send()
 /// @param[in] nbytes - bytes read from socket read operation.
 ///
 /// @return A can_message_t object fully initialized with canfd_frame values.
-can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes, uint64_t timestamp)
+std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes, uint64_t timestamp)
 {
 	uint8_t maxdlen = 0, length = 0, flags = 0;
 	uint32_t id;
@@ -213,5 +161,34 @@ can_message_t can_message_t::convert_from_frame(const struct canfd_frame& frame,
 								id, (uint8_t)format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 	}
 
-	return can_message_t(maxdlen, id, length, format, rtr_flag, flags, data, timestamp);
+	return std::make_shared<can_message_t>(can_message_t(maxdlen, id, length, format, rtr_flag, flags, data, timestamp));
 }
+
+
+bool can_message_t::is_set()
+{
+	return (id_ != 0 && length_ != 0);
+}
+
+std::string can_message_t::get_debug_message()
+{
+	std::string ret = "";
+    ret = ret + "Here is the next can message : id " + std::to_string(id_)  + " length " + std::to_string(length_) + ", data ";
+    for (size_t i = 0; i < data_.size(); i++)
+    {
+        ret = ret + std::to_string(data_[i]);
+    }
+
+    return ret;
+}
+
+struct bcm_msg can_message_t::get_bcm_msg()
+{
+	return bcm_msg_;
+}
+
+void can_message_t::set_bcm_msg(struct bcm_msg bcm_msg)
+{
+	bcm_msg_ = bcm_msg;
+}
+

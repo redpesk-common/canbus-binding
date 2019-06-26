@@ -18,21 +18,10 @@
 #pragma once
 
 #include "socketcan.hpp"
-#include "../can/can-message.hpp"
-
-#define MAX_BCM_CAN_FRAMES 257
+#include "../can/message/can-message.hpp"
 
 namespace utils
 {
-	struct bcm_msg
-	{
-		struct bcm_msg_head msg_head;
-		union {
-			struct canfd_frame fd_frames[MAX_BCM_CAN_FRAMES];
-			struct can_frame frames[MAX_BCM_CAN_FRAMES];
-		};
-	};
-
 	/// @brief derivated socketcan class specialized for BCM CAN socket.make_bcm_head
 	class socketcan_bcm_t : public socketcan_t
 	{
@@ -40,10 +29,9 @@ namespace utils
 		using socketcan_t::socketcan_t;
 
 		virtual int open(std::string device_name);
-		virtual std::shared_ptr<can_message_t> read_message();
-		virtual void write_message(std::vector<std::shared_ptr<can_message_t>>& vobj);
-		virtual void write_message(std::shared_ptr<can_message_t> obj);
-		void write_message(struct bcm_msg& obj);
+		virtual std::shared_ptr<message_t> read_message();
+		virtual void write_message(std::vector<std::shared_ptr<message_t>>& vobj);
+		virtual void write_message(std::shared_ptr<message_t> obj);
 
 	private:
 		int connect(const struct sockaddr* addr, socklen_t len);

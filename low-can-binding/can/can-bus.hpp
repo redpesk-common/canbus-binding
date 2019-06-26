@@ -24,9 +24,8 @@
 #include <thread>
 #include <linux/can.h>
 #include <condition_variable>
-
 #include "openxc.pb.h"
-#include "can-message.hpp"
+#include "message/can-message.hpp"
 #include "../utils/config-parser.hpp"
 #include "../binding/low-can-subscription.hpp"
 
@@ -47,8 +46,8 @@ private:
 	utils::config_parser_t conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
 
 	bool apply_filter(const openxc_VehicleMessage& vehicle_message, std::shared_ptr<low_can_subscription_t> can_subscription);
-	void process_can_signals(const can_message_t& can_message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
-	void process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
+	void process_signals(const message_t& message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
+	void process_diagnostic_signals(diagnostic_manager_t& manager, std::shared_ptr<message_t> message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
 
 	void can_decode_message();
 	std::thread th_decoding_; ///< thread that will handle decoding a can frame
@@ -60,7 +59,7 @@ private:
 
 	std::condition_variable new_can_message_cv_; ///< condition_variable use to wait until there is a new CAN message to read
 	std::mutex can_message_mutex_; ///< mutex protecting the can_message_q_ queue.
-	std::queue <can_message_t> can_message_q_; ///< queue that will store can_message_t to be decoded
+	std::queue <std::shared_ptr<message_t>> can_message_q_; ///< queue that will store can_message_t to be decoded
 
 	std::condition_variable new_decoded_can_message_; ///< condition_variable use to wait until there is a new vehicle message
 							  /// to read from the queue vehicle_message_q_
@@ -80,8 +79,8 @@ public:
 	void start_threads();
 	void stop_threads();
 
-	const can_message_t next_can_message();
-	void push_new_can_message(const can_message_t& can_msg);
+	std::shared_ptr<message_t> next_can_message();
+	void push_new_can_message(std::shared_ptr<message_t> can_msg);
 	std::mutex& get_can_message_mutex();
 	std::condition_variable& get_new_can_message_cv();
 

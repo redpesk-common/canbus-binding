@@ -32,7 +32,7 @@
 #include "../can/can-encoder.hpp"
 #include "../can/can-bus.hpp"
 #include "../can/can-signals.hpp"
-#include "../can/can-message.hpp"
+#include "../can/message/message.hpp"
 #include "../utils/signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/openxc-utils.hpp"
@@ -70,12 +70,12 @@ void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std
 	s.erase(it);
 }
 
-static void push_n_notify(std::shared_ptr<can_message_t> m)
+static void push_n_notify(std::shared_ptr<message_t> m)
 {
 	can_bus_t& cbm = application_t::instance().get_can_bus_manager();
 	{
 		std::lock_guard<std::mutex> can_message_lock(cbm.get_can_message_mutex());
-		cbm.push_new_can_message(*m);
+	 	cbm.push_new_can_message(m);
 	}
 	cbm.get_new_can_message_cv().notify_one();
 }
@@ -88,7 +88,7 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 	if ((revents & EPOLLIN) != 0)
 	{
 		std::shared_ptr<utils::socketcan_t> s = can_subscription->get_socket();
-		std::shared_ptr<can_message_t> message = s->read_message();
+		std::shared_ptr<message_t> message = s->read_message();
 
 		// Sure we got a valid CAN message ?
 		if (! message->get_id() == 0 && ! message->get_length() == 0)
@@ -413,7 +413,7 @@ static int send_frame(struct canfd_frame& cfd, const std::string& bus_name)
 	if( cd.count(bus_name) == 0)
 		{cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());}
 
-	return cd[bus_name]->tx_send(cfd, bus_name);
+	return cd[bus_name]->tx_send(*cd[bus_name], cfd, bus_name);
 }
 
 static void write_raw_frame(afb_req_t request, const std::string& bus_name, json_object *json_value)

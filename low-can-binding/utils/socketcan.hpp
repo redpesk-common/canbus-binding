@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "../binding/low-can-hat.hpp"
-#include "../can/can-message.hpp"
+#include "../can/message/can-message.hpp"
 
 #define INVALID_SOCKET -1
 
@@ -47,9 +47,9 @@ namespace utils
 		virtual int open(std::string device_name) = 0;
 		int setopt(int level, int optname, const void* optval, socklen_t optlen);
 		virtual int close();
-		virtual std::shared_ptr<can_message_t> read_message() = 0;
-		virtual void write_message(std::shared_ptr<can_message_t> obj) = 0;
-		virtual void write_message(std::vector<std::shared_ptr<can_message_t>>& vobj) = 0;
+		virtual std::shared_ptr<message_t> read_message() = 0;
+		virtual void write_message(std::shared_ptr<message_t> obj) = 0;
+		virtual void write_message(std::vector<std::shared_ptr<message_t>>& vobj) = 0;
 
 	protected:
 		int socket_;

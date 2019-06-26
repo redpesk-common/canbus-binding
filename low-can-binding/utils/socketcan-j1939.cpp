@@ -181,12 +181,12 @@ namespace utils
 	}
 
 
-	void socketcan_j1939_t::write_message(std::vector<std::shared_ptr<can_message_t>>& vobj)
+	void socketcan_j1939_t::write_message(std::vector<std::shared_ptr<message_t>>& vobj)
 	{
 		AFB_WARNING("Not implemented");
 	}
 
-	void socketcan_j1939_t::write_message(std::shared_ptr<can_message_t> cm)
+	void socketcan_j1939_t::write_message(std::shared_ptr<message_t> cm)
 	{
 		AFB_WARNING("Not implemented");
 	}

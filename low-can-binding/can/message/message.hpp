@@ -20,11 +20,24 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <iostream>
+#include <memory>
 #include <linux/can.h>
-
-#include "../utils/timer.hpp"
+#include <linux/can/bcm.h>
+#include "../../utils/timer.hpp"
 
 #define CAN_MESSAGE_SIZE 8
+
+#define MAX_BCM_CAN_FRAMES 257
+
+struct bcm_msg
+{
+	struct bcm_msg_head msg_head;
+	union {
+		struct canfd_frame fd_frames[MAX_BCM_CAN_FRAMES];
+		struct can_frame frames[MAX_BCM_CAN_FRAMES];
+	};
+};
 
 /**
  * @enum can_message_format_t
@@ -33,30 +46,28 @@
 enum class can_message_format_t {
 	STANDARD, ///< STANDARD - standard 11-bit CAN arbitration ID. */
 	EXTENDED, ///< EXTENDED - an extended frame, with a 29-bit arbitration ID. */
-	INVALID,    ///< INVALID - INVALID code used at initialization to signify that it isn't usable'*/
+	J1939,	  ///< J1939 	- Format for j1939 messages
+	INVALID,  ///< INVALID  - INVALID code used at initialization to signify that it isn't usable'*/
 };
 
-/// @class can_message_t
+
+/// @class message_t
 ///
 /// @brief A compact representation of a single CAN message, meant to be used in in/out
 /// buffers. It is a wrapper of a can_frame struct with some sugar around it for binding purposes.
-class can_message_t {
-private:
-	uint8_t maxdlen_; ///< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
-	uint32_t id_; ///< id_ - The ID of the message. */
+class message_t {
+protected:
 	uint8_t length_; ///< length_ - the length of the data array (max 8). */
 	can_message_format_t format_; ///< format_ - the format of the message's ID.*/
-	bool rtr_flag_; ///< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
-	uint8_t flags_; ///< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
 	std::vector<uint8_t> data_; ///< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 	uint64_t timestamp_; ///< timestamp_ - timestamp of the received message*/
 	int sub_id_; ///< sub_id_ - Subscription index. */
 
-public:
-	can_message_t();
-	can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, can_message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
 
-	uint32_t get_id() const;
+public:
+	message_t();
+	message_t(uint8_t length, can_message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp);
+
 	int get_sub_id() const;
 	const uint8_t* get_data() const;
 	const std::vector<uint8_t> get_data_vector() const;
@@ -65,8 +76,11 @@ public:
 
 	void set_sub_id(int sub_id);
 	void set_timestamp(uint64_t timestamp);
+	can_message_format_t get_msg_format();
+	virtual bool is_set() = 0;
+	virtual std::string get_debug_message() = 0;
+	virtual uint32_t get_id() const = 0;
+	virtual struct bcm_msg get_bcm_msg() = 0;
+	virtual void set_bcm_msg(struct bcm_msg bcm_msg) = 0;
 
-	bool is_correct_to_send();
-
-	static can_message_t convert_from_frame(const canfd_frame& frame, size_t nbytes, uint64_t timestamp);
 };

@@ -104,7 +104,7 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 	if(! tx_socket)
 		tx_socket.open(dm.get_bus_device_name());
 
-	struct utils::bcm_msg bcm_msg;
+	struct bcm_msg bcm_msg;
 	struct can_frame cf;
 
 	struct timeval freq = current_adr->get_frequency_clock().get_timeval_from_period();
@@ -123,7 +123,12 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 
 	bcm_msg.frames[0] = cf;
 
-	tx_socket.write_message(bcm_msg);
+
+	std::shared_ptr<message_t> msg = std::make_shared<can_message_t>();
+
+	msg->set_bcm_msg(bcm_msg);
+
+	tx_socket.write_message(msg);
 	if(tx_socket)
 		return true;
 	return false;
@@ -466,13 +471,13 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 /// @param[in] cm - A raw CAN message.
 ///
 /// @return A pointer to a filled openxc_VehicleMessage or a nullptr if nothing has been found.
-openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_handle(active_diagnostic_request_t* entry, const can_message_t& cm)
+openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_handle(active_diagnostic_request_t* entry, std::shared_ptr<message_t> m)
 {
-	DiagnosticResponse response = diagnostic_receive_can_frame(&shims_, entry->get_handle(), cm.get_id(), cm.get_data(), cm.get_length());
+	DiagnosticResponse response = diagnostic_receive_can_frame(&shims_, entry->get_handle(), m->get_id(), m->get_data(), m->get_length());
 	if(response.completed && entry->get_handle()->completed)
 	{
 		if(entry->get_handle()->success)
-			return relay_diagnostic_response(entry, response, cm.get_timestamp());
+			return relay_diagnostic_response(entry, response, m->get_timestamp());
 	}
 	else if(!response.completed && response.multi_frame)
 	{
@@ -491,20 +496,20 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_handle(active_diagn
 /// @param[in] cm - Raw CAN message received
 ///
 /// @return VehicleMessage with decoded value.
-openxc_VehicleMessage diagnostic_manager_t::find_and_decode_adr(const can_message_t& cm)
+openxc_VehicleMessage diagnostic_manager_t::find_and_decode_adr(std::shared_ptr<message_t> m)
 {
 	openxc_VehicleMessage vehicle_message = build_VehicleMessage();
 
 	for ( auto entry : non_recurring_requests_)
 	{
-		vehicle_message = relay_diagnostic_handle(entry, cm);
+		vehicle_message = relay_diagnostic_handle(entry, m);
 		if (is_valid(vehicle_message))
 			return vehicle_message;
 	}
 
 	for ( auto entry : recurring_requests_)
 	{
-		vehicle_message = relay_diagnostic_handle(entry, cm);
+		vehicle_message = relay_diagnostic_handle(entry, m);
 		if (is_valid(vehicle_message))
 			return vehicle_message;
 	}
@@ -519,9 +524,12 @@ openxc_VehicleMessage diagnostic_manager_t::find_and_decode_adr(const can_messag
 /// @param[in] cm - CAN message received from the socket.
 ///
 /// @return True if the active diagnostic request match the response.
-bool diagnostic_manager_t::is_diagnostic_response(const can_message_t& cm)
+bool diagnostic_manager_t::is_diagnostic_response(std::shared_ptr<message_t> m)
 {
-	if (cm.get_id() >= 0x7e8 && cm.get_id() <= 0x7ef)
-			return true;
+	if(m->get_msg_format() == can_message_format_t::STANDARD || m->get_msg_format() == can_message_format_t::EXTENDED)
+	{
+		if (m->get_id() >= 0x7e8 && m->get_id() <= 0x7ef)
+				return true;
+	}
 	return false;
 }

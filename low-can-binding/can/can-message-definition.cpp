@@ -54,6 +54,18 @@ bool can_message_definition_t::is_fd() const
 	return is_fd_;
 }
 
+bool can_message_definition_t::is_j1939() const
+{
+	if(format_ == can_message_format_t::J1939)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 std::vector<std::shared_ptr<can_signal_t> >& can_message_definition_t::get_can_signals()
 {
 	return can_signals_;
@@ -64,7 +76,7 @@ void can_message_definition_t::set_parent(can_message_set_t* parent)
 	parent_= parent;
 }
 
-void can_message_definition_t::set_last_value(const can_message_t& cm)
+void can_message_definition_t::set_last_value(const message_t& cm)
 {
 	last_value_= cm.get_data_vector();
 }

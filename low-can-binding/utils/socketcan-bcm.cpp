@@ -70,7 +70,7 @@ namespace utils
 	/// Read the socket to retrieve the associated CAN message. All the hard work is do into
 	/// convert_from_frame method and if there isn't CAN message retrieve, only BCM head struct,
 	/// then CAN message will be zeroed and must be handled later.
-	std::shared_ptr<can_message_t> socketcan_bcm_t::read_message()
+	std::shared_ptr<message_t> socketcan_bcm_t::read_message()
 	{
 		struct bcm_msg msg;
 		std::shared_ptr<can_message_t> cm = std::make_shared<can_message_t>();
@@ -98,33 +98,24 @@ namespace utils
 		struct timeval tv;
 		ioctl(socket(), SIOCGSTAMP, &tv);
 		uint64_t timestamp = 1000000 * tv.tv_sec + tv.tv_usec;
-		*cm = can_message_t::convert_from_frame(msg.fd_frames[0] , frame_size, timestamp);
+		cm = can_message_t::convert_from_frame(msg.fd_frames[0] , frame_size, timestamp);
 		cm->set_sub_id((int)socket());
 
 		return cm;
 	}
 
-	void socketcan_bcm_t::write_message(std::vector<std::shared_ptr<can_message_t>>& vobj)
+	void socketcan_bcm_t::write_message(std::vector<std::shared_ptr<message_t>>& vobj)
 	{
 		for(const auto& obj : vobj)
 			write_message(obj);
 	}
 
-	void socketcan_bcm_t::write_message(std::shared_ptr<can_message_t> m)
+	void socketcan_bcm_t::write_message(std::shared_ptr<message_t> m)
 	{
-		struct can_frame obj;
-		obj.can_id  = m->get_id();
-		obj.can_dlc = m->get_length();
-		::memcpy(obj.data, m->get_data(), CAN_MAX_DLEN);
-		if (::sendto(socket(), &obj, sizeof(&obj), 0, (const struct sockaddr*)&get_tx_address(), sizeof(get_tx_address())) < 0)
-			AFB_API_ERROR(afbBindingV3root, "Error sending : %i %s", errno, ::strerror(errno));
-	}
-
-	void socketcan_bcm_t::write_message(struct bcm_msg& obj)
-	{
+		struct bcm_msg obj = m->get_bcm_msg();
 		size_t size = (obj.msg_head.flags & CAN_FD_FRAME) ?
-		(size_t)((char*)&obj.fd_frames[obj.msg_head.nframes] - (char*)&obj):
-		(size_t)((char*)&obj.frames[obj.msg_head.nframes] - (char*)&obj);
+			(size_t)((char*)&obj.fd_frames[obj.msg_head.nframes] - (char*)&obj):
+			(size_t)((char*)&obj.frames[obj.msg_head.nframes] - (char*)&obj);
 		if (::sendto(socket(), &obj, size, 0, (const struct sockaddr*)&get_tx_address(), sizeof(get_tx_address())) < 0)
 			AFB_API_ERROR(afbBindingV3root, "Error sending : %i %s", errno, ::strerror(errno));
 	}

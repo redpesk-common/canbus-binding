@@ -54,7 +54,7 @@ private:
 	std::shared_ptr<can_signal_t> can_signal_; ///< can_signal_ - the CAN signal subscribed
 	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to receive OBD2
 										 /// responses. Normal diagnostic request and response are not tested for now.
-	std::shared_ptr<utils::socketcan_bcm_t> socket_; ///< socket_ - socket_ that receives CAN messages.
+	std::shared_ptr<utils::socketcan_t> socket_; ///< socket_ - socket_ that receives CAN messages.
 
 	int set_event();
 
@@ -89,14 +89,16 @@ public:
 	void set_min(float min);
 	void set_max(float max);
 
-	struct utils::bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0,0}, const struct timeval& frequency_thinning = {0,0}) const;
-	void add_one_bcm_frame(struct canfd_frame& cfd, struct utils::bcm_msg& bcm_msg) const;
+	struct bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0,0}, const struct timeval& frequency_thinning = {0,0}) const;
+	void add_one_bcm_frame(struct canfd_frame& cfd, struct bcm_msg& bcm_msg) const;
 
 	int open_socket(const std::string& bus_name = "");
 
 	int create_rx_filter(std::shared_ptr<can_signal_t> sig);
 	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
-	int create_rx_filter(utils::bcm_msg& bcm_msg);
+	static int create_rx_filter_can(low_can_subscription_t &subscription, std::shared_ptr<can_signal_t> sig);
+	static int create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<can_signal_t> sig);
+	static int create_rx_filter_bcm(low_can_subscription_t &subscription, struct bcm_msg& bcm_msg);
 
-	int tx_send(struct canfd_frame& cfd, const std::string& bus_name);
+	static int tx_send(low_can_subscription_t &subscription, struct canfd_frame& cfd, const std::string& bus_name);
 };

@@ -26,7 +26,7 @@
 #include <condition_variable>
 
 #include "openxc.pb.h"
-#include "can-message.hpp"
+#include "message/can-message.hpp"
 #include "../utils/config-parser.hpp"
 #include "../binding/low-can-subscription.hpp"
 

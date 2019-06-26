@@ -81,9 +81,9 @@ bool can_bus_t::apply_filter(const openxc_VehicleMessage& vehicle_message, std::
 /// @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
 ///
 /// @return How many signals has been decoded.
-void can_bus_t::process_can_signals(const can_message_t& can_message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+void can_bus_t::process_signals(const message_t& message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
-	int subscription_id = can_message.get_sub_id();
+	int subscription_id = message.get_sub_id();
 	openxc_DynamicField decoded_message;
 	openxc_VehicleMessage vehicle_message;
 
@@ -93,9 +93,9 @@ void can_bus_t::process_can_signals(const can_message_t& can_message, std::map<i
 		// First we have to found which can_signal_t it is
 		std::shared_ptr<low_can_subscription_t> sig = s[subscription_id];
 
-		decoded_message = decoder_t::translate_signal(*sig->get_can_signal(), can_message, &send);
+		decoded_message = decoder_t::translate_signal(*sig->get_can_signal(), message, &send);
 		openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
-		vehicle_message = build_VehicleMessage(s_message, can_message.get_timestamp());
+		vehicle_message = build_VehicleMessage(s_message, message.get_timestamp());
 
 		if(send && apply_filter(vehicle_message, sig))
 		{
@@ -114,13 +114,13 @@ void can_bus_t::process_can_signals(const can_message_t& can_message, std::map<i
 /// @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
 ///
 /// @return How many signals has been decoded.
-void can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, const can_message_t& can_message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+void can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, std::shared_ptr<message_t> message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
-	int subscription_id = can_message.get_sub_id();
+	int subscription_id = message->get_sub_id();
 
-	openxc_VehicleMessage vehicle_message = manager.find_and_decode_adr(can_message);
-	if (can_message.get_timestamp())
-		{vehicle_message.timestamp = can_message.get_timestamp();}
+	openxc_VehicleMessage vehicle_message = manager.find_and_decode_adr(message);
+	if (message->get_timestamp())
+		{vehicle_message.timestamp = message->get_timestamp();}
 	if( (vehicle_message.has_simple_message && vehicle_message.simple_message.has_name) &&
 		s.find(subscription_id) != s.end() && afb_event_is_valid(s[subscription_id]->get_event()))
 	{
@@ -155,16 +155,18 @@ void can_bus_t::can_decode_message()
 		new_can_message_cv_.wait(can_message_lock);
 		while(!can_message_q_.empty())
 		{
-			const can_message_t can_message = next_can_message();
+			std::shared_ptr<message_t>  message = next_can_message();
 			can_message_lock.unlock();
 
 			{
 				std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
 				std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
-				if(application_t::instance().get_diagnostic_manager().is_diagnostic_response(can_message))
-					{process_diagnostic_signals(application_t::instance().get_diagnostic_manager(), can_message, s);}
+				if(application_t::instance().get_diagnostic_manager().is_diagnostic_response(message))
+				{
+					process_diagnostic_signals(application_t::instance().get_diagnostic_manager(), message, s);
+				}
 				else
-					{process_can_signals(can_message, s);}
+					{process_signals(*message, s);}
 			}
 			can_message_lock.lock();
 		}
@@ -251,28 +253,28 @@ std::mutex& can_bus_t::get_can_message_mutex()
 /// @brief Return first can_message_t on the queue
 ///
 /// @return a can_message_t
-const can_message_t can_bus_t::next_can_message()
+std::shared_ptr<message_t> can_bus_t::next_can_message()
 {
-	can_message_t can_msg;
+	std::shared_ptr<message_t> msg;
 
 	if(!can_message_q_.empty())
 	{
-		can_msg = can_message_q_.front();
+		msg = can_message_q_.front();
 		can_message_q_.pop();
-		AFB_DEBUG("Here is the next can message : id %X, length %X, data %02X%02X%02X%02X%02X%02X%02X%02X", can_msg.get_id(), can_msg.get_length(),
-			can_msg.get_data()[0], can_msg.get_data()[1], can_msg.get_data()[2], can_msg.get_data()[3], can_msg.get_data()[4], can_msg.get_data()[5], can_msg.get_data()[6], can_msg.get_data()[7]);
-		return can_msg;
+		std::string debug = msg->get_debug_message();
+		AFB_DEBUG(debug.c_str());
+		return msg;
 	}
 
-	return can_msg;
+	return msg;
 }
 
-/// @brief Push a can_message_t into the queue
+/// @brief Push a message_t into the queue
 ///
-/// @param[in] can_msg - the const reference can_message_t object to push into the queue
-void can_bus_t::push_new_can_message(const can_message_t& can_msg)
+/// @param[in] msg - the const reference message_t object to push into the queue
+void can_bus_t::push_new_can_message(std::shared_ptr<message_t> msg)
 {
-	can_message_q_.push(can_msg);
+	can_message_q_.push(msg);
 }
 
 /// @brief Return first openxc_VehicleMessage on the queue
