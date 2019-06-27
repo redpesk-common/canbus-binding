@@ -117,7 +117,7 @@
         }
       },
     "/unsubscribe": {
-      "description": "Unsubscribe previously suscribed signals.",
+      "description": "Unsubscribe previously subscribed signals.",
         "parameters": [
           {
             "in": "query",
