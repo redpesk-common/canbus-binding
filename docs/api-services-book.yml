@@ -12,7 +12,7 @@ books:
       name: Architecture presentation
     - url: 2-Installation.md
       name: Installation Guide
-    - url: 3-Installation-J1939
+    - url: 3-Installation-J1939.md
       name: Installation Guide for J1939
     - url: 4-Usage.md
       name: Usage Guide
