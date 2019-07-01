@@ -23,6 +23,7 @@
 #include <string>
 #include <memory>
 #include <systemd/sd-event.h>
+#include <cctype>
 
 #include <afb/afb-binding>
 
@@ -31,3 +32,12 @@ class low_can_subscription_t;
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
 int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata);
+
+inline bool caseInsCharCompareN(char a, char b) {
+	return(toupper(a) == toupper(b));
+}
+
+inline bool caseInsCompare(const std::string& s1, const std::string& s2) {
+	return((s1.size() == s2.size()) &&
+	equal(s1.begin(), s1.end(), s2.begin(), caseInsCharCompareN));
+}

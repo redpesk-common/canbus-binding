@@ -216,7 +216,8 @@ low-can subscribe { "event": "doors.driver.open" }
 ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"a18fd375-b6fa-4c0e-a1d4-9d3955975ae8"}}
 ```
 
-Subscription and unsubscription can take wildcard in their _event_ value.
+Subscription and unsubscription can take wildcard in their _event_ value and are
+**case-insensitive**.
 
 To receive all doors events :
 
@@ -317,9 +318,9 @@ ON-REPLY 2:low-can/list: {"response":["messages.hvac.fan.speed","messages.hvac.t
 
 ## Write on CAN buses
 
-A new capability as been introcuded to be able to write on handled CAN buses.
 Two modes could be used for that which is either specifying the CAN bus and a
-*RAW* CAN message either by specifying a defined signal and its value.
+*RAW* CAN message either by specifying a defined signal, **case-insensitively**,
+and its value.
 
 Examples:
 
