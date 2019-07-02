@@ -27,6 +27,9 @@
         "0x128": {
             "name": "ECM_z_5D2",
             "bus": "hs",
+            "is_fd" : false,
+            "is_extended": false,
+            "is_j1939" : false,
             "signals": {
                 "StrAnglAct": {
                     "generic_name": "SteeringWheelAngle",

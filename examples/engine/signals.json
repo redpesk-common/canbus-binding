@@ -7,6 +7,9 @@
 	"messages": {
 	"0x3D9": {
 	"bus": "hs",
+	"is_fd" : false,
+	"is_extended": false,
+	"is_j1939" : false,
 	"signals": {
 		"PT_FuelLevelPct": {
 			"generic_name": "fuel.level",
@@ -34,6 +37,9 @@
 	},
 		"0x4D1": {
 		"bus": "hs",
+		"is_fd" : false,
+		"is_extended": false,
+		"is_j1939" : false,
 		"signals": {
 			"PT_EngineOilTempHigh": {
 				"generic_name": "engine.oil.temp.high",
@@ -54,6 +60,9 @@
 		},
 		"0x3E9": {
 		"bus": "hs",
+		"is_fd" : false,
+		"is_extended": false,
+		"is_j1939" : false,
 		"signals": {
 			"PT_VehicleAvgSpeed": {
 				"generic_name": "vehicle.average.speed",

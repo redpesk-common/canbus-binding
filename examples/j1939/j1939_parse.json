@@ -11,10 +11,12 @@
 			"length": 8,
 			"name": "ETC1",
 			"bus" : "j1939",
+			"is_fd" : false,
+			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
-				"TrnsTrqueConverterLockupEngaged" : {
-					"generic_name": "TrnsTrqueConverterLockupEngaged",
+				"Trns.Trque.Converter.Lockup.Engaged" : {
+					"generic_name": "Trns.Trque.Converter.Lockup.Engaged",
 					"bit_position": 2,
 					"bit_size": 2,
 					"factor": 1,
@@ -22,6 +24,7 @@
 					"comment": "State signal which indicates whether the torque converter lockup is engaged.",
 					"is_big_endian": false,
 					"is_signed": false,
+					"writable" : true,
 					"states": {
 						"TorqueConverterLockupDisengaged": [0],
 						"TorqueConverterLockupEngaged": [1],
@@ -29,8 +32,8 @@
 						"NotAvailable": [3]
 					}
 				},
-				"TrnsTrqCnvrtrLckpTrnstnInPrcess" : {
-					"generic_name": "TrnsTrqCnvrtrLckpTrnstnInPrcess",
+				"Trns.Trq.Cnvrtr.Lckp.Trnstn.In.Prcess" : {
+					"generic_name": "Trns.Trq.Cnvrtr.Lckp.Trnstn.In.Prcess",
 					"bit_position": 6,
 					"bit_size": 2,
 					"factor": 1,
@@ -38,6 +41,7 @@
 					"comment": "State signal indicating whether or not the transmission torque converter lock up clutch is transitioning between being",
 					"is_big_endian": false,
 					"is_signed": false,
+					"writable" : true,
 					"states": {
 						"TransitionIsNotInProcess": [0],
 						"TransitionIsInProcess": [1],
@@ -45,18 +49,19 @@
 						"NotAvailable": [3]
 					}
 				},
-				"SrcAddrssOfCtrllngDvcFrTrnsCntrl" : {
-					"generic_name": "SrcAddrssOfCtrllngDvcFrTrnsCntrl",
+				"Src.Addrss.Of.Ctrllng.Dvc.Fr.Trns.Cntrl" : {
+					"generic_name": "Src.Addrss.Of.Ctrllng.Dvc.Fr.Trns.Cntrl",
 					"bit_position": 56,
 					"bit_size": 8,
 					"factor": 1,
 					"offset": 0,
 					"comment": "The source address of the SAE J1939 device currently controlling the transmission.",
 					"is_big_endian": false,
-					"is_signed": false
+					"is_signed": false,
+					"writable" : true
 				},
-				"MomentaryEngMaxPowerEnable" : {
-					"generic_name": "MomentaryEngMaxPowerEnable",
+				"Momentary.Eng.Max.Power.Enable" : {
+					"generic_name": "Momentary.Eng.Max.Power.Enable",
 					"bit_position": 36,
 					"bit_size": 2,
 					"factor": 1,
@@ -64,6 +69,7 @@
 					"comment": "Momentarily Requesting highest torque map from the engine control",
 					"is_big_endian": false,
 					"is_signed": false,
+					"writable" : true,
 					"states": {
 						"notRqingMaxPowerAvailable": [0],
 						"mmntarilyRqingMaxPowerAvailable": [1],
@@ -71,8 +77,8 @@
 						"notAvailable": [3]
 					}
 				},
-				"TransInputShaftSpeed" : {
-					"generic_name": "TransInputShaftSpeed",
+				"Trans.Input.Shaft.Speed" : {
+					"generic_name": "Trans.Input.Shaft.Speed",
 					"bit_position": 40,
 					"bit_size": 16,
 					"factor": 0.125,
@@ -80,10 +86,11 @@
 					"comment": "Rotational velocity of the primary shaft transferring power into the transmission.",
 					"unit": "rpm",
 					"is_big_endian": false,
-					"is_signed": false
+					"is_signed": false,
+					"writable" : true
 				},
-				"ProgressiveShiftDisable" : {
-					"generic_name": "ProgressiveShiftDisable",
+				"Progressive.Shift.Disable" : {
+					"generic_name": "Progressive.Shift.Disable",
 					"bit_position": 34,
 					"bit_size": 2,
 					"factor": 1,
@@ -91,6 +98,7 @@
 					"comment": "Command signal used to indicate that progressive shifting by the engine should be disallowed.",
 					"is_big_endian": false,
 					"is_signed": false,
+					"writable" : true,
 					"states": {
 						"ProgressiveShiftIsNotDisabled": [0],
 						"ProgressiveShiftIsDisabled": [1],
@@ -98,8 +106,8 @@
 						"TakeNoAction": [3]
 					}
 				},
-				"EngMomentaryOverspeedEnable" : {
-					"generic_name": "EngMomentaryOverspeedEnable",
+				"Eng.Momentary.Overspeed.Enable" : {
+					"generic_name": "Eng.Momentary.Overspeed.Enable",
 					"bit_position": 32,
 					"bit_size": 2,
 					"factor": 1,
@@ -107,6 +115,7 @@
 					"comment": "Command signal used to indicate that the engine speed may be boosted up to the maximum engine overspeed value to",
 					"is_big_endian": false,
 					"is_signed": false,
+					"writable" : true,
 					"states": {
 						"MomentaryEngOverspeedIsDisabled": [0],
 						"MomentaryEngOverspeedIsEnabled": [1],
@@ -114,8 +123,8 @@
 						"TakeNoAction": [3]
 					}
 				},
-				"PercentClutchSlip" : {
-					"generic_name": "PercentClutchSlip",
+				"Percent.Clutch.Slip" : {
+					"generic_name": "Percent.Clutch.Slip",
 					"bit_position": 24,
 					"bit_size": 8,
 					"factor": 0.4,
@@ -123,10 +132,11 @@
 					"comment": "Parameter which represents the ratio of input shaft speed to current engine speed (in percent).",
 					"unit": "%",
 					"is_big_endian": false,
-					"is_signed": false
+					"is_signed": false,
+					"writable" : true
 				},
-				"TransOutputShaftSpeed" : {
-					"generic_name": "TransOutputShaftSpeed",
+				"Trans.Output.Shaft.Speed" : {
+					"generic_name": "Trans.Output.Shaft.Speed",
 					"bit_position": 8,
 					"bit_size": 16,
 					"factor": 0.125,
@@ -134,10 +144,11 @@
 					"comment": "Calculated speed of the transmission output shaft.",
 					"unit": "rpm",
 					"is_big_endian": false,
-					"is_signed": false
+					"is_signed": false,
+					"writable" : true
 				},
-				"TransShiftInProcess" : {
-					"generic_name": "TransShiftInProcess",
+				"Trans.Shift.In.Process" : {
+					"generic_name": "Trans.Shift.In.Process",
 					"bit_position": 4,
 					"bit_size": 2,
 					"factor": 1,
@@ -145,6 +156,7 @@
 					"comment": "Indicates that the transmission is in process of shifting from the current gear to the selected gear.",
 					"is_big_endian": false,
 					"is_signed": false,
+					"writable" : true,
 					"states": {
 						"ShiftIsNotInProcess": [0],
 						"ShiftInProcess": [1],
@@ -152,8 +164,8 @@
 						"NotAvailable": [3]
 					}
 				},
-				"TransDrivelineEngaged" : {
-					"generic_name": "TransDrivelineEngaged",
+				"Trans.Driveline.Engaged" : {
+					"generic_name": "Trans.Driveline.Engaged",
 					"bit_position": 0,
 					"bit_size": 2,
 					"factor": 1,
@@ -161,6 +173,7 @@
 					"comment": "Driveline engaged indicates the transmission controlled portion of the driveline is engaged sufficiently to allow a transfer",
 					"is_big_endian": false,
 					"is_signed": false,
+					"writable" : true,
 					"states": {
 						"DrivelineDisengaged": [0],
 						"DrivelineEngaged": [1],
@@ -175,10 +188,12 @@
 			"length": 8,
 			"name": "EEC1",
 			"bus" : "j1939",
+			"is_fd" : false,
+			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
-				"SrcAddrssOfCtrllngDvcFrEngCntrl" : {
-					"generic_name": "SrcAddrssOfCtrllngDvcFrEngCntrl",
+				"Src.AddrssOf.Ctrllng.Dvc.Fr.Eng.Cntrl" : {
+					"generic_name": "Src.AddrssOf.Ctrllng.Dvc.Fr.Eng.Cntrl",
 					"bit_position": 40,
 					"bit_size": 8,
 					"factor": 1,
@@ -187,8 +202,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"ActlEngPrcntTrqueHighResolution" : {
-					"generic_name": "ActlEngPrcntTrqueHighResolution",
+				"Actl.Eng.Prcnt.Trque.High.Resolution" : {
+					"generic_name": "Actl.Eng.Prcnt.Trque.High.Resolution",
 					"bit_position": 4,
 					"bit_size": 4,
 					"factor": 0.125,
@@ -204,8 +219,8 @@
 						"1111NotAvailable": [8]
 					}
 				},
-				"EngDemandPercentTorque" : {
-					"generic_name": "EngDemandPercentTorque",
+				"Eng.Demand.Percent.Torque" : {
+					"generic_name": "Eng.Demand.Percent.Torque",
 					"bit_position": 56,
 					"bit_size": 8,
 					"factor": 1,
@@ -215,8 +230,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"EngStarterMode" : {
-					"generic_name": "EngStarterMode",
+				"Eng.Starter.Mode" : {
+					"generic_name": "Eng.Starter.Mode",
 					"bit_position": 48,
 					"bit_size": 4,
 					"factor": 1,
@@ -240,8 +255,8 @@
 						"notAvailable": [15]
 					}
 				},
-				"EngSpeed" : {
-					"generic_name": "EngSpeed",
+				"Eng.Speed" : {
+					"generic_name": "Eng.Speed",
 					"bit_position": 24,
 					"bit_size": 16,
 					"factor": 0.125,
@@ -251,8 +266,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"ActualEngPercentTorque" : {
-					"generic_name": "ActualEngPercentTorque",
+				"Actual.Eng.Percent.Torque" : {
+					"generic_name": "Actual.Eng.Percent.Torque",
 					"bit_position": 16,
 					"bit_size": 8,
 					"factor": 1,
@@ -262,8 +277,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"DriversDemandEngPercentTorque" : {
-					"generic_name": "DriversDemandEngPercentTorque",
+				"Drivers.Demand.Eng.Percent.Torque" : {
+					"generic_name": "Drivers.Demand.Eng.Percent.Torque",
 					"bit_position": 8,
 					"bit_size": 8,
 					"factor": 1,
@@ -273,8 +288,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"EngTorqueMode" : {
-					"generic_name": "EngTorqueMode",
+				"Eng.Torque.Mode" : {
+					"generic_name": "Eng.Torque.Mode",
 					"bit_position": 0,
 					"bit_size": 4,
 					"factor": 1,
@@ -305,10 +320,12 @@
 			"length": 8,
 			"name": "HOURS",
 			"bus" : "j1939",
+			"is_fd" : false,
+			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
-				"EngTotalRevolutions" : {
-					"generic_name": "EngTotalRevolutions",
+				"Eng.Total.Revolutions" : {
+					"generic_name": "Eng.Total.Revolutions",
 					"bit_position": 32,
 					"bit_size": 32,
 					"factor": 1000,
@@ -318,8 +335,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"EngTotalHoursOfOperation" : {
-					"generic_name": "EngTotalHoursOfOperation",
+				"Eng.Total.Hours.Of.Operation" : {
+					"generic_name": "Eng.Total.Hours.Of.Operation",
 					"bit_position": 0,
 					"bit_size": 32,
 					"factor": 0.05,
@@ -336,10 +353,12 @@
 			"length": 8,
 			"name": "VDC2",
 			"bus" : "j1939",
+			"is_fd" : false,
+			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
-				"SteerWheelAngle" : {
-					"generic_name": "SteerWheelAngle",
+				"Steer.Wheel.Angle" : {
+					"generic_name": "Steer.Wheel.Angle",
 					"bit_position": 0,
 					"bit_size": 16,
 					"factor": 0.0009765625,
@@ -349,8 +368,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"LongitudinalAcceleration" : {
-					"generic_name": "LongitudinalAcceleration",
+				"Longitudinal.Acceleration" : {
+					"generic_name": "Longitudinal.Acceleration",
 					"bit_position": 56,
 					"bit_size": 8,
 					"factor": 0.1,
@@ -360,8 +379,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"LateralAcceleration" : {
-					"generic_name": "LateralAcceleration",
+				"Lateral.Acceleration" : {
+					"generic_name": "Lateral.Acceleration",
 					"bit_position": 40,
 					"bit_size": 16,
 					"factor": 0.00048828125,
@@ -371,8 +390,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"YawRate" : {
-					"generic_name": "YawRate",
+				"Yaw.Rate" : {
+					"generic_name": "Yaw.Rate",
 					"bit_position": 24,
 					"bit_size": 16,
 					"factor": 0.0001220703125,
@@ -382,8 +401,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"SteerWheelAngleSensorType" : {
-					"generic_name": "SteerWheelAngleSensorType",
+				"Steer.Wheel.Angle.Sensor.Type" : {
+					"generic_name": "Steer.Wheel.Angle.Sensor.Type",
 					"bit_position": 22,
 					"bit_size": 2,
 					"factor": 1,
@@ -398,8 +417,8 @@
 						"NotAvailable": [3]
 					}
 				},
-				"SteerWheelTurnCounter" : {
-					"generic_name": "SteerWheelTurnCounter",
+				"Steer.Wheel.Turn.Counter" : {
+					"generic_name": "Steer.Wheel.Turn.Counter",
 					"bit_position": 16,
 					"bit_size": 6,
 					"factor": 1,
@@ -416,10 +435,12 @@
 			"length": 8,
 			"name": "EBC2",
 			"bus" : "j1939",
+			"is_fd" : false,
+			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
-				"RlativeSpeedRearAxle2RightWheel" : {
-					"generic_name": "RlativeSpeedRearAxle2RightWheel",
+				"Rlative.Speed.Rear.Axle2.Right.Wheel" : {
+					"generic_name": "Rlative.Speed.Rear.Axle2.Right.Wheel",
 					"bit_position": 56,
 					"bit_size": 8,
 					"factor": 0.0625,
@@ -429,8 +450,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"RelativeSpeedRearAxle2LeftWheel" : {
-					"generic_name": "RelativeSpeedRearAxle2LeftWheel",
+				"Relative.Speed.Rear.Axle2.Left.Wheel" : {
+					"generic_name": "Relative.Speed.Rear.Axle2.Left.Wheel",
 					"bit_position": 48,
 					"bit_size": 8,
 					"factor": 0.0625,
@@ -440,8 +461,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"RlativeSpeedRearAxle1RightWheel" : {
-					"generic_name": "RlativeSpeedRearAxle1RightWheel",
+				"Rlative.Speed.Rear.Axle1.Right.Wheel" : {
+					"generic_name": "Rlative.Speed.Rear.Axle1.Right.Wheel",
 					"bit_position": 40,
 					"bit_size": 8,
 					"factor": 0.0625,
@@ -451,8 +472,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"RelativeSpeedRearAxle1LeftWheel" : {
-					"generic_name": "RelativeSpeedRearAxle1LeftWheel",
+				"Relative.Speed.Rear.Axle1.Left.Wheel" : {
+					"generic_name": "Relative.Speed.Rear.Axle1.Left.Wheel",
 					"bit_position": 32,
 					"bit_size": 8,
 					"factor": 0.0625,
@@ -462,8 +483,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"RlativeSpeedFrontAxleRightWheel" : {
-					"generic_name": "RlativeSpeedFrontAxleRightWheel",
+				"Rlative.Speed.Front.Axle.Right.Wheel" : {
+					"generic_name": "Rlative.Speed.Front.Axle.Right.Wheel",
 					"bit_position": 24,
 					"bit_size": 8,
 					"factor": 0.0625,
@@ -473,8 +494,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"RelativeSpeedFrontAxleLeftWheel" : {
-					"generic_name": "RelativeSpeedFrontAxleLeftWheel",
+				"Relative.Speed.Front.Axle.Left.Wheel" : {
+					"generic_name": "Relative.Speed.Front.Axle.Left.Wheel",
 					"bit_position": 16,
 					"bit_size": 8,
 					"factor": 0.0625,
@@ -484,8 +505,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"FrontAxleSpeed" : {
-					"generic_name": "FrontAxleSpeed",
+				"Front.Axle.Speed" : {
+					"generic_name": "Front.Axle.Speed",
 					"bit_position": 0,
 					"bit_size": 16,
 					"factor": 0.00390625,
@@ -502,10 +523,12 @@
 			"length": 8,
 			"name": "ET1",
 			"bus" : "j1939",
+			"is_fd" : false,
+			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
-				"EngFuelTemp1" : {
-					"generic_name": "EngFuelTemp1",
+				"Eng.Fuel.Temp1" : {
+					"generic_name": "Eng.Fuel.Temp1",
 					"bit_position": 8,
 					"bit_size": 8,
 					"factor": 1,
@@ -515,8 +538,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"EngIntercoolerThermostatOpening" : {
-					"generic_name": "EngIntercoolerThermostatOpening",
+				"Eng.Intercooler.Thermostat.Opening" : {
+					"generic_name": "Eng.Intercooler.Thermostat.Opening",
 					"bit_position": 56,
 					"bit_size": 8,
 					"factor": 0.4,
@@ -526,8 +549,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"EngIntercoolerTemp" : {
-					"generic_name": "EngIntercoolerTemp",
+				"Eng.Intercooler.Temp" : {
+					"generic_name": "Eng.Intercooler.Temp",
 					"bit_position": 48,
 					"bit_size": 8,
 					"factor": 1,
@@ -537,8 +560,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"EngTurboOilTemp" : {
-					"generic_name": "EngTurboOilTemp",
+				"Eng.Turbo.Oil.Temp" : {
+					"generic_name": "Eng.Turbo.Oil.Temp",
 					"bit_position": 32,
 					"bit_size": 16,
 					"factor": 0.03125,
@@ -548,8 +571,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"EngOilTemp1" : {
-					"generic_name": "EngOilTemp1",
+				"Eng.Oil.Temp1" : {
+					"generic_name": "Eng.Oil.Temp1",
 					"bit_position": 16,
 					"bit_size": 16,
 					"factor": 0.03125,
@@ -559,8 +582,8 @@
 					"is_big_endian": false,
 					"is_signed": false
 				},
-				"EngCoolantTemp" : {
-					"generic_name": "EngCoolantTemp",
+				"Eng.Coolant.Temp" : {
+					"generic_name": "Eng.Coolant.Temp",
 					"bit_position": 0,
 					"bit_size": 8,
 					"factor": 0.03125,
