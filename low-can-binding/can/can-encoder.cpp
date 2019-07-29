@@ -51,8 +51,120 @@ const canfd_frame encoder_t::build_frame(const std::shared_ptr<signal_t>& signal
 					cf.data,
 					cf.len);
 	}
-
 	return cf;
+}
+
+
+/**
+ * @brief Allows to build a single frame message with correct data to be send
+ *
+ * @param signal The CAN signal to write, including the bit position and bit size.
+ * @param value The encoded integer value to write in the CAN signal.
+ * @param message A single frame message to complete
+ * @return message_t*  The message that is generated
+ */
+message_t* encoder_t::build_one_frame_message(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message)
+{
+	signal->set_last_value((float)value);
+	uint8_t data_tab[message->get_length()];
+	::memset(&data_tab, 0, sizeof(data_tab));
+	std::vector<uint8_t> data;
+
+	for(const auto& sig: signal->get_message()->get_signals())
+	{
+		float last_value = sig->get_last_value();
+		bitfield_encode_float(last_value,
+					sig->get_bit_position(),
+					sig->get_bit_size(),
+					sig->get_factor(),
+					sig->get_offset(),
+					data_tab,
+					(uint8_t)message->get_length());
+	}
+
+	for (size_t i = 0; i < (uint8_t) message->get_length(); i++)
+	{
+		data.push_back(data_tab[i]);
+	}
+
+	message->set_data(data);
+	return message;
+}
+
+/**
+ * @brief Allows to build a multi frame message with correct data to be send
+ *
+ * @param signal The CAN signal to write, including the bit position and bit size.
+ * @param value The encoded integer value to write in the CAN signal.
+ * @param message A multi frame message to complete
+ * @return message_t*  The message that is generated
+ */
+message_t* encoder_t::build_multi_frame_message(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message)
+{
+	signal->set_last_value((float)value);
+	std::vector<uint8_t> data;
+
+	uint32_t msgs_len = signal->get_message()->get_length(); // multi frame - number of bytes
+	int number_of_frame = (int) msgs_len / 8;
+
+	uint8_t data_tab[number_of_frame][8] = {0};
+
+	for(const auto& sig: signal->get_message()->get_signals())
+	{
+
+		int frame_position = (int) sig->get_bit_position() / 64;
+		float last_value = sig->get_last_value();
+		uint8_t bit_position = sig->get_bit_position() - ((uint8_t)(64 * frame_position));
+
+		bitfield_encode_float(last_value,
+					bit_position,
+					sig->get_bit_size(),
+					sig->get_factor(),
+					sig->get_offset(),
+					data_tab[frame_position],
+					8);
+	}
+
+	for (size_t i = 0; i < number_of_frame; i++)
+	{
+		for(size_t j = 0; j < 8 ; j++)
+		{
+			data.push_back(data_tab[i][j]);
+		}
+	}
+
+	message->set_data(data);
+	return message;
+}
+
+/**
+ * @brief Allows to build a message_t with correct data to be send
+ *
+ * @param signal The CAN signal to write, including the bit position and bit size.
+ * @param value The encoded integer value to write in the CAN signal.
+ * @return message_t* The message that is generated
+ */
+message_t* encoder_t::build_message(const std::shared_ptr<signal_t>& signal, uint64_t value)
+{
+	message_t *message;
+	std::vector<uint8_t> data;
+	if(signal->get_message()->is_fd())
+	{
+		message = new can_message_t(CANFD_MAX_DLEN,signal->get_message()->get_id(),CANFD_MAX_DLEN,signal->get_message()->get_format(),false,CAN_FD_FRAME,data,0);
+		return build_one_frame_message(signal,value,message);
+	}
+#ifdef USE_FEATURE_J1939
+	else if(signal->get_message()->is_j1939())
+	{
+		message = new j1939_message_t(J1939_MAX_DLEN,signal->get_message()->get_length(),signal->get_message()->get_format(),data,0,J1939_NO_NAME,signal->get_message()->get_id(),J1939_NO_ADDR);
+		return build_multi_frame_message(signal,value,message);
+	}
+#endif
+	else
+	{
+		message = new can_message_t(CAN_MAX_DLEN,signal->get_message()->get_id(),CAN_MAX_DLEN,signal->get_message()->get_format(),false,0,data,0);
+		return build_one_frame_message(signal,value,message);
+	}
 }
 
 /// @brief Encode a boolean into an integer, fit for a CAN signal bitfield.

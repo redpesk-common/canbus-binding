@@ -102,3 +102,13 @@ void message_definition_t::set_last_value(std::shared_ptr<message_t> m)
 {
 	last_value_= m->get_data_vector();
 }
+
+uint32_t message_definition_t::get_length() const
+{
+	return length_;
+}
+
+message_format_t message_definition_t::get_format() const
+{
+	return format_;
+}

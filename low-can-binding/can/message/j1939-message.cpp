@@ -16,14 +16,16 @@
  */
 
 #include <cstring>
+#include <sstream>
+#include <iomanip>
+#include <net/if.h>
 #include "../../binding/low-can-hat.hpp"
 #include "j1939-message.hpp"
 
-///
-/// @brief Class constructor
-///
-/// j1939_message_t class constructor.
-///
+/**
+ * @brief Construct a new j1939 message t::j1939 message t object
+ *
+ */
 j1939_message_t::j1939_message_t():
     message_t(),
     name_{0},
@@ -31,14 +33,27 @@ j1939_message_t::j1939_message_t():
     addr_{0}
 {}
 
-j1939_message_t::j1939_message_t(uint8_t length,
+/**
+ * @brief Construct a new j1939 message t::j1939 message t object
+ *
+ * @param maxdlen The max length of the message
+ * @param length The length of the message
+ * @param format The format of the message
+ * @param data The vector data of the message
+ * @param timestamp The timetamp of the message
+ * @param name The name of the message
+ * @param pgn The PGN of the message
+ * @param addr The address of the message
+ */
+j1939_message_t::j1939_message_t(uint32_t maxdlen,
+    uint32_t length,
     message_format_t format,
     std::vector<uint8_t>& data,
     uint64_t timestamp,
     name_t name,
     pgn_t pgn,
     uint8_t addr):
-    message_t(length, format, data, timestamp),
+    message_t(maxdlen,length, format, data, timestamp),
     name_{name},
     pgn_{pgn},
     addr_{addr}
@@ -71,6 +86,23 @@ uint8_t j1939_message_t::get_addr() const{
     return addr_;
 }
 
+/**
+ * @brief Convert hex data to string
+ *
+ * @param data An array of data
+ * @param length The length of the data
+ * @return std::string The string data
+ */
+std::string to_hex( uint8_t data[], const size_t length)
+{
+    std::stringstream stream;
+    stream << std::hex << std::setfill('0');
+    for(int i = 0; i < length; i++)
+    {
+        stream << std::hex << ((int) data[i]);
+    }
+    return stream.str();
+}
 
 /// @brief Take a sockaddr_can struct and array of data to initialize class members
 ///
@@ -84,9 +116,10 @@ uint8_t j1939_message_t::get_addr() const{
 /// @return A j1939_message_t object fully initialized with sockaddr_can and data values.
 std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct sockaddr_can& addr, uint8_t (&data)[128],size_t nbytes, uint64_t timestamp)
 {
-	uint8_t length = 0;
-	message_format_t format;
-	std::vector<uint8_t> dataVector;
+    int i;
+    uint32_t length = 0;
+    message_format_t format;
+    std::vector<uint8_t> data_vector;
 
     if(nbytes > J1939_MAX_DLEN)
     {
@@ -95,23 +128,27 @@ std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct socka
     }
     else
     {
-        AFB_DEBUG("Got a j1939 frame");
+        //AFB_DEBUG("Got a j1939 frame");
         format = message_format_t::J1939;
     }
 
-    length = (uint8_t) nbytes;
-    dataVector.reserve(length);
-    int i;
-    dataVector.clear();
+    length = (uint32_t) nbytes;
+    data_vector.reserve(length);
+
+    data_vector.clear();
+
+    std::string data_string;
+    data_string = to_hex(data,length);
+
     for(i=0;i<length;i++)
     {
-        dataVector.push_back(data[i]);
+        data_vector.push_back(data[i]);
     };
 
-    AFB_DEBUG("Found pgn: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X",
-                            addr.can_addr.j1939.pgn, (uint8_t)format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+    AFB_DEBUG("Found pgn: %X, format: %X, length: %X, data %s",
+                            addr.can_addr.j1939.pgn, (uint8_t)format, length, data_string.c_str());
 
-	return std::make_shared<j1939_message_t>(j1939_message_t(length, format, dataVector, timestamp,addr.can_addr.j1939.name,addr.can_addr.j1939.pgn,addr.can_addr.j1939.addr));
+    return std::make_shared<j1939_message_t>(j1939_message_t(J1939_MAX_DLEN,length, format, data_vector, timestamp,addr.can_addr.j1939.name,addr.can_addr.j1939.pgn,addr.can_addr.j1939.addr));
 }
 
 /// @brief Test if members pgn_ and length are set.
@@ -143,7 +180,7 @@ std::string j1939_message_t::get_debug_message()
 ///
 uint32_t j1939_message_t::get_id() const
 {
-    AFB_WARNING("Prefer method get_pgn() for j1939 messages");
+    AFB_DEBUG("Prefer method get_pgn() for j1939 messages");
 	return get_pgn();
 }
 

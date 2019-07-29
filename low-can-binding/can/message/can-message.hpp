@@ -26,24 +26,26 @@
 /// buffers. It is a wrapper of a can_frame struct with some sugar around it for binding purposes.
 class can_message_t : public message_t {
 	private:
-		uint8_t maxdlen_; ///< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
 		uint32_t id_; ///< id_ - The ID of the message. */
 		bool rtr_flag_; ///< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
-		uint8_t flags_; ///< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
+		uint32_t flags_; ///< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
 		struct bcm_msg bcm_msg_;
 
 	public:
 		can_message_t();
-		can_message_t(uint8_t maxdlen, uint32_t id, uint8_t length, message_format_t format, bool rtr_flag_, uint8_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
+		can_message_t(uint32_t maxdlen, uint32_t id, uint32_t length, message_format_t format, bool rtr_flag_, uint32_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
 
 		uint32_t get_id() const;
 
 		static std::shared_ptr<can_message_t> convert_from_frame(const canfd_frame& frame, size_t nbytes, uint64_t timestamp);
+		struct canfd_frame convert_to_canfd_frame();
+		struct can_frame convert_to_can_frame();
+
 		bool is_correct_to_send();
 		bool is_set();
 		struct bcm_msg get_bcm_msg();
 		void set_bcm_msg(struct bcm_msg bcm_msg);
 
 		std::string get_debug_message();
-
+		uint32_t get_flags();
 };

@@ -25,12 +25,6 @@
 
 namespace utils
 {
-	/// @brief Connect the socket.
-	/// @return 0 if success.
-	int socketcan_bcm_t::connect(const struct sockaddr* addr, socklen_t len)
-	{
-		return socket_ != INVALID_SOCKET ? ::connect(socket_, addr, len) : 0;
-	}
 
  	/// @brief Open a raw socket CAN.
 	/// @param[in] device_name is the kernel network device name of the CAN interface.
@@ -104,19 +98,19 @@ namespace utils
 		return cm;
 	}
 
-	void socketcan_bcm_t::write_message(std::vector<std::shared_ptr<message_t>>& vobj)
+	int socketcan_bcm_t::write_message(message_t& m)
 	{
-		for(const auto& obj : vobj)
-			write_message(obj);
-	}
 
-	void socketcan_bcm_t::write_message(std::shared_ptr<message_t> m)
-	{
-		struct bcm_msg obj = m->get_bcm_msg();
+		can_message_t&  cm = reinterpret_cast<can_message_t&>(m);
+		struct bcm_msg obj = cm.get_bcm_msg();
 		size_t size = (obj.msg_head.flags & CAN_FD_FRAME) ?
 			(size_t)((char*)&obj.fd_frames[obj.msg_head.nframes] - (char*)&obj):
 			(size_t)((char*)&obj.frames[obj.msg_head.nframes] - (char*)&obj);
 		if (::sendto(socket(), &obj, size, 0, (const struct sockaddr*)&get_tx_address(), sizeof(get_tx_address())) < 0)
-			AFB_API_ERROR(afbBindingV3root, "Error sending : %i %s", errno, ::strerror(errno));
+		{
+			AFB_ERROR("Error sending : %i %s", errno, ::strerror(errno));
+			return -1;
+		}
+		return 0;
 	}
 }

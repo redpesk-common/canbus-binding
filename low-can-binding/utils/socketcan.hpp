@@ -28,6 +28,17 @@
 
 #define INVALID_SOCKET -1
 
+/**
+ * @enum socket_type
+ * @brief The type of socket
+ */
+enum class socket_type {
+	BCM, ///< BCM - Socket BCM
+	J1939_ADDR_CLAIM, ///< J1939 - Socket J1939
+	J1939, ///< J1939 - Socket J1939
+	INVALID
+};
+
 namespace utils
 {
 
@@ -48,13 +59,15 @@ namespace utils
 		int setopt(int level, int optname, const void* optval, socklen_t optlen);
 		virtual int close();
 		virtual std::shared_ptr<message_t> read_message() = 0;
-		virtual void write_message(std::shared_ptr<message_t> obj) = 0;
-		virtual void write_message(std::vector<std::shared_ptr<message_t>>& vobj) = 0;
+		virtual int write_message(message_t& obj) = 0;
+		virtual int write_message(std::vector<message_t>& vobj);
 
 	protected:
 		int socket_;
 		struct sockaddr_can tx_address_;
 		int open(int domain, int type, int protocol);
+		int bind(const struct sockaddr* addr, socklen_t len);
+		int connect(const struct sockaddr* addr, socklen_t len);
 	};
 
 

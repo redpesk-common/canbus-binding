@@ -21,29 +21,45 @@
 
 #include "../../binding/low-can-hat.hpp"
 
-///
-/// @brief Class constructor
-///
-/// message_t class constructor.
-///
+/**
+ * @brief Construct a new message t::message t object
+ *
+ */
 message_t::message_t()
-	: length_{0},
+	: maxdlen_{0},
+	 length_{0},
 	 format_{message_format_t::INVALID},
 	 timestamp_{0},
 	 sub_id_{-1}
 {}
 
-message_t::message_t(uint8_t length,
+/**
+ * @brief Construct a new message t::message t object
+ *
+ * @param maxdlen The maxdlen of a message
+ * @param length The length of the message
+ * @param format The format of the message
+ * @param data The data vector of the message
+ * @param timestamp The timestamp of the message
+ */
+message_t::message_t(uint32_t maxdlen,
+	uint32_t length,
 	message_format_t format,
 	std::vector<uint8_t>& data,
 	uint64_t timestamp)
-	: length_{length},
+	: maxdlen_{maxdlen},
+	length_{length},
 	format_{format},
 	data_{data},
 	timestamp_{timestamp},
 	sub_id_{-1}
 {}
 
+/**
+ * @brief Return the sub_id of the message
+ *
+ * @return int The sub_id of the message
+ */
 int message_t::get_sub_id() const
 {
 	return sub_id_;
@@ -75,21 +91,46 @@ const std::vector<uint8_t> message_t::get_data_vector() const
 ///
 /// @return length_ class member
 ///
-uint8_t message_t::get_length() const
+uint32_t message_t::get_length() const
 {
 	return length_;
 }
 
+/**
+ * @brief Set data vector of the message
+ *
+ * @param data A vector of data
+ */
+void message_t::set_data(std::vector<uint8_t> &data)
+{
+	data_ = data;
+}
+
+/**
+ * @brief Set sub_id of the message
+ *
+ * @param sub_id The sub_id to set
+ */
 void message_t::set_sub_id(int sub_id)
 {
 	sub_id_ = sub_id;
 }
 
+/**
+ * @brief Return the timestamp of the message
+ *
+ * @return uint64_t The timestamp
+ */
 uint64_t message_t::get_timestamp() const
 {
 	return timestamp_;
 }
 
+/**
+ * @brief Return the format of the message
+ *
+ * @return message_format_t The message format
+ */
 message_format_t message_t::get_msg_format()
 {
 	return format_;
