@@ -75,6 +75,7 @@ class j1939_message_t : public message_t
         bool is_set();
         std::string get_debug_message();
         uint32_t get_id() const;
-        struct bcm_msg get_bcm_msg();
-		void set_bcm_msg(struct bcm_msg bcm_msg);
+        struct sockaddr_can get_sockname();
+		void set_sockname(struct sockaddr_can sockname);
+        void set_sockname(pgn_t pgn, name_t name, uint8_t addr);
 };

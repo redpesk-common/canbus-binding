@@ -51,7 +51,9 @@ PROJECT_TARGET_ADD(low-can)
 	if(WITH_FEATURE_J1939)
 		set(SOURCES_J1939
 			can/message/j1939-message.cpp
-			utils/socketcan-j1939.cpp
+			utils/socketcan-j1939/socketcan-j1939.cpp
+			utils/socketcan-j1939/socketcan-j1939-data.cpp
+			utils/socketcan-j1939/socketcan-j1939-addressclaiming.cpp
 		)
 	endif()
 

@@ -30,14 +30,6 @@
 
 #define MAX_BCM_CAN_FRAMES 257
 
-struct bcm_msg
-{
-	struct bcm_msg_head msg_head;
-	union {
-		struct canfd_frame fd_frames[MAX_BCM_CAN_FRAMES];
-		struct can_frame frames[MAX_BCM_CAN_FRAMES];
-	};
-};
 
 /**
  * @enum message_format_t
