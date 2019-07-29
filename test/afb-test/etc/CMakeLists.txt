@@ -20,8 +20,12 @@
 # Low-CAN test configuration files
 ##################################################
 PROJECT_TARGET_ADD(afb-test-config)
+	if(WITH_FEATURE_J1939)
+		set(J1939_TEST_CONFFILE ",\"low-can_J1939Test.lua\"")
+	endif()
 
-	file(GLOB CONF_FILES "*.json")
+	configure_file("aft-agl-service-low-can.json.in" "aft-agl-service-low-can.json")
+	file(GLOB CONF_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.json")
 
 	add_input_files("${CONF_FILES}")
 

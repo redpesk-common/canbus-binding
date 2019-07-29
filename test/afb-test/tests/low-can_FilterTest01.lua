@@ -18,6 +18,10 @@
     NOTE: strict mode: every global variables should be prefixed by '_'
 --]]
 
+print("\n##########################################")
+print("#########    BEGIN FILTER TESTS   #########")
+print("##########################################\n")
+
 local api = "low-can"
 local evt = "messages.engine.speed"
 

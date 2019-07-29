@@ -19,6 +19,10 @@
     NOTE: strict mode: every global variables should be prefixed by '_'
 --]]
 
+print("\n##########################################")
+print("#########    BEGIN BASIC TESTS   #########")
+print("##########################################\n")
+
 _AFT.setBeforeAll(function()
     local can = io.open("/sys/class/net/can0")
     if can == nil then
@@ -44,7 +48,7 @@ _AFT.testVerbStatusSuccess("low-can_auth", "low-can", "auth", {})
 _AFT.testVerbStatusSuccess("low-can_write", "low-can", "write", { signal_name = "hvac.temperature.left", signal_value = 21})
 _AFT.testVerbStatusSuccess("low-can_write_raw", "low-can", "write", { bus_name= "hs", frame= { can_id= 1568, can_dlc=8, can_data= {255,255,255,255,255,255,255,255}}})
 
-_AFT.testVerbStatusError("low-can_write_unwritable_signal", "low-can", "write", { signal_name = "engine.speed", signal_value = 1234})
+_AFT.testVerbStatusError("low-can_write_unwritable_signal", "low-can", "write", { signal_name = "vehicle.average.speed", signal_value = 1234})
 _AFT.testVerbStatusError("low-can_write_wrong_name_key", "low-can", "write", { name = "hvac.temperature.left", signal_value = 21})
 _AFT.testVerbStatusError("low-can_write_wrong_value_key", "low-can", "write", { signal_name = "hvac.temperature.left", value = 21})
 _AFT.testVerbStatusError("low-can_write_raw_invalid_bus_key", "low-can", "write", { bus= "hs", frame= { can_id= 1568, can_dlc=8, can_data= {255,255,255,255,255,255,255,255}}})
