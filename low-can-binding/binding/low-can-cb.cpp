@@ -151,8 +151,7 @@ static int subscribe_unsubscribe_signal(afb_req_t request,
 		}
 
 		// Event doesn't exist , so let's create it
-		if (! subscription_exists &&
-		    (ret = can_subscription->subscribe(request)) < 0)
+		if ((ret = can_subscription->subscribe(request)) < 0)
 			return ret;
 
 		if(! subscription_exists)
