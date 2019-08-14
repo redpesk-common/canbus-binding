@@ -353,6 +353,17 @@ void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, struct b
 	bcm_msg.msg_head.nframes++;
 }
 
+/// @brief Take an existing bcm_msg struct and add a can_frame.
+/// Currently only 1 uniq can_frame can be added, it's not possible to build
+/// a multiplexed message with several can_frame.
+void low_can_subscription_t::remove_last_bcm_frame(struct bcm_msg& bcm_msg)
+{
+	struct canfd_frame cf;
+	memset(&cf,0,sizeof(cf));
+	bcm_msg.fd_frames[bcm_msg.msg_head.nframes] = cf;
+	bcm_msg.msg_head.nframes--;
+}
+
 #ifdef USE_FEATURE_J1939
 int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig)
 {
