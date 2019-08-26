@@ -669,7 +669,7 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 	}
 
 //	cfd = encoder_t::build_frame(sig, value);
-	message_t *message = encoder_t::build_message(sig,value);
+	message_t *message = encoder_t::build_message(sig,value,false,false);
 
 	if(! send_message(message, sig->get_message()->get_bus_device_name(), type) && send)
 	{

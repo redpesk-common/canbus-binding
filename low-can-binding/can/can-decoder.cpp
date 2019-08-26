@@ -21,6 +21,7 @@
 #include "../utils/openxc-utils.hpp"
 #include "message-definition.hpp"
 #include "../binding/low-can-hat.hpp"
+#include "../utils/converter.hpp"
 
 /// @brief Parses the signal's bitfield from the given data and returns the raw
 /// value.
@@ -33,8 +34,57 @@
 ///
 float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message_t> message)
 {
-	 return bitfield_parse_float(message->get_data(), CAN_MESSAGE_SIZE,
-			signal.get_bit_position(), signal.get_bit_size(), signal.get_factor(),
+	const std::vector<uint8_t> data = message->get_data_vector();
+	std::vector<uint8_t> data_signal;
+	uint32_t bit_size = signal.get_bit_size();
+	uint32_t bit_position = signal.get_bit_position();
+
+	int new_start_byte = 0;
+	int new_end_byte = 0;
+	int new_start_bit = 0;
+	int new_end_bit = 0;
+
+	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit, new_end_bit);
+
+	for(int i=new_start_byte;i<=new_end_byte;i++)
+	{
+		data_signal.push_back(data[i]);
+	}
+
+	uint8_t new_bit_size = 0;
+
+	if(bit_size > 255)
+	{
+		AFB_ERROR("Error signal %s to long bit size",signal.get_name().c_str());
+	}
+	else
+	{
+		new_bit_size = (uint8_t) bit_size;
+	}
+
+	uint8_t bit_offset = 0;
+	if(new_start_bit > 255)
+	{
+		AFB_ERROR("Too long signal offset %d", new_start_bit);
+	}
+	else
+	{
+		bit_offset = (uint8_t) new_start_bit;
+	}
+
+	uint16_t length = 0;
+
+	if(data_signal.size() > 65535)
+	{
+		AFB_ERROR("Too long data signal %s",signal.get_name().c_str());
+	}
+	else
+	{
+		length = (uint16_t) data_signal.size();
+	}
+
+	return bitfield_parse_float(data_signal.data(), length,
+			bit_offset, new_bit_size, signal.get_factor(),
 			signal.get_offset());
 }
 
