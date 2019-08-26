@@ -331,6 +331,7 @@ struct bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t c
 	bcm_msg.msg_head.ival2.tv_sec = frequency_thinning.tv_sec ;
 	bcm_msg.msg_head.ival2.tv_usec = frequency_thinning.tv_usec;
 
+
 	return bcm_msg;
 }
 
@@ -389,32 +390,65 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 	struct timeval freq, timeout = {0, 0};
 	struct canfd_frame cfd;
 	subscription.signal_= sig;
+	bool is_fd = sig->get_message()->is_fd();
 
-	if (sig->get_message()->is_fd())
+	std::vector<uint8_t> data;
+	uint32_t length_msg = sig->get_message()->get_length();
+
+	if(length_msg == 0)
+	{
+		AFB_ERROR("Error in the length of message with id %d",sig->get_message()->get_id());
+		return -1;
+	}
+
+	for(int i = 0; i<length_msg;i++)
+	{
+		data.push_back(0);
+	}
+
+	encoder_t::encode_data(subscription.signal_,data,true,false,true);
+
+	can_message_t cm;
+
+	if (is_fd)
 	{
 		flags = SETTIMER|RX_NO_AUTOTIMER|CAN_FD_FRAME;
 		cfd.len = CANFD_MAX_DLEN;
+		cm = can_message_t(CANFD_MAX_DLEN,sig->get_message()->get_id(),length_msg,sig->get_message()->get_format(),false,CAN_FD_FRAME,data,0);
 	}
 	else
 	{
 		flags = SETTIMER|RX_NO_AUTOTIMER;
 		cfd.len = CAN_MAX_DLEN;
+		cm = can_message_t(CAN_MAX_DLEN,sig->get_message()->get_id(),length_msg,sig->get_message()->get_format(),false,0,data,0);
 	}
-	val = (float)(1 << subscription.signal_->get_bit_size()) - 1;
-	if(! bitfield_encode_float(val,
-				   subscription.signal_->get_bit_position(),
-				   subscription.signal_->get_bit_size(),
-				   1,
-				   subscription.signal_->get_offset(),
-				   cfd.data,
-				   cfd.len))
-		return -1;
 
 	frequency_clock_t f = subscription.event_filter_.frequency == 0 ? subscription.signal_->get_frequency() : frequency_clock_t(subscription.event_filter_.frequency);
 	freq = f.get_timeval_from_period();
 
 	struct bcm_msg bcm_msg = subscription.make_bcm_head(RX_SETUP, subscription.signal_->get_message()->get_id(), flags, timeout, freq);
-	subscription.add_one_bcm_frame(cfd, bcm_msg);
+
+	std::vector<canfd_frame> cfd_vect = cm.convert_to_canfd_frame_vector();
+
+	if(cfd_vect.size() > 1) //multi
+	{
+		AFB_ERROR("Not implemented yet");
+		return -1;
+	}
+	else if(cfd_vect.size() == 1)
+	{
+		canfd_frame cf = cfd_vect[0];
+		for(int i=0;i<cfd.len;i++)
+		{
+			cfd.data[i] = cf.data[i];
+		}
+		subscription.add_one_bcm_frame(cfd, bcm_msg);
+	}
+	else
+	{
+		AFB_ERROR("No data available");
+		return -1;
+	}
 
 	return create_rx_filter_bcm(subscription, bcm_msg);
 }
