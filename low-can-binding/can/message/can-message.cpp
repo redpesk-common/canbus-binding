@@ -67,7 +67,7 @@ bool can_message_t::is_correct_to_send()
 	if (id_ != 0 && length_ != 0 && format_ != message_format_t::INVALID)
 	{
 		int i;
-		for(i=0;i<CAN_MESSAGE_SIZE;i++)
+		for(i=0;i<length_;i++)
 			if(data_[i] != 0)
 				return true;
 	}
@@ -182,6 +182,68 @@ struct canfd_frame can_message_t::convert_to_canfd_frame()
 		AFB_ERROR("can_message_t not correctly initialized to be sent");
 
 	return frame;
+}
+
+/// @brief Take all initialized class members and build a
+/// canfd_frame struct that can be use to send a CAN message over
+/// the bus.
+///
+/// @return canfd_frame struct built from class members.
+struct std::vector<canfd_frame> can_message_t::convert_to_canfd_frame_vector()
+{
+	std::vector<canfd_frame> ret;
+	if(is_correct_to_send())
+	{
+		if(flags_ & CAN_FD_FRAME)
+		{
+			int i=0;
+			do
+			{
+				canfd_frame frame;
+				frame.can_id = id_;
+				frame.len = 64;
+				std::vector<uint8_t> data = get_data_vector((i*64),(i*64)+63);
+				if(data.size()<64)
+				{
+					::memset(frame.data,0,sizeof(frame.data));
+					::memcpy(frame.data,data.data(),data.size());
+				}
+				else
+				{
+					::memcpy(frame.data,data.data(),64);
+				}
+				ret.push_back(frame);
+				i++;
+			} while (i<(length_ >> 6));
+		}
+		else
+		{
+			int i=0;
+			do
+			{
+				canfd_frame frame;
+				frame.can_id = id_;
+				frame.len = 8;
+				std::vector<uint8_t> data = get_data_vector(i*8,(i*8)+7);
+				if(data.size()<8)
+				{
+					::memset(frame.data,0,sizeof(frame.data));
+					::memcpy(frame.data,data.data(),data.size());
+				}
+				else
+				{
+					::memset(frame.data,0,sizeof(frame.data));
+					::memcpy(frame.data,data.data(),8);
+				}
+				ret.push_back(frame);
+				i++;
+			} while (i<(length_ >> 3));
+		}
+	}
+	else
+		AFB_ERROR("can_message_t not correctly initialized to be sent");
+
+	return ret;
 }
 
 /// @brief Take all initialized class members and build a
