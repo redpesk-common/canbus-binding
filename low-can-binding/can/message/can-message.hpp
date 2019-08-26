@@ -50,7 +50,7 @@ class can_message_t : public message_t {
 
 		bool is_correct_to_send();
 		bool is_set();
-		struct bcm_msg get_bcm_msg();
+		struct bcm_msg& get_bcm_msg();
 		void set_bcm_msg(struct bcm_msg bcm_msg);
 
 		std::string get_debug_message();
