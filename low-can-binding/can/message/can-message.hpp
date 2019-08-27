@@ -39,8 +39,16 @@ class can_message_t : public message_t {
 
 	public:
 		can_message_t();
-		can_message_t(uint32_t maxdlen, uint32_t id, uint32_t length, bool rtr_flag_, uint32_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
+		can_message_t(  uint32_t maxdlen,
+						uint32_t id,
+						uint32_t length,
+						bool rtr_flag_,
+						uint32_t flags,
+						std::vector<uint8_t>& data,
+						uint64_t timestamp);
+
 		uint32_t get_id() const;
+		void set_id(const canid_t id);
 
 		static std::shared_ptr<can_message_t> convert_from_frame(const canfd_frame& frame, size_t nbytes, uint64_t timestamp);
 		struct canfd_frame convert_to_canfd_frame();
@@ -53,5 +61,4 @@ class can_message_t : public message_t {
 		void set_bcm_msg(struct bcm_msg bcm_msg);
 
 		std::string get_debug_message();
-
 };

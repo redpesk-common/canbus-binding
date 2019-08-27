@@ -213,6 +213,80 @@
 		}
 	}
     },
+    "0x111": {
+        "bus": "ls",
+        "is_fd" : false,
+        "is_extended": false,
+        "is_j1939" : false,
+        "is_isotp" : true,
+        "length" : 16,
+        "signals": {
+            "sig11": {
+                "generic_name": "sig1.1",
+                "bit_position": 0,
+                "bit_size": 16,
+                "factor": 1,
+                "offset": 0,
+                "writable": true
+            },
+            "sig12": {
+                "generic_name": "sig1.2",
+                "bit_position": 16,
+                "bit_size": 16,
+                "factor": 1,
+                "offset": 0,
+                "writable": true
+            },
+            "sig21": {
+                "generic_name": "sig2.1",
+                "bit_position": 32,
+                "bit_size": 16,
+                "factor": 1,
+                "offset": 0,
+                "writable": true
+            },
+            "sig22": {
+                "generic_name": "sig2.2",
+                "bit_position": 48,
+                "bit_size": 16,
+                "factor": 1,
+                "offset": 0,
+                "writable": true
+            },
+            "sig31": {
+                "generic_name": "sig3.1",
+                "bit_position": 64,
+                "bit_size": 16,
+                "factor": 1,
+                "offset": 0,
+                "writable": true
+            },
+            "sig32": {
+                "generic_name": "sig3.2",
+                "bit_position": 80,
+                "bit_size": 16,
+                "factor": 1,
+                "offset": 0,
+                "writable": true
+            },
+            "sig41": {
+                "generic_name": "sig4.1",
+                "bit_position": 96,
+                "bit_size": 16,
+                "factor": 1,
+                "offset": 0,
+                "writable": true
+            },
+            "sig42": {
+                "generic_name": "sig4.2",
+                "bit_position": 112,
+                "bit_size": 16,
+                "factor": 1,
+                "offset": 0,
+                "writable": true
+            }
+        }
+    },
     "61442": {
         "comment": "Electronic Transmission Controller 1",
         "length": 8,

@@ -82,6 +82,7 @@ public:
 	uint32_t get_id() const;
 	bool is_fd() const;
 	bool is_j1939() const;
+	bool is_isotp() const;
 	std::vector<std::shared_ptr<signal_t>>& get_signals();
 	uint32_t get_length() const;
 	uint32_t get_flags() const;

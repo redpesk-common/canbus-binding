@@ -55,6 +55,11 @@ uint32_t can_message_t::get_id() const
 }
 
 
+void can_message_t::set_id(const canid_t id)
+{
+	id_ = id;
+}
+
 /// @brief Control whether the object is correctly initialized
 ///  to be sent over the CAN bus
 ///

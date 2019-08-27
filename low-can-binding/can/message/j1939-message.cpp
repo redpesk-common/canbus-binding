@@ -159,6 +159,12 @@ uint32_t j1939_message_t::get_id() const
 	return get_pgn();
 }
 
+void j1939_message_t::set_id(const canid_t id)
+{
+	pgn_ = id;
+}
+
+
 /**
  * @brief Return the sockname of the message
  *
