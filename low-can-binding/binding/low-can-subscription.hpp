@@ -95,7 +95,7 @@ public:
 	static void add_one_bcm_frame(struct canfd_frame& cfd, struct bcm_msg& bcm_msg);
 	static void remove_last_bcm_frame(struct bcm_msg& bcm_msg);
 
-	static int open_socket(low_can_subscription_t &subscription, const std::string& bus_name = "", socket_type type = socket_type::INVALID);
+	static int open_socket(low_can_subscription_t &subscription, const std::string& bus_name = "", uint32_t flags = INVALID_FLAG);
 
 	int create_rx_filter(std::shared_ptr<signal_t> sig);
 	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);

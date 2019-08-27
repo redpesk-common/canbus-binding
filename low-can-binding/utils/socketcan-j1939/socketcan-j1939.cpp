@@ -256,7 +256,7 @@ namespace utils
 	 */
 	int socketcan_j1939_t::write_j1939_message(pgn_t pgn, std::vector<uint8_t> &data, uint32_t len_data)
 	{
-		j1939_message_t msg = j1939_message_t(J1939_MAX_DLEN, len_data, message_format_t::J1939, data, 0, 0, pgn, 0);
+		j1939_message_t msg = j1939_message_t(len_data, data, 0, 0, pgn, 0);
 		msg.set_sockname(pgn,J1939_NO_NAME,J1939_NO_ADDR);
 		return write_message(msg);
 	}

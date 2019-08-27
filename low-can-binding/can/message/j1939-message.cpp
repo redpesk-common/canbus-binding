@@ -45,13 +45,12 @@ j1939_message_t::j1939_message_t():
  * @param addr The address of the message
  */
 j1939_message_t::j1939_message_t(uint32_t length,
-	message_format_t format,
 	std::vector<uint8_t>& data,
 	uint64_t timestamp,
 	name_t name,
 	pgn_t pgn,
 	uint8_t addr):
-	message_t(J1939_MAX_DLEN,length, format, data, timestamp, 0),
+	message_t(J1939_MAX_DLEN, length, J1939_PROTOCOL, data, timestamp),
 	name_{name},
 	pgn_{pgn},
 	addr_{addr}
@@ -99,18 +98,13 @@ std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct socka
 {
 	int i;
 	uint32_t length = 0;
-	message_format_t format;
+	uint32_t flags;
 	std::vector<uint8_t> data_vector;
 
 	if(nbytes > J1939_MAX_DLEN)
 	{
 		AFB_DEBUG("Unsupported j1939 frame");
-		format = message_format_t::INVALID;
-	}
-	else
-	{
-		//AFB_DEBUG("Got a j1939 frame");
-		format = message_format_t::J1939;
+		return std::make_shared<j1939_message_t>(j1939_message_t());
 	}
 
 	length = (uint32_t) nbytes;
@@ -126,10 +120,10 @@ std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct socka
 		data_vector.push_back(data[i]);
 	};
 
-	AFB_DEBUG("Found pgn: %X, format: %X, length: %X, data %s",
-							addr.can_addr.j1939.pgn, (uint8_t)format, length, data_string.c_str());
+	AFB_DEBUG("Found pgn: %X, length: %X, data %s",
+							addr.can_addr.j1939.pgn, length, data_string.c_str());
 
-	return std::make_shared<j1939_message_t>(j1939_message_t(J1939_MAX_DLEN,length, format, data_vector, timestamp,addr.can_addr.j1939.name,addr.can_addr.j1939.pgn,addr.can_addr.j1939.addr));
+	return std::make_shared<j1939_message_t>(j1939_message_t(length, data_vector, timestamp,addr.can_addr.j1939.name,addr.can_addr.j1939.pgn,addr.can_addr.j1939.addr));
 }
 
 /// @brief Test if members pgn_ and length are set.

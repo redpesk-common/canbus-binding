@@ -102,7 +102,7 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 				std::shared_ptr<message_t> message = s->read_message();
 
 				// Sure we got a valid CAN message ?
-				if (! message->get_id() == 0 && ! message->get_length() == 0 && message->get_msg_format() != message_format_t::INVALID)
+				if (! message->get_id() == 0 && ! message->get_length() == 0 && !(message->get_flags()&INVALID_FLAG))
 				{
 					push_n_notify(message);
 				}
@@ -515,7 +515,7 @@ static int send_frame(struct canfd_frame& cfd, const std::string& bus_name, sock
 	}
 }
 */
-static int send_message(message_t *message, const std::string& bus_name, socket_type type)
+static int send_message(message_t *message, const std::string& bus_name, uint32_t flags)
 {
 	if(bus_name.empty())
 	{
@@ -530,12 +530,12 @@ static int send_message(message_t *message, const std::string& bus_name, socket_
 	}
 
 
-	if(type == socket_type::BCM)
+	if(flags&BCM_PROTOCOL)
 	{
 		return low_can_subscription_t::tx_send(*cd[bus_name], message, bus_name);
 	}
 #ifdef USE_FEATURE_J1939
-	else if(type == socket_type::J1939)
+	else if(flags&J1939_PROTOCOL)
 	{
 		return low_can_subscription_t::j1939_send(*cd[bus_name], message, bus_name);
 	}
@@ -547,7 +547,7 @@ static int send_message(message_t *message, const std::string& bus_name, socket_
 }
 
 
-static void write_raw_frame(afb_req_t request, const std::string& bus_name, message_t *message, struct json_object *can_data, socket_type type)
+static void write_raw_frame(afb_req_t request, const std::string& bus_name, message_t *message, struct json_object *can_data, uint32_t flags)
 {
 
 	struct utils::signals_found sf;
@@ -557,7 +557,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 	if( !sf.signals.empty() )
 	{
 		AFB_DEBUG("ID WRITE RAW : %d",sf.signals[0]->get_message()->get_id());
-		if(type == socket_type::BCM)
+		if(flags&BCM_PROTOCOL)
 		{
 			if(sf.signals[0]->get_message()->is_fd())
 			{
@@ -573,12 +573,12 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 		}
 
 		if((message->get_length()> 0 && (
-		((type == socket_type::BCM) && (
+		((flags&BCM_PROTOCOL) && (
 				(message->get_length() <= CANFD_MAX_DLEN * MAX_BCM_CAN_FRAMES && message->get_flags() & CAN_FD_FRAME)
 			||	(message->get_length() <= CAN_MAX_DLEN * MAX_BCM_CAN_FRAMES && !(message->get_flags() & CAN_FD_FRAME))
 		))
 	#ifdef USE_FEATURE_J1939
-		|| (message->get_length() <= J1939_MAX_DLEN && type == socket_type::J1939)
+		|| (message->get_length() <= J1939_MAX_DLEN && flags&J1939_PROTOCOL)
 	#endif
 		)))
 		{
@@ -593,11 +593,11 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 		}
 		else
 		{
-			if(type == socket_type::BCM)
+			if(flags&BCM_PROTOCOL)
 			{
 				afb_req_fail(request, "Invalid", "Frame BCM");
 			}
-			else if(type == socket_type::J1939)
+			else if(flags&J1939_PROTOCOL)
 			{
 				afb_req_fail(request, "Invalid", "Frame J1939");
 			}
@@ -608,7 +608,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 			return;
 		}
 
-		if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name),type))
+		if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name),flags))
 		{
 			afb_req_success(request, nullptr, "Message correctly sent");
 		}
@@ -639,8 +639,8 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 				  "can_dlc", &length,
 				  "can_data", &can_data))
 	{
-		message = new can_message_t(0,(uint32_t)id,(uint32_t)length,message_format_t::STANDARD,false,0,data,0);
-		write_raw_frame(request,bus_name,message,can_data,socket_type::BCM);
+		message = new can_message_t(0,(uint32_t)id,(uint32_t)length,false,0,data,0);
+		write_raw_frame(request,bus_name,message,can_data,BCM_PROTOCOL);
 	}
 #ifdef USE_FEATURE_J1939
 	else if(!wrap_json_unpack(json_value, "{si, si, so !}",
@@ -648,8 +648,8 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 				  "length", &length,
 				  "data", &can_data))
 	{
-		message = new j1939_message_t(J1939_MAX_DLEN,(uint32_t)length,message_format_t::J1939,data,0,J1939_NO_NAME,(pgn_t)id,J1939_NO_ADDR);
-		write_raw_frame(request,bus_name,message,can_data,socket_type::J1939);
+		message = new j1939_message_t((uint32_t)length,data,0,J1939_NO_NAME,(pgn_t)id,J1939_NO_ADDR);
+		write_raw_frame(request,bus_name,message,can_data,J1939_PROTOCOL);
 	}
 #endif
 	else
@@ -690,21 +690,21 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 			encoder(*sig, dynafield_value, &send) :
 			encoder_t::encode_DynamicField(*sig, dynafield_value, &send);
 
-	socket_type type = socket_type::INVALID;
+	uint32_t flags = INVALID_FLAG;
 
 	if(sig->get_message()->is_j1939())
 	{
-		type = socket_type::J1939;
+		flags = J1939_PROTOCOL;
 	}
 	else
 	{
-		type = socket_type::BCM;
+		flags = BCM_PROTOCOL;
 	}
 
 //	cfd = encoder_t::build_frame(sig, value);
 	message_t *message = encoder_t::build_message(sig,value,false,false);
 
-	if(! send_message(message, sig->get_message()->get_bus_device_name(), type) && send)
+	if(! send_message(message, sig->get_message()->get_bus_device_name(), flags) && send)
 	{
 		afb_req_success(request, nullptr, "Message correctly sent");
 	}
@@ -912,7 +912,7 @@ int init_binding(afb_api_t api)
 
 			ret = low_can_subscription_t::open_socket(*low_can_j1939,
 													message_definition->get_bus_device_name(),
-													socket_type::J1939_ADDR_CLAIM);
+													J1939_ADDR_CLAIM_PROTOCOL);
 			if(ret < 0)
 			{
 				AFB_ERROR("Error open socket address claiming for j1939 protocol");

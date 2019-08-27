@@ -32,16 +32,17 @@
 
 
 /**
- * @enum message_format_t
- * @brief The ID format for a CAN message.
+ * FLAGS
  */
-enum class message_format_t {
-	STANDARD, ///< STANDARD - standard 11-bit CAN arbitration ID. */
-	EXTENDED, ///< EXTENDED - an extended frame, with a 29-bit arbitration ID. */
-	J1939,	  ///< J1939 	- Format for j1939 messages
-	INVALID,  ///< INVALID  - INVALID code used at initialization to signify that it isn't usable'*/
-};
 
+#define INVALID_FLAG 0x0001
+#define STANDARD_ID 0x0002
+#define EXTENDED_ID 0x0004
+#define BCM_PROTOCOL 0x0008
+#define J1939_PROTOCOL 0x0010
+#define J1939_ADDR_CLAIM_PROTOCOL 0x0020
+#define ISOTP_PROTOCOL 0x0040
+#define FD_FRAME 0x0800
 
 /// @class message_t
 ///
@@ -51,15 +52,14 @@ class message_t {
 protected:
 	uint32_t maxdlen_; ///< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
 	uint32_t length_; ///< length_ - the length of the data array. */
-	message_format_t format_; ///< format_ - the format of the message's ID.*/
+	uint32_t flags_; ///< format_ - the format mask of the message*/
 	std::vector<uint8_t> data_; ///< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 	uint64_t timestamp_; ///< timestamp_ - timestamp of the received message*/
 	int sub_id_; ///< sub_id_ - Subscription index. */
-	uint32_t flags_; ///< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
 
 public:
 	message_t();
-	message_t(uint32_t maxdlen, uint32_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp, uint32_t flags);
+	message_t(uint32_t maxdlen, uint32_t length, uint32_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
 	virtual ~message_t() = default;
 
 	int get_sub_id() const;
@@ -72,7 +72,6 @@ public:
 	void set_data(std::vector<uint8_t> &data);
 	void set_sub_id(int sub_id);
 	void set_timestamp(uint64_t timestamp);
-	message_format_t get_msg_format();
 	virtual bool is_set() = 0;
 	virtual std::string get_debug_message() = 0;
 	virtual uint32_t get_id() const = 0;

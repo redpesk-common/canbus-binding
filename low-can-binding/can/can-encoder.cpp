@@ -174,20 +174,37 @@ message_t* encoder_t::build_message(const std::shared_ptr<signal_t>& signal, uin
 	std::vector<uint8_t> data;
 	if(signal->get_message()->is_fd())
 	{
-		message = new can_message_t(CANFD_MAX_DLEN,signal->get_message()->get_id(),CANFD_MAX_DLEN,signal->get_message()->get_format(),false,CAN_FD_FRAME,data,0);
+		message = new can_message_t( CANFD_MAX_DLEN,
+									 signal->get_message()->get_id(),
+									 CANFD_MAX_DLEN,
+									 false,
+									 signal->get_message()->get_flags(),
+									 data,
+									 0);
 
 		return build_frame(signal,value,message, factor, offset);
 	}
 #ifdef USE_FEATURE_J1939
 	else if(signal->get_message()->is_j1939())
 	{
-		message = new j1939_message_t(J1939_MAX_DLEN,signal->get_message()->get_length(),signal->get_message()->get_format(),data,0,J1939_NO_NAME,signal->get_message()->get_id(),J1939_NO_ADDR);
+		message = new j1939_message_t( signal->get_message()->get_length(),
+									   data,
+									   0,
+									   J1939_NO_NAME,
+									   signal->get_message()->get_id(),
+									   J1939_NO_ADDR);
 		return build_frame(signal,value,message, factor, offset);
 	}
 #endif
 	else
 	{
-		message = new can_message_t(CAN_MAX_DLEN,signal->get_message()->get_id(),CAN_MAX_DLEN,signal->get_message()->get_format(),false,0,data,0);
+		message = new can_message_t(CAN_MAX_DLEN,
+									signal->get_message()->get_id(),
+									CAN_MAX_DLEN,
+									false,
+									signal->get_message()->get_flags(),
+									data,
+									0);
 		return build_frame(signal,value,message, factor, offset);
 	}
 }

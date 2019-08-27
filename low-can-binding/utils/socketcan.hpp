@@ -28,17 +28,6 @@
 
 #define INVALID_SOCKET -1
 
-/**
- * @enum socket_type
- * @brief The type of socket
- */
-enum class socket_type {
-	BCM, ///< BCM - Socket BCM
-	J1939_ADDR_CLAIM, ///< J1939 - Socket J1939
-	J1939, ///< J1939 - Socket J1939
-	INVALID
-};
-
 namespace utils
 {
 

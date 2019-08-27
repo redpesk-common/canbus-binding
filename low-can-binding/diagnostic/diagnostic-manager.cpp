@@ -526,7 +526,7 @@ openxc_VehicleMessage diagnostic_manager_t::find_and_decode_adr(std::shared_ptr<
 /// @return True if the active diagnostic request match the response.
 bool diagnostic_manager_t::is_diagnostic_response(std::shared_ptr<message_t> m)
 {
-	if(m->get_msg_format() == message_format_t::STANDARD || m->get_msg_format() == message_format_t::EXTENDED)
+	if(m->get_flags()&STANDARD_ID || m->get_flags()&EXTENDED_ID)
 	{
 		if (m->get_id() >= 0x7e8 && m->get_id() <= 0x7ef)
 				return true;

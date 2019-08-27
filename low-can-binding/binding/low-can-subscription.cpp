@@ -241,14 +241,12 @@ void low_can_subscription_t::set_index(int index)
 /// it will open the socket with the required CAN bus device name.
 ///
 /// @return INVALID_SOCKET on failure, else positive integer
-int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, const std::string& bus_name, socket_type type)
+int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, const std::string& bus_name,  uint32_t flags)
 {
 	int ret = -1;
 	if(! subscription.socket_)
 	{
-		switch (type)
-		{
-		case socket_type::BCM:
+		if(flags&BCM_PROTOCOL)
 		{
 			if( subscription.signal_ != nullptr)
 			{
@@ -266,10 +264,9 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 					ret = subscription.socket_->open(bus_name);
 			}
 			subscription.index_ = (int)subscription.socket_->socket();
-			break;
 		}
 #ifdef USE_FEATURE_J1939
-		case socket_type::J1939_ADDR_CLAIM:
+		else if(flags&J1939_ADDR_CLAIM_PROTOCOL)
 		{
 			pgn_t pgn = J1939_NO_PGN;
 			if(!bus_name.empty())
@@ -279,9 +276,8 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 				subscription.socket_ = socket;
 			}
 			subscription.index_ = (int)subscription.socket_->socket();
-			break;
 		}
-		case socket_type::J1939:
+		else if(flags&J1939_PROTOCOL)
 		{
 			pgn_t pgn = J1939_NO_PGN;
 			if(subscription.signal_ != nullptr)
@@ -298,15 +294,12 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 				subscription.socket_ = socket;
 			}
 			subscription.index_ = (int)subscription.socket_->socket();
-			break;
 		}
 #endif
-		default:
+		else
 		{
 			AFB_ERROR("Socket format not supported");
 			return INVALID_SOCKET;
-			break;
-		}
 		}
 	}
 	else{
@@ -373,7 +366,7 @@ int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subsc
 	subscription.signal_= sig;
 
 	// Make sure that socket is opened.
-	if(open_socket(subscription,"",socket_type::J1939) < 0)
+	if(open_socket(subscription,"",J1939_PROTOCOL) < 0)
 	{
 			return -1;
 	}
@@ -387,7 +380,7 @@ int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subsc
 /// @return 0 if ok else -1
 int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig)
 {
-	uint32_t flags;
+	uint32_t flags_bcm;
 	float val;
 	struct timeval freq, timeout = {0, 0};
 	struct canfd_frame cfd;
@@ -414,21 +407,33 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 
 	if (is_fd)
 	{
-		flags = SETTIMER|RX_NO_AUTOTIMER|CAN_FD_FRAME;
+		flags_bcm = SETTIMER|RX_NO_AUTOTIMER|CAN_FD_FRAME;
 		cfd.len = CANFD_MAX_DLEN;
-		cm = can_message_t(CANFD_MAX_DLEN,sig->get_message()->get_id(),length_msg,sig->get_message()->get_format(),false,CAN_FD_FRAME,data,0);
+		cm = can_message_t( CANFD_MAX_DLEN,
+							sig->get_message()->get_id(),
+							length_msg,
+							false,
+							sig->get_message()->get_flags(),
+							data,
+							0);
 	}
 	else
 	{
-		flags = SETTIMER|RX_NO_AUTOTIMER;
+		flags_bcm = SETTIMER|RX_NO_AUTOTIMER;
 		cfd.len = CAN_MAX_DLEN;
-		cm = can_message_t(CAN_MAX_DLEN,sig->get_message()->get_id(),length_msg,sig->get_message()->get_format(),false,0,data,0);
+		cm = can_message_t( CAN_MAX_DLEN,
+							sig->get_message()->get_id(),
+							length_msg,
+							false,
+							sig->get_message()->get_flags(),
+							data,
+							0);
 	}
 
 	frequency_clock_t f = subscription.event_filter_.frequency == 0 ? subscription.signal_->get_frequency() : frequency_clock_t(subscription.event_filter_.frequency);
 	freq = f.get_timeval_from_period();
 
-	struct bcm_msg bcm_msg = subscription.make_bcm_head(RX_SETUP, subscription.signal_->get_message()->get_id(), flags, timeout, freq);
+	struct bcm_msg bcm_msg = subscription.make_bcm_head(RX_SETUP, subscription.signal_->get_message()->get_id(), flags_bcm, timeout, freq);
 
 	std::vector<canfd_frame> cfd_vect = cm.convert_to_canfd_frame_vector();
 
@@ -499,7 +504,7 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscription, struct bcm_msg& bcm_msg)
 {
 	// Make sure that socket is opened.
-	if(subscription.open_socket(subscription,"",socket_type::BCM) < 0)
+	if(subscription.open_socket(subscription,"",BCM_PROTOCOL) < 0)
 		{return -1;}
 
 	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
@@ -542,7 +547,7 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 
 	std::vector<canfd_frame> cfd_vect = cm->convert_to_canfd_frame_vector();
 
-	if(subscription.open_socket(subscription, bus_name,socket_type::BCM) < 0)
+	if(subscription.open_socket(subscription, bus_name, BCM_PROTOCOL) < 0)
 	{
 			return -1;
 	}
@@ -586,7 +591,7 @@ int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, mes
 	//struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cfd.can_id);
 	//subscription.add_one_bcm_frame(cfd, bcm_msg);
 
-	if(subscription.open_socket(subscription, bus_name, socket_type::J1939) < 0)
+	if(subscription.open_socket(subscription, bus_name, J1939_PROTOCOL) < 0)
 	{
 		return -1;
 	}
