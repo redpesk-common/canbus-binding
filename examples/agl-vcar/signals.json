@@ -1,4 +1,5 @@
 {   "name": "AGL Virtual Car",
+	"version": "2.0",
 	"extra_sources": [],
 	"initializers": [],
 	"loopers": [],

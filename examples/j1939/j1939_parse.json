@@ -1,5 +1,6 @@
 
 {   "name": "Virtual J1939",
+	"version": "2.0",
 	"extra_sources": [],
 	"initializers": [],
 	"loopers": [],
