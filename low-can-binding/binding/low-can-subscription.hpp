@@ -35,8 +35,8 @@ struct event_filter_t
 	float frequency; ///< frequency - Maximum frequency which will be received and pushed to a subscribed event.
 	float min; ///< min - Minimum value that the signal doesn't have to go below to be pushed.
 	float max; ///< max - Maximum value that the signal doesn't have to go above to be pushed.
-	canid_t rx_id;
-	canid_t tx_id;
+	canid_t rx_id; ///< rx_id - RX_ID for ISO_TP protocol
+	canid_t tx_id; ///< tx_id - TX_ID for ISO_TP protocol
 
 	event_filter_t() : frequency{0}, min{-__FLT_MAX__}, max{__FLT_MAX__}, rx_id{NO_CAN_ID}, tx_id{NO_CAN_ID} {};
 	bool operator==(const event_filter_t& ext) const {
