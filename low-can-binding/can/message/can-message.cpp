@@ -213,13 +213,13 @@ bool can_message_t::is_set()
 std::string can_message_t::get_debug_message()
 {
 	std::string ret = "";
-    ret = ret + "Here is the next can message : id " + std::to_string(id_)  + " length " + std::to_string(length_) + ", data ";
-    for (size_t i = 0; i < data_.size(); i++)
-    {
-        ret = ret + std::to_string(data_[i]);
-    }
+	ret = ret + "Here is the next can message : id " + std::to_string(id_)  + " length " + std::to_string(length_) + ", data ";
+	for (size_t i = 0; i < data_.size(); i++)
+	{
+		ret = ret + std::to_string(data_[i]);
+	}
 
-    return ret;
+	return ret;
 }
 
 struct bcm_msg can_message_t::get_bcm_msg()

@@ -117,4 +117,3 @@ class application_t
 		bool isBusActive(can_bus_dev_t* bus);
 		*/
 };
-

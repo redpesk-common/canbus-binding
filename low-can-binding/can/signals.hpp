@@ -68,7 +68,7 @@ private:
 	std::shared_ptr<message_definition_t> parent_; /*!< parent_ - pointer to the parent message definition holding this signal*/
 	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
 	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
-				     * which make easier to sort message when the come in.*/
+					 * which make easier to sort message when the come in.*/
 	uint8_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
 				*	non-inverted bit numbering, i.e. the most significant bit of
 				*	each byte is 0) */
@@ -80,8 +80,8 @@ private:
 	float min_value_; /*!< min_value_ - The minimum value for the processed signal.*/
 	float max_value_; /*!< max_value_ - The maximum value for the processed signal. */
 	frequency_clock_t frequency_; /*!< frequency_ - A frequency_clock_t struct to control the maximum frequency to
-				       * process and send this signal. To process every value, set the
-				       * clock's frequency to 0. */
+					   * process and send this signal. To process every value, set the
+					   * clock's frequency to 0. */
 	bool send_same_; /*!< send_same_ - If true, will re-send even if the value hasn't changed.*/
 	bool force_send_changed_; /*!< force_send_changed_ - If true, regardless of the frequency, it will send the
 				   * value if it has changed. */
@@ -96,7 +96,7 @@ private:
 				  * is used. */
 	bool received_; /*!< received_ - True if this signal has ever been received.*/
 	float last_value_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
-			    * this value is undefined. */
+				* this value is undefined. */
 	std::pair<bool,int> multiplex_; /*!< multiplex_ - If bool is false and int is 0 is not a multiplex signal
 										If bool is true, that indicate that is a multiplexor
 										If int is different of 0, that indicate the link with a multiplexor */

@@ -22,47 +22,47 @@
 
 namespace utils
 {
-    /**
-     * @brief Open a socket for receive or send data
-     *
-     * @param device_name The device name to open the socket
-     * @param pgn The pgn to receive only him
-     * @return int Return the number of the socket
-     */
-    int socketcan_j1939_data_t::open(std::string device_name, pgn_t pgn)
-    {
-        int ret = socketcan_j1939_t::open(device_name,htole64(J1939_NAME_ECU),pgn,J1939_NO_ADDR);
-        if(ret >= 0)
-        {
-            if(tx_address_.can_addr.j1939.pgn != J1939_NO_PGN)
-            {
-                add_filter(J1939_NO_NAME,tx_address_.can_addr.j1939.pgn,J1939_NO_ADDR,J1939_NO_NAME,J1939_NO_PGN,J1939_NO_ADDR);
-            }
-            define_opt();
-        }
-        return ret;
-    }
+	/**
+	 * @brief Open a socket for receive or send data
+	 *
+	 * @param device_name The device name to open the socket
+	 * @param pgn The pgn to receive only him
+	 * @return int Return the number of the socket
+	 */
+	int socketcan_j1939_data_t::open(std::string device_name, pgn_t pgn)
+	{
+		int ret = socketcan_j1939_t::open(device_name,htole64(J1939_NAME_ECU),pgn,J1939_NO_ADDR);
+		if(ret >= 0)
+		{
+			if(tx_address_.can_addr.j1939.pgn != J1939_NO_PGN)
+			{
+				add_filter(J1939_NO_NAME,tx_address_.can_addr.j1939.pgn,J1939_NO_ADDR,J1939_NO_NAME,J1939_NO_PGN,J1939_NO_ADDR);
+			}
+			define_opt();
+		}
+		return ret;
+	}
 
-    /**
-     * @brief Write a message but check if the address claiming is operation before
-     *
-     * @param obj A j1939 message
-     * @return int 0 if the write is ok
-     */
-    int socketcan_j1939_data_t::write_message(message_t& obj)
-    {
-        std::unique_lock<std::mutex> lock(mutex_claiming_);
-        application_t &application = application_t::instance();
-        socketcan_j1939_addressclaiming_t *socket_addr_claimed = static_cast<socketcan_j1939_addressclaiming_t*>(application.get_socket_address_claiming().get());
-        while(socket_addr_claimed->get_state() != claiming_state::OPERATIONAL)
-        {
-            socketcan_j1939_t::signal_address_claiming_.wait(lock);
-            if(socket_addr_claimed->get_state() == claiming_state::INVALID)
-            {
-                AFB_ERROR("Invalid state");
-                return -1;
-            }
-        }
-        return socketcan_j1939_t::write_message(obj);
-    }
+	/**
+	 * @brief Write a message but check if the address claiming is operation before
+	 *
+	 * @param obj A j1939 message
+	 * @return int 0 if the write is ok
+	 */
+	int socketcan_j1939_data_t::write_message(message_t& obj)
+	{
+		std::unique_lock<std::mutex> lock(mutex_claiming_);
+		application_t &application = application_t::instance();
+		socketcan_j1939_addressclaiming_t *socket_addr_claimed = static_cast<socketcan_j1939_addressclaiming_t*>(application.get_socket_address_claiming().get());
+		while(socket_addr_claimed->get_state() != claiming_state::OPERATIONAL)
+		{
+			socketcan_j1939_t::signal_address_claiming_.wait(lock);
+			if(socket_addr_claimed->get_state() == claiming_state::INVALID)
+			{
+				AFB_ERROR("Invalid state");
+				return -1;
+			}
+		}
+		return socketcan_j1939_t::write_message(obj);
+	}
 }

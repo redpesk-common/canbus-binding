@@ -70,15 +70,15 @@ class diagnostic_message_t
 	public:
 		const char* generic_name = generic_name_.c_str();
 		diagnostic_message_t(uint8_t pid,
-				     const std::string& generic_name,
-				     const int min,
-				     const int max,
-				     enum UNIT unit,
-				     float frequency,
-				     DiagnosticResponseDecoder decoder,
-				     DiagnosticResponseCallback callback,
-				     bool supported,
-				     bool received);
+					 const std::string& generic_name,
+					 const int min,
+					 const int max,
+					 enum UNIT unit,
+					 float frequency,
+					 DiagnosticResponseDecoder decoder,
+					 DiagnosticResponseCallback callback,
+					 bool supported,
+					 bool received);
 
 		uint32_t get_pid();
 		const std::string get_generic_name() const;
