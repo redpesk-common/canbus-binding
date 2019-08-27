@@ -29,12 +29,15 @@
 
 #include "../binding/low-can-subscription.hpp"
 
+typedef std::list<std::shared_ptr<signal_t>> list_ptr_signal_t;
+typedef std::list<std::shared_ptr<diagnostic_message_t>> list_ptr_diag_msg_t;
+
 namespace utils
 {
 	struct signals_found
 	{
-		std::list<std::shared_ptr<signal_t> > signals;
-		std::list<std::shared_ptr<diagnostic_message_t> > diagnostic_messages;
+		list_ptr_signal_t signals;
+		list_ptr_diag_msg_t diagnostic_messages;
 	};
 
 	/// @brief Signal manager singleton hold subscription object with attached afb_event_t and its mutex
@@ -45,7 +48,7 @@ namespace utils
 	{
 	private:
 		std::mutex subscribed_signals_mutex_;
-		std::map<int, std::shared_ptr<low_can_subscription_t> > subscribed_signals_; ///< Map containing all subscribed signals, key is the socket int value.
+		map_subscription subscribed_signals_; ///< Map containing all subscribed signals, key is the socket int value.
 
 		signals_manager_t(); ///< Private constructor to make singleton class.
 
@@ -53,11 +56,11 @@ namespace utils
 		static signals_manager_t& instance();
 
 		std::mutex& get_subscribed_signals_mutex();
-		std::map<int, std::shared_ptr<low_can_subscription_t> >& get_subscribed_signals();
+		map_subscription& get_subscribed_signals();
 
 		struct signals_found find_signals(const openxc_DynamicField &key);
-		void find_diagnostic_messages(const openxc_DynamicField &key, std::vector<std::shared_ptr<diagnostic_message_t> >& found_signals);
-		void find_signals(const openxc_DynamicField &key, std::vector<std::shared_ptr<signal_t> >& found_signals);
+		void find_diagnostic_messages(const openxc_DynamicField &key, vect_ptr_diag_msg_t& found_signals);
+		void find_signals(const openxc_DynamicField &key, vect_ptr_signal_t& found_signals);
 
 		template <typename T>
 		void lookup_signals_by_name(const std::string& key, std::vector<std::shared_ptr<T> > signals, std::list<std::shared_ptr<T> >& found_signals)

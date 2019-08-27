@@ -47,7 +47,7 @@
 ///
 ///*******************************************************************************/
 
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, map_subscription& s)
 {
 	bool is_permanent_recurring_request = false;
 
@@ -68,7 +68,7 @@ void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uin
 		on_no_clients(can_subscription, s);
 }
 
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, map_subscription& s)
 {
 	auto it = s.find(can_subscription->get_index());
 	s.erase(it);
@@ -132,7 +132,7 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 static int subscribe_unsubscribe_signal(afb_req_t request,
 					bool subscribe,
 					std::shared_ptr<low_can_subscription_t>& can_subscription,
-					std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+					map_subscription& s)
 {
 	int ret = 0;
 	int sub_index = can_subscription->get_index();
@@ -194,9 +194,9 @@ static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscr
 
 static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 							 bool subscribe,
-							 std::list<std::shared_ptr<diagnostic_message_t> > diagnostic_messages,
+							 list_ptr_diag_msg_t diagnostic_messages,
 							 struct event_filter_t& event_filter,
-							 std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
+							 map_subscription& s,
 							 bool perm_rec_diag_req)
 {
 	int rets = 0;
@@ -259,9 +259,9 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 
 static int subscribe_unsubscribe_signals(afb_req_t request,
 						 bool subscribe,
-						 std::list<std::shared_ptr<signal_t> > signals,
+						 list_ptr_signal_t signals,
 						 struct event_filter_t& event_filter,
-						 std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+						 map_subscription& s)
 {
 	int rets = 0;
 	for(const auto& sig: signals)
@@ -309,7 +309,7 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
 	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-	std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
+	map_subscription& s = sm.get_subscribed_signals();
 
 	rets += subscribe_unsubscribe_diagnostic_messages(request, subscribe, signals.diagnostic_messages, event_filter, s, false);
 	rets += subscribe_unsubscribe_signals(request, subscribe, signals.signals, event_filter, s);
@@ -390,7 +390,7 @@ static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const
 
 	if(message_definition)
 	{
-		sf.signals = std::list<std::shared_ptr<signal_t>>(message_definition->get_signals().begin(),message_definition->get_signals().end());
+		sf.signals = list_ptr_signal_t(message_definition->get_signals().begin(),message_definition->get_signals().end());
 	}
 
 	if(sf.signals.empty())
@@ -956,14 +956,14 @@ int init_binding(afb_api_t api)
 		struct event_filter_t event_filter;
 		event_filter.frequency = sf.diagnostic_messages.front()->get_frequency();
 
-		std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
+		map_subscription& s = sm.get_subscribed_signals();
 
 		subscribe_unsubscribe_diagnostic_messages(request, true, sf.diagnostic_messages, event_filter, s, true);
 	}
 
 
 #ifdef USE_FEATURE_J1939
-	std::vector<std::shared_ptr<message_definition_t>> current_messages_definition = application.get_messages_definition();
+	vect_ptr_msg_def_t current_messages_definition = application.get_messages_definition();
 	for(std::shared_ptr<message_definition_t> message_definition: current_messages_definition)
 	{
 		if(message_definition->is_j1939())

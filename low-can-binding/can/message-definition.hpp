@@ -54,7 +54,7 @@ private:
 	std::vector<uint8_t> last_value_; ///< last_value_ - The last received value of the message. Defaults to undefined.
 										///	This is required for the forceSendChanged functionality, as the stack
 										///	needs to compare an incoming CAN message with the previous frame.*/
-	std::vector<std::shared_ptr<signal_t> > signals_; ///< signals_ - Vector holding signal_t object which share the same arbitration ID */
+	vect_ptr_signal_t signals_; ///< signals_ - Vector holding signal_t object which share the same arbitration ID */
 
 public:
 	//message_definition_t(const message_definition_t& b);
@@ -66,7 +66,7 @@ public:
 				 uint32_t flags,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
-				 const std::vector<std::shared_ptr<signal_t> >& signals);
+				 const vect_ptr_signal_t& signals);
 	message_definition_t(const std::string bus,
 				 uint32_t id,
 				 std::string name,
@@ -74,7 +74,7 @@ public:
 				 uint32_t flags,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
-				 const std::vector<std::shared_ptr<signal_t> >& signals);
+				 const vect_ptr_signal_t& signals);
 
 
 	const std::string get_bus_name() const;
@@ -83,7 +83,7 @@ public:
 	bool is_fd() const;
 	bool is_j1939() const;
 	bool is_isotp() const;
-	std::vector<std::shared_ptr<signal_t>>& get_signals();
+	vect_ptr_signal_t& get_signals();
 	uint32_t get_length() const;
 	uint32_t get_flags() const;
 

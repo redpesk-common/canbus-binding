@@ -139,7 +139,7 @@ bool low_can_subscription_t::is_signal_subscription_corresponding(const std::sha
 	return signal_ == signal && event_filter_ == event_filter;
 }
 
-const std::vector<std::shared_ptr<diagnostic_message_t> > low_can_subscription_t::get_diagnostic_message() const
+const vect_ptr_diag_msg_t low_can_subscription_t::get_diagnostic_message() const
 {
 	return diagnostic_message_;
 }

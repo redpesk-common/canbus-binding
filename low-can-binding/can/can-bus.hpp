@@ -46,8 +46,8 @@ private:
 	utils::config_parser_t conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
 
 	bool apply_filter(const openxc_VehicleMessage& vehicle_message, std::shared_ptr<low_can_subscription_t> can_subscription);
-	void process_signals(std::shared_ptr<message_t> message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
-	void process_diagnostic_signals(diagnostic_manager_t& manager, std::shared_ptr<message_t> can_message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
+	void process_signals(std::shared_ptr<message_t> message, map_subscription& s);
+	void process_diagnostic_signals(diagnostic_manager_t& manager, std::shared_ptr<message_t> can_message, map_subscription& s);
 
 	void can_decode_message();
 	std::thread th_decoding_; ///< thread that will handle decoding a can frame

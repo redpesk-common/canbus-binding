@@ -73,9 +73,9 @@ class application_t
 
 		std::vector<std::shared_ptr<message_set_t> > get_message_set();
 
-		std::vector<std::shared_ptr<signal_t> > get_all_signals();
+		vect_ptr_signal_t get_all_signals();
 
-		std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_messages();
+		vect_ptr_diag_msg_t get_diagnostic_messages();
 
 		const std::vector<std::string>& get_signals_prefix() const;
 
