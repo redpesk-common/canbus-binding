@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+#define MAX_ISOTP_BYTES 4095
+
 /* Enum definitions */
 typedef enum _openxc_VehicleMessage_Type {
     openxc_VehicleMessage_Type_CAN = 1,
@@ -73,7 +75,8 @@ typedef enum _openxc_DiagnosticRequest_DecodedType {
 typedef enum _openxc_DynamicField_Type {
     openxc_DynamicField_Type_STRING = 1,
     openxc_DynamicField_Type_NUM = 2,
-    openxc_DynamicField_Type_BOOL = 3
+    openxc_DynamicField_Type_BOOL = 3,
+    openxc_DynamicField_Type_BYTES = 4
 } openxc_DynamicField_Type;
 
 /* Struct definitions */
@@ -163,6 +166,9 @@ typedef struct _openxc_DynamicField {
     double numeric_value;
     bool has_boolean_value;
     bool boolean_value;
+    uint8_t bytes_value[MAX_ISOTP_BYTES];
+    uint32_t length_array;
+    bool has_bytes_value;
 } openxc_DynamicField;
 
 typedef struct _openxc_NetworkOperatorSettings_NetworkDescriptor {

@@ -88,6 +88,97 @@ float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message
 			signal.get_offset());
 }
 
+
+/// @brief Decode and return string bytes (hex) for a CAN signal's.
+///
+/// This is an implementation of the Signal type signature, and can be
+/// used directly in the signal_t.decoder field.
+///
+/// @param[in] signal  - The details of the signal.
+/// @param[in] message - The message with data to decode.
+/// @param[out] send - An output argument that will be set to false if the value should
+///     not be sent for any reason.
+///
+/// @return Returns a DynamicField with a string value of bytes (hex)
+///
+openxc_DynamicField decoder_t::decode_bytes(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
+{
+	int i=0;
+	openxc_DynamicField decoded_value;
+	std::vector<uint8_t> data = message->get_data_vector();
+	uint32_t length = message->get_length();
+	uint32_t bit_position = signal.get_bit_position();
+	uint32_t bit_size = signal.get_bit_size();
+	std::vector<uint8_t> new_data = std::vector<uint8_t>();
+	new_data.reserve(bit_size << 3);
+
+	int new_start_byte = 0;
+	int new_end_byte = 0;
+	int new_start_bit = 0;
+	int new_end_bit = 0;
+
+	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit, new_end_bit);
+
+	if(new_end_byte >= length)
+	{
+		new_end_byte = length-1;
+	}
+
+	if(new_start_byte >= length)
+	{
+		AFB_ERROR("Error in description of signals");
+		return decoded_value;
+	}
+
+	uint8_t first = data[new_start_byte];
+	int mask_first = 0;
+	for(i=new_start_bit;i<8;i++)
+	{
+		mask_first = mask_first | (1 << i);
+	}
+
+	uint8_t mask_first_v = 0;
+	if(mask_first > 255)
+	{
+		AFB_ERROR("Error mask decode bytes");
+	}
+	else
+	{
+		mask_first_v = (uint8_t)mask_first;
+	}
+
+	data[new_start_byte]=first&mask_first_v;
+
+	uint8_t last = data[new_end_byte];
+	int mask_last = 0;
+	for(i=0;i<=new_end_bit;i++)
+	{
+		mask_last = mask_last | (1 << (7-i));
+	}
+
+	uint8_t mask_last_v = 0;
+	if(mask_last > 255)
+	{
+		AFB_ERROR("Error mask decode bytes");
+	}
+	else
+	{
+		mask_last_v = (uint8_t)mask_last;
+	}
+
+	data[new_end_byte]=last&mask_last_v;
+
+
+	for(i=new_start_byte;i<=new_end_byte;i++)
+	{
+		new_data.push_back(data[i]);
+	}
+
+	decoded_value = build_DynamicField(new_data);
+
+	return decoded_value;
+}
+
 /// @brief Wraps a raw CAN signal value in a DynamicField without modification.
 ///
 /// This is an implementation of the Signal type signature, and can be
