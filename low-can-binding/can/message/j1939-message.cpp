@@ -36,7 +36,6 @@ j1939_message_t::j1939_message_t():
 /**
  * @brief Construct a new j1939 message t::j1939 message t object
  *
- * @param maxdlen The max length of the message
  * @param length The length of the message
  * @param format The format of the message
  * @param data The vector data of the message
@@ -45,15 +44,14 @@ j1939_message_t::j1939_message_t():
  * @param pgn The PGN of the message
  * @param addr The address of the message
  */
-j1939_message_t::j1939_message_t(uint32_t maxdlen,
-	uint32_t length,
+j1939_message_t::j1939_message_t(uint32_t length,
 	message_format_t format,
 	std::vector<uint8_t>& data,
 	uint64_t timestamp,
 	name_t name,
 	pgn_t pgn,
 	uint8_t addr):
-	message_t(maxdlen,length, format, data, timestamp),
+	message_t(J1939_MAX_DLEN,length, format, data, timestamp, 0),
 	name_{name},
 	pgn_{pgn},
 	addr_{addr}

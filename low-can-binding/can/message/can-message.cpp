@@ -29,8 +29,7 @@
 can_message_t::can_message_t()
 	: message_t(),
 	 id_{0},
-	 rtr_flag_{false},
-	 flags_{0}
+	 rtr_flag_{false}
 {}
 
 can_message_t::can_message_t(uint32_t maxdlen,
@@ -41,10 +40,9 @@ can_message_t::can_message_t(uint32_t maxdlen,
 	uint32_t flags,
 	std::vector<uint8_t>& data,
 	uint64_t timestamp)
-	: message_t(maxdlen, length, format, data, timestamp),
+	: message_t(maxdlen, length, format, data, timestamp, flags),
 	id_{id},
-	rtr_flag_{rtr_flag},
-	flags_{flags}
+	rtr_flag_{rtr_flag}
 {}
 
 ///
@@ -292,9 +290,4 @@ struct bcm_msg can_message_t::get_bcm_msg()
 void can_message_t::set_bcm_msg(struct bcm_msg bcm_msg)
 {
 	bcm_msg_ = bcm_msg;
-}
-
-uint32_t can_message_t::get_flags()
-{
-	return flags_;
 }

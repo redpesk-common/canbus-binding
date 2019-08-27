@@ -30,7 +30,8 @@ message_t::message_t()
 	 length_{0},
 	 format_{message_format_t::INVALID},
 	 timestamp_{0},
-	 sub_id_{-1}
+	 sub_id_{-1},
+	 flags_{0}
 {}
 
 /**
@@ -46,13 +47,15 @@ message_t::message_t(uint32_t maxdlen,
 	uint32_t length,
 	message_format_t format,
 	std::vector<uint8_t>& data,
-	uint64_t timestamp)
+	uint64_t timestamp,
+	uint32_t flags)
 	: maxdlen_{maxdlen},
 	length_{length},
 	format_{format},
 	data_{data},
 	timestamp_{timestamp},
-	sub_id_{-1}
+	sub_id_{-1},
+	flags_{flags}
 {}
 
 /**
@@ -168,4 +171,26 @@ uint64_t message_t::get_timestamp() const
 message_format_t message_t::get_msg_format()
 {
 	return format_;
+}
+
+
+uint32_t message_t::get_flags()
+{
+	return flags_;
+}
+
+void message_t::set_flags(uint32_t flags)
+{
+	flags_ = flags_ | flags;
+}
+
+uint32_t message_t::get_maxdlen()
+{
+	return maxdlen_;
+}
+
+
+void message_t::set_maxdlen(uint32_t maxdlen)
+{
+	maxdlen_ = maxdlen;
 }
