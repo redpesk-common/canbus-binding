@@ -194,7 +194,7 @@ static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscr
 
 static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 							 bool subscribe,
-							 std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages,
+							 std::list<std::shared_ptr<diagnostic_message_t> > diagnostic_messages,
 							 struct event_filter_t& event_filter,
 							 std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
 							 bool perm_rec_diag_req)
@@ -259,7 +259,7 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 
 static int subscribe_unsubscribe_signals(afb_req_t request,
 						 bool subscribe,
-						 std::vector<std::shared_ptr<signal_t> > signals,
+						 std::list<std::shared_ptr<signal_t> > signals,
 						 struct event_filter_t& event_filter,
 						 std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
@@ -353,6 +353,22 @@ static int one_subscribe_unsubscribe_events(afb_req_t request, bool subscribe, c
 	// subscribe or unsubscribe
 	openxc_DynamicField search_key = build_DynamicField(tag);
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
+
+
+#ifdef USE_FEATURE_ISOTP
+	if(sf.signals.size() > 1)
+	{
+		sf.signals.remove_if([](std::shared_ptr<signal_t> x){
+			bool isotp = x->get_message()->is_isotp();
+			if(isotp)
+			{
+				AFB_NOTICE("ISO TP messages need to be subscribed one by one (rx, tx)");
+			}
+			return isotp;
+		});
+	}
+#endif
+
 	if (sf.signals.empty() && sf.diagnostic_messages.empty())
 	{
 		AFB_NOTICE("No signal(s) found for %s.", tag.c_str());
@@ -374,7 +390,7 @@ static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const
 
 	if(message_definition)
 	{
-		sf.signals = message_definition->get_signals();
+		sf.signals = std::list<std::shared_ptr<signal_t>>(message_definition->get_signals().begin(),message_definition->get_signals().end());
 	}
 
 	if(sf.signals.empty())
@@ -571,10 +587,10 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 
 	if( !sf.signals.empty() )
 	{
-		AFB_DEBUG("ID WRITE RAW : %d",sf.signals[0]->get_message()->get_id());
+		AFB_DEBUG("ID WRITE RAW : %d",sf.signals.front()->get_message()->get_id());
 		if(flags&BCM_PROTOCOL)
 		{
-			if(sf.signals[0]->get_message()->is_fd())
+			if(sf.signals.front()->get_message()->is_fd())
 			{
 				AFB_DEBUG("CANFD_MAX_DLEN");
 				message->set_flags(CAN_FD_FRAME);
@@ -586,7 +602,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 				message->set_maxdlen(CAN_MAX_DLEN);
 			}
 
-			if(sf.signals[0]->get_message()->is_isotp())
+			if(sf.signals.front()->get_message()->is_isotp())
 			{
 				flags = ISOTP_PROTOCOL;
 				message->set_maxdlen(MAX_ISOTP_FRAMES * message->get_maxdlen());
@@ -632,7 +648,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 			return;
 		}
 
-		if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name), flags, event_filter, sf.signals[0]))
+		if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name), flags, event_filter, sf.signals.front()))
 		{
 			afb_req_success(request, nullptr, "Message correctly sent");
 		}
@@ -703,7 +719,7 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 		return;
 	}
 
-	std::shared_ptr<signal_t> sig = sf.signals[0];
+	std::shared_ptr<signal_t> sig = sf.signals.front();
 	if(! sig->get_writable())
 	{
 		afb_req_fail_f(request, "%s isn't writable. Message not sent.", sig->get_name().c_str());
