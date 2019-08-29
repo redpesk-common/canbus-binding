@@ -98,7 +98,6 @@ std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct socka
 {
 	int i;
 	uint32_t length = 0;
-	uint32_t flags;
 	std::vector<uint8_t> data_vector;
 
 	if(nbytes > J1939_MAX_DLEN)
