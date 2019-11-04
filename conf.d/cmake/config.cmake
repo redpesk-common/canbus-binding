@@ -125,7 +125,6 @@ set(COMPILE_OPTIONS
  -Wno-sign-compare
  -Wno-sign-conversion
  -Werror=maybe-uninitialized
- -Werror=implicit-function-declaration
  -ffunction-sections
  -fdata-sections
  -fPIC
