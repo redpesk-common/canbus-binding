@@ -10,7 +10,6 @@
 			"bus": "hs",
 			"is_fd" : false,
 			"is_j1939" : false,
-			"length" : 8,
 			"signals": {
 				"doors.driver.open": {
 					"generic_name": "doors.front_left.open",
@@ -58,7 +57,6 @@
 			"bus": "hs",
 			"is_fd" : false,
 			"is_j1939" : false,
-			"length" : 8,
 			"signals": {
 				"windows.driver.open": {
 					"generic_name": "windows.front_left.open",
@@ -99,7 +97,6 @@
 	"is_fd" : false,
 	"is_extended": false,
 	"is_j1939" : false,
-	"length" : 8,
 	"signals": {
 		"PT_FuelLevelPct": {
 			"generic_name": "fuel.level",
@@ -133,7 +130,6 @@
 	"is_fd" : false,
 	"is_extended": false,
 	"is_j1939" : false,
-	"length" : 8,
 	"signals": {
 		"PT_EngineOilTempHigh": {
 			"generic_name": "engine.oil.temp.high",
@@ -159,7 +155,6 @@
 	"is_fd" : false,
 	"is_extended": false,
 	"is_j1939" : false,
-	"length" : 8,
 	"signals": {
 		"PT_VehicleAvgSpeed": {
 			"generic_name": "vehicle.average.speed",
@@ -176,7 +171,6 @@
 	"is_fd" : false,
 	"is_extended": true,
 	"is_j1939" : false,
-	"length" : 8,
 	"signals": {
 		"LeftTemperature": {
 			"generic_name": "hvac.temperature.left",

@@ -1015,7 +1015,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-
 		}, // end message_definition vector
 			{ // beginning diagnostic_messages_ vector
 
