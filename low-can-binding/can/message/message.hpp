@@ -37,15 +37,13 @@
  */
 
 #define INVALID_FLAG 0x0001
-#define STANDARD_ID 0x0002
-#define EXTENDED_ID 0x0004
-#define BCM_PROTOCOL 0x0008
-#define J1939_PROTOCOL 0x0010
-#define J1939_ADDR_CLAIM_PROTOCOL 0x0020
-#define ISOTP_PROTOCOL 0x0040
-#define ISOTP_SEND 0x0080
-#define ISOTP_RECEIVE 0x0100
-#define FD_FRAME 0x0800
+#define BCM_PROTOCOL 0x0002
+#define J1939_PROTOCOL 0x0004
+#define J1939_ADDR_CLAIM_PROTOCOL 0x0008
+#define ISOTP_PROTOCOL 0x0010
+#define ISOTP_SEND 0x0020
+#define ISOTP_RECEIVE 0x0040
+#define FD_FRAME 0x0080
 
 /// @class message_t
 ///
@@ -55,7 +53,7 @@ class message_t {
 protected:
 	uint32_t maxdlen_; ///< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
 	uint32_t length_; ///< length_ - the length of the data array. */
-	uint32_t flags_; ///< format_ - the format mask of the message*/
+	uint32_t flags_; ///< format_ - the format mask of the message that control which socketcan will used*/
 	std::vector<uint8_t> data_; ///< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 	uint64_t timestamp_; ///< timestamp_ - timestamp of the received message*/
 	int sub_id_; ///< sub_id_ - Subscription index. */

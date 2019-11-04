@@ -114,12 +114,10 @@ std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct ca
 	}
 	else if (frame.can_id & CAN_EFF_FLAG)
 	{
-		flags = flags|EXTENDED_ID;
 		id = frame.can_id & CAN_EFF_MASK;
 	}
 	else
 	{
-		flags = flags|STANDARD_ID;
 		id = frame.can_id & CAN_SFF_MASK;
 	}
 
