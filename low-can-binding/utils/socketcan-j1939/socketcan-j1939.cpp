@@ -51,12 +51,9 @@ namespace utils
 		{
 			filter.name = name;
 			if(name_mask != J1939_NO_NAME)
-			{
 				filter.name_mask = name_mask;
-			} else
-			{
+			else
 				filter.name_mask = ~0ULL;
-			}
 			++filter_on;
 		}
 
@@ -64,30 +61,25 @@ namespace utils
 		{
 			filter.addr = addr;
 			if(addr_mask != J1939_NO_ADDR)
-			{
 				filter.addr_mask = addr_mask;
-			} else
-			{
+			else
 				filter.addr_mask = ~0;
-			}
+
 			++filter_on;
 		}
 		if (pgn <= J1939_PGN_MAX)
 		{
 			filter.pgn = pgn;
 			if(pgn_mask != J1939_NO_PGN)
-			{
 				filter.pgn_mask = pgn_mask;
-			} else
-			{
+			else
 				filter.pgn_mask = ~0;
-			}
+
 			++filter_on;
 		}
+
 		if(filter_on)
-		{
 			setopt(SOL_CAN_J1939, SO_J1939_FILTER, &filter, sizeof(filter));
-		}
 	}
 
 	/**
@@ -137,32 +129,18 @@ namespace utils
 
 
 		if(addr <= 0 || addr >= UINT8_MAX )
-		{
 			tx_address_.can_addr.j1939.addr = J1939_NO_ADDR;
-		}
 		else
-		{
 			tx_address_.can_addr.j1939.addr = addr;
-		}
-
 		if(name <= 0 || name >= UINT64_MAX )
-		{
 			tx_address_.can_addr.j1939.name = J1939_NO_NAME;
-		}
 		else
-		{
 			tx_address_.can_addr.j1939.name = name;
-		}
 
 		if(pgn <= 0 || pgn > J1939_PGN_MAX)
-		{
 			tx_address_.can_addr.j1939.pgn = J1939_NO_PGN;
-		}
 		else
-		{
 			tx_address_.can_addr.j1939.pgn = pgn;
-		}
-
 	}
 
 
@@ -229,9 +207,8 @@ namespace utils
 		ssize_t nbytes = recvfrom(socket_, &data, sizeof(data), flag, (struct sockaddr *)&peername,  &peernamelen);
 
 		if(nbytes < 0)
-		{
 			return nullptr;
-		}
+
 		//AFB_DEBUG("Data available: %i bytes read", (int)nbytes);
 
 		struct timeval tv;
@@ -270,9 +247,7 @@ namespace utils
 		uint8_t data[jm.get_data_vector().size()];
 
 		for(int i=0; i<jm.get_data_vector().size(); i++)
-		{
 			data[i] = jm.get_data_vector()[i];
-		}
 
 		if (sendto(socket_, &data, sizeof(data), 0, (const struct sockaddr *)&sockname, sizeof(sockname)) < 0)
 		{

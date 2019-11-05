@@ -237,9 +237,7 @@ const openxc_DynamicField build_DynamicField(std::vector<uint8_t> &array)
 
 
 	for(int i=0;i<size;i++)
-	{
 		d.bytes_value[i] = array[i];
-	}
 
 	return d;
 }

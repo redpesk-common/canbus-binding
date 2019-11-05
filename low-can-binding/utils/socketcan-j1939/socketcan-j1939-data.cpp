@@ -35,9 +35,8 @@ namespace utils
 		if(ret >= 0)
 		{
 			if(tx_address_.can_addr.j1939.pgn != J1939_NO_PGN)
-			{
 				add_filter(J1939_NO_NAME,tx_address_.can_addr.j1939.pgn,J1939_NO_ADDR,J1939_NO_NAME,J1939_NO_PGN,J1939_NO_ADDR);
-			}
+
 			define_opt();
 		}
 		return ret;

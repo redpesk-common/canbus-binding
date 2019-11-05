@@ -226,7 +226,7 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 
 			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency, perm_rec_diag_req);
 			if(can_subscription->create_rx_filter(sig) < 0)
-				{return -1;}
+				return -1;
 			AFB_DEBUG("Signal: %s subscribed", sig->get_name().c_str());
 			if(it == s.end() && add_to_event_loop(can_subscription) < 0)
 			{
@@ -272,18 +272,18 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 		});
 		std::shared_ptr<low_can_subscription_t> can_subscription;
 		if(it != s.end())
-			{can_subscription = it->second;}
+			can_subscription = it->second;
 		else
 		{
 			can_subscription = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
 			if(can_subscription->create_rx_filter(sig) < 0)
-				{return -1;}
+				return -1;
 			if(add_to_event_loop(can_subscription) < 0)
-				{return -1;}
+				return -1;
 		}
 
 		if(subscribe_unsubscribe_signal(request, subscribe, can_subscription, s) < 0)
-			{return -1;}
+			return -1;
 
 		rets++;
 		AFB_DEBUG("%s Signal: %s %ssubscribed", sig->get_message()->is_fd() ? "FD": "", sig->get_name().c_str(), subscribe ? "":"un");
@@ -328,19 +328,19 @@ static event_filter_t generate_filter(json_object* args)
 	{
 		if (json_object_object_get_ex(filter, "frequency", &obj)
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
-			{event_filter.frequency = (float)json_object_get_double(obj);}
+			event_filter.frequency = (float)json_object_get_double(obj);
 		if (json_object_object_get_ex(filter, "min", &obj)
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
-			{event_filter.min = (float)json_object_get_double(obj);}
+			event_filter.min = (float)json_object_get_double(obj);
 		if (json_object_object_get_ex(filter, "max", &obj)
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
-			{event_filter.max = (float)json_object_get_double(obj);}
+			event_filter.max = (float)json_object_get_double(obj);
 		if (json_object_object_get_ex(filter, "rx_id", &obj)
 		&& (json_object_is_type(obj, json_type_int)))
-			{event_filter.rx_id = (canid_t) json_object_get_int(obj);}
+			event_filter.rx_id = (canid_t) json_object_get_int(obj);
 		if (json_object_object_get_ex(filter, "tx_id", &obj)
 		&& (json_object_is_type(obj, json_type_int)))
-			{event_filter.tx_id = (canid_t) json_object_get_int(obj);}
+			event_filter.tx_id = (canid_t) json_object_get_int(obj);
 	}
 	return event_filter;
 }
@@ -362,9 +362,8 @@ static int one_subscribe_unsubscribe_events(afb_req_t request, bool subscribe, c
 		sf.signals.remove_if([](std::shared_ptr<signal_t> x){
 			bool isotp = x->get_message()->is_isotp();
 			if(isotp)
-			{
 				AFB_NOTICE("ISO TP messages need to be subscribed one by one (rx, tx)");
-			}
+
 			return isotp;
 		});
 	}
@@ -390,9 +389,7 @@ static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const
 	struct utils::signals_found sf;
 
 	if(message_definition)
-	{
 		sf.signals = list_ptr_signal_t(message_definition->get_signals().begin(),message_definition->get_signals().end());
-	}
 
 	if(sf.signals.empty())
 	{
@@ -404,6 +401,7 @@ static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const
 		event_filter_t event_filter = generate_filter(args);
 		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);
 	}
+
 	return ret;
 }
 
@@ -419,9 +417,7 @@ static int process_one_subscribe_args(afb_req_t request, bool subscribe, json_ob
 	json_object_object_get_ex(args,"event",&event);
 	json_bool test_id = json_object_object_get_ex(args,"id",&id);
 	if(!test_id)
-	{
 		test_id = json_object_object_get_ex(args,"pgn",&id);
-	}
 
 	if(	args == NULL || (id && ((std::string)json_object_get_string(id)).compare("*") == 0))
 	{
@@ -541,40 +537,28 @@ static int send_frame(struct canfd_frame& cfd, const std::string& bus_name, sock
 static int send_message(message_t *message, const std::string& bus_name, uint32_t flags, event_filter_t &event_filter, std::shared_ptr<signal_t> signal)
 {
 	if(bus_name.empty())
-	{
 		return -1;
-	}
 
 	std::map<std::string, std::shared_ptr<low_can_subscription_t> >& cd = application_t::instance().get_can_devices();
 
 	if( cd.count(bus_name) == 0)
-	{
 		cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
-	}
 
 	cd[bus_name]->set_signal(signal);
 
 
 	if(flags&BCM_PROTOCOL)
-	{
 		return low_can_subscription_t::tx_send(*cd[bus_name], message, bus_name);
-	}
 #ifdef USE_FEATURE_ISOTP
 	else if(flags&ISOTP_PROTOCOL)
-	{
 		return low_can_subscription_t::isotp_send(*cd[bus_name], message, bus_name);
-	}
 #endif
 #ifdef USE_FEATURE_J1939
 	else if(flags&J1939_PROTOCOL)
-	{
 		return low_can_subscription_t::j1939_send(*cd[bus_name], message, bus_name);
-	}
 #endif
 	else
-	{
 		return -1;
-	}
 }
 
 
@@ -612,9 +596,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 
 #ifdef USE_FEATURE_J1939
 		if(flags&J1939_PROTOCOL)
-		{
 			message->set_maxdlen(J1939_MAX_DLEN);
-		}
 #endif
 
 		if(message->get_length() > 0 && message->get_length() <= message->get_maxdlen())
@@ -631,32 +613,21 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 		else
 		{
 			if(flags&BCM_PROTOCOL)
-			{
 				afb_req_fail(request, "Invalid", "Frame BCM");
-			}
 			else if(flags&J1939_PROTOCOL)
-			{
 				afb_req_fail(request, "Invalid", "Frame J1939");
-			}
 			else if(flags&ISOTP_PROTOCOL)
-			{
 				afb_req_fail(request, "Invalid", "Frame ISOTP");
-			}
 			else
-			{
 				afb_req_fail(request, "Invalid", "Frame");
-			}
+
 			return;
 		}
 
 		if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name), flags, event_filter, sf.signals.front()))
-		{
 			afb_req_success(request, nullptr, "Message correctly sent");
-		}
 		else
-		{
 			afb_req_fail(request, "Error", "sending the message. See the log for more details.");
-		}
 	}
 	else
 	{
@@ -734,40 +705,28 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 	uint32_t flags = INVALID_FLAG;
 
 	if(sig->get_message()->is_j1939())
-	{
 		flags = J1939_PROTOCOL;
-	}
 	else if(sig->get_message()->is_isotp())
-	{
 		flags = ISOTP_PROTOCOL;
-	}
 	else
-	{
 		flags = BCM_PROTOCOL;
-	}
 
 //	cfd = encoder_t::build_frame(sig, value);
 	message_t *message = encoder_t::build_message(sig,value,false,false);
 
 	if(! send_message(message, sig->get_message()->get_bus_device_name(), flags, event_filter, sig) && send)
-	{
 		afb_req_success(request, nullptr, "Message correctly sent");
-	}
 	else
-	{
 		afb_req_fail(request, "Error", "Sending the message. See the log for more details.");
-	}
 
 	if(sig->get_message()->is_j1939())
-	{
 #ifdef USE_FEATURE_J1939
 		delete (j1939_message_t*) message;
+#else
+		afb_req_fail(request, "Warning", "J1939 not implemented in your kernel.");
 #endif
-	}
 	else
-	{
 		delete (can_message_t*) message;
-	}
 }
 
 void write(afb_req_t request)
@@ -782,26 +741,19 @@ void write(afb_req_t request)
 		if(json_object_object_get_ex(args,"bus_name",&name))
 		{
 			if(json_object_object_get_ex(args,"frame",&json_value))
-			{
 				write_frame(request, (std::string)json_object_get_string(name), json_value, event_filter);
-			}
 			else
-			{
 				afb_req_fail(request, "Error", "Request argument malformed");
-			}
 		}
 		else if(json_object_object_get_ex(args,"signal_name",&name))
 		{
 			if(json_object_object_get_ex(args,"signal_value",&json_value))
-			{
 				write_signal(request, (std::string)json_object_get_string(name), json_value, event_filter);
-			}
 			else
-			{
 				afb_req_fail(request, "Error", "Request argument malformed");
-			}
 		}
-		else {
+		else
+		{
 			afb_req_fail(request, "Error", "Request argument malformed");
 		}
 	}
@@ -903,26 +855,19 @@ void list(afb_req_t request)
 	const char *name;
 	if ((args != nullptr) &&
 		(json_object_object_get_ex(args, "event", &json_name) && json_object_is_type(json_name, json_type_string)))
-	{
 		name = json_object_get_string(json_name);
-	}
 	else
-	{
 		name = "*";
-	}
 
 	ans = list_can_message(name);
 	if (!ans)
 		rc = -1;
 
 	if (rc >= 0)
-	{
 		afb_req_success(request, ans, NULL);
-	}
 	else
-	{
 		afb_req_fail(request, "error", NULL);
-	}
+
 }
 
 /// @brief Initialize the binding.
@@ -991,9 +936,7 @@ int init_binding(afb_api_t api)
 #endif
 
 	if(ret)
-	{
 		AFB_ERROR("There was something wrong with CAN device Initialization.");
-	}
 
 	return ret;
 }

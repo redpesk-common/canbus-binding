@@ -139,9 +139,8 @@ namespace utils
 			}
 			else
 			{
-				for (int i = start_addr; i <= end_addr; i++) {
+				for (int i = start_addr; i <= end_addr; i++)
 					table_j1939_address_[i] = std::make_pair(0,true);
-				}
 			}
 		}
 	}
@@ -187,9 +186,7 @@ namespace utils
 			if(table_j1939_address_[i].second && i!=current_address_)
 			{
 				if(	table_j1939_address_[i].first >= htole64(J1939_NAME_ECU) || table_j1939_address_[i].first == 0)
-				{
 					return (uint8_t) i;
-				}
 			}
 		}
 		return J1939_IDLE_ADDR;
@@ -344,9 +341,8 @@ namespace utils
 		int ret = sendto(socket_, dat, sizeof(dat), 0, (const struct sockaddr *)&peername, sizeof(peername));
 
 		if(ret < 0)
-		{
 			AFB_ERROR("Error pgn_request()");
-		}
+
 		return ret;
 	}
 	*/
@@ -362,9 +358,7 @@ namespace utils
 		for(int i = 0; i < J1939_IDLE_ADDR; i++)
 		{
 			if(table_j1939_address_[i].first == name)
-			{
 				return (uint8_t) i;
-			}
 		}
 		return J1939_IDLE_ADDR;
 	}

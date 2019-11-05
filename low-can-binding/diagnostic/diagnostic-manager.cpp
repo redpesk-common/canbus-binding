@@ -256,7 +256,7 @@ active_diagnostic_request_t* diagnostic_manager_t::find_recurring_request(Diagno
 		if(entry != nullptr)
 		{
 			if(diagnostic_request_equals(&entry->get_handle()->request, &request))
-				{return entry;}
+				return entry;
 		}
 	}
 	return nullptr;
@@ -390,7 +390,7 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 		}
 	}
 	else
-		{ AFB_DEBUG("Can't add request, one already exists with same key");}
+		 AFB_DEBUG("Can't add request, one already exists with same key");
 	return entry;
 }
 
@@ -409,9 +409,7 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 	found_signals = utils::signals_manager_t::instance().find_signals(build_DynamicField((double) adr->get_pid()));
 
 	if(adr->get_decoder() != nullptr)
-	{
 		value = adr->get_decoder()(&response, value);
-	}
 
 	if((response.success && adr->get_name().size()) > 0)
 	{
@@ -440,9 +438,7 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 	}
 
 	if(adr->get_callback() != nullptr)
-	{
 		adr->get_callback()(adr, &response, value);
-	}
 
 	// Reset the completed flag handle to make sure that it will be reprocessed the next time.
 	adr->get_handle()->success = false;

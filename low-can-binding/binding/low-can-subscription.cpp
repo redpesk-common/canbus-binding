@@ -514,9 +514,8 @@ int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subsc
 
 	// Make sure that socket is opened.
 	if(open_socket(subscription, "", J1939_PROTOCOL) < 0)
-	{
 			return -1;
-	}
+
 	return 0;
 }
 #endif
@@ -534,9 +533,8 @@ int low_can_subscription_t::create_rx_filter_isotp(low_can_subscription_t &subsc
 
 	// Make sure that socket is opened.
 	if(open_socket(subscription, "", ISOTP_PROTOCOL|ISOTP_RECEIVE) < 0)
-	{
 			return -1;
-	}
+
 	return 0;
 }
 
@@ -624,7 +622,7 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<signal_t> sig)
 #ifdef USE_FEATURE_ISOTP
 	else if(sig->get_message()->is_isotp())
 	{
-		return low_can_subscription_t::create_rx_filter_isotp(*this,sig);
+		return low_can_subscription_t::create_rx_filter_isotp(*this, sig);
 	}
 #endif
 #ifdef USE_FEATURE_J1939
@@ -669,7 +667,7 @@ int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscri
 {
 	// Make sure that socket is opened.
 	if(subscription.open_socket(subscription, "", BCM_PROTOCOL) < 0)
-		{return -1;}
+		return -1;
 
 	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
 	// else monitor all standard 8 CAN OBD2 ID response.
@@ -681,8 +679,8 @@ int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscri
 	if(bcm_msg.msg_head.can_id != OBD2_FUNCTIONAL_BROADCAST_ID)
 	{
 		subscription.socket_->write_message(msg);
-			if(! subscription.socket_)
-				return -1;
+		if(! subscription.socket_)
+			return -1;
 	}
 	else
 	{
@@ -712,9 +710,7 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 	std::vector<canfd_frame> cfd_vect = cm->convert_to_canfd_frame_vector();
 
 	if(subscription.open_socket(subscription, bus_name, BCM_PROTOCOL) < 0)
-	{
-			return -1;
-	}
+		return -1;
 
 	struct bcm_msg &bcm_cm = cm->get_bcm_msg();
 
@@ -742,9 +738,7 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 	}
 
 	if(! subscription.socket_.get())
-	{
-			return -1;
-	}
+		return -1;
 
 	return 0;
 }
@@ -764,9 +758,7 @@ int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, mes
 	//subscription.add_one_bcm_frame(cfd, bcm_msg);
 
 	if(subscription.open_socket(subscription, bus_name, J1939_PROTOCOL) < 0)
-	{
 		return -1;
-	}
 
 	j1939_message_t *jm = static_cast<j1939_message_t*>(message);
 	jm->set_sockname(jm->get_pgn(), J1939_NO_NAME, J1939_NO_ADDR);
@@ -795,9 +787,7 @@ int low_can_subscription_t::isotp_send(low_can_subscription_t &subscription, mes
 	//subscription.add_one_bcm_frame(cfd, bcm_msg);
 
 	if(subscription.open_socket(subscription, bus_name, ISOTP_PROTOCOL|ISOTP_SEND) < 0)
-	{
 		return -1;
-	}
 
 	can_message_t *cm = static_cast<can_message_t*>(message);
 	if(subscription.socket_->write_message(*cm) < 0)

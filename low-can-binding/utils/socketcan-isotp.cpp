@@ -60,9 +60,7 @@ namespace utils
 		}
 
 		if(define_tx_address(device_name,rx_id,tx_id) < 0)
-		{
 			return -1;
-		}
 
 		struct can_isotp_options opts;
 		memset(&opts,0,sizeof(opts));
@@ -100,9 +98,7 @@ namespace utils
 
 		std::vector<uint8_t> data;
 		for (int i=0; i < nbytes; i++)
-		{
 			data.push_back(msg[i]);
-		}
 
 		std::string data_string;
 		data_string = converter_t::to_hex(msg,nbytes);
@@ -138,9 +134,7 @@ namespace utils
 			}
 
 			if(ret != size)
-			{
 				AFB_WARNING("ISOTP wrote only %zd byte",ret);
-			}
 		}
 		else
 		{
@@ -171,9 +165,7 @@ namespace utils
 			close();
 		}
 		else
-		{
 			tx_address_.can_ifindex = ifr.ifr_ifindex;
-		}
 
 		tx_address_.can_family = AF_CAN;
 

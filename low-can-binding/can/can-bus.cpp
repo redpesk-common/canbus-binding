@@ -120,7 +120,7 @@ void can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, std::s
 
 	openxc_VehicleMessage vehicle_message = manager.find_and_decode_adr(message);
 	if (message->get_timestamp())
-		{vehicle_message.timestamp = message->get_timestamp();}
+		vehicle_message.timestamp = message->get_timestamp();
 	if( (vehicle_message.has_simple_message && vehicle_message.simple_message.has_name) &&
 		s.find(subscription_id) != s.end() && afb_event_is_valid(s[subscription_id]->get_event()))
 	{
@@ -166,7 +166,7 @@ void can_bus_t::can_decode_message()
 					process_diagnostic_signals(application_t::instance().get_diagnostic_manager(), message, s);
 				}
 				else
-					{process_signals(message, s);}
+					process_signals(message, s);
 			}
 			can_message_lock.lock();
 		}
@@ -200,9 +200,9 @@ void can_bus_t::can_event_push()
 					if(afb_event_push(s[v_message.first]->get_event(), jo) == 0)
 					{
 						if(v_message.second.has_diagnostic_response)
-							{on_no_clients(s[v_message.first], v_message.second.diagnostic_response.pid, s);}
+							on_no_clients(s[v_message.first], v_message.second.diagnostic_response.pid, s);
 						else
-							{on_no_clients(s[v_message.first], s);}
+							on_no_clients(s[v_message.first], s);
 					}
 				}
 			}

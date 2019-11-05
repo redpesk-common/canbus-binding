@@ -37,10 +37,10 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 	uint32_t bit_position = sig->get_bit_position();
 	int new_start_byte = 0;
 	int new_end_byte = 0;
-	int new_start_bit_tmp = 0;
-	int new_end_bit = 0;
+	uint8_t new_start_bit = 0;
+	uint8_t new_end_bit = 0;
 
-	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit_tmp, new_end_bit);
+	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit, new_end_bit);
 
 	int len_signal_bytes_tmp = new_end_byte - new_start_byte + 1;
 
@@ -53,17 +53,12 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 	{
 		len_signal_bytes = (uint8_t) len_signal_bytes_tmp;
 	}
-
-	uint8_t new_start_bit = 0;
-	if(new_start_bit_tmp > 255)
+/*
+	if(new_start_bit > 255)
 	{
 		AFB_ERROR("Error signal %s too long",sig->get_name().c_str());
 	}
-	else
-	{
-		new_start_bit = (uint8_t) new_start_bit_tmp;
-	}
-
+*/
 	uint8_t new_bit_size = 0;
 	if(bit_size > 255)
 	{

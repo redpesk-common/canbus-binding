@@ -32,9 +32,8 @@ std::string converter_t::to_hex(const uint8_t data[], const size_t length)
 	std::stringstream stream;
 	stream << std::hex << std::setfill('0');
 	for(int i = 0; i < length; i++)
-	{
 		stream << std::hex << ((int) data[i]);
-	}
+
 	return stream.str();
 }
 
@@ -49,7 +48,7 @@ std::string converter_t::to_hex(const uint8_t data[], const size_t length)
  * @param new_start_bit The first bit of the signal in the frame
  * @param new_end_bit The last bit of the signal in the frame
  */
-void converter_t::signal_to_bits_bytes(uint32_t bit_position, uint32_t bit_size, int &new_start_byte, int &new_end_byte, int &new_start_bit, int &new_end_bit)
+void converter_t::signal_to_bits_bytes(uint32_t bit_position, uint32_t bit_size, int &new_start_byte, int &new_end_byte, uint8_t &new_start_bit, uint8_t &new_end_bit)
 {
 	new_start_byte = bit_position >> 3;
 	new_start_bit = bit_position % 8;
