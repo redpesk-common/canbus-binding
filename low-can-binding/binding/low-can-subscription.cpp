@@ -364,7 +364,7 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 	int ret = -1;
 	if(! subscription.socket_)
 	{
-		if(flags&BCM_PROTOCOL)
+		if(flags & BCM_PROTOCOL)
 		{
 			if( subscription.signal_ != nullptr)
 			{
@@ -384,18 +384,18 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 			subscription.index_ = (int)subscription.socket_->socket();
 		}
 #ifdef USE_FEATURE_ISOTP
-		else if(flags&ISOTP_PROTOCOL)
+		else if(flags & ISOTP_PROTOCOL)
 		{
 			if(subscription.signal_ != nullptr)
 			{
 				canid_t rx = NO_CAN_ID;
 				canid_t tx = NO_CAN_ID;
-				if(flags&ISOTP_SEND)
+				if(flags & ISOTP_SEND)
 				{
 					rx = subscription.get_rx_id();
 					tx = subscription.signal_->get_message()->get_id();
 				}
-				else if(flags&ISOTP_RECEIVE)
+				else if(flags & ISOTP_RECEIVE)
 				{
 					rx = subscription.signal_->get_message()->get_id();
 					tx = subscription.get_tx_id();
@@ -414,7 +414,7 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 		}
 #endif
 #ifdef USE_FEATURE_J1939
-		else if(flags&J1939_ADDR_CLAIM_PROTOCOL)
+		else if(flags & J1939_ADDR_CLAIM_PROTOCOL)
 		{
 			pgn_t pgn = J1939_NO_PGN;
 			if(!bus_name.empty())
@@ -425,7 +425,7 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 			}
 			subscription.index_ = (int)subscription.socket_->socket();
 		}
-		else if(flags&J1939_PROTOCOL)
+		else if(flags & J1939_PROTOCOL)
 		{
 			pgn_t pgn = J1939_NO_PGN;
 			if(subscription.signal_ != nullptr)
@@ -521,7 +521,7 @@ int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subsc
 	subscription.signal_= sig;
 
 	// Make sure that socket is opened.
-	if(open_socket(subscription,"",J1939_PROTOCOL) < 0)
+	if(open_socket(subscription, "", J1939_PROTOCOL) < 0)
 	{
 			return -1;
 	}
@@ -541,7 +541,7 @@ int low_can_subscription_t::create_rx_filter_isotp(low_can_subscription_t &subsc
 	subscription.signal_= sig;
 
 	// Make sure that socket is opened.
-	if(open_socket(subscription,"",ISOTP_PROTOCOL|ISOTP_RECEIVE) < 0)
+	if(open_socket(subscription, "", ISOTP_PROTOCOL|ISOTP_RECEIVE) < 0)
 	{
 			return -1;
 	}
@@ -556,52 +556,40 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 {
 	uint32_t flags_bcm;
 	struct timeval freq, timeout = {0, 0};
-	struct canfd_frame cfd;
 	subscription.signal_= sig;
 	bool is_fd = sig->get_message()->is_fd();
+	uint32_t max_dlen = 0;
 
-	std::vector<uint8_t> data;
 	uint32_t length_msg = sig->get_message()->get_length();
+	std::vector<uint8_t> data(length_msg);
+	can_message_t cm;
 
-	if(length_msg == 0)
+	if(! length_msg)
 	{
-		AFB_ERROR("Error in the length of message with id %d",sig->get_message()->get_id());
+		AFB_ERROR("Error in the length of message with id %d", sig->get_message()->get_id());
 		return -1;
 	}
 
-	for(int i = 0; i<length_msg;i++)
-	{
-		data.push_back(0);
-	}
-
-	encoder_t::encode_data(subscription.signal_,data,true,false,true);
-
-	can_message_t cm;
+	encoder_t::encode_data(subscription.signal_, data, true, false, true);
 
 	if (is_fd)
 	{
 		flags_bcm = SETTIMER|RX_NO_AUTOTIMER|CAN_FD_FRAME;
-		cfd.len = CANFD_MAX_DLEN;
-		cm = can_message_t( CANFD_MAX_DLEN,
-							sig->get_message()->get_id(),
-							length_msg,
-							false,
-							sig->get_message()->get_flags(),
-							data,
-							0);
+		max_dlen = CANFD_MAX_DLEN;
 	}
 	else
 	{
 		flags_bcm = SETTIMER|RX_NO_AUTOTIMER;
-		cfd.len = CAN_MAX_DLEN;
-		cm = can_message_t( CAN_MAX_DLEN,
-							sig->get_message()->get_id(),
-							length_msg,
-							false,
-							sig->get_message()->get_flags(),
-							data,
-							0);
+		max_dlen = CAN_MAX_DLEN;
 	}
+
+	cm = can_message_t( max_dlen,
+			    sig->get_message()->get_id(),
+			    length_msg,
+			    false,
+			    sig->get_message()->get_flags(),
+			    data,
+			    0);
 
 	frequency_clock_t f = subscription.event_filter_.frequency == 0 ? subscription.signal_->get_frequency() : frequency_clock_t(subscription.event_filter_.frequency);
 	freq = f.get_timeval_from_period();
@@ -617,12 +605,7 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 	}
 	else if(cfd_vect.size() == 1)
 	{
-		canfd_frame cf = cfd_vect[0];
-		for(int i=0;i<cfd.len;i++)
-		{
-			cfd.data[i] = cf.data[i];
-		}
-		subscription.add_one_bcm_frame(cfd, bcm_msg);
+		subscription.add_one_bcm_frame(cfd_vect[0], bcm_msg);
 	}
 	else
 	{
@@ -676,9 +659,9 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 
 	struct timeval freq = frequency_clock_t(event_filter_.frequency).get_timeval_from_period();
 	//struct timeval timeout = frequency_clock_t(10).get_timeval_from_period();
-	struct timeval timeout = {0,0};
+	struct timeval timeout = {0, 0};
 
-	struct bcm_msg bcm_msg =  make_bcm_head(RX_SETUP, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER|RX_NO_AUTOTIMER|RX_FILTER_ID, timeout, freq);
+	struct bcm_msg bcm_msg =  make_bcm_head(RX_SETUP, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER | RX_NO_AUTOTIMER | RX_FILTER_ID, timeout, freq);
 	return create_rx_filter_bcm(*this, bcm_msg);
 }
 
@@ -693,7 +676,7 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscription, struct bcm_msg& bcm_msg)
 {
 	// Make sure that socket is opened.
-	if(subscription.open_socket(subscription,"",BCM_PROTOCOL) < 0)
+	if(subscription.open_socket(subscription, "", BCM_PROTOCOL) < 0)
 		{return -1;}
 
 	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
@@ -713,7 +696,7 @@ int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscri
 	{
 		for(uint8_t i = 0; i < 8; i++)
 		{
-			bcm_msg.msg_head.can_id  =  OBD2_FUNCTIONAL_RESPONSE_START + i;
+			bcm_msg.msg_head.can_id = OBD2_FUNCTIONAL_RESPONSE_START + i;
 			msg.set_bcm_msg(bcm_msg);
 			subscription.socket_->write_message(msg);
 			if(! subscription.socket_)
@@ -756,7 +739,7 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 
 		if(subscription.socket_->write_message(*cm) < 0)
 		{
-			AFB_ERROR("Error write message id : %d",cfd_vect[0].can_id);
+			AFB_ERROR("Error write message id : %d", cfd_vect[0].can_id);
 			return -1;
 		}
 	}
@@ -794,7 +777,7 @@ int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, mes
 	}
 
 	j1939_message_t *jm = static_cast<j1939_message_t*>(message);
-	jm->set_sockname(jm->get_pgn(),J1939_NO_NAME,J1939_NO_ADDR);
+	jm->set_sockname(jm->get_pgn(), J1939_NO_NAME, J1939_NO_ADDR);
 	if(subscription.socket_->write_message(*jm) < 0)
 	{
 		AFB_ERROR("Error write j1939 message");
