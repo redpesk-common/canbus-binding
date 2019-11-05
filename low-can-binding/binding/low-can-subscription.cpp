@@ -366,27 +366,21 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 	{
 		if(flags & BCM_PROTOCOL)
 		{
-			if( subscription.signal_ != nullptr)
-			{
-					subscription.socket_ = std::make_shared<utils::socketcan_bcm_t>();
-					ret = subscription.socket_->open(subscription.signal_->get_message()->get_bus_device_name());
-			}
-			else if (! subscription.diagnostic_message_ .empty())
-			{
-					subscription.socket_ = std::make_shared<utils::socketcan_bcm_t>();
-					ret = subscription.socket_->open(application_t::instance().get_diagnostic_manager().get_bus_device_name());
-			}
-			else if ( !bus_name.empty())
-			{
-					subscription.socket_ = std::make_shared<utils::socketcan_bcm_t>();
-					ret = subscription.socket_->open(bus_name);
-			}
+			subscription.socket_ = std::make_shared<utils::socketcan_bcm_t>();
+			if( subscription.signal_ )
+				ret = subscription.socket_->open(subscription.signal_->get_message()->get_bus_device_name());
+			else if(! subscription.diagnostic_message_.empty())
+				ret = subscription.socket_->open(application_t::instance().get_diagnostic_bus());
+			else if(! bus_name.empty())
+				ret = subscription.socket_->open(bus_name);
+
 			subscription.index_ = (int)subscription.socket_->socket();
 		}
 #ifdef USE_FEATURE_ISOTP
 		else if(flags & ISOTP_PROTOCOL)
 		{
-			if(subscription.signal_ != nullptr)
+			std::shared_ptr<utils::socketcan_isotp_t> socket = std::make_shared<utils::socketcan_isotp_t>();
+			if(subscription.signal_ )
 			{
 				canid_t rx = NO_CAN_ID;
 				canid_t tx = NO_CAN_ID;
@@ -400,13 +394,11 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 					rx = subscription.signal_->get_message()->get_id();
 					tx = subscription.get_tx_id();
 				}
-				std::shared_ptr<utils::socketcan_isotp_t> socket = std::make_shared<utils::socketcan_isotp_t>();
 				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(),rx,tx);
 				subscription.socket_ = socket;
 			}
-			else if(!bus_name.empty())
+			else if(! bus_name.empty())
 			{
-				std::shared_ptr<utils::socketcan_isotp_t> socket = std::make_shared<utils::socketcan_isotp_t>();
 				ret = socket->open(bus_name, subscription.get_rx_id(),subscription.get_tx_id());
 				subscription.socket_ = socket;
 			}

@@ -111,7 +111,7 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 	}
 
 	// check if error or hangup
-	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
+	if ((revents & (EPOLLERR | EPOLLRDHUP | EPOLLHUP)) != 0)
 	{
 		sd_event_source_unref(event_source);
 		can_subscription->get_socket()->close();
@@ -193,11 +193,11 @@ static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscr
 }
 
 static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
-							 bool subscribe,
-							 list_ptr_diag_msg_t diagnostic_messages,
-							 struct event_filter_t& event_filter,
-							 map_subscription& s,
-							 bool perm_rec_diag_req)
+						     bool subscribe,
+						     list_ptr_diag_msg_t diagnostic_messages,
+						     struct event_filter_t& event_filter,
+						     map_subscription& s,
+						     bool perm_rec_diag_req)
 {
 	int rets = 0;
 	application_t& app = application_t::instance();
@@ -258,10 +258,10 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 }
 
 static int subscribe_unsubscribe_signals(afb_req_t request,
-						 bool subscribe,
-						 list_ptr_signal_t signals,
-						 struct event_filter_t& event_filter,
-						 map_subscription& s)
+					 bool subscribe,
+					 list_ptr_signal_t signals,
+					 struct event_filter_t& event_filter,
+					 map_subscription& s)
 {
 	int rets = 0;
 	for(const auto& sig: signals)
@@ -589,7 +589,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 	if( !sf.signals.empty() )
 	{
 		AFB_DEBUG("ID WRITE RAW : %d",sf.signals.front()->get_message()->get_id());
-		if(flags&BCM_PROTOCOL)
+		if(flags & BCM_PROTOCOL)
 		{
 			if(sf.signals.front()->get_message()->is_fd())
 			{
