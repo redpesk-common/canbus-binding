@@ -909,26 +909,28 @@ int init_binding(afb_api_t api)
 
 
 #ifdef USE_FEATURE_J1939
+	std::string j1939_bus;
 	vect_ptr_msg_def_t current_messages_definition = application.get_messages_definition();
 	for(std::shared_ptr<message_definition_t> message_definition: current_messages_definition)
 	{
 		if(message_definition->is_j1939())
 		{
-			std::shared_ptr<low_can_subscription_t> low_can_j1939 = std::make_shared<low_can_subscription_t>();
+			if (j1939_bus == message_definition->get_bus_device_name() )
+				continue;
+			j1939_bus = message_definition->get_bus_device_name();
 
+			std::shared_ptr<low_can_subscription_t> low_can_j1939 = std::make_shared<low_can_subscription_t>();
 			application.set_subscription_address_claiming(low_can_j1939);
 
 			ret = low_can_subscription_t::open_socket(*low_can_j1939,
-													message_definition->get_bus_device_name(),
-													J1939_ADDR_CLAIM_PROTOCOL);
+												j1939_bus,
+												J1939_ADDR_CLAIM_PROTOCOL);
+
 			if(ret < 0)
 			{
 				AFB_ERROR("Error open socket address claiming for j1939 protocol");
 				return -1;
 			}
-
-//			std::shared_ptr<low_can_subscription_t> saddrclaim = application.get_subscription_address_claiming();
-
 			add_to_event_loop(low_can_j1939);
 			break;
 		}
