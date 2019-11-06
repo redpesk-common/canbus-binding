@@ -21,6 +21,7 @@
 
 #include <sys/socket.h>
 #include <linux/can/bcm.h>
+#include <linux/sockios.h>
 #include <string.h>
 
 #include "../binding/low-can-hat.hpp"

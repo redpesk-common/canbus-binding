@@ -107,7 +107,6 @@ namespace utils
 		if(broadcast) broadcast_i = 1;
 
 		setopt(SOL_CAN_J1939, SO_J1939_PROMISC, &promisc_i, sizeof(promisc_i));
-		setopt(SOL_CAN_J1939, SO_J1939_RECV_OWN, &recv_own_msgs_i, sizeof(recv_own_msgs_i));
 		setopt(SOL_SOCKET, SO_BROADCAST, &broadcast_i, sizeof(broadcast_i));
 	}
 
