@@ -28,8 +28,8 @@ class message_definition_t;
 class diagnostic_message_t;
 
 typedef std::vector<std::shared_ptr<signal_t>> vect_ptr_signal_t;
-typedef std::vector<std::shared_ptr<diagnostic_message_t>> vect_ptr_diag_msg_t;
 typedef std::vector<std::shared_ptr<message_definition_t>> vect_ptr_msg_def_t;
+typedef std::vector<std::shared_ptr<diagnostic_message_t>> vect_ptr_diag_msg_t;
 
 /// @brief A parent wrapper for a particular set of CAN messages and diagnostic messages
 /// (e.g. a vehicle or program).
@@ -38,14 +38,14 @@ class message_set_t
 private:
 	uint8_t index_; /// < A numerical ID for the message set, ideally the index is in an array for fast lookup
 	const std::string name_; /// < The name of the message set.
-	std::vector<std::shared_ptr<message_definition_t> > messages_definition_; ///< Vector holding all message definitions handled by the message set.
+	vect_ptr_msg_def_t messages_definition_; ///< Vector holding all message definitions handled by the message set.
 	vect_ptr_diag_msg_t diagnostic_messages_; ///< Vector holding all diagnostics messages from JSON signals description file. First vector map to message set
 
 public:
 	message_set_t(
 			uint8_t index,
 			const std::string& name,
-			const std::vector<std::shared_ptr<message_definition_t> >& messages_definition,
+			const vect_ptr_msg_def_t& messages_definition,
 			const vect_ptr_diag_msg_t& diagnostic_messages);
 
 	int add_message_definition(std::shared_ptr<message_definition_t> msg_def);

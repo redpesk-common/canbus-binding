@@ -23,7 +23,7 @@
 message_set_t::message_set_t(
 		uint8_t index,
 		const std::string& name,
-		const std::vector<std::shared_ptr<message_definition_t> >& messages_definition,
+		const vect_ptr_msg_def_t& messages_definition,
 		const vect_ptr_diag_msg_t& diagnostic_messages)
 	: index_{index}
 	, name_{name}

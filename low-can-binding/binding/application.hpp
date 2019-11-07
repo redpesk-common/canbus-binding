@@ -81,7 +81,7 @@ class application_t
 
 		const std::vector<std::string>& get_signals_prefix() const;
 
-		std::vector<std::shared_ptr<message_definition_t> > get_messages_definition();
+		vect_ptr_msg_def_t get_messages_definition();
 
 		std::shared_ptr<message_definition_t> get_message_definition(uint32_t id);
 
