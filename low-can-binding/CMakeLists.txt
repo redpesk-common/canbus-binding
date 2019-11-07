@@ -23,7 +23,6 @@ PROJECT_TARGET_ADD(low-can)
 
 	# Define project Targets
 	set (SOURCES
-		#binding/${TARGET_NAME}-hat.cpp
 		binding/${TARGET_NAME}-cb.cpp
 		binding/${TARGET_NAME}-subscription.cpp
 		binding/application.cpp
@@ -46,7 +45,6 @@ PROJECT_TARGET_ADD(low-can)
 		utils/socketcan-bcm.cpp
 		utils/config-parser.cpp
 		utils/converter.cpp
-		binding/application-generated.cpp
 		)
 
 
@@ -84,6 +82,6 @@ PROJECT_TARGET_ADD(low-can)
 		uds-c
 		isotp-c
 		bitfield-c
-		afb-helpers
+		appcontroller
 		${link_libraries})
 

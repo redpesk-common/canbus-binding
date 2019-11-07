@@ -1,0 +1,30 @@
+{
+	"$schema": "",
+	"metadata": {
+		"uid": "Low Can",
+		"version": "1.0",
+		"api": "low-can",
+		"info": "Low can Configuration"
+	},
+	"config": {
+		"active_message_set": 0,
+		"diagnostic_bus": "hs"
+	},
+	"plugins": [
+		{
+			"uid": "agl-callbacks",
+			"info": "AGL signals",
+			"libs": "agl-signals.ctlso"
+		},
+		{
+			"uid": "j1939-callbacks",
+			"info": "J1939 signals",
+			"libs": "j1939-signals.ctlso"
+		},
+		{
+			"uid": "nmea2000-callbacks",
+			"info": "NMEA2000 Signals",
+			"libs": "nmea2000-signals.ctlso"
+		}
+	]
+}

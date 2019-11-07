@@ -62,6 +62,10 @@ const std::string message_definition_t::get_bus_device_name() const
 		.get_can_device_name(bus_);
 }
 
+const std::string message_definition_t::get_name() const{
+	return name_;
+}
+
 uint32_t message_definition_t::get_id() const
 {
 	return id_ & CAN_EFF_MASK ?

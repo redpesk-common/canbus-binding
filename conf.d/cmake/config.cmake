@@ -38,7 +38,7 @@ set(PROJECT_CMAKE_CONF_DIR "conf.d")
 
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
-set(BUILD_TYPE "RELEASE" CACHE STRING "Default Build variant chosen. (Overwritten by cli if given)")
+set(BUILD_TYPE "DEBUG" CACHE STRING "Default Build variant chosen. (Overwritten by cli if given)")
 
 # Activate J1939
 # Need module in kernel
@@ -100,6 +100,7 @@ set (PKG_REQUIRED_LIST
 	libsystemd>=222
 	afb-daemon
 	afb-helpers
+	appcontroller
 )
 
 # Prefix path where will be installed the files
@@ -215,6 +216,13 @@ set(AFB_REMPORT "1234" CACHE STRING "Default binder listening port")
 # ----------------------------------------------------
 set(CLOSING_MESSAGE "Typical binding launch: afb-daemon --port=${AFB_REMPORT} --workdir=${CMAKE_BINARY_DIR}/package --ldpaths=lib --roothttp=htdocs  --token=\"${AFB_TOKEN}\" --tracereq=common --verbose")
 set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
+
+
+# Add Controller config
+add_definitions(-DCONTROL_PLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/lib/plugins:${CMAKE_BINARY_DIR}/package/lib/plugins:${CMAKE_BINARY_DIR}/package/var:${CMAKE_BINARY_DIR}/package-test")
+add_definitions(-DCONTROL_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/etc:${CMAKE_BINARY_DIR}/package/etc:${CMAKE_BINARY_DIR}/package-test/")
+
+
 
 # Optional schema validator about now only XML, LUA and JSON
 # are supported

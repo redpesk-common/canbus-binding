@@ -79,6 +79,7 @@ public:
 
 	const std::string get_bus_name() const;
 	const std::string get_bus_device_name() const;
+	const std::string get_name() const;
 	uint32_t get_id() const;
 	bool is_fd() const;
 	bool is_j1939() const;

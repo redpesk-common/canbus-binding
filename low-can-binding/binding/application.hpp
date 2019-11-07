@@ -71,6 +71,8 @@ class application_t
 
 		uint8_t get_active_message_set() const;
 
+		int add_message_set(std::shared_ptr<message_set_t> new_message_set);
+
 		std::vector<std::shared_ptr<message_set_t> > get_message_set();
 
 		vect_ptr_signal_t get_all_signals();
