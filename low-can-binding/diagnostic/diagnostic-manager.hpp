@@ -33,7 +33,7 @@
 #define DIAGNOSTIC_RESPONSE_ARBITRATION_ID_OFFSET 0x8
 
 ///
-/// @brief The core structure for running the diagnostics module of the binding.
+/// @brief The binding structure for running the diagnostics module of the binding.
 ///
 /// This stores details about the active requests and shims required to connect
 /// the diagnostics library to the CAN device.
@@ -54,11 +54,12 @@ private:
 
 	static bool shims_send(const uint32_t arbitration_id, const uint8_t* data, const uint8_t size);
 	static void shims_logger(const char* m, ...);
+
 public:
 	diagnostic_manager_t();
 	~diagnostic_manager_t();
 
-	bool initialize();
+	bool initialize(std::string diagnostic_bus);
 
 	const std::string get_bus_name() const;
 	const std::string get_bus_device_name() const;

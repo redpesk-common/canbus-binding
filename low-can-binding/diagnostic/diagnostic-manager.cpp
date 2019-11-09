@@ -56,16 +56,19 @@ diagnostic_manager_t::~diagnostic_manager_t()
 ///
 /// this will initialize DiagnosticShims and cancel all active requests
 ///  if there are any.
-bool diagnostic_manager_t::initialize()
+bool diagnostic_manager_t::initialize(std::string diagnostic_bus)
 {
-	// Mandatory to set the bus before intialize shims.
-	bus_ = application_t::instance().get_diagnostic_bus();
+	if (! diagnostic_bus.empty())
+	{
+		bus_ = diagnostic_bus;
+		init_diagnostic_shims();
+		reset();
 
-	init_diagnostic_shims();
-	reset();
-
-	initialized_ = true;
-	AFB_DEBUG("Diagnostic Manager initialized");
+		AFB_DEBUG("Diagnostic Manager initialized");
+		initialized_ = true;
+		return initialized_;
+	}
+	AFB_ERROR("Diagnostic Manager missing its bus name in the config");
 	return initialized_;
 }
 

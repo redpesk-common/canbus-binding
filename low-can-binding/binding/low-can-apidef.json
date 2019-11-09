@@ -12,6 +12,7 @@
 			"postfix": "",
 			"start": null ,
 			"onevent": null,
+			"preninit": "loadConf",
 			"init": "init_binding",
 			"scope": "",
 			"private": false

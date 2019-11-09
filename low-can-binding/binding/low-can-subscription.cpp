@@ -370,7 +370,7 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 			if( subscription.signal_ )
 				ret = subscription.socket_->open(subscription.signal_->get_message()->get_bus_device_name());
 			else if(! subscription.diagnostic_message_.empty())
-				ret = subscription.socket_->open(application_t::instance().get_diagnostic_bus());
+				ret = subscription.socket_->open(application_t::instance().get_diagnostic_manager().get_bus_name());
 			else if(! bus_name.empty())
 				ret = subscription.socket_->open(bus_name);
 

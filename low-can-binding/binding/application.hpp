@@ -65,8 +65,6 @@ class application_t
 
 		std::map<std::string, std::shared_ptr<low_can_subscription_t> >& get_can_devices();
 
-		const std::string get_diagnostic_bus() const;
-
 		diagnostic_manager_t& get_diagnostic_manager() ;
 
 		uint8_t get_active_message_set() const;

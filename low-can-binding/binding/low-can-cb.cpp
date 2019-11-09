@@ -26,6 +26,7 @@
 #include <thread>
 #include <wrap-json.h>
 #include <systemd/sd-event.h>
+#include <ctl-config.h>
 #include "openxc.pb.h"
 #include "application.hpp"
 #include "../can/can-encoder.hpp"
@@ -41,90 +42,65 @@
 	#include "../can/message/j1939-message.hpp"
 	#include <linux/can/j1939.h>
 #endif
-///******************************************************************************
+
+///*****************************************************************************
 ///
-///		SystemD event loop Callbacks
+///		Controller Definitions and Callbacks
 ///
-///*******************************************************************************/
+///****************************************************************************/
 
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, map_subscription& s)
+int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_obj)
 {
-	bool is_permanent_recurring_request = false;
+	AFB_DEBUG("Config %s", json_object_to_json_string(json_obj));
+	CtlConfigT *ctrlConfig;
 
-	if( ! can_subscription->get_diagnostic_message().empty() && can_subscription->get_diagnostic_message(pid) != nullptr)
+	ctrlConfig = (CtlConfigT *) afb_api_get_userdata(apiHandle);
+	if(!ctrlConfig)
+		return -1;
+
+	if(!section->handle)
+		return -1;
+
+	application_t *application = (application_t*) section->handle;
+
+
+	int active_message_set;
+	const char *diagnotic_bus = nullptr;
+
+	if(wrap_json_unpack(json_obj, "{si, ss}",
+			      "active_message_set", &active_message_set,
+			      "diagnostic_bus", &diagnotic_bus))
+		return -1;
+
+	application->set_active_message_set((uint8_t)active_message_set);
+
+	/// Initialize Diagnostic manager that will handle obd2 requests.
+	/// We pass by default the first CAN bus device to its Initialization.
+	if(! application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
 	{
-		DiagnosticRequest diag_req = can_subscription->get_diagnostic_message(pid)->build_diagnostic_request();
-		active_diagnostic_request_t* adr = application_t::instance().get_diagnostic_manager().find_recurring_request(diag_req);
-		if( adr != nullptr)
-		{
-			is_permanent_recurring_request = adr->get_permanent();
-
-			if(! is_permanent_recurring_request)
-				application_t::instance().get_diagnostic_manager().cleanup_request(adr, true);
-		}
-	}
-
-	if(! is_permanent_recurring_request)
-		on_no_clients(can_subscription, s);
-}
-
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, map_subscription& s)
-{
-	auto it = s.find(can_subscription->get_index());
-	s.erase(it);
-}
-
-static void push_n_notify(std::shared_ptr<message_t> m)
-{
-	can_bus_t& cbm = application_t::instance().get_can_bus_manager();
-	{
-		std::lock_guard<std::mutex> can_message_lock(cbm.get_can_message_mutex());
-	 	cbm.push_new_can_message(m);
-	}
-	cbm.get_new_can_message_cv().notify_one();
-}
-
-int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *userdata)
-{
-
-	low_can_subscription_t* can_subscription = (low_can_subscription_t*)userdata;
-
-
-	if ((revents & EPOLLIN) != 0)
-	{
-		utils::signals_manager_t& sm = utils::signals_manager_t::instance();
-		std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-		if(can_subscription->get_index() != -1)
-		{
-			std::shared_ptr<utils::socketcan_t> s = can_subscription->get_socket();
-			if(s->socket() && s->socket() != -1)
-			{
-				std::shared_ptr<message_t> message = s->read_message();
-
-				// Sure we got a valid CAN message ?
-				if (! message->get_id() == 0 && ! message->get_length() == 0 && !(message->get_flags()&INVALID_FLAG))
-				{
-					push_n_notify(message);
-				}
-			}
-		}
-	}
-
-	// check if error or hangup
-	if ((revents & (EPOLLERR | EPOLLRDHUP | EPOLLHUP)) != 0)
-	{
-		sd_event_source_unref(event_source);
-		can_subscription->get_socket()->close();
+		AFB_ERROR("Diagnostic Manager: error at initialization");
+		return -1;
 	}
 
 	return 0;
 }
 
-///******************************************************************************
+CtlSectionT ctlSections_[] = {
+	[0]={.key="config" , .uid="config", .info=nullptr,
+		 .loadCB=config_low_can,
+		 .handle=nullptr,
+		 .actions=nullptr},
+	[1]={.key="plugins" , .uid="plugins", .info=nullptr,
+		.loadCB=PluginConfig,
+		.handle=nullptr,
+		.actions=nullptr},
+};
+
+///*****************************************************************************
 ///
 ///		Subscription and unsubscription
 ///
-///*******************************************************************************/
+///****************************************************************************/
 
 /// @brief This will determine if an event handle needs to be created and checks if
 /// we got a valid afb_event to get subscribe or unsubscribe. After that launch the subscription or unsubscription
@@ -881,15 +857,16 @@ int init_binding(afb_api_t api)
 	application_t& application = application_t::instance();
 	can_bus_t& can_bus_manager = application.get_can_bus_manager();
 
+	if(application.get_message_set().empty())
+	{
+		AFB_ERROR("No message_set defined");
+		return -1;
+	}
+
+
 	can_bus_manager.set_can_devices();
 	can_bus_manager.start_threads();
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
-
-	/// Initialize Diagnostic manager that will handle obd2 requests.
-	/// We pass by default the first CAN bus device to its Initialization.
-	/// TODO: be able to choose the CAN bus device that will be use as Diagnostic bus.
-	if(application_t::instance().get_diagnostic_manager().initialize())
-		ret = 0;
 
 	// Add a recurring dignostic message request to get engine speed at all times.
 	openxc_DynamicField search_key = build_DynamicField("diagnostic_messages.engine.speed");
@@ -939,6 +916,44 @@ int init_binding(afb_api_t api)
 
 	if(ret)
 		AFB_ERROR("There was something wrong with CAN device Initialization.");
+
+	return ret;
+}
+
+int load_conf(afb_api_t api)
+{
+	int ret = 0;
+	CtlConfigT *ctlConfig;
+	const char *dirList = getenv("CONTROL_CONFIG_PATH");
+	std::string bindingDirPath = GetBindingDirPath(api);
+	std::string filepath = bindingDirPath + "/etc";
+
+	if (!dirList)
+		dirList=CONTROL_CONFIG_PATH;
+
+	filepath.append(":");
+	filepath.append(dirList);
+	const char *configPath = CtlConfigSearch(api, filepath.c_str(), "control");
+
+	if (!configPath)
+	{
+		AFB_ERROR_V3("CtlPreInit: No control-* config found invalid JSON %s ", filepath.c_str());
+		return -1;
+	}
+
+	// create one API per file
+	ctlConfig = CtlLoadMetaData(api, configPath);
+	if (!ctlConfig)
+	{
+		AFB_ERROR_V3("CtrlPreInit No valid control config file in:\n-- %s", configPath);
+		return -1;
+	}
+
+	// Save the config in the api userdata field
+	afb_api_set_userdata(api, ctlConfig);
+
+	setExternalData(ctlConfig, (void*) &application_t::instance());
+	ret= CtlLoadSections(api, ctlConfig, ctlSections_);
 
 	return ret;
 }
