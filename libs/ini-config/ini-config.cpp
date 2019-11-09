@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, 2016 ,2017 "IoT.bzh"
+ * Copyright (C) 2015, 2016 ,2017, 2018, 2019 "IoT\.bzh"
  * Author "Loïc Collignon" <loic.collignon@iot.bzh>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

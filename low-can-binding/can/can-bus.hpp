@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, 2016, 2017 "IoT.bzh"
+ * Copyright (C) 2015, 2016, 2017, 2018, 2019 "IoT\.bzh"
  * Author "Romain Forlot" <romain.forlot@iot.bzh>
  * Author "Loïc Collignon" <loic.collignon@iot.bzh>
  *
