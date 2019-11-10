@@ -49,16 +49,15 @@ class can_message_t : public message_t {
 
 		uint32_t get_id() const;
 		void set_id(const canid_t id);
+		bool is_correct_to_send();
 
 		static std::shared_ptr<can_message_t> convert_from_frame(const canfd_frame& frame, size_t nbytes, uint64_t timestamp);
 		struct canfd_frame convert_to_canfd_frame();
 		struct std::vector<canfd_frame> convert_to_canfd_frame_vector();
-		struct can_frame convert_to_can_frame();
-
-		bool is_correct_to_send();
-		bool is_set();
 		struct bcm_msg& get_bcm_msg();
 		void set_bcm_msg(struct bcm_msg bcm_msg);
 
+		struct can_frame convert_to_can_frame();
+		bool is_set();
 		std::string get_debug_message();
 };
