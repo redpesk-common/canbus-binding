@@ -47,7 +47,7 @@ end)
 ###########################################################
 ####################### J1939 TESTS #######################
 ###########################################################
-]] 
+]]
 
 print("\n##########################################")
 print("#########    BEGIN J1939 TESTS   #########")
@@ -84,7 +84,7 @@ end)
 +++++++++++
 Tests write
 +++++++++++
-]] 
+]]
 
 --print("\n++++++++++++++++++++++++++")
 --print("++++   TESTS WRITE    ++++")
@@ -94,23 +94,23 @@ _AFT.describe("Test write", function()
 _AFT.testVerbStatusError("low-can_write_wo_auth", "low-can", "write", { signal_name = "Eng.Momentary.Overspeed.Enable", signal_value = 1})
 _AFT.testVerbStatusSuccess("low-can_auth", "low-can", "auth", {})
 _AFT.testVerbStatusSuccess("low-can_write_signal", "low-can", "write", { signal_name = "Eng.Momentary.Overspeed.Enable", signal_value = 1})
-_AFT.testVerbStatusSuccess("low-can_write_frame", "low-can", "write", { bus_name= "j1939", frame= { pgn= 62420, length=8, data= {1,2,3,4,5,6,7,8}}})
-_AFT.testVerbStatusSuccess("low-can_write_frame_other_pgn", "low-can", "write", { bus_name= "j1939", frame= { pgn= 126208, length=8, data= {9,10,11,12,13,14,15,16}}})
-_AFT.testVerbStatusError("low-can_write_frame_invalid_pgn", "low-can", "write", { bus_name= "j1939", frame= { pgn= 1234, length=8, data= {9,10,11,12,13,14,15,16}}})
-_AFT.testVerbStatusSuccess("low-can_write_multi_frame", "low-can", "write", { bus_name= "j1939", frame= { pgn= 126208, length=9, data= {9,10,11,12,13,14,15,16,17}}})
+_AFT.testVerbStatusSuccess("low-can_write_frame", "low-can", "write", { bus_name= "j1939", frame= { pgn= 62420, length=8, data= {1, 2, 3, 4, 5, 6, 7, 8}}})
+_AFT.testVerbStatusSuccess("low-can_write_frame_other_pgn", "low-can", "write", { bus_name= "j1939", frame= { pgn= 126208, length=8, data= {9, 10, 11, 12, 13, 14, 15, 16}}})
+_AFT.testVerbStatusError("low-can_write_frame_invalid_pgn", "low-can", "write", { bus_name= "j1939", frame= { pgn= 1234, length=8, data= {9, 10, 11, 12, 13, 14, 15, 16}}})
+_AFT.testVerbStatusSuccess("low-can_write_multi_frame", "low-can", "write", { bus_name= "j1939", frame= { pgn= 126208, length=9, data= {9, 10, 11, 12, 13, 14, 15, 16, 17}}})
 end)
 --[[
 ++++++++++
 Tests read
 ++++++++++
-]] 
+]]
 
 local api = "low-can"
 local evt = "messages.Eng.Momentary.Overspeed.Enable"
 local evt2 = "messages.Actl.Eng.Prcnt.Trque.High.Resolution"
 
 _AFT.describe("Test subscribe read frame", function()
-    _AFT.addEventToMonitor(api .. "/" ..evt, function(eventname,data)
+    _AFT.addEventToMonitor(api .. "/" ..evt, function(eventname, data)
         _AFT.assertEquals(eventname, api.."/"..evt)
     end)
 
@@ -128,7 +128,7 @@ end)
 ------------------------------------------------------------------------------
 
 _AFT.describe("Test subscribe not read all frame", function()
-    _AFT.addEventToMonitor(api .. "/" ..evt2, function(eventname,data)
+    _AFT.addEventToMonitor(api .. "/" ..evt2, function(eventname, data)
         _AFT.assertEquals(eventname, api.."/"..evt2)
     end)
 
@@ -147,7 +147,7 @@ end)
 ---------------
 
 _AFT.describe("Test subscribe read frame low time", function()
-    _AFT.addEventToMonitor(api .. "/" ..evt, function(eventname,data)
+    _AFT.addEventToMonitor(api .. "/" ..evt, function(eventname, data)
         _AFT.assertEquals(eventname, api.."/"..evt)
     end)
 
