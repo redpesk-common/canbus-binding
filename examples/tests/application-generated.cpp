@@ -7,7 +7,7 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"AGL Virtual Car",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x111,"",16,66,frequency_clock_t(5.00000f),true,
+				{std::make_shared<message_definition_t>(message_definition_t{"ls", 0x111,"", 16, 66, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"sig1.1",// generic_name
@@ -187,7 +187,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x30,"",8,4,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"ls", 0x30,"", 8, 4, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"hvac.fan.speed",// generic_name
@@ -279,7 +279,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3D9,"",8,2050,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x3D9,"", 8, 2050, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine.speed",// generic_name
@@ -349,7 +349,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3E9,"",8,2,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x3E9,"", 8, 2, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"vehicle.average.speed",// generic_name
@@ -375,7 +375,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x4D1,"",8,2,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x4D1,"", 8, 2, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine.oil.temp",// generic_name
@@ -423,7 +423,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x620,"",8,2,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x620,"", 8, 2, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"doors.boot.open",// generic_name
@@ -537,7 +537,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x799,"",8,2,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x799,"", 8, 2, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"windows.front_left.open",// generic_name
@@ -629,7 +629,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61442,"ETC1",8,18,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 61442,"ETC1", 8, 18, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Momentary.Overspeed.Enable",// generic_name
@@ -903,7 +903,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61444,"EEC1",8,18,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 61444,"EEC1", 8, 18, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Actl.Eng.Prcnt.Trque.High.Resolution",// generic_name
@@ -1113,7 +1113,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61449,"VDC2",8,18,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 61449,"VDC2", 8, 18, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Lateral.Acceleration",// generic_name
@@ -1253,7 +1253,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65215,"EBC2",8,18,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 65215,"EBC2", 8, 18, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Front.Axle.Speed",// generic_name
@@ -1411,7 +1411,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65253,"HOURS",8,18,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 65253,"HOURS", 8, 18, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Total.Hours.Of.Operation",// generic_name
@@ -1459,7 +1459,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65262,"ET1",8,18,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 65262,"ET1", 8, 18, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Coolant.Temp",// generic_name
@@ -1857,7 +1857,7 @@ application_t::application_t()
 {
 	for(std::shared_ptr<message_set_t> cms: message_set_)
 	{
-		std::vector<std::shared_ptr<message_definition_t>> messages_definition = cms->get_messages_definition();
+		vect_ptr_msg_def_t messages_definition = cms->get_messages_definition();
 		for(std::shared_ptr<message_definition_t> cmd : messages_definition)
 		{
 			cmd->set_parent(cms);

@@ -34,7 +34,7 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"example",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x128,"ECM_z_5D2",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x128,"ECM_z_5D2", 0, false, message_format_t::STANDARD, frequency_clock_t(5.00000f), true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine_speed",// generic_name
@@ -200,7 +200,7 @@ application_t::application_t()
 {
 	for(std::shared_ptr<message_set_t> cms: message_set_)
 	{
-		std::vector<std::shared_ptr<message_definition_t>> messages_definition = cms->get_messages_definition();
+		vect_ptr_msg_def_t messages_definition = cms->get_messages_definition();
 		for(std::shared_ptr<message_definition_t> cmd : messages_definition)
 		{
 			cmd->set_parent(cms);
