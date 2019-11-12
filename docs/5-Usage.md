@@ -52,7 +52,7 @@ others supported bitrate like 125000, 250000 if 500000 doesn't work:
 ip link set can0 type can bitrate 500000
 ip link set can0 up
 ip link show can0
-  can0: <NOARP,UP,LOWER_UP,ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
+  can0: <NOARP, UP, LOWER_UP, ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
     link/can
     can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
     bitrate 500000 sample-point 0.875
@@ -70,7 +70,7 @@ The instructions will be the same:
 ip link set can1 type can bitrate 500000
 ip link set can1 up
 ip link show can1
-  can0: <NOARP,UP,LOWER_UP,ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
+  can0: <NOARP, UP, LOWER_UP, ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
     link/can
     can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
     bitrate 500000 sample-point 0.875
@@ -354,17 +354,17 @@ Examples:
 # Authentification
 low-can auth
 # Write a raw can frame to the CAN id 0x620
-low-can write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc": 8, "can_data": [ 255,255,255,255,255,255,255,255]} }
+low-can write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc": 8, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }
 # Write a signal's value.
 low-can write { "signal_name": "engine.speed", "signal_value": 1256}
 # Write J1939 'single frame'
-low-can write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":8, "data": [ 255,255,255,255,255,255,255,255]} }
+low-can write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":8, "data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }
 # Write J1939 'multi frame'
-low-can write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":9, "data": [ 255,255,255,255,255,255,255,255,254]} }
+low-can write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":9, "data": [ 255, 255, 255, 255, 255, 255, 255, 255, 254]} }
 # Write ISOTP 'single frame'
-low-can write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 8, "can_data": [ 255,255,255,255,255,255,255,255]} }
+low-can write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 8, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }
 # Write ISOTP 'multi frame'
-low-can write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 9, "can_data": [ 255,255,255,255,255,255,255,255,25]} }
+low-can write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 9, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255, 25]} }
 ```
 
 To be able to use write capability, you need to add the permission
