@@ -53,8 +53,8 @@
 					"offset": 0,
 					"writable": true,
 					"decoder": "decoder_t::decode_boolean"}
-		}
-	},
+			}
+		},
 		"0x799": {
 			"bus": "hs",
 			"is_fd" : false,
@@ -211,6 +211,173 @@
 			"factor": 23.529411765,
 			"offset": 0,
 			"writable": true
+		}
+	}
+	},
+	"0x21": {
+	"bus": "ls",
+	"signals": {
+		"SW_Previous": {
+			"generic_name": "steering_wheel.previous",
+			"bit_position": 32,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_VolumeUp": {
+			"generic_name": "steering_wheel.volume.up",
+			"bit_position": 33,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_Mode": {
+			"generic_name": "steering_wheel.mode",
+			"bit_position": 34,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_VolumeDown": {
+			"generic_name": "steering_wheel.volume.down",
+			"bit_position": 35,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_Next": {
+			"generic_name": "steering_wheel.next",
+			"bit_position": 36,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_Info": {
+			"generic_name": "steering_wheel.info",
+			"bit_position": 38,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_VolumeMute": {
+			"generic_name": "steering_wheel.volume.mute",
+			"bit_position": 39,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_Voice": {
+			"generic_name": "steering_wheel.voice",
+			"bit_position": 45,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_PhoneHangup": {
+			"generic_name": "steering_wheel.phone.hangup",
+			"bit_position": 46,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_PhoneCall": {
+			"generic_name": "steering_wheel.phone.call",
+			"bit_position": 47,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_CruiseEnable": {
+			"generic_name": "steering_wheel.cruise.enable",
+			"bit_position": 48,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_CruiseResume": {
+			"generic_name": "steering_wheel.cruise.resume",
+			"bit_position": 49,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_CruiseSet": {
+			"generic_name": "steering_wheel.cruise.set",
+			"bit_position": 51,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_CruiseCancel": {
+			"generic_name": "steering_wheel.cruise.cancel",
+			"bit_position": 52,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_CruiseLimit": {
+			"generic_name": "steering_wheel.cruise.limit",
+			"bit_position": 54,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_CruiseDistance": {
+			"generic_name": "steering_wheel.cruise.distance",
+			"bit_position": 55,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_Horn": {
+			"generic_name": "steering_wheel.horn",
+			"bit_position": 56,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
+		},
+		"SW_LaneDepartureWarning": {
+			"generic_name": "steering_wheel.lane_departure_warning",
+			"bit_position": 63,
+			"bit_size": 1,
+			"factor": 1,
+			"offset": 0,
+			"decoder": "decoder_t::decode_boolean",
+			"writable": false
 		}
 	}
 	}

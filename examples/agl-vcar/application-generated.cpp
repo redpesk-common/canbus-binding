@@ -7,7 +7,407 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"AGL Virtual Car",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x30,"",8,4,frequency_clock_t(5.00000f),true,
+				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x21,"",0,2,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.cruise.cancel",// generic_name
+							52,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.cruise.distance",// generic_name
+							55,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.cruise.enable",// generic_name
+							48,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.cruise.limit",// generic_name
+							54,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.cruise.resume",// generic_name
+							49,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.cruise.set",// generic_name
+							51,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.horn",// generic_name
+							56,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.info",// generic_name
+							38,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.lane_departure_warning",// generic_name
+							63,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.mode",// generic_name
+							34,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.next",// generic_name
+							36,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.phone.call",// generic_name
+							47,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.phone.hangup",// generic_name
+							46,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.previous",// generic_name
+							32,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.voice",// generic_name
+							45,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.volume.down",// generic_name
+							35,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.volume.mute",// generic_name
+							39,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"steering_wheel.volume.up",// generic_name
+							33,// bit_position
+							1,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							false,// writable
+							decoder_t::decode_boolean,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							false,// is_big_endian
+							false,// is_signed
+							""// unit
+						})}
+					} // end signals vector
+				})} // end message_definition entry
+,				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x30,"",8,4,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"hvac.fan.speed",// generic_name
@@ -27,8 +427,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -49,8 +449,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -71,8 +471,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -93,8 +493,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})}
 					} // end signals vector
@@ -119,8 +519,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -141,8 +541,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -163,8 +563,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})}
 					} // end signals vector
@@ -189,8 +589,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})}
 					} // end signals vector
@@ -215,8 +615,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -237,8 +637,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})}
 					} // end signals vector
@@ -263,8 +663,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -285,8 +685,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -307,8 +707,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -329,8 +729,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -351,8 +751,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})}
 					} // end signals vector
@@ -377,8 +777,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -399,8 +799,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -421,8 +821,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -443,8 +843,8 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							false,// is_signed
 							""// unit
 						})}
 					} // end signals vector
