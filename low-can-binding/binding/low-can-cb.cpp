@@ -55,14 +55,13 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	CtlConfigT *ctrlConfig;
 
 	ctrlConfig = (CtlConfigT *) afb_api_get_userdata(apiHandle);
-	if(!ctrlConfig)
+	if(! ctrlConfig)
 		return -1;
 
-	if(!section->handle)
+	if(! ctrlConfig->external)
 		return -1;
 
-	application_t *application = (application_t*) section->handle;
-
+	application_t *application = (application_t*) ctrlConfig->external;
 
 	int active_message_set;
 	const char *diagnotic_bus = nullptr;
@@ -920,7 +919,7 @@ int init_binding(afb_api_t api)
 	return ret;
 }
 
-int load_conf(afb_api_t api)
+int load_config(afb_api_t api)
 {
 	int ret = 0;
 	CtlConfigT *ctlConfig;
