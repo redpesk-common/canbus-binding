@@ -54,25 +54,12 @@ uint8_t application_t::get_active_message_set() const
 
 int application_t::add_message_set(std::shared_ptr<message_set_t> new_message_set)
 {
-
-	vect_ptr_msg_def_t messages_definition = new_message_set->get_messages_definition();
-	for(std::shared_ptr<message_definition_t> cmd : messages_definition)
-	{
-		cmd->set_parent(new_message_set);
-		std::vector<std::shared_ptr<signal_t>> signals = cmd->get_signals();
-		for(std::shared_ptr<signal_t> sig: signals)
-			sig->set_parent(cmd);
-	}
-
-	std::vector<std::shared_ptr<diagnostic_message_t>> diagnostic_messages = new_message_set->get_diagnostic_messages();
-	for(std::shared_ptr<diagnostic_message_t> dm : diagnostic_messages)
-		dm->set_parent(new_message_set);
+	set_parents(new_message_set);
 
 	for(auto old_msg_set : message_set_)
 	{
 		if(old_msg_set->get_index() == new_message_set->get_index())
 		{
-
 			for(auto new_msg_def : new_message_set->get_messages_definition())
 			{
 				if(old_msg_set->add_message_definition(new_msg_def) < 0)
@@ -84,7 +71,6 @@ int application_t::add_message_set(std::shared_ptr<message_set_t> new_message_se
 				if(old_msg_set->add_diagnostic_message(new_diag_msg) < 0)
 					return -1;
 			}
-
 			return 0;
 		}
 	}
@@ -194,6 +180,22 @@ bool application_t::is_engine_on()
 	}
 
 	return engine_on;
+}
+
+void application_t::set_parents(std::shared_ptr<message_set_t> new_message_set)
+{
+	vect_ptr_msg_def_t messages_definition = new_message_set->get_messages_definition();
+	for(std::shared_ptr<message_definition_t> cmd : messages_definition)
+	{
+		cmd->set_parent(new_message_set);
+		std::vector<std::shared_ptr<signal_t>> signals = cmd->get_signals();
+		for(std::shared_ptr<signal_t> sig: signals)
+			sig->set_parent(cmd);
+	}
+
+	std::vector<std::shared_ptr<diagnostic_message_t>> diagnostic_messages = new_message_set->get_diagnostic_messages();
+	for(std::shared_ptr<diagnostic_message_t> dm : diagnostic_messages)
+		dm->set_parent(new_message_set);
 }
 
 #ifdef USE_FEATURE_J1939
