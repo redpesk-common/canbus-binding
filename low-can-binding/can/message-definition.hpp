@@ -49,6 +49,8 @@ private:
 	frequency_clock_t frequency_clock_; ///<  clock_ - an optional frequency clock to control the output of this
 							///      message, if sent raw, or simply to mark the max frequency for custom
 							///      handlers to retrieve.*/
+	bool frame_layout_is_little_; ///<frame_layout_is_little_ Defines if the can frame layout is little endian or big endian.
+								  /// Default is true;
 	bool force_send_changed_; ///< force_send_changed_ - If true, regardless of the frequency, it will send CAN
 							///	message if it has changed when using raw passthrough.*/
 	std::vector<uint8_t> last_value_; ///< last_value_ - The last received value of the message. Defaults to undefined.
@@ -64,6 +66,7 @@ public:
 	message_definition_t(const std::string bus,
 				 uint32_t id,
 				 uint32_t flags,
+				 bool frame_layout_is_little,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
 				 const vect_ptr_signal_t& signals);
@@ -72,6 +75,7 @@ public:
 				 std::string name,
 				 uint32_t length,
 				 uint32_t flags,
+				 bool frame_layout_is_little,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
 				 const vect_ptr_signal_t& signals);
@@ -87,6 +91,7 @@ public:
 	vect_ptr_signal_t& get_signals();
 	uint32_t get_length() const;
 	uint32_t get_flags() const;
+	bool frame_layout_is_little() const;
 
 	void set_parent(std::shared_ptr<message_set_t> parent);
 	void set_last_value(std::shared_ptr<message_t>  m);

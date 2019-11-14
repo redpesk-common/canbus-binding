@@ -220,7 +220,12 @@ void signal_t::set_timestamp(uint64_t timestamp)
 	frequency_.tick(timestamp);
 }
 
-std::pair<bool, int> signal_t::get_multiplex() const
+void signal_t::set_bit_position(uint32_t bit_position)
+{
+	bit_position_=bit_position;
+}
+
+std::pair<bool,int> signal_t::get_multiplex() const
 {
 	return multiplex_;
 }

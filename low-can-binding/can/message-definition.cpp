@@ -23,6 +23,7 @@ message_definition_t::message_definition_t(
 	const std::string bus,
 	uint32_t id,
 	uint32_t flags,
+	bool frame_layout_is_little,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed,
 	const vect_ptr_signal_t& signals)
@@ -30,6 +31,7 @@ message_definition_t::message_definition_t(
 	bus_{bus},
 	id_{id},
 	flags_{flags},
+	frame_layout_is_little_{frame_layout_is_little},
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
@@ -41,6 +43,7 @@ message_definition_t::message_definition_t(const std::string bus,
 	const std::string name,
 	uint32_t length,
 	uint32_t flags,
+	bool frame_layout_is_little,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed,
 	const vect_ptr_signal_t& signals)
@@ -50,6 +53,7 @@ message_definition_t::message_definition_t(const std::string bus,
 	name_{name},
 	length_{length},
 	flags_{flags},
+	frame_layout_is_little_{frame_layout_is_little},
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
@@ -111,4 +115,8 @@ uint32_t message_definition_t::get_length() const
 uint32_t message_definition_t::get_flags() const
 {
 	return flags_;
+}
+
+bool message_definition_t::frame_layout_is_little() const{
+	return frame_layout_is_little_;
 }

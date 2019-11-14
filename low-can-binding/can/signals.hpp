@@ -171,4 +171,5 @@ public:
 	void set_received(bool r);
 	void set_last_value(float val);
 	void set_timestamp(uint64_t timestamp);
+	void set_bit_position(uint32_t bit_position);
 };

@@ -55,3 +55,33 @@ void converter_t::signal_to_bits_bytes(uint32_t bit_position, uint32_t bit_size,
 	new_end_byte = (bit_position + bit_size - 1) >> 3;
 	new_end_bit = (bit_position + bit_size - 1) % 8;
 }
+
+
+/**
+ * @brief 	This is to use when you have a big endian CAN frame layout.
+ * 		  	It converts the bit position so it matches with little endiant CAN frame layout.
+ *
+ * @param bit_position 	Original bit position.
+ * @param bit_size 		Size of the data.
+ * @return uint32_t 	New little endian bit position.
+ */
+uint32_t converter_t::bit_position_swap(uint32_t bit_position,uint32_t bit_size)
+{
+	uint32_t start_byte_position = (uint32_t)(bit_position/8);
+	uint32_t bit_size_rest = bit_size;
+	if(bit_size<=8 && ((bit_position+bit_size)%8==bit_size || (bit_position+bit_size)%8==0))
+	{
+		return (uint32_t)(start_byte_position*8 + (8-bit_size));
+	}
+	else
+	{
+		do
+		{
+			bit_size_rest = bit_size_rest - ((start_byte_position+1)*8-bit_position);
+			start_byte_position--;
+			bit_position = start_byte_position*8;
+		} while (bit_size_rest>8);
+		return (uint32_t)(start_byte_position*8 + (8-bit_size_rest));
+	}
+
+}

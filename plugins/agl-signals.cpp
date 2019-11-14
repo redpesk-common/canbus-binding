@@ -12,7 +12,7 @@ CTLP_LUA_REGISTER("TO-EDIT");
 std::shared_ptr<message_set_t> message_set =
 	std::make_shared<message_set_t>(message_set_t{0,"AGL Virtual Car",
 		{ // beginning message_definition_ vector
-			{std::make_shared<message_definition_t>(message_definition_t{"ls", 0x30,"", 0, false, frequency_clock_t(5.00000f), true,
+			{std::make_shared<message_definition_t>(message_definition_t{"ls", 0x30,"", 0, 0 ,false, frequency_clock_t(5.00000f), true,
 				{ // beginning signals vector
 					{std::make_shared<signal_t> (signal_t{
 						"hvac.fan.speed",// generic_name
@@ -104,7 +104,7 @@ std::shared_ptr<message_set_t> message_set =
 					})}
 					} // end signals vector
 				})} // end message_definition entry
-,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x3D9,"", 0, true, frequency_clock_t(5.00000f), true,
+,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x3D9,"", 0, 0, true, frequency_clock_t(5.00000f), true,
 				{ // beginning signals vector
 					{std::make_shared<signal_t> (signal_t{
 						"engine.speed",// generic_name
@@ -174,7 +174,7 @@ std::shared_ptr<message_set_t> message_set =
 					})}
 					} // end signals vector
 				})} // end message_definition entry
-,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x3E9,"", 0, false, frequency_clock_t(5.00000f), true,
+,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x3E9,"", 0, 0,false, frequency_clock_t(5.00000f), true,
 				{ // beginning signals vector
 					{std::make_shared<signal_t> (signal_t{
 						"vehicle.average.speed",// generic_name
@@ -200,7 +200,7 @@ std::shared_ptr<message_set_t> message_set =
 					})}
 					} // end signals vector
 				})} // end message_definition entry
-,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x4D1,"", 0, false, frequency_clock_t(5.00000f), true,
+,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x4D1,"", 0, 0, false, frequency_clock_t(5.00000f), true,
 				{ // beginning signals vector
 					{std::make_shared<signal_t> (signal_t{
 						"engine.oil.temp",// generic_name
@@ -248,7 +248,7 @@ std::shared_ptr<message_set_t> message_set =
 					})}
 					} // end signals vector
 				})} // end message_definition entry
-,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x620,"", 0, false, frequency_clock_t(5.00000f), true,
+,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x620,"", 0, 0, false, frequency_clock_t(5.00000f), true,
 				{ // beginning signals vector
 					{std::make_shared<signal_t> (signal_t{
 						"doors.boot.open",// generic_name
@@ -362,7 +362,7 @@ std::shared_ptr<message_set_t> message_set =
 					})}
 					} // end signals vector
 				})} // end message_definition entry
-,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x799,"", 0, false, frequency_clock_t(5.00000f), true,
+,			{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x799,"", 0, 0, false, frequency_clock_t(5.00000f), true,
 				{ // beginning signals vector
 					{std::make_shared<signal_t> (signal_t{
 						"windows.front_left.open",// generic_name
