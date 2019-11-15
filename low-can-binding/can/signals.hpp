@@ -60,6 +60,14 @@ typedef openxc_DynamicField (*signal_decoder)(signal_t& signal, std::shared_ptr<
 typedef uint64_t (*signal_encoder)(signal_t& signal,
 		 const openxc_DynamicField& field, bool* send);
 
+enum sign_t
+{
+		UNSIGNED = 0,
+		SIGN_BIT = 1,
+		ONES_COMPLEMENT = 2,
+		TWOS_COMPLEMENT = 3,
+		SIGN_BIT_EXTERN = 4
+};
 
 class signal_t
 {
@@ -100,7 +108,8 @@ private:
 										If bool is true, that indicate that is a multiplexor
 										If int is different of 0, that indicate the link with a multiplexor */
 	bool is_big_endian_; /*!< is_big_endian - True if the signal's data are meant to be read as a big_endian */
-	bool is_signed_; /* !< is_signed_ - True if the data is signed */
+	sign_t sign_; /* !< sign_ - if the data is signed it indicates the encode */
+	int32_t bit_sign_position_; /*!< bit_sign_position_ - The bit that indicates the sign of the signal in its CAN message*/
 	std::string unit_; /* !< unit_ - The unit of the data */
 
 public:
@@ -123,7 +132,8 @@ public:
 		bool received,
 		std::pair<bool, int> multiplex,
 		bool is_big_endian,
-		bool is_signed,
+		sign_t sign,
+		int32_t bit_sign_position,
 		std::string unit);
 
 
@@ -164,7 +174,8 @@ public:
 	std::pair<float, uint64_t> get_last_value_with_timestamp() const;
 	std::pair<bool, int> get_multiplex() const;
 	bool get_is_big_endian() const;
-	bool get_is_signed() const;
+	sign_t get_sign() const;
+	int32_t get_bit_sign_position() const;
 	const std::string get_unit() const;
 
 	void set_parent(std::shared_ptr<message_definition_t> parent);

@@ -46,7 +46,8 @@ signal_t::signal_t(
 	bool received,
 	std::pair<bool, int> multiplex,
 	bool is_big_endian,
-	bool is_signed,
+	sign_t sign,
+	int32_t bit_sign_position,
 	std::string unit)
 	: parent_{nullptr},
 	 generic_name_{ generic_name }
@@ -67,7 +68,8 @@ signal_t::signal_t(
 	, last_value_{.0f}
 	, multiplex_{multiplex}
 	, is_big_endian_{is_big_endian}
-	, is_signed_{is_signed}
+	, sign_{sign}
+	, bit_sign_position_{bit_sign_position}
 	, unit_{unit}
 {}
 
@@ -235,9 +237,14 @@ bool signal_t::get_is_big_endian() const
 	return is_big_endian_;
 }
 
-bool signal_t::get_is_signed() const
+sign_t signal_t::get_sign() const
 {
-	return is_signed_;
+	return sign_;
+}
+
+int32_t signal_t::get_bit_sign_position() const
+{
+	return bit_sign_position_;
 }
 
 const std::string signal_t::get_unit() const

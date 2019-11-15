@@ -23,6 +23,66 @@
 #include "../binding/low-can-hat.hpp"
 #include "../utils/converter.hpp"
 
+/// @brief Handle sign of the signal according to several decoding methods
+///
+/// @param[in] signal - The signal
+/// @param[in] data_signal - The data of the signal
+/// @param[in] new_end_bit - The last bit of in the last byte of the data (data_signal[0])
+/// @param[in] can_data - The whole can data (needed for SIGN BIT EXTERN)
+///
+/// @return Returns the sign of the data
+///
+int decoder_t::handle_sign(const signal_t& signal, std::vector<uint8_t>& data_signal, uint8_t new_end_bit, const std::vector<uint8_t>& can_data)
+{
+	uint8_t data_byte = 0;
+	uint8_t mask = 0;
+	int end_bit = 0;
+
+	if(signal.get_sign() == sign_t::UNSIGNED)
+		return 1;
+	else if(signal.get_sign() == sign_t::SIGN_BIT_EXTERN) {
+		end_bit = signal.get_bit_sign_position()%8;
+		mask = static_cast<uint8_t>((1 << (end_bit + 1)) - 1);
+		data_byte = can_data[signal.get_bit_sign_position()/8] & mask;
+	}
+	else {
+		end_bit = new_end_bit;
+		mask = static_cast<uint8_t>((1 << (end_bit + 1)) - 1);
+		data_byte = data_signal[0] & mask;
+	}
+
+	//if negative: decode with right method
+	if(data_byte  >> end_bit) {
+		switch(signal.get_sign())
+		{
+			//remove the sign bit to get the absolute value
+			case sign_t::SIGN_BIT:
+				data_signal[0] = static_cast<uint8_t>(data_signal[0] & (mask >> 1));
+				break;
+			//same method twos complement = ones complement + 1
+			case sign_t::ONES_COMPLEMENT:
+			case sign_t::TWOS_COMPLEMENT:
+				//complement only until end_bit
+				data_signal[0] = ((data_signal[0] ^ mask) & mask);
+				if(data_signal.size() > 1) {
+					for(int i=1; i < data_signal.size(); i++) {
+						data_signal[i] = data_signal[i] ^ 0xFF;
+					}
+				}
+				if(signal.get_sign() == sign_t::TWOS_COMPLEMENT)
+					data_signal[data_signal.size() - 1] = static_cast<uint8_t>(data_signal[data_signal.size() - 1] + 1);
+				break;
+			case sign_t::SIGN_BIT_EXTERN:
+				break;
+			default:
+				AFB_ERROR("Not a valid sign entry %d, considering the value as unsigned", signal.get_sign());
+				break;
+		}
+		return -1;
+	}
+	return 1;
+}
+
 /// @brief Parses the signal's bitfield from the given data and returns the raw
 /// value.
 ///
@@ -49,16 +109,12 @@ float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message
 	for(int i=new_start_byte;i<=new_end_byte;i++)
 		data_signal.push_back(data[i]);
 
-//	if(bit_size > 255)
-//		AFB_ERROR("Error signal %s to long bit size", signal.get_name().c_str());
-
-//	if(new_start_bit > 255)
-//		AFB_ERROR("Too long signal offset %d", new_start_bit);
+	int sign = decoder_t::handle_sign(signal, data_signal, new_end_bit, data);
 
 	if(data_signal.size() > 65535)
 		AFB_ERROR("Too long data signal %s", signal.get_name().c_str());
 
-	return bitfield_parse_float(data_signal.data(), (uint16_t) data_signal.size(),
+	return static_cast<float>(sign) * bitfield_parse_float(data_signal.data(), (uint16_t) data_signal.size(),
 			new_start_bit, bit_size, signal.get_factor(),
 			signal.get_offset());
 }
@@ -294,7 +350,10 @@ openxc_DynamicField decoder_t::decode_state(signal_t& signal, std::shared_ptr<me
 ///
 openxc_DynamicField decoder_t::translate_signal(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
-
+	if(!signal.get_message()->frame_layout_is_little())
+	{
+		signal.set_bit_position(converter_t::bit_position_swap(signal.get_bit_position(),signal.get_bit_size()));
+	}
 	// Must call the decoders every time, regardless of if we are going to
 	// decide to send the signal or not.
 	openxc_DynamicField decoded_value = decoder_t::decode_signal(signal,
