@@ -350,9 +350,10 @@ openxc_DynamicField decoder_t::decode_state(signal_t& signal, std::shared_ptr<me
 ///
 openxc_DynamicField decoder_t::translate_signal(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
-	if(!signal.get_message()->frame_layout_is_little())
+	if(!signal.get_message()->frame_layout_is_little() && !signal.bit_position_is_swapped())
 	{
 		signal.set_bit_position(converter_t::bit_position_swap(signal.get_bit_position(),signal.get_bit_size()));
+		signal.bit_position_is_swapped_reverse();
 	}
 	// Must call the decoders every time, regardless of if we are going to
 	// decide to send the signal or not.

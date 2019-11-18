@@ -71,6 +71,7 @@ signal_t::signal_t(
 	, sign_{sign}
 	, bit_sign_position_{bit_sign_position}
 	, unit_{unit}
+	,bit_position_is_swapped_{false}
 {}
 
 signal_t::signal_t(
@@ -104,6 +105,7 @@ signal_t::signal_t(
 	, decoder_{decoder}
 	, encoder_{encoder}
 	, received_{received}
+	, bit_position_is_swapped_{false}
 {}
 
 std::shared_ptr<message_definition_t> signal_t::get_message() const
@@ -250,4 +252,14 @@ int32_t signal_t::get_bit_sign_position() const
 const std::string signal_t::get_unit() const
 {
 	return unit_;
+}
+
+bool signal_t::bit_position_is_swapped() const
+{
+	return bit_position_is_swapped_;
+}
+
+void signal_t::bit_position_is_swapped_reverse()
+{
+	bit_position_is_swapped_ = !bit_position_is_swapped_;
 }

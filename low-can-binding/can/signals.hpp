@@ -111,6 +111,8 @@ private:
 	sign_t sign_; /* !< sign_ - if the data is signed it indicates the encode */
 	int32_t bit_sign_position_; /*!< bit_sign_position_ - The bit that indicates the sign of the signal in its CAN message*/
 	std::string unit_; /* !< unit_ - The unit of the data */
+	bool bit_position_is_swapped_; /* !<bit_position_is_swapped_- True if the signal's bit position has been
+										swapped (refer to converter_t::bit_position_swap()). Default is false.*/
 
 public:
 
@@ -177,10 +179,12 @@ public:
 	sign_t get_sign() const;
 	int32_t get_bit_sign_position() const;
 	const std::string get_unit() const;
+	bool bit_position_is_swapped() const;
 
 	void set_parent(std::shared_ptr<message_definition_t> parent);
 	void set_received(bool r);
 	void set_last_value(float val);
 	void set_timestamp(uint64_t timestamp);
 	void set_bit_position(uint32_t bit_position);
+	void bit_position_is_swapped_reverse();
 };
