@@ -93,6 +93,10 @@ CtlSectionT ctlSections_[] = {
 		.loadCB=PluginConfig,
 		.handle=nullptr,
 		.actions=nullptr},
+	[2]={.key=nullptr , .uid=nullptr, .info=nullptr,
+		.loadCB=nullptr,
+		.handle=nullptr,
+		.actions=nullptr},
 };
 
 ///*****************************************************************************
@@ -861,7 +865,6 @@ int init_binding(afb_api_t api)
 		AFB_ERROR("No message_set defined");
 		return -1;
 	}
-
 
 	can_bus_manager.set_can_devices();
 	can_bus_manager.start_threads();
