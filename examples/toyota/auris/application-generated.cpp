@@ -7,7 +7,7 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"example",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x3D9,"", 0, false, message_format_t::STANDARD, frequency_clock_t(5.00000f), true,
+				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3D9,"",8,0,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine.speed",// generic_name
@@ -27,8 +27,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -49,8 +50,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -71,13 +73,14 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x3E9,"", 0, false, message_format_t::STANDARD, frequency_clock_t(5.00000f), true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3E9,"",8,0,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"vehicle.average.speed",// generic_name
@@ -97,13 +100,14 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x4D1,"", 0, false, message_format_t::STANDARD, frequency_clock_t(5.00000f), true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x4D1,"",8,0,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine.oil.temp",// generic_name
@@ -123,8 +127,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -145,13 +150,14 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x620,"", 0, false, message_format_t::STANDARD, frequency_clock_t(5.00000f), true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x620,"",8,0,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"doors.boot.open",// generic_name
@@ -171,8 +177,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -193,8 +200,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -215,8 +223,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -237,8 +246,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -259,13 +269,14 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x799,"", 0, false, message_format_t::STANDARD, frequency_clock_t(5.00000f), true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x799,"",8,0,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"windows.front_left.open",// generic_name
@@ -285,8 +296,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -307,8 +319,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -329,8 +342,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -351,8 +365,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})}
 					} // end signals vector
@@ -619,7 +634,7 @@ application_t::application_t()
 {
 	for(std::shared_ptr<message_set_t> cms: message_set_)
 	{
-		vect_ptr_msg_def_t messages_definition = cms->get_messages_definition();
+		std::vector<std::shared_ptr<message_definition_t>> messages_definition = cms->get_messages_definition();
 		for(std::shared_ptr<message_definition_t> cmd : messages_definition)
 		{
 			cmd->set_parent(cms);

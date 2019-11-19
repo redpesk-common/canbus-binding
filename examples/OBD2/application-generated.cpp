@@ -269,7 +269,7 @@ application_t::application_t()
 {
 	for(std::shared_ptr<message_set_t> cms: message_set_)
 	{
-		vect_ptr_msg_def_t messages_definition = cms->get_messages_definition();
+		std::vector<std::shared_ptr<message_definition_t>> messages_definition = cms->get_messages_definition();
 		for(std::shared_ptr<message_definition_t> cmd : messages_definition)
 		{
 			cmd->set_parent(cms);

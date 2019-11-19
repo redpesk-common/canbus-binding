@@ -2,6 +2,28 @@
 #include "../can/can-decoder.hpp"
 #include "../can/can-encoder.hpp"
 
+#include "can/canread.h"
+
+using openxc::can::read::publishNumericalMessage;
+
+void handleSteeringWheelMessage(CanMessage* message,
+        CanSignal* signals, int signalCount, Pipeline* pipeline) {
+    publishNumericalMessage("latitude", 42.0, pipeline);
+}
+
+openxc_DynamicField handleInverted(CanSignal* signal, CanSignal* signals,
+        int signalCount, float value, bool* send) {
+    return openxc::payload::wrapNumber(value * -1);
+}
+
+void initializeMyStuff() { }
+
+void initializeOtherStuff() { }
+
+void myLooper() {
+    // this function will be called once, each time through the main loop, after
+    // all CAN message processing has been completed
+}
 
 // >>>>> handlers.cpp >>>>>
 #include "can/canread.h"
@@ -34,7 +56,7 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"example",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"hs", 0x128,"ECM_z_5D2", 0, false, message_format_t::STANDARD, frequency_clock_t(5.00000f), true,
+				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x128,"ECM_z_5D2",8,0,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine_speed",// generic_name
@@ -54,8 +76,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -82,8 +105,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -100,12 +124,13 @@ application_t::application_t()
 							{
 							},// states
 							false,// writable
-							handleUnsignedSteeringWheelAngle,// decoder
+							decoder_t::v1_to_v2_gnedSteeringWheelAngle,// decoder
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -122,12 +147,13 @@ application_t::application_t()
 							{
 							},// states
 							false,// writable
-							ignoreDecoder,// decoder
+							decoder_t::v1_to_v2_der,// decoder
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -144,12 +170,13 @@ application_t::application_t()
 							{
 							},// states
 							false,// writable
-							ignoreDecoder,// decoder
+							decoder_t::v1_to_v2_der,// decoder
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})}
 					} // end signals vector
@@ -164,7 +191,7 @@ application_t::application_t()
 					0,
 					UNIT::INVALID,
 					1.00000f,
-					handleObd2Pid,
+					decoder_t::v1_to_v2_Pid,
 					nullptr,
 					true,
 					false
@@ -188,7 +215,7 @@ application_t::application_t()
 					0,
 					UNIT::INVALID,
 					1.00000f,
-					handleMyDiagRequest,
+					decoder_t::v1_to_v2_agRequest,
 					nullptr,
 					true,
 					false
@@ -200,7 +227,7 @@ application_t::application_t()
 {
 	for(std::shared_ptr<message_set_t> cms: message_set_)
 	{
-		vect_ptr_msg_def_t messages_definition = cms->get_messages_definition();
+		std::vector<std::shared_ptr<message_definition_t>> messages_definition = cms->get_messages_definition();
 		for(std::shared_ptr<message_definition_t> cmd : messages_definition)
 		{
 			cmd->set_parent(cms);
@@ -224,4 +251,44 @@ const std::string application_t::get_diagnostic_bus() const
 	return "hs";
 }
 
+
+openxc_DynamicField decoder_t::v1_to_v2_gnedSteeringWheelAngle(signal_t& signal, std::shared_ptr<message_t> message, bool* send){
+	float value = decoder_t::parse_signal_bitfield(signal, message);
+	openxc_DynamicField ret = decoder_t::gnedSteeringWheelAngle(signal, value, send);
+	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send ){
+		*send = false;
+	}
+	signal.set_last_value(value);
+	return ret;
+}
+
+openxc_DynamicField decoder_t::v1_to_v2_der(signal_t& signal, std::shared_ptr<message_t> message, bool* send){
+	float value = decoder_t::parse_signal_bitfield(signal, message);
+	openxc_DynamicField ret = decoder_t::der(signal, value, send);
+	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send ){
+		*send = false;
+	}
+	signal.set_last_value(value);
+	return ret;
+}
+
+openxc_DynamicField decoder_t::v1_to_v2_Pid(signal_t& signal, std::shared_ptr<message_t> message, bool* send){
+	float value = decoder_t::parse_signal_bitfield(signal, message);
+	openxc_DynamicField ret = decoder_t::Pid(signal, value, send);
+	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send ){
+		*send = false;
+	}
+	signal.set_last_value(value);
+	return ret;
+}
+
+openxc_DynamicField decoder_t::v1_to_v2_agRequest(signal_t& signal, std::shared_ptr<message_t> message, bool* send){
+	float value = decoder_t::parse_signal_bitfield(signal, message);
+	openxc_DynamicField ret = decoder_t::agRequest(signal, value, send);
+	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send ){
+		*send = false;
+	}
+	signal.set_last_value(value);
+	return ret;
+}
 

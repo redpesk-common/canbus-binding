@@ -13,7 +13,6 @@
 			"name": "ETC1",
 			"bus" : "j1939",
 			"is_fd" : false,
-			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
 				"Trns.Trque.Converter.Lockup.Engaged" : {
@@ -190,7 +189,6 @@
 			"name": "EEC1",
 			"bus" : "j1939",
 			"is_fd" : false,
-			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
 				"Src.AddrssOf.Ctrllng.Dvc.Fr.Eng.Cntrl" : {
@@ -322,7 +320,6 @@
 			"name": "HOURS",
 			"bus" : "j1939",
 			"is_fd" : false,
-			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
 				"Eng.Total.Revolutions" : {
@@ -355,7 +352,6 @@
 			"name": "VDC2",
 			"bus" : "j1939",
 			"is_fd" : false,
-			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
 				"Steer.Wheel.Angle" : {
@@ -437,7 +433,6 @@
 			"name": "EBC2",
 			"bus" : "j1939",
 			"is_fd" : false,
-			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
 				"Rlative.Speed.Rear.Axle2.Right.Wheel" : {
@@ -525,7 +520,6 @@
 			"name": "ET1",
 			"bus" : "j1939",
 			"is_fd" : false,
-			"is_extended": false,
 			"is_j1939" : true,
 			"signals" : {
 				"Eng.Fuel.Temp1" : {

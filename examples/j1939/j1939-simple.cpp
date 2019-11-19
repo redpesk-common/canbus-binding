@@ -7,7 +7,7 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"Virtual J1939",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 61442,"ETC1", 8, false, message_format_t::J1939, frequency_clock_t(5.00000f), true,
+				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61442,"ETC1",8,4,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Momentary.Overspeed.Enable",// generic_name
@@ -31,8 +31,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -57,8 +58,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -79,8 +81,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -105,8 +108,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -127,8 +131,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -153,8 +158,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -175,8 +181,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"rpm"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -197,8 +204,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"rpm"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -223,8 +231,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -249,8 +258,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -275,13 +285,14 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 61444,"EEC1", 8, false, message_format_t::J1939, frequency_clock_t(5.00000f), true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61444,"EEC1",8,4,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Actl.Eng.Prcnt.Trque.High.Resolution",// generic_name
@@ -305,8 +316,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -327,8 +339,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -349,8 +362,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -371,8 +385,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -393,8 +408,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"rpm"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -428,8 +444,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -463,8 +480,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -485,13 +503,14 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 61449,"VDC2", 8, false, message_format_t::J1939, frequency_clock_t(5.00000f), true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61449,"VDC2",8,4,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Lateral.Acceleration",// generic_name
@@ -511,8 +530,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"m/s/s"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -533,8 +553,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"m/s/s"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -555,8 +576,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"rad"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -581,8 +603,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -603,8 +626,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"turns"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -625,13 +649,14 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"rad/s"// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 65215,"EBC2", 8, false, message_format_t::J1939, frequency_clock_t(5.00000f), true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65215,"EBC2",8,4,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Front.Axle.Speed",// generic_name
@@ -651,8 +676,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -673,8 +699,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -695,8 +722,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -717,8 +745,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -739,8 +768,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -761,8 +791,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -783,13 +814,14 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"km/h"// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 65253,"HOURS", 8, false, message_format_t::J1939, frequency_clock_t(5.00000f), true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65253,"HOURS",8,4,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Total.Hours.Of.Operation",// generic_name
@@ -809,8 +841,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"hr"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -831,13 +864,14 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"r"// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939", 65262,"ET1", 8, false, message_format_t::J1939, frequency_clock_t(5.00000f), true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65262,"ET1",8,4,true,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Coolant.Temp",// generic_name
@@ -857,8 +891,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"deg C"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -879,8 +914,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"deg C"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -901,8 +937,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"deg C"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -923,8 +960,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -945,8 +983,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"deg C"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
@@ -967,8 +1006,9 @@ application_t::application_t()
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							0,// is_big_endian
-							0,// is_signed
+							false,// is_big_endian
+							static_cast<sign_t>(0),// signed
+							-1,// bit_sign_position
 							"deg C"// unit
 						})}
 					} // end signals vector
@@ -983,7 +1023,7 @@ application_t::application_t()
 {
 	for(std::shared_ptr<message_set_t> cms: message_set_)
 	{
-		vect_ptr_msg_def_t messages_definition = cms->get_messages_definition();
+		std::vector<std::shared_ptr<message_definition_t>> messages_definition = cms->get_messages_definition();
 		for(std::shared_ptr<message_definition_t> cmd : messages_definition)
 		{
 			cmd->set_parent(cms);

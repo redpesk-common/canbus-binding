@@ -9,7 +9,6 @@
 		"0x620": {
 			"bus": "hs",
 			"is_fd" : false,
-			"is_extended": false,
 			"is_j1939" : false,
 			"length" : 8,
 			"signals": {
@@ -58,7 +57,6 @@
 		"0x799": {
 			"bus": "hs",
 			"is_fd" : false,
-			"is_extended": false,
 			"is_j1939" : false,
 			"length" : 8,
 			"signals": {
