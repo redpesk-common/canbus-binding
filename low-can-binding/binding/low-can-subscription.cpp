@@ -420,7 +420,7 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 		else if(flags & J1939_PROTOCOL)
 		{
 			pgn_t pgn = J1939_NO_PGN;
-			if(subscription.signal_ != nullptr)
+			if(subscription.signal_)
 			{
 				pgn = subscription.signal_->get_message()->get_id();
 				std::shared_ptr<utils::socketcan_j1939_data_t> socket = std::make_shared<utils::socketcan_j1939_data_t>();
