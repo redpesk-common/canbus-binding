@@ -364,7 +364,7 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 	int ret = -1;
 	if(! subscription.socket_)
 	{
-		if(flags & BCM_PROTOCOL)
+		if(flags & CAN_PROTOCOL)
 		{
 			subscription.socket_ = std::make_shared<utils::socketcan_bcm_t>();
 			if( subscription.signal_ )
@@ -666,7 +666,7 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscription, struct bcm_msg& bcm_msg)
 {
 	// Make sure that socket is opened.
-	if(subscription.open_socket(subscription, "", BCM_PROTOCOL) < 0)
+	if(subscription.open_socket(subscription, "", CAN_PROTOCOL) < 0)
 		return -1;
 
 	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
@@ -709,7 +709,7 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 
 	std::vector<canfd_frame> cfd_vect = cm->convert_to_canfd_frame_vector();
 
-	if(subscription.open_socket(subscription, bus_name, BCM_PROTOCOL) < 0)
+	if(subscription.open_socket(subscription, bus_name, CAN_PROTOCOL) < 0)
 		return -1;
 
 	struct bcm_msg &bcm_cm = cm->get_bcm_msg();

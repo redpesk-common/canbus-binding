@@ -79,12 +79,12 @@ uint32_t message_definition_t::get_id() const
 
 bool message_definition_t::is_fd() const
 {
-	return (flags_&FD_FRAME);
+	return (flags_ & CAN_PROTOCOL_WITH_FD_FRAME);
 }
 
 bool message_definition_t::is_j1939() const
 {
-	return (flags_&J1939_PROTOCOL);
+	return (flags_ & J1939_PROTOCOL);
 }
 
 bool message_definition_t::is_isotp() const

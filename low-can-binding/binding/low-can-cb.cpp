@@ -526,7 +526,7 @@ static int send_message(message_t *message, const std::string& bus_name, uint32_
 	cd[bus_name]->set_signal(signal);
 
 
-	if(flags&BCM_PROTOCOL)
+	if(flags&CAN_PROTOCOL)
 		return low_can_subscription_t::tx_send(*cd[bus_name], message, bus_name);
 #ifdef USE_FEATURE_ISOTP
 	else if(flags&ISOTP_PROTOCOL)
@@ -552,12 +552,12 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 	if( !sf.signals.empty() )
 	{
 		AFB_DEBUG("ID WRITE RAW : %d", sf.signals.front()->get_message()->get_id());
-		if(flags & BCM_PROTOCOL)
+		if(flags & CAN_PROTOCOL)
 		{
 			if(sf.signals.front()->get_message()->is_fd())
 			{
 				AFB_DEBUG("CANFD_MAX_DLEN");
-				message->set_flags(CAN_FD_FRAME);
+				message->set_flags(CAN_PROTOCOL_WITH_FD_FRAME);
 				message->set_maxdlen(CANFD_MAX_DLEN);
 			}
 			else
@@ -591,7 +591,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 		}
 		else
 		{
-			if(flags&BCM_PROTOCOL)
+			if(flags&CAN_PROTOCOL)
 				afb_req_fail(request, "Invalid", "Frame BCM");
 			else if(flags&J1939_PROTOCOL)
 				afb_req_fail(request, "Invalid", "Frame J1939");
@@ -631,7 +631,7 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 				  "can_data", &can_data))
 	{
 		message = new can_message_t(0, id, length, false, 0, data, 0);
-		write_raw_frame(request, bus_name, message, can_data, BCM_PROTOCOL, event_filter);
+		write_raw_frame(request, bus_name, message, can_data, CAN_PROTOCOL, event_filter);
 	}
 #ifdef USE_FEATURE_J1939
 	else if(!wrap_json_unpack(json_value, "{si, si, so !}",
@@ -688,7 +688,7 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 	else if(sig->get_message()->is_isotp())
 		flags = ISOTP_PROTOCOL;
 	else
-		flags = BCM_PROTOCOL;
+		flags = CAN_PROTOCOL;
 
 //	cfd = encoder_t::build_frame(sig, value);
 	message_t *message = encoder_t::build_message(sig, value, false, false);
