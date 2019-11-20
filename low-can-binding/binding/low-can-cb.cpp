@@ -53,20 +53,15 @@
 int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_obj)
 {
 	AFB_DEBUG("Config %s", json_object_to_json_string(json_obj));
-	CtlConfigT *ctrlConfig;
+	CtlConfigT *ctrlConfig = (CtlConfigT *) afb_api_get_userdata(apiHandle);
+	int active_message_set = 0;
+	json_object *dev_mapping = nullptr;
+	const char *diagnotic_bus = nullptr;
 
-	ctrlConfig = (CtlConfigT *) afb_api_get_userdata(apiHandle);
-	if(! ctrlConfig)
-		return -1;
-
-	if(! ctrlConfig->external)
+	if(! ctrlConfig || ! ctrlConfig->external)
 		return -1;
 
 	application_t *application = (application_t*) ctrlConfig->external;
-
-	int active_message_set;
-	json_object *dev_mapping = nullptr;
-	const char *diagnotic_bus = nullptr;
 
 	if(wrap_json_unpack(json_obj, "{si, ss}",
 			      "active_message_set", &active_message_set,
@@ -196,7 +191,7 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 		event_filter.frequency = event_filter.frequency == 0 ? sig->get_frequency() : event_filter.frequency;
 		std::shared_ptr<low_can_subscription_t> can_subscription;
 
-		auto it =  std::find_if(s.begin(), s.end(), [&sig](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub)
+		auto it = std::find_if(s.begin(), s.end(), [&sig](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub)
 		{
 			return (! sub.second->get_diagnostic_message().empty());
 		});
