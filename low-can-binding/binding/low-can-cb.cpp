@@ -65,6 +65,7 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	application_t *application = (application_t*) ctrlConfig->external;
 
 	int active_message_set;
+	json_object *dev_mapping = nullptr;
 	const char *diagnotic_bus = nullptr;
 
 	if(wrap_json_unpack(json_obj, "{si, ss}",
@@ -73,6 +74,12 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 		return -1;
 
 	application->set_active_message_set((uint8_t)active_message_set);
+
+	if(wrap_json_unpack(json_obj, "{so}",
+			    "dev-mapping", &dev_mapping))
+		return -1;
+
+	application->get_can_bus_manager().set_can_devices(dev_mapping);
 
 	/// Initialize Diagnostic manager that will handle obd2 requests.
 	/// We pass by default the first CAN bus device to its Initialization.
@@ -867,7 +874,6 @@ int init_binding(afb_api_t api)
 		return -1;
 	}
 
-	can_bus_manager.set_can_devices();
 	can_bus_manager.start_threads();
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 

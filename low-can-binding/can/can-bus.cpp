@@ -44,11 +44,30 @@ can_bus_t::~can_bus_t()
 }
 
 /// @brief Class constructor
-///
-/// @param[in] conf_file - handle to the json configuration file.
-can_bus_t::can_bus_t(utils::config_parser_t conf_file)
-	: conf_file_{conf_file}
+can_bus_t::can_bus_t()
 {}
+
+/// @brief Fills the CAN device map member with value from device
+///
+/// @param[in] mapping configuration section.
+void can_bus_t::set_can_devices(json_object *mapping)
+{
+	if (! mapping)
+	{
+		AFB_ERROR("Can't initialize CAN buses with this empty mapping.");
+		return;
+	}
+
+	struct json_object_iterator it = json_object_iter_begin(mapping);
+	struct json_object_iterator end = json_object_iter_end(mapping);
+	while (! json_object_iter_equal(&it, &end)) {
+		can_devices_mapping_.push_back(std::make_pair(
+			json_object_iter_peek_name(&it),
+			json_object_get_string(json_object_iter_peek_value(&it))
+			));
+		json_object_iter_next(&it);
+	}
+}
 
 /// @brief Take a decoded message to determine if its value complies with the desired
 /// filters.
@@ -302,23 +321,6 @@ void can_bus_t::push_new_vehicle_message(int subscription_id, const openxc_Vehic
 {
 	vehicle_message_q_.push(std::make_pair(subscription_id, v_msg));
 }
-
-/// @brief Fills the CAN device map member with value from device
-/// mapping configuration file read at initialization.
-void can_bus_t::set_can_devices()
-{
-	if(conf_file_.check_conf())
-	{
-		can_devices_mapping_ = conf_file_.get_devices_name();
-
-		if(can_devices_mapping_.empty())
-		{
-			AFB_ERROR("No mapping found in config file: '%s'. Check it that it have a CANbus-mapping section.",
-				conf_file_.filepath().c_str());
-		}
-	}
-}
-
 
 /// @brief Return the CAN device index from the map
 /// map are sorted so index depend upon alphabetical sorting.

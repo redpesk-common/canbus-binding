@@ -8,6 +8,10 @@
 	},
 	"config": {
 		"active_message_set": 0,
+		"dev-mapping": {
+			"hs": "can0",
+			"ls": "can0"
+		},
 		"diagnostic_bus": "hs"
 	},
 	"plugins": [

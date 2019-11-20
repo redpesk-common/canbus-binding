@@ -25,6 +25,11 @@
 #define MICROSECONDS_IN_SECOND	1000000
 #define ENGINE_VALUE_TIMEOUT	5
 
+application_t::application_t()
+	: can_bus_manager_{}
+	, message_set_{}
+{}
+
 /// @brief Return singleton instance of configuration object.
 application_t& application_t::instance()
 {

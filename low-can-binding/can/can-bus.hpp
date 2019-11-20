@@ -26,7 +26,6 @@
 #include <condition_variable>
 #include "openxc.pb.h"
 #include "message/can-message.hpp"
-#include "../utils/config-parser.hpp"
 #include "../binding/low-can-subscription.hpp"
 
 #define CAN_ACTIVE_TIMEOUT_S 30
@@ -43,8 +42,6 @@ class diagnostic_manager_t;
 class can_bus_t
 {
 private:
-	utils::config_parser_t conf_file_; ///< configuration file handle used to initialize can_bus_dev_t objects.
-
 	bool apply_filter(const openxc_VehicleMessage& vehicle_message, std::shared_ptr<low_can_subscription_t> can_subscription);
 	void process_signals(std::shared_ptr<message_t> message, map_subscription& s);
 	void process_diagnostic_signals(diagnostic_manager_t& manager, std::shared_ptr<message_t> can_message, map_subscription& s);
@@ -68,11 +65,12 @@ private:
 
 	std::vector<std::pair<std::string, std::string> > can_devices_mapping_; ///< can_devices_mapping_ - holds a mapping between logical CAN devices names and linux CAN devices names.
 public:
-	explicit can_bus_t(utils::config_parser_t conf_file);
+	explicit can_bus_t();
 	can_bus_t(can_bus_t&&);
 	~can_bus_t();
 
-	void set_can_devices();
+	void set_can_devices(json_object *mapping);
+
 	int get_can_device_index(const std::string& bus_name) const;
 	const std::string get_can_device_name(const std::string& id_name) const;
 
