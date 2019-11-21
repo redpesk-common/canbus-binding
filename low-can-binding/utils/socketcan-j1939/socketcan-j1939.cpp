@@ -168,6 +168,8 @@ namespace utils
 	{
 
 		socket_ = socketcan_t::open(PF_CAN, SOCK_DGRAM, CAN_J1939);
+		if (socket_ < 0)
+			return socket_;
 
 		define_tx_address(device_name, name, pgn, addr);
 

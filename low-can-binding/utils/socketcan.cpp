@@ -73,6 +73,9 @@ namespace utils
 	{
 		close();
 		socket_ = ::socket(domain, type, protocol);
+		if (socket_ < 0)
+			AFB_ERROR("Open failed. %s", strerror(errno));
+
 		return socket_;
 	}
 
