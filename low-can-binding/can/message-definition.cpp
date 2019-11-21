@@ -72,9 +72,7 @@ const std::string message_definition_t::get_name() const{
 
 uint32_t message_definition_t::get_id() const
 {
-	return id_ & CAN_EFF_MASK ?
-		id_ | CAN_EFF_FLAG :
-		id_;
+	return ((id_ & CAN_SFF_MASK) != id_) ? id_ | CAN_EFF_FLAG : id_;
 }
 
 bool message_definition_t::is_fd() const
