@@ -66,12 +66,12 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 		if(can_subscription->get_index() != -1)
 		{
 			std::shared_ptr<utils::socketcan_t> s = can_subscription->get_socket();
-			if(s->socket() && s->socket() != -1)
+			if(s->socket() > 0)
 			{
 				std::shared_ptr<message_t> message = s->read_message();
 
 				// Sure we got a valid CAN message ?
-				if (! message->get_id() == 0 && ! message->get_length() == 0 && message->get_flags() & INVALID_FLAG)
+				if (message->get_id() && message->get_length() && !(message->get_flags() & INVALID_FLAG))
 					push_n_notify(message);
 			}
 		}
