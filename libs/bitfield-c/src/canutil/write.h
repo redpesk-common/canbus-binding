@@ -23,15 +23,15 @@ extern "C" {
  *
  * Returns a big-endian uint64_t with the value encoded as a bitfield.
  */
-uint64_t eightbyte_encode_float(float value, uint8_t bit_offset,
-        uint8_t bit_size, float factor, float offset);
+uint64_t eightbyte_encode_float(float value, unsigned int bit_offset,
+        unsigned int bit_size, float factor, float offset);
 
 uint64_t float_to_fixed_point(const float value, const float factor,
         const float offset);
 
-bool bitfield_encode_float(const float value, const uint8_t bit_offset,
-        const uint8_t bit_size, const float factor, const float offset,
-        uint8_t destination[], const uint8_t destination_length);
+bool bitfield_encode_float(const float value, const unsigned int bit_offset,
+        const unsigned int bit_size, const float factor, const float offset,
+        uint8_t destination[], const unsigned int destination_length);
 
 /* Public: Encode a boolean into fixed bit width field in a bit array.
  *
@@ -43,12 +43,12 @@ bool bitfield_encode_float(const float value, const uint8_t bit_offset,
  *
  * Returns a big-endian uint64_t with the value encoded as a bitfield.
  */
-uint64_t eightbyte_encode_bool(const bool value, const uint8_t bit_offset,
-        const uint8_t bit_size);
+uint64_t eightbyte_encode_bool(const bool value, const unsigned int bit_offset,
+        const unsigned int bit_size);
 
-bool bitfield_encode_bool(const bool value, const uint8_t bit_offset, const
-        uint8_t bit_size, uint8_t destination[],
-        const uint16_t destination_length);
+bool bitfield_encode_bool(const bool value, const unsigned int bit_offset, const
+        unsigned int bit_size, uint8_t destination[],
+        const unsigned int destination_length);
 
 #ifdef __cplusplus
 }

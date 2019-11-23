@@ -37,8 +37,8 @@ extern "C" {
  *
  * Returns the value of the requested bit field, right aligned in a uint64_t.
  */
-uint64_t get_bitfield(const uint8_t source[], const uint8_t source_length,
-                const uint16_t offset, const uint16_t bit_count);
+uint64_t get_bitfield(const uint8_t source[], const unsigned int source_length,
+                const unsigned int offset, const unsigned int bit_count);
 
 /* Public: Return a single nibble from the byte array, with range checking.
  *
@@ -47,10 +47,10 @@ uint64_t get_bitfield(const uint8_t source[], const uint8_t source_length,
  * nibble_index - the index of the nibble to retreive. The leftmost nibble is
  *      index 0.
  *
- * Returns the retreived nibble, right aligned in a uint8_t.
+ * Returns the retreived nibble, right aligned in a unsigned int.
  */
-uint8_t get_nibble(const uint8_t source[], const uint8_t source_length,
-                const uint8_t nibble_index);
+unsigned int get_nibble(const uint8_t source[], const unsigned int source_length,
+                const unsigned int nibble_index);
 
 /* Public: Return a single byte from the byte array, with range checking.
  *
@@ -60,8 +60,8 @@ uint8_t get_nibble(const uint8_t source[], const uint8_t source_length,
  *
  * Returns the retreived byte.
  */
-uint8_t get_byte(const uint8_t source[], const uint8_t source_length,
-        const uint8_t byte_index);
+unsigned int get_byte(const uint8_t source[], const unsigned int source_length,
+        const unsigned int byte_index);
 
 /* Public: Copy a range of bits from one bit array to another.
  *
@@ -74,8 +74,8 @@ uint8_t get_byte(const uint8_t source[], const uint8_t source_length,
  *
  * For example:
  *
- *      uint8_t source[4] = {0x11, 0x22, 0x33, 0x44};
- *      uint8_t destination[4] = {0};
+ *      unsigned int source[4] = {0x11, 0x22, 0x33, 0x44};
+ *      unsigned int destination[4] = {0};
  *      copy_bits(source, sizeof(source), 8, 8, destination,
  *              sizeof(destination), 0);
  *      // destination[0] == 0x22
@@ -105,10 +105,10 @@ uint8_t get_byte(const uint8_t source[], const uint8_t source_length,
  * Returns true if the copy was successful and false if the range exceeded the
  * size of the source or destination, or if the range size negative or 0.
  */
-bool copy_bits(const uint8_t* source_origin, const uint16_t source_length,
-        const uint16_t source_offset, uint16_t bit_count,
-        uint8_t* destination_origin, const uint16_t destination_length,
-        const uint16_t destination_offset);
+bool copy_bits(const uint8_t* source_origin, const unsigned int source_length,
+        const unsigned int source_offset, unsigned int bit_count,
+        uint8_t* destination_origin, const unsigned int destination_length,
+        const unsigned int destination_offset);
 
 /* Public: Copy a range of bits from one array to another, right aligning the
  * result.
@@ -118,8 +118,8 @@ bool copy_bits(const uint8_t* source_origin, const uint16_t source_length,
  *
  * For example:
  *
- *      uint8_t source[4] = {0x11, 0x22, 0x33, 0x44};
- *      uint8_t destination[4] = {0};
+ *      unsigned int source[4] = {0x11, 0x22, 0x33, 0x44};
+ *      unsigned int destination[4] = {0};
  *      copy_bits_right_aligned(source, sizeof(source), 8, 8, destination,
  *              sizeof(destination));
  *      // destination[0] == 0x0
@@ -136,9 +136,9 @@ bool copy_bits(const uint8_t* source_origin, const uint16_t source_length,
  * Returns true if the copy was successful and false if the range exceeded the
  * size of the source or destination, or if the range size negative or 0.
  */
-bool copy_bits_right_aligned(const uint8_t source[], const uint16_t source_length,
-                const uint16_t offset, const uint16_t bit_count,
-                uint8_t* destination, const uint16_t destination_length);
+bool copy_bits_right_aligned(const uint8_t source[], const unsigned int source_length,
+                const unsigned int offset, const unsigned int bit_count,
+                uint8_t* destination, const unsigned int destination_length);
 
 /* Public: Copy a range of bytes from one byte array to another.
  *
@@ -161,9 +161,9 @@ bool copy_bits_right_aligned(const uint8_t source[], const uint16_t source_lengt
  * Returns true if the copy was successful and false if the range exceeded the
  * size of the source or destination, or if the range size negative or 0.
  */
-bool copy_bytes_right_aligned(const uint8_t source[], const uint16_t source_length,
-                const uint16_t offset, const uint16_t byte_count,
-                uint8_t* destination, const uint16_t destination_length);
+bool copy_bytes_right_aligned(const uint8_t source[], const unsigned int source_length,
+                const unsigned int offset, const unsigned int byte_count,
+                uint8_t* destination, const unsigned int destination_length);
 
 /* Public: Set the a nibble in the given data array to the new value.
  *
@@ -177,8 +177,8 @@ bool copy_bytes_right_aligned(const uint8_t source[], const uint16_t source_leng
  * Returns true if the bit_count is enough to fully represent the value, and
  *      false if it will not fit.
  */
-bool set_nibble(const uint16_t nibble_index, const uint8_t value,
-                uint8_t* destination, const uint16_t destination_length);
+bool set_nibble(const unsigned int nibble_index, const unsigned int value,
+                uint8_t* destination, const unsigned int destination_length);
 
 /* Public: Set the bit field in the given data array to the new value.
  *
@@ -192,21 +192,21 @@ bool set_nibble(const uint16_t nibble_index, const uint8_t value,
  * Returns true if the bit_count is enough to fully represent the value, and
  *      false if it will not fit.
  */
-bool set_bitfield(const uint64_t value, const uint16_t offset,
-        const uint16_t bit_count, uint8_t destination[],
-        uint16_t destination_length);
+bool set_bitfield(const uint64_t value, const unsigned int offset,
+        const unsigned int bit_count, uint8_t destination[],
+        unsigned int destination_length);
 
 /* Public: Return a right aligned bitmask for a uint64_t.
  *
  * bit_count - the number of bits to mask, right aligned.
  */
-uint64_t bitmask(const uint8_t bit_count);
+uint64_t bitmask(const unsigned int bit_count);
 
 /* Private:
  */
-uint16_t bits_to_bytes(uint32_t bits);
+unsigned int bits_to_bytes(uint32_t bits);
 
-/* Private: A union to assist swapping between uint64_t and a uint8_t array.
+/* Private: A union to assist swapping between uint64_t and a unsigned int array.
  */
 typedef union {
     uint64_t whole;

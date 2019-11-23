@@ -173,8 +173,8 @@ END_TEST
 START_TEST(test_eightbyte_get_byte)
 {
     uint64_t data = 0x00000000F34DFCFF;
-    uint8_t result = eightbyte_get_byte(data, 0, false);
-    uint8_t expected = 0x0;
+    unsigned int result = eightbyte_get_byte(data, 0, false);
+    unsigned int expected = 0x0;
     ck_assert_int_eq(result, expected);
 
     result = eightbyte_get_byte(data, 4, false);
@@ -198,8 +198,8 @@ END_TEST
 START_TEST(test_eightbyte_get_nibble)
 {
     uint64_t data = 0x00000000F34DFCFF;
-    uint8_t result = eightbyte_get_nibble(data, 0, false);
-    uint8_t expected = 0x0;
+    unsigned int result = eightbyte_get_nibble(data, 0, false);
+    unsigned int expected = 0x0;
     ck_assert_int_eq(result, expected);
 
     result = eightbyte_get_nibble(data, 2, false);

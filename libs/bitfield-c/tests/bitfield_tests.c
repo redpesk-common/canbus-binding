@@ -4,8 +4,8 @@
 
 START_TEST (test_get_byte)
 {
-    uint8_t data[4] = {0x12, 0x34, 0x56, 0x78};
-    uint8_t result = get_byte(data, sizeof(data), 0);
+    unsigned int data[4] = {0x12, 0x34, 0x56, 0x78};
+    unsigned int result = get_byte(data, sizeof(data), 0);
     ck_assert_int_eq(result, 0x12);
     result = get_byte(data, sizeof(data), 3);
     ck_assert_int_eq(result, 0x78);
@@ -14,7 +14,7 @@ END_TEST
 
 START_TEST (test_set_nibble)
 {
-    uint8_t data[4] = {0};
+    unsigned int data[4] = {0};
     fail_unless(set_nibble(0, 0x1, data, sizeof(data)));
     fail_unless(set_nibble(1, 0x2, data, sizeof(data)));
     fail_unless(set_nibble(2, 0x3, data, sizeof(data)));
@@ -28,7 +28,7 @@ END_TEST
 
 START_TEST (test_set_bitfield)
 {
-    uint8_t data[4] = {0};
+    unsigned int data[4] = {0};
     fail_unless(set_bitfield(0x12, 0, 8, data, sizeof(data)));
     fail_unless(set_bitfield(bitmask(3), 10, 3, data, sizeof(data)));
     ck_assert_int_eq(data[0], 0x12);
@@ -38,7 +38,7 @@ END_TEST
 
 START_TEST (test_set_bitfield_doesnt_fit)
 {
-    uint8_t data[4] = {0};
+    unsigned int data[4] = {0};
     fail_if(set_bitfield(0xffff, 0, 8, data, sizeof(data)));
     ck_assert_int_eq(data[0], 0);
     ck_assert_int_eq(data[1], 0);
@@ -49,8 +49,8 @@ END_TEST
 
 START_TEST (test_get_nibble)
 {
-    uint8_t data[4] = {0x12, 0x34, 0x56, 0x78};
-    uint8_t result = get_nibble(data, sizeof(data), 0);
+    unsigned int data[4] = {0x12, 0x34, 0x56, 0x78};
+    unsigned int result = get_nibble(data, sizeof(data), 0);
     ck_assert_int_eq(result, 0x1);
     result = get_nibble(data, sizeof(data), 1);
     ck_assert_int_eq(result, 0x2);
@@ -61,8 +61,8 @@ END_TEST
 
 START_TEST (test_get_bits_out_of_range)
 {
-    uint8_t data[4] = {0x12, 0x34, 0x56, 0x78};
-    uint8_t result[4];
+    unsigned int data[4] = {0x12, 0x34, 0x56, 0x78};
+    unsigned int result[4];
     fail_if(copy_bits_right_aligned(data, sizeof(data), 25, 16, result,
                 sizeof(result)));
 }
@@ -70,8 +70,8 @@ END_TEST
 
 START_TEST (test_get_bits)
 {
-    uint8_t data[4] = {0x12, 0x34, 0x56, 0x78};
-    uint8_t result[4] = {0};
+    unsigned int data[4] = {0x12, 0x34, 0x56, 0x78};
+    unsigned int result[4] = {0};
     fail_unless(copy_bits_right_aligned(data, sizeof(data), 0, 16, result,
                 sizeof(result)));
     ck_assert_int_eq(result[2], 0x12);
@@ -81,8 +81,8 @@ END_TEST
 
 START_TEST (test_copy_bytes)
 {
-    uint8_t data[4] = {0x12, 0x34, 0x56, 0x78};
-    uint8_t result[4] = {0};
+    unsigned int data[4] = {0x12, 0x34, 0x56, 0x78};
+    unsigned int result[4] = {0};
     fail_unless(copy_bytes_right_aligned(data, sizeof(data), 1, 3, result,
                 sizeof(result)));
     ck_assert_int_eq(result[1], 0x34);
@@ -93,8 +93,8 @@ END_TEST
 
 START_TEST (test_get_uneven_bits)
 {
-    uint8_t data[4] = {0x12, 0x34, 0x56, 0x78};
-    uint8_t result[4] = {0};
+    unsigned int data[4] = {0x12, 0x34, 0x56, 0x78};
+    unsigned int result[4] = {0};
     fail_unless(copy_bits_right_aligned(data, sizeof(data), 4, 12, result,
                 sizeof(result)));
     ck_assert_int_eq(result[2], 0x2);

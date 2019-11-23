@@ -36,8 +36,8 @@ extern "C" {
  *
  * Returns the value of the requested bit field, right aligned in a uint64_t.
  */
-uint64_t eightbyte_get_bitfield(uint64_t source, const uint16_t offset,
-        const uint16_t bit_count, const bool data_is_big_endian);
+uint64_t eightbyte_get_bitfield(uint64_t source, const unsigned int offset,
+        const unsigned int bit_count, const bool data_is_big_endian);
 
 /* Public: Return a single nibble from the payload, with range checking.
  *
@@ -47,9 +47,9 @@ uint64_t eightbyte_get_bitfield(uint64_t source, const uint16_t offset,
  * data_is_big_endian - if the data passed in is little endian, set this to false and it
  *      will be flipped before grabbing the bit field.
  *
- * Returns the retreived nibble, right aligned in a uint8_t.
+ * Returns the retreived nibble, right aligned in a unsigned int.
  */
-uint8_t eightbyte_get_nibble(const uint64_t source, const uint8_t nibble_index,
+unsigned int eightbyte_get_nibble(const uint64_t source, const unsigned int nibble_index,
         const bool data_is_big_endian);
 
 /* Public: Return a single byte from the payload, with range checking.
@@ -61,7 +61,7 @@ uint8_t eightbyte_get_nibble(const uint64_t source, const uint8_t nibble_index,
  *
  * Returns the retreived byte.
  */
-uint8_t eightbyte_get_byte(const uint64_t source, const uint8_t byte_index,
+unsigned int eightbyte_get_byte(const uint64_t source, const unsigned int byte_index,
         const bool data_is_big_endian);
 
 /* Public: Set the bit field in the given data array to the new value.
@@ -75,11 +75,11 @@ uint8_t eightbyte_get_byte(const uint64_t source, const uint8_t byte_index,
  *      false if it will not fit.
  */
 bool eightbyte_set_bitfield(uint64_t value,
-        const uint16_t offset, const uint16_t bit_count, uint64_t* destination);
+        const unsigned int offset, const unsigned int bit_count, uint64_t* destination);
 
 /* Private: Determine the index of the last bit used.
  */
-uint8_t find_end_bit(const uint16_t num_bits);
+unsigned int find_end_bit(const unsigned int num_bits);
 
 #ifdef __cplusplus
 }

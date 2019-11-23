@@ -4,14 +4,14 @@
 #include <stddef.h>
 #include <sys/param.h>
 
-uint64_t bitmask(const uint8_t bit_count) {
+uint64_t bitmask(const unsigned int bit_count) {
     return (((uint64_t)0x1) << bit_count) - 1;
 }
 
-uint8_t get_nibble(const uint8_t source[], const uint8_t source_length,
-                const uint8_t nibble_index) {
-    uint8_t byte_index = nibble_index / 2;
-    uint8_t result = get_byte(source, source_length, byte_index);
+unsigned int get_nibble(const uint8_t source[], const unsigned int source_length,
+                const unsigned int nibble_index) {
+    unsigned int byte_index = nibble_index / 2;
+    unsigned int result = get_byte(source, source_length, byte_index);
     if(nibble_index % 2 == 0) {
         result >>= NIBBLE_SIZE;
     }
@@ -19,16 +19,16 @@ uint8_t get_nibble(const uint8_t source[], const uint8_t source_length,
     return result;
 }
 
-uint8_t get_byte(const uint8_t source[], const uint8_t source_length,
-        const uint8_t byte_index) {
+unsigned int get_byte(const uint8_t source[], const unsigned int source_length,
+        const unsigned int byte_index) {
     if(byte_index < source_length) {
         return source[byte_index];
     }
     return 0;
 }
 
-uint64_t get_bitfield(const uint8_t source[], const uint8_t source_length,
-                const uint16_t offset, const uint16_t bit_count) {
+uint64_t get_bitfield(const uint8_t source[], const unsigned int source_length,
+                const unsigned int offset, const unsigned int bit_count) {
     if(bit_count > 64 || bit_count < 1) {
         // TODO error reporting?
         return 0;
@@ -47,15 +47,15 @@ uint64_t get_bitfield(const uint8_t source[], const uint8_t source_length,
     return combined.whole;
 }
 
-bool set_nibble(const uint16_t nibble_index, const uint8_t value,
-        uint8_t* destination, const uint16_t destination_length) {
+bool set_nibble(const unsigned int nibble_index, const unsigned int value,
+        uint8_t* destination, const unsigned int destination_length) {
     return copy_bits(&value, CHAR_BIT, NIBBLE_SIZE, NIBBLE_SIZE, destination,
             destination_length, nibble_index * NIBBLE_SIZE);
 }
 
-bool set_bitfield(const uint64_t value, const uint16_t offset,
-        const uint16_t bit_count, uint8_t destination[],
-        uint16_t destination_length) {
+bool set_bitfield(const uint64_t value, const unsigned int offset,
+        const unsigned int bit_count, uint8_t destination[],
+        unsigned int destination_length) {
     if(value > bitmask(bit_count)) {
         return false;
     }

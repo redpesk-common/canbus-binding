@@ -9,10 +9,10 @@ started, here are examples using the API:
 
 ## Bitfield Manipulation
 
-The bitfields are stored in `uint8_t[]`.
+The bitfields are stored in `unsigned int[]`.
 
-    uint8_t data[4] = {0x12, 0x34, 0x56, 0x78};
-    uint8_t result = get_byte(data, sizeof(data), 0);
+    unsigned int data[4] = {0x12, 0x34, 0x56, 0x78};
+    unsigned int result = get_byte(data, sizeof(data), 0);
     // result = 0x12;
     result = get_nibble(data, sizeof(data), 0);
     // result = 0x1;

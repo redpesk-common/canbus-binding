@@ -30,7 +30,7 @@ END_TEST
 
 START_TEST (test_bitfield_encode_float)
 {
-    uint8_t data[8] = {0};
+    unsigned int data[8] = {0};
     bitfield_encode_float(0, 1, 3, 1, 0, data, sizeof(data));
     ck_assert_int_eq(data[0], 0);
     ck_assert_int_eq(data[1], 0);
@@ -55,7 +55,7 @@ END_TEST
 
 START_TEST (test_bitfield_encode_bool)
 {
-    uint8_t data[8] = {0};
+    unsigned int data[8] = {0};
     bitfield_encode_bool(true, 1, 3, data, sizeof(data));
     ck_assert_int_eq(data[0], 0x10);
     ck_assert_int_eq(data[1], 0);

@@ -20,8 +20,8 @@ extern "C" {
  *
  * Returns the decoded and transformed value of the signal.
  */
-float eightbyte_parse_float(const uint64_t source, const uint8_t bit_offset,
-        const uint8_t bit_size, const float factor, const float offset);
+float eightbyte_parse_float(const uint64_t source, const unsigned int bit_offset,
+        const unsigned int bit_size, const float factor, const float offset);
 
 /* Public: Parse a CAN signal from a message storage as a byte array and apply
  * required transformation.
@@ -37,8 +37,8 @@ float eightbyte_parse_float(const uint64_t source, const uint8_t bit_offset,
  *
  * Returns the decoded and transformed value of the signal.
  */
-float bitfield_parse_float(const uint8_t source[], const uint16_t source_size,
-        const uint8_t bit_offset, const uint8_t bit_size, const float factor,
+float bitfield_parse_float(const uint8_t source[], const unsigned int source_size,
+        const unsigned int bit_offset, const unsigned int bit_size, const float factor,
         const float offset);
 
 /* Public: Parse a CAN signal from a message and interpret it as a boolean.
@@ -53,7 +53,7 @@ float bitfield_parse_float(const uint8_t source[], const uint16_t source_size,
  *
  * Returns false if the value was 0, otherwise true.
  */
-bool eightbyte_parse_bool(uint64_t source, uint8_t bit_offset, uint8_t bit_size,
+bool eightbyte_parse_bool(uint64_t source, unsigned int bit_offset, unsigned int bit_size,
         float factor, float offset);
 
 /* Public: Parse a CAN signal from a message storage as a byte array and
@@ -70,8 +70,8 @@ bool eightbyte_parse_bool(uint64_t source, uint8_t bit_offset, uint8_t bit_size,
  *
  * Returns false if the value was 0, otherwise true.
  */
-bool bitfield_parse_bool(const uint8_t source[], const uint16_t source_size,
-        const uint8_t bit_offset, const uint8_t bit_size, const float factor,
+bool bitfield_parse_bool(const uint8_t source[], const unsigned int source_size,
+        const unsigned int bit_offset, const unsigned int bit_size, const float factor,
         const float offset);
 
 #ifdef __cplusplus
