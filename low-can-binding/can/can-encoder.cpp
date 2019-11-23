@@ -35,96 +35,47 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 {
 	uint32_t bit_size = sig->get_bit_size();
 	uint32_t bit_position = sig->get_bit_position();
+	float factor_v = factor ? sig->get_factor() : 1;
+	float offset_v = offset ? sig->get_offset() : 0;
+
 	int new_start_byte = 0;
 	int new_end_byte = 0;
 	uint8_t new_start_bit = 0;
 	uint8_t new_end_bit = 0;
 
 	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit, new_end_bit);
-
-	int len_signal_bytes_tmp = new_end_byte - new_start_byte + 1;
-
-	uint8_t len_signal_bytes = 0;
-	if(len_signal_bytes_tmp > 255)
-	{
-		AFB_ERROR("Error signal %s too long", sig->get_name().c_str());
-	}
-	else
-	{
-		len_signal_bytes = (uint8_t) len_signal_bytes_tmp;
-	}
-/*
-	if(new_start_bit > 255)
-	{
-		AFB_ERROR("Error signal %s too long", sig->get_name().c_str());
-	}
-*/
-	uint8_t new_bit_size = 0;
-	if(bit_size > 255)
-	{
-		AFB_ERROR("Error signal %s to long bit size", sig->get_name().c_str());
-	}
-	else
-	{
-		new_bit_size = (uint8_t) bit_size;
-	}
-
-	uint8_t data_signal[len_signal_bytes] = {0};
-	float factor_v = 1;
-	if(factor)
-	{
-		factor_v = sig->get_factor();
-	}
-
-	float offset_v = 0;
-	if(factor)
-	{
-		offset_v = sig->get_offset();
-	}
+	std::vector<uint8_t> data_signal(new_end_byte - new_start_byte + 1);
 
 	if(filter)
 	{
-		uint8_t tmp = 0;
-		int j=0;
-		for(int i=0;i<new_bit_size;i++)
+		for (auto& elt: data_signal)
+			elt = 0xFF;
+		uint8_t mask_first_v = static_cast<uint8_t>(0xFF << new_start_bit);
+		uint8_t mask_last_v = static_cast<uint8_t>(0xFF >> (7 - new_end_bit));
+
+		if(new_start_byte == new_end_byte)
 		{
-			int mask = 0x80 >> ((i%8)+new_start_bit);
-
-			uint8_t mask_v = 0;
-			if(mask > 255)
-			{
-				AFB_ERROR("Error mask too large");
-			}
-			else
-			{
-				mask_v = (uint8_t) mask;
-			}
-			tmp = tmp|mask_v;
-
-			if(i%8 == 7)
-			{
-				data_signal[j] = tmp;
-				tmp = 0;
-				j++;
-			}
+			data_signal[0] = mask_first_v & mask_last_v;
 		}
-		data_signal[j]=tmp;
+		else
+		{
+			data_signal[0] = mask_first_v;
+			data_signal[new_end_byte - new_start_byte] = mask_last_v;
+		}
 	}
 	else
 	{
-		bitfield_encode_float(	sig->get_last_value(),
-						new_start_bit,
-						new_bit_size,
-						factor_v,
-						offset_v,
-						data_signal,
-						len_signal_bytes);
+		bitfield_encode_float(sig->get_last_value(),
+				      new_start_bit,
+				      bit_size,
+				      factor_v,
+				      offset_v,
+				      data_signal.data(),
+				      bit_size);
 	}
 
 	for(size_t i = new_start_byte; i <= new_end_byte ; i++)
-	{
 		data[i] = data[i] | data_signal[i-new_start_byte];
-	}
 }
 
 /**
@@ -139,17 +90,12 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
  */
 message_t* encoder_t::build_frame(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message, bool factor, bool offset)
 {
-	signal->set_last_value((float)value);
-	std::vector<uint8_t> data;
-	for(int i = 0; i<message->get_length();i++)
-	{
-		data.push_back(0);
-	}
+	signal->set_last_value(static_cast<float>(value));
+	std::vector<uint8_t> data(message->get_length(), 0);
 
 	for(const auto& sig: signal->get_message()->get_signals())
-	{
 		encode_data(sig, data, false, factor, offset);
-	}
+
 	message->set_data(data);
 	return message;
 }
