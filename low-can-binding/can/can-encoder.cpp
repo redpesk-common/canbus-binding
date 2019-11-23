@@ -26,7 +26,7 @@
  * @brief Allows to encode data for a signal
  *
  * @param sig The signal to know its location
- * @param data The data to encod
+ * @param data The data to encode
  * @param filter If true that will generate the filter BCM for the signal
  * @param factor If true that will use the factor of the signal else 1
  * @param offset If true that will use the offset of the signal else 0

@@ -156,7 +156,7 @@ openxc_DynamicField decoder_t::decode_bytes(signal_t& signal, std::shared_ptr<me
 
 	if(new_start_byte >= length)
 	{
-		AFB_ERROR("Error in description of signals");
+		AFB_ERROR("Error in signal's description");
 		return decoded_value;
 	}
 
