@@ -44,6 +44,7 @@ namespace utils
 		{
 			AFB_ERROR("ioctl failed. Error was : %s", strerror(errno));
 			close();
+			return -1;
 		}
 		else
 		{
