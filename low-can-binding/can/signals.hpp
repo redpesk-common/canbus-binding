@@ -38,15 +38,13 @@ class signal_t;
 /// string or boolean.
 ///
 /// @param[in] signal - The CAN signal that we are decoding.
-/// @param[in] signalCount - The length of the signals array.
-/// @param[in] value - The CAN signal parsed from the message as a raw floating point
-///	value.
+/// @param[in] message - The message with data to decode.
 /// @param[out] send - An output parameter. If decoding fails or CAN signal is
 ///	not sending, this should be flipped to false.
 ///
 /// @return a decoded value in an openxc_DynamicField struct.
 ///
-typedef openxc_DynamicField (*signal_decoder)(signal_t& signal, float value, bool* send);
+typedef openxc_DynamicField (*signal_decoder)(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
 
 ///
 /// @brief: The type signature for a CAN signal encoder.
