@@ -55,12 +55,11 @@ protected:
 	std::vector<uint8_t> data_; ///< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 	uint64_t timestamp_; ///< timestamp_ - timestamp of the received message*/
 	int sub_id_; ///< sub_id_ - Subscription index. */
-
-
+	uint32_t flags_; ///< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
 
 public:
 	message_t();
-	message_t(uint32_t maxdlen, uint32_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp);
+	message_t(uint32_t maxdlen, uint32_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp, uint32_t flags);
 	virtual ~message_t() = default;
 
 	int get_sub_id() const;
@@ -77,5 +76,10 @@ public:
 	virtual bool is_set() = 0;
 	virtual std::string get_debug_message() = 0;
 	virtual uint32_t get_id() const = 0;
+	uint32_t get_flags();
+	void set_flags(uint32_t flags);
+	uint32_t get_maxdlen();
+	void set_maxdlen(uint32_t maxdlen);
+
 
 };

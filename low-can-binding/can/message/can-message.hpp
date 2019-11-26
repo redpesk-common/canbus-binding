@@ -35,7 +35,6 @@ class can_message_t : public message_t {
 	private:
 		uint32_t id_; ///< id_ - The ID of the message. */
 		bool rtr_flag_; ///< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
-		uint32_t flags_; ///< flags_ - flags of a CAN FD frame. Needed if we catch FD frames.*/
 		struct bcm_msg bcm_msg_;
 
 	public:
@@ -55,5 +54,5 @@ class can_message_t : public message_t {
 		void set_bcm_msg(struct bcm_msg bcm_msg);
 
 		std::string get_debug_message();
-		uint32_t get_flags();
+
 };
