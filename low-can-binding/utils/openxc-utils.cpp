@@ -17,8 +17,9 @@
  */
 
 #include "openxc-utils.hpp"
-
+#include "converter.hpp"
 #include "../binding/application.hpp"
+
 
 ///
 /// @brief Build a specific VehicleMessage containing a DiagnosticResponse.
@@ -210,6 +211,40 @@ const openxc_DynamicField build_DynamicField(json_object* value)
 	}
 }
 
+const openxc_DynamicField build_DynamicField(std::vector<uint8_t> &array)
+{
+	openxc_DynamicField d;
+	d.has_type = true;
+	d.type = openxc_DynamicField_Type_BYTES;
+
+	d.has_string_value = false;
+	d.has_numeric_value = false;
+	d.has_boolean_value = false;
+	d.has_bytes_value = true;
+
+
+	size_t size = array.size();
+
+	if(size > 2040)
+	{
+		AFB_ERROR("Error to generate array dynamic field, too large data");
+		return d;
+	}
+	else
+	{
+		 d.length_array = (uint32_t) size;
+	}
+
+
+	for(int i=0;i<size;i++)
+	{
+		d.bytes_value[i] = array[i];
+	}
+
+	return d;
+}
+
+
 ///
 /// @brief Build an openxc_DynamicField with a string value
 ///
@@ -227,6 +262,7 @@ const openxc_DynamicField build_DynamicField(const char* value)
 	d.has_string_value = true;
 	d.has_numeric_value = false;
 	d.has_boolean_value = false;
+	d.has_bytes_value = false;
 	::strncpy(d.string_value, value, 100);
 
 	return d;
@@ -249,6 +285,7 @@ const openxc_DynamicField build_DynamicField(const std::string& value)
 	d.has_string_value = true;
 	d.has_numeric_value = false;
 	d.has_boolean_value = false;
+	d.has_bytes_value = false;
 	::strncpy(d.string_value, value.c_str(), 100);
 
 	return d;
@@ -272,6 +309,7 @@ const openxc_DynamicField build_DynamicField(double value)
 	d.has_string_value = false;
 	d.has_numeric_value = true;
 	d.has_boolean_value = false;
+	d.has_bytes_value = false;
 	d.numeric_value = value;
 
 	return d;
@@ -293,7 +331,9 @@ const openxc_DynamicField build_DynamicField(bool value)
 	d.has_string_value = false;
 	d.has_numeric_value = false;
 	d.has_boolean_value = true;
+	d.has_bytes_value = false;
 	d.boolean_value = value;
+
 
 	return d;
 }
@@ -350,11 +390,23 @@ const openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg
 void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value)
 {
 	if(field.has_numeric_value)
+	{
 		json_object_object_add(value, "value", json_object_new_double(field.numeric_value));
+	}
 	else if(field.has_boolean_value)
+	{
 		json_object_object_add(value, "value", json_object_new_boolean(field.boolean_value));
+	}
 	else if(field.has_string_value)
+	{
 		json_object_object_add(value, "value", json_object_new_string(field.string_value));
+	}
+	else if(field.has_bytes_value)
+	{
+		std::string s = converter_t::to_hex(field.bytes_value,field.length_array);
+
+		json_object_object_add(value, "value", json_object_new_string(s.c_str()));
+	}
 }
 
 ///

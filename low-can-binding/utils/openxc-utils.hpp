@@ -37,6 +37,7 @@ const openxc_DynamicField build_DynamicField(const char* value);
 const openxc_DynamicField build_DynamicField(const std::string& value);
 const openxc_DynamicField build_DynamicField(double value);
 const openxc_DynamicField build_DynamicField(bool value);
+const openxc_DynamicField build_DynamicField(std::vector<uint8_t> &array);
 
 int get_bool_from_DynamicField(const openxc_VehicleMessage& v_msg, bool& ret);
 double get_numerical_from_DynamicField(const openxc_VehicleMessage& v_msg);
