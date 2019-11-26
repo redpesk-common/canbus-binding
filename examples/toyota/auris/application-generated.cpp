@@ -7,14 +7,14 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"example",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3D9,0,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3D9,"",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine.speed",// generic_name
 							16,// bit_position
 							16,// bit_size
 							0.250000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -36,7 +36,7 @@ application_t::application_t()
 							55,// bit_position
 							1,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -58,7 +58,7 @@ application_t::application_t()
 							8,// bit_position
 							8,// bit_size
 							0.392157f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -77,14 +77,14 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3E9,0,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3E9,"",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"vehicle.average.speed",// generic_name
 							0,// bit_position
 							15,// bit_size
 							0.0156250f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -103,14 +103,14 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x4D1,0,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x4D1,"",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine.oil.temp",// generic_name
 							16,// bit_position
 							8,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -132,7 +132,7 @@ application_t::application_t()
 							7,// bit_position
 							1,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -151,14 +151,14 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x620,0,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x620,"",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"doors.boot.open",// generic_name
 							47,// bit_position
 							1,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -180,7 +180,7 @@ application_t::application_t()
 							43,// bit_position
 							1,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -202,7 +202,7 @@ application_t::application_t()
 							44,// bit_position
 							1,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -224,7 +224,7 @@ application_t::application_t()
 							46,// bit_position
 							1,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -246,7 +246,7 @@ application_t::application_t()
 							45,// bit_position
 							4,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -265,14 +265,14 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x799,0,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x799,"",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"windows.front_left.open",// generic_name
 							43,// bit_position
 							1,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -294,7 +294,7 @@ application_t::application_t()
 							44,// bit_position
 							1,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -316,7 +316,7 @@ application_t::application_t()
 							46,// bit_position
 							1,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -338,7 +338,7 @@ application_t::application_t()
 							45,// bit_position
 							4,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency

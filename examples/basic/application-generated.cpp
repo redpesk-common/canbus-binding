@@ -34,14 +34,14 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"example",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x128,0,0,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
+				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x128,"ECM_z_5D2",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine_speed",// generic_name
 							12,// bit_position
 							8,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(15.0000f),// frequency
@@ -63,7 +63,7 @@ application_t::application_t()
 							41,// bit_position
 							3,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -78,7 +78,7 @@ application_t::application_t()
 								{3,"THIRD"}
 							},// states
 							false,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
@@ -91,7 +91,7 @@ application_t::application_t()
 							52,// bit_position
 							12,// bit_size
 							0.153920f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -113,7 +113,7 @@ application_t::application_t()
 							44,// bit_position
 							12,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency
@@ -135,7 +135,7 @@ application_t::application_t()
 							52,// bit_position
 							12,// bit_size
 							1.00000f,// factor
-							0.00000,// offset
+							0.00000f,// offset
 							0,// min_value
 							0,// max_value
 							frequency_clock_t(0.00000f),// frequency

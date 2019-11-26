@@ -7,6 +7,9 @@
 	"messages": {
 		"0x30": {
 		"bus": "ls",
+		"is_fd" : false,
+		"is_extended": false,
+		"is_j1939" : false,
 		"signals": {
 			"LeftTemperature": {
 				"generic_name": "hvac.temperature.left",
