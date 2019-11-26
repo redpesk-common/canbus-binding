@@ -24,7 +24,7 @@ message_set_t::message_set_t(
 		uint8_t index,
 		const std::string& name,
 		const std::vector<std::shared_ptr<message_definition_t> >& messages_definition,
-		const std::vector<std::shared_ptr<diagnostic_message_t> >& diagnostic_messages)
+		const vect_ptr_diag_msg_t& diagnostic_messages)
 	: index_{index}
 	, name_{name}
 	, messages_definition_{messages_definition}
@@ -32,14 +32,14 @@ message_set_t::message_set_t(
 {}
 
 /// @brief Returns a vector holding all message definitions which are handled by this message set.
-std::vector<std::shared_ptr<message_definition_t>>& message_set_t::get_messages_definition()
+vect_ptr_msg_def_t& message_set_t::get_messages_definition()
 {
 	return messages_definition_;
 }
 
 std::vector<std::shared_ptr<signal_t>> message_set_t::get_all_signals() const
 {
-	std::vector<std::shared_ptr<signal_t> > signals;
+	vect_ptr_signal_t signals;
 	for(const auto& cmd: messages_definition_)
 	{
 		std::vector<std::shared_ptr<signal_t>> cmd_signals = cmd->get_signals();
@@ -53,7 +53,7 @@ std::vector<std::shared_ptr<signal_t>> message_set_t::get_all_signals() const
 }
 
 /// @brief Returns a vector holding all diagnostic message definitions which are handled by this message set.
-std::vector<std::shared_ptr<diagnostic_message_t>>& message_set_t::get_diagnostic_messages()
+vect_ptr_diag_msg_t& message_set_t::get_diagnostic_messages()
 {
 	return diagnostic_messages_;
 }

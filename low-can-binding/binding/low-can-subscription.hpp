@@ -44,6 +44,7 @@ struct event_filter_t
 	}
 };
 
+
 /// @brief The object stores socket to CAN to be used to write on it.
 /// This is a simple access to a CAN bus device without any subscriptions attached
 class low_can_subscription_t
@@ -55,7 +56,7 @@ private:
 
 	/// Signal part
 	std::shared_ptr<signal_t> signal_; ///< signal_ - the CAN signal subscribed
-	std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to receive OBD2
+	vect_ptr_diag_msg_t diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to receive OBD2
 										 /// responses. Normal diagnostic request and response are not tested for now.
 	std::shared_ptr<utils::socketcan_t> socket_; ///< socket_ - socket_ that receives CAN messages.
 
@@ -79,7 +80,7 @@ public:
 	const std::shared_ptr<signal_t> get_signal() const;
 	bool is_signal_subscription_corresponding(const std::shared_ptr<signal_t>, const struct event_filter_t& event_filter) const;
 	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(uint32_t pid) const;
-	const std::vector<std::shared_ptr<diagnostic_message_t> > get_diagnostic_message() const;
+	const vect_ptr_diag_msg_t get_diagnostic_message() const;
 	const std::shared_ptr<diagnostic_message_t> get_diagnostic_message(const std::string& name) const;
 	const std::string get_name() const;
 	const std::string get_name(uint32_t pid) const;

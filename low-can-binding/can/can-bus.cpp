@@ -81,7 +81,7 @@ bool can_bus_t::apply_filter(const openxc_VehicleMessage& vehicle_message, std::
 /// @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
 ///
 /// @return How many signals has been decoded.
-void can_bus_t::process_signals(std::shared_ptr<message_t> message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+void can_bus_t::process_signals(std::shared_ptr<message_t> message, map_subscription& s)
 {
 	int subscription_id = message->get_sub_id();
 	openxc_DynamicField decoded_message;
@@ -114,7 +114,7 @@ void can_bus_t::process_signals(std::shared_ptr<message_t> message, std::map<int
 /// @param[in] can_message - a single CAN message from the CAN socket read, to be decode.
 ///
 /// @return How many signals has been decoded.
-void can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, std::shared_ptr<message_t> message, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+void can_bus_t::process_diagnostic_signals(diagnostic_manager_t& manager, std::shared_ptr<message_t> message, map_subscription& s)
 {
 	int subscription_id = message->get_sub_id();
 
@@ -160,7 +160,7 @@ void can_bus_t::can_decode_message()
 
 			{
 				std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-				std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
+				map_subscription& s = sm.get_subscribed_signals();
 				if(application_t::instance().get_diagnostic_manager().is_diagnostic_response(message))
 				{
 					process_diagnostic_signals(application_t::instance().get_diagnostic_manager(), message, s);
@@ -192,7 +192,7 @@ void can_bus_t::can_event_push()
 			decoded_can_message_lock.unlock();
 			{
 				std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-				std::map<int, std::shared_ptr<low_can_subscription_t> >& s = sm.get_subscribed_signals();
+				map_subscription& s = sm.get_subscribed_signals();
 				if(s.find(v_message.first) != s.end() && afb_event_is_valid(s[v_message.first]->get_event()))
 				{
 					jo = json_object_new_object();

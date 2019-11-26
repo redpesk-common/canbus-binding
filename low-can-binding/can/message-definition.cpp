@@ -25,7 +25,7 @@ message_definition_t::message_definition_t(
 	uint32_t flags,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed,
-	const std::vector<std::shared_ptr<signal_t> >& signals)
+	const vect_ptr_signal_t& signals)
 	:  parent_{nullptr},
 	bus_{bus},
 	id_{id},
@@ -43,7 +43,7 @@ message_definition_t::message_definition_t(const std::string bus,
 	uint32_t flags,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed,
-	const std::vector<std::shared_ptr<signal_t> >& signals)
+	const vect_ptr_signal_t& signals)
 	: parent_{nullptr},
 	bus_{bus},
 	id_{id},
@@ -82,7 +82,7 @@ bool message_definition_t::is_isotp() const
 	return (flags_&ISOTP_PROTOCOL);
 }
 
-std::vector<std::shared_ptr<signal_t>>& message_definition_t::get_signals()
+vect_ptr_signal_t& message_definition_t::get_signals()
 {
 	return signals_;
 }

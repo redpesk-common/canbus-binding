@@ -29,8 +29,10 @@
 
 class low_can_subscription_t;
 
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
-void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, std::map<int, std::shared_ptr<low_can_subscription_t> >& s);
+typedef std::map<int, std::shared_ptr<low_can_subscription_t>> map_subscription;
+
+void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, map_subscription& s);
+void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, map_subscription& s);
 int read_message(sd_event_source *s, int fd, uint32_t revents, void *userdata);
 
 inline bool caseInsCharCompareN(char a, char b) {
