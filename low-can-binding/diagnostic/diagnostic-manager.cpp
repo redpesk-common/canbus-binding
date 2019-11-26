@@ -124,9 +124,9 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 	bcm_msg.frames[0] = cf;
 
 
-	std::shared_ptr<can_message_t> msg = std::make_shared<can_message_t>();
+	can_message_t msg = can_message_t();
 
-	msg->set_bcm_msg(bcm_msg);
+	msg.set_bcm_msg(bcm_msg);
 
 	tx_socket.write_message(msg);
 	if(tx_socket)
@@ -473,7 +473,7 @@ openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_response(active_dia
 /// @return A pointer to a filled openxc_VehicleMessage or a nullptr if nothing has been found.
 openxc_VehicleMessage diagnostic_manager_t::relay_diagnostic_handle(active_diagnostic_request_t* entry, std::shared_ptr<message_t> m)
 {
-	DiagnosticResponse response = diagnostic_receive_can_frame(&shims_, entry->get_handle(), m->get_id(), m->get_data(), m->get_length());
+	DiagnosticResponse response = diagnostic_receive_can_frame(&shims_, entry->get_handle(), m->get_id(), m->get_data(), (uint8_t)m->get_length());
 	if(response.completed && entry->get_handle()->completed)
 	{
 		if(entry->get_handle()->success)

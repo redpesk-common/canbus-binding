@@ -57,30 +57,32 @@ enum class message_format_t {
 /// buffers. It is a wrapper of a can_frame struct with some sugar around it for binding purposes.
 class message_t {
 protected:
-	uint8_t length_; ///< length_ - the length of the data array (max 8). */
+	uint32_t maxdlen_; ///< maxdlen_ - Max data length deduce from number of bytes read from the socket.*/
+	uint32_t length_; ///< length_ - the length of the data array. */
 	message_format_t format_; ///< format_ - the format of the message's ID.*/
 	std::vector<uint8_t> data_; ///< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 	uint64_t timestamp_; ///< timestamp_ - timestamp of the received message*/
 	int sub_id_; ///< sub_id_ - Subscription index. */
 
 
+
 public:
 	message_t();
-	message_t(uint8_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp);
+	message_t(uint32_t maxdlen, uint32_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp);
+	virtual ~message_t() = default;
 
 	int get_sub_id() const;
 	const uint8_t* get_data() const;
 	const std::vector<uint8_t> get_data_vector() const;
-	uint8_t get_length() const;
+	uint32_t get_length() const;
 	uint64_t get_timestamp() const;
 
+	void set_data(std::vector<uint8_t> &data);
 	void set_sub_id(int sub_id);
 	void set_timestamp(uint64_t timestamp);
 	message_format_t get_msg_format();
 	virtual bool is_set() = 0;
 	virtual std::string get_debug_message() = 0;
 	virtual uint32_t get_id() const = 0;
-	virtual struct bcm_msg get_bcm_msg() = 0;
-	virtual void set_bcm_msg(struct bcm_msg bcm_msg) = 0;
 
 };

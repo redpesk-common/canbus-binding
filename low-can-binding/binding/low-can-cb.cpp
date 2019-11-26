@@ -197,7 +197,10 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 		event_filter.frequency = event_filter.frequency == 0 ? sig->get_frequency() : event_filter.frequency;
 		std::shared_ptr<low_can_subscription_t> can_subscription;
 
-		auto it =  std::find_if(s.begin(), s.end(), [&sig](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub){ return (! sub.second->get_diagnostic_message().empty());});
+		auto it =  std::find_if(s.begin(), s.end(), [&sig](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub)
+		{
+			return (! sub.second->get_diagnostic_message().empty());
+		});
 		can_subscription = it != s.end() ?
 			it->second :
 			std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
@@ -250,7 +253,10 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 	int rets = 0;
 	for(const auto& sig: signals)
 	{
-		auto it =  std::find_if(s.begin(), s.end(), [&sig, &event_filter](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub){ return sub.second->is_signal_subscription_corresponding(sig, event_filter) ; });
+		auto it =  std::find_if(s.begin(), s.end(), [&sig, &event_filter](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub)
+		{
+			return sub.second->is_signal_subscription_corresponding(sig, event_filter) ;
+		});
 		std::shared_ptr<low_can_subscription_t> can_subscription;
 		if(it != s.end())
 			{can_subscription = it->second;}
@@ -374,14 +380,14 @@ static int process_one_subscribe_args(afb_req_t request, bool subscribe, json_ob
 
 	// 2 cases : ID(PGN) and event
 
-	json_bool test_event = json_object_object_get_ex(args,"event",&event);
+	json_object_object_get_ex(args,"event",&event);
 	json_bool test_id = json_object_object_get_ex(args,"id",&id);
 	if(!test_id)
 	{
-		json_object_object_get_ex(args,"pgn",&id);
+		test_id = json_object_object_get_ex(args,"pgn",&id);
 	}
 
-	if(	args == NULL || (!test_event && !id))
+	if(	args == NULL || (id && ((std::string)json_object_get_string(id)).compare("*") == 0))
 	{
 		rc = one_subscribe_unsubscribe_events(request, subscribe, "*", args);
 	}
@@ -467,55 +473,122 @@ void unsubscribe(afb_req_t request)
 	do_subscribe_unsubscribe(request, false);
 }
 
-static int send_frame(struct canfd_frame& cfd, const std::string& bus_name)
+/*
+static int send_frame(struct canfd_frame& cfd, const std::string& bus_name, socket_type type)
 {
-	if(bus_name.empty()) {
+	if(bus_name.empty())
+	{
 		return -1;
 	}
 
 	std::map<std::string, std::shared_ptr<low_can_subscription_t> >& cd = application_t::instance().get_can_devices();
 
 	if( cd.count(bus_name) == 0)
-		{cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());}
+	{
+		cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());
+	}
 
-	return low_can_subscription_t::tx_send(*cd[bus_name], cfd, bus_name);
+
+	if(type == socket_type::BCM)
+	{
+		return low_can_subscription_t::tx_send(*cd[bus_name], cfd, bus_name);
+	}
+	else{
+		return -1;
+	}
+}
+*/
+static int send_message(message_t *message, const std::string& bus_name, socket_type type)
+{
+	if(bus_name.empty())
+	{
+		return -1;
+	}
+
+	std::map<std::string, std::shared_ptr<low_can_subscription_t> >& cd = application_t::instance().get_can_devices();
+
+	if( cd.count(bus_name) == 0)
+	{
+		cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());
+	}
+
+
+	if(type == socket_type::BCM)
+	{
+		return low_can_subscription_t::tx_send(*cd[bus_name], message, bus_name);
+	}
+	else
+	{
+		return -1;
+	}
 }
 
-static void write_raw_frame(afb_req_t request, const std::string& bus_name, json_object *json_value)
+
+static void write_raw_frame(afb_req_t request, const std::string& bus_name, message_t *message, struct json_object *can_data, socket_type type)
 {
-	struct canfd_frame cfd;
+	if((message->get_length() <= 8 && message->get_length() > 0 && type == socket_type::BCM)
+#ifdef USE_FEATURE_J1939
+	|| (message->get_length() < J1939_MAX_DLEN && type == socket_type::J1939)
+#endif
+	)
+	{
+
+		std::vector<uint8_t> data;
+		for (int i = 0 ; i < message->get_length() ; i++)
+		{
+			struct json_object *one_can_data = json_object_array_get_idx(can_data, i);
+			data.push_back((json_object_is_type(one_can_data, json_type_int)) ?
+					(uint8_t)json_object_get_int(one_can_data) : 0);
+		}
+		message->set_data(data);
+	}
+	else
+	{
+		if(type == socket_type::BCM)
+		{
+			afb_req_fail(request, "Invalid", "Data array must hold 1 to 8 values.");
+		}
+		else
+		{
+			afb_req_fail(request, "Invalid", "Invalid socket type");
+		}
+		return;
+	}
+
+	if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name),type))
+	{
+		afb_req_success(request, nullptr, "Message correctly sent");
+	}
+	else
+	{
+		afb_req_fail(request, "Error", "sending the message. See the log for more details.");
+	}
+}
+
+static void write_frame(afb_req_t request, const std::string& bus_name, json_object *json_value)
+{
+	message_t *message;
+	int id;
+	int length;
 	struct json_object *can_data = nullptr;
+	std::vector<uint8_t> data;
 
-	::memset(&cfd, 0, sizeof(cfd));
+	AFB_DEBUG("JSON content %s",json_object_get_string(json_value));
 
-	if(wrap_json_unpack(json_value, "{si, si, so !}",
-			      "can_id", &cfd.can_id,
-			      "can_dlc", &cfd.len,
+	if(!wrap_json_unpack(json_value, "{si, si, so !}",
+			      "can_id", &id,
+			      "can_dlc", &length,
 			      "can_data", &can_data))
+	{
+		message = new can_message_t(CANFD_MAX_DLEN,(uint32_t)id,(uint32_t)length,message_format_t::STANDARD,false,0,data,0);
+		write_raw_frame(request,bus_name,message,can_data,socket_type::BCM);
+	}
+	else
 	{
 		afb_req_fail(request, "Invalid", "Frame object malformed");
 		return;
 	}
-
-	if(cfd.len <= 8 && cfd.len > 0)
-	{
-		for (int i = 0 ; i < cfd.len ; i++)
-		{
-			struct json_object *one_can_data = json_object_array_get_idx(can_data, i);
-			cfd.data[i] = (json_object_is_type(one_can_data, json_type_int)) ?
-					(uint8_t)json_object_get_int(one_can_data) : 0;
-		}
-	}
-	else
-	{
-		afb_req_fail(request, "Invalid", "Data array must hold 1 to 8 values.");
-		return;
-	}
-
-	if(! send_frame(cfd, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name)))
-		afb_req_success(request, nullptr, "Message correctly sent");
-	else
-		afb_req_fail(request, "Error", "sending the message. See the log for more details.");
+	delete message;
 }
 
 static void write_signal(afb_req_t request, const std::string& name, json_object *json_value)
@@ -548,11 +621,39 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 			encoder(*sig, dynafield_value, &send) :
 			encoder_t::encode_DynamicField(*sig, dynafield_value, &send);
 
-	cfd = encoder_t::build_frame(sig, value);
-	if(! send_frame(cfd, sig->get_message()->get_bus_device_name()) && send)
-		afb_req_success(request, nullptr, "Message correctly sent");
+	socket_type type = socket_type::INVALID;
+
+	if(sig->get_message()->is_j1939())
+	{
+		type = socket_type::J1939;
+	}
 	else
+	{
+		type = socket_type::BCM;
+	}
+
+//	cfd = encoder_t::build_frame(sig, value);
+	message_t *message = encoder_t::build_message(sig,value);
+
+	if(! send_message(message, sig->get_message()->get_bus_device_name(), type) && send)
+	{
+		afb_req_success(request, nullptr, "Message correctly sent");
+	}
+	else
+	{
 		afb_req_fail(request, "Error", "Sending the message. See the log for more details.");
+	}
+
+	if(sig->get_message()->is_j1939())
+	{
+#ifdef USE_FEATURE_J1939
+		delete (j1939_message_t*) message;
+#endif
+	}
+	else
+	{
+		delete (can_message_t*) message;
+	}
 }
 
 void write(afb_req_t request)
@@ -566,7 +667,7 @@ void write(afb_req_t request)
 	if (args != NULL && ! wrap_json_unpack(args, "{ss, so !}",
 					       "bus_name", &name,
 					       "frame", &json_value))
-		write_raw_frame(request, name, json_value);
+		write_frame(request, name, json_value);
 
 	// Search signal then encode value.
 	else if(args != NULL &&
@@ -683,9 +784,13 @@ void list(afb_req_t request)
 		rc = -1;
 
 	if (rc >= 0)
+	{
 		afb_req_success(request, ans, NULL);
+	}
 	else
+	{
 		afb_req_fail(request, "error", NULL);
+	}
 }
 
 /// @brief Initialize the binding.

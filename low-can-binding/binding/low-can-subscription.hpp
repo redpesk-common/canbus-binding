@@ -101,5 +101,5 @@ public:
 	static int create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig);
 	static int create_rx_filter_bcm(low_can_subscription_t &subscription, bcm_msg& bcm_msg);
 
-	static int tx_send(low_can_subscription_t &subscription, struct canfd_frame& cfd, const std::string& bus_name);
+	static int tx_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name);
 };

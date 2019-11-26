@@ -28,22 +28,20 @@
 ///
 can_message_t::can_message_t()
 	: message_t(),
-	 maxdlen_{0},
 	 id_{0},
 	 rtr_flag_{false},
 	 flags_{0}
 {}
 
-can_message_t::can_message_t(uint8_t maxdlen,
+can_message_t::can_message_t(uint32_t maxdlen,
 	uint32_t id,
-	uint8_t length,
+	uint32_t length,
 	message_format_t format,
 	bool rtr_flag,
-	uint8_t flags,
+	uint32_t flags,
 	std::vector<uint8_t>& data,
 	uint64_t timestamp)
-	: message_t(length, format, data, timestamp),
-	maxdlen_{maxdlen},
+	: message_t(maxdlen, length, format, data, timestamp),
 	id_{id},
 	rtr_flag_{rtr_flag},
 	flags_{flags}
@@ -86,7 +84,8 @@ bool can_message_t::is_correct_to_send()
 /// @return A can_message_t object fully initialized with canfd_frame values.
 std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes, uint64_t timestamp)
 {
-	uint8_t maxdlen = 0, length = 0, flags = 0;
+	uint32_t maxdlen = 0, length = 0;
+	uint8_t flags = 0;
 	uint32_t id;
 	message_format_t format;
 	bool rtr_flag;
@@ -164,6 +163,47 @@ std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct ca
 	return std::make_shared<can_message_t>(can_message_t(maxdlen, id, length, format, rtr_flag, flags, data, timestamp));
 }
 
+/// @brief Take all initialized class members and build a
+/// canfd_frame struct that can be use to send a CAN message over
+/// the bus.
+///
+/// @return canfd_frame struct built from class members.
+struct canfd_frame can_message_t::convert_to_canfd_frame()
+{
+	canfd_frame frame;
+
+	if(is_correct_to_send())
+	{
+		frame.can_id = get_id();
+		frame.len = (uint8_t) get_length();
+		::memcpy(frame.data, get_data(), length_);
+	}
+	else
+		AFB_ERROR("can_message_t not correctly initialized to be sent");
+
+	return frame;
+}
+
+/// @brief Take all initialized class members and build a
+/// can_frame struct that can be use to send a CAN message over
+/// the bus.
+///
+/// @return can_frame struct built from class members.
+struct can_frame can_message_t::convert_to_can_frame()
+{
+	can_frame frame;
+
+	if(is_correct_to_send())
+	{
+		frame.can_id = get_id();
+		frame.can_dlc = (uint8_t) get_length();
+		::memcpy(frame.data, get_data(), length_);
+	}
+	else
+		AFB_ERROR("can_message_t not correctly initialized to be sent");
+
+	return frame;
+}
 
 bool can_message_t::is_set()
 {
@@ -192,3 +232,7 @@ void can_message_t::set_bcm_msg(struct bcm_msg bcm_msg)
 	bcm_msg_ = bcm_msg;
 }
 
+uint32_t can_message_t::get_flags()
+{
+	return flags_;
+}

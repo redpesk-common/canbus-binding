@@ -86,6 +86,8 @@ public:
 	bool is_fd() const;
 	bool is_j1939() const;
 	std::vector<std::shared_ptr<signal_t>>& get_signals();
+	uint32_t get_length() const;
+	message_format_t get_format() const;
 
 	void set_parent(std::shared_ptr<message_set_t> parent);
 	void set_last_value(std::shared_ptr<message_t>  m);

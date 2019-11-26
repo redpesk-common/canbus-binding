@@ -79,7 +79,8 @@ namespace utils
 			}
 			++filter_on;
 		}
-		if(filter_on){
+		if(filter_on)
+		{
 			setopt(SOL_CAN_J1939, SO_J1939_FILTER, &filter, sizeof(filter));
 		}
 	}

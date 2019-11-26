@@ -96,4 +96,32 @@ namespace utils
 	{
 		return socket_;
 	}
+
+	/// @brief Connect the socket.
+	/// @return 0 if success.
+	int socketcan_t::connect(const struct sockaddr* addr, socklen_t len)
+	{
+		return socket_ != INVALID_SOCKET ? ::connect(socket_, addr, len) : 0;
+	}
+
+	/// @brief Bind the socket.
+	/// @return 0 if success.
+	int socketcan_t::bind(const struct sockaddr* addr, socklen_t len)
+	{
+		return socket_ != INVALID_SOCKET ? ::bind(socket_, addr, len) : 0;
+	}
+
+	int socketcan_t::write_message(std::vector<message_t>& vobj)
+	{
+		for(int i=0;i<vobj.size();i++)
+		{
+			if(write_message(vobj[i])<0)
+			{
+				AFB_ERROR("Error send message %d",i);
+				return -1;
+			}
+		}
+		return 0;
+	}
+
 }

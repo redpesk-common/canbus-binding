@@ -20,11 +20,18 @@
 #include "signals.hpp"
 #include "message/can-message.hpp"
 #include "openxc.pb.h"
+#include "message/can-message.hpp"
+#ifdef USE_FEATURE_J1939
+#include "message/j1939-message.hpp"
+#endif
 
 class encoder_t
 {
 public:
 	static const canfd_frame build_frame(const std::shared_ptr<signal_t>& signal, uint64_t value);
+	static message_t* build_message(const std::shared_ptr<signal_t>& signal, uint64_t value);
+	static message_t* build_one_frame_message(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message);
+	static message_t* build_multi_frame_message(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message);
 	static uint64_t encode_state(const signal_t& signal, const std::string& value, bool* send);
 	static uint64_t encode_boolean(const signal_t& signal, bool value, bool* send);
 	static uint64_t encode_number(const signal_t& signal, float value, bool* send);

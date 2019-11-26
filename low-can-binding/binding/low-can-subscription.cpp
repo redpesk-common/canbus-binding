@@ -427,9 +427,9 @@ int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscri
 	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
 	// else monitor all standard 8 CAN OBD2 ID response.
 
-	std::shared_ptr<can_message_t> msg = std::make_shared<can_message_t>();
+	can_message_t msg = can_message_t();
 
-	msg->set_bcm_msg(bcm_msg);
+	msg.set_bcm_msg(bcm_msg);
 
 	if(bcm_msg.msg_head.can_id != OBD2_FUNCTIONAL_BROADCAST_ID)
 	{
@@ -442,7 +442,7 @@ int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscri
 		for(uint8_t i = 0; i < 8; i++)
 		{
 			bcm_msg.msg_head.can_id  =  OBD2_FUNCTIONAL_RESPONSE_START + i;
-			msg->set_bcm_msg(bcm_msg);
+			msg.set_bcm_msg(bcm_msg);
 			subscription.socket_->write_message(msg);
 			if(! subscription.socket_)
 				return -1;
@@ -455,22 +455,23 @@ int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscri
 /// send a message
 ///
 /// @return 0 if ok else -1
-int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, struct canfd_frame& cfd, const std::string& bus_name)
+int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name)
 {
-	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cfd.can_id);
+	can_message_t *cm = static_cast<can_message_t*>(message);
+
+	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cm->get_id(),cm->get_flags());
+	canfd_frame cfd = cm->convert_to_canfd_frame();
 	subscription.add_one_bcm_frame(cfd, bcm_msg);
 
 	if(subscription.open_socket(subscription, bus_name) < 0)
 		{return -1;}
 
-
-	std::shared_ptr<can_message_t> msg = std::make_shared<can_message_t>();
-
-	msg->set_bcm_msg(bcm_msg);
-
-	subscription.socket_->write_message(msg);
+	cm->set_bcm_msg(bcm_msg);
+	subscription.socket_->write_message(*cm);
 	if(! subscription.socket_.get())
-		return -1;
+	{
+			return -1;
+	}
 
 	return 0;
 }

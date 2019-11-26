@@ -22,12 +22,6 @@
 
 namespace utils
 {
-	/// @brief Bind the socket.
-	/// @return 0 if success.
-	int socketcan_raw_t::bind(const struct sockaddr* addr, socklen_t len)
-	{
-		return socket_ != INVALID_SOCKET ? ::bind(socket_, addr, len) : 0;
-	}
 
  	/// @brief Open a raw socket CAN.
 	/// @param[in] device_name is the kernel network device name of the CAN interface.
@@ -75,7 +69,7 @@ namespace utils
 		ifr.ifr_ifindex = addr.can_ifindex;
 		ioctl(socket(), SIOCGIFNAME, &ifr);
 
-		AFB_DEBUG("Data available: %i bytes read", (int)nbytes);
+		//AFB_DEBUG("Data available: %i bytes read", (int)nbytes);
 		AFB_DEBUG("read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, frame.can_id, frame.len,
 			frame.data[0], frame.data[1], frame.data[2], frame.data[3], frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
 
@@ -87,13 +81,9 @@ namespace utils
 		return cm;
 	}
 
-	void socketcan_raw_t::write_message(std::vector<std::shared_ptr<message_t>>& vobj)
+	int socketcan_raw_t::write_message(message_t& m)
 	{
 		AFB_WARNING("Not implemented");
-	}
-
-	void socketcan_raw_t::write_message(std::shared_ptr<message_t> cm)
-	{
-		AFB_WARNING("Not implemented");
+		return -1;
 	}
 }

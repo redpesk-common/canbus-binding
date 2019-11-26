@@ -19,10 +19,11 @@
 
 #include <linux/can/j1939.h>
 #include "message.hpp"
-#include "../../utils/socketcan-j1939.hpp"
+
 
 #define J1939_MAX_MULTIPACKETS 255
 #define J1939_MAX_DLEN J1939_MAX_MULTIPACKETS * CAN_MAX_DLEN
+
 
 class j1939_message_t : public message_t
 {
@@ -54,12 +55,19 @@ class j1939_message_t : public message_t
 
 
         /* J1939 Address
+            0-255
          */
         uint8_t addr_;
 
+        /**
+         * @brief The sockanme to send a message to
+         * an other ECU
+         */
+        struct sockaddr_can sockname_;
+
     public:
         j1939_message_t();
-        j1939_message_t(uint8_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp, name_t name, pgn_t pgn, uint8_t addr);
+        j1939_message_t(uint32_t maxdlen, uint32_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp, name_t name, pgn_t pgn, uint8_t addr);
         uint64_t get_name() const;
         uint32_t get_pgn() const;
         uint8_t get_addr() const;

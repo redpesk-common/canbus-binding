@@ -30,11 +30,8 @@ namespace utils
 
 		virtual int open(std::string device_name);
 		virtual std::shared_ptr<message_t> read_message();
-		virtual void write_message(std::vector<std::shared_ptr<message_t>>& vobj);
-		virtual void write_message(std::shared_ptr<message_t> obj);
+		virtual int write_message(message_t& obj);
 
-	private:
-		int connect(const struct sockaddr* addr, socklen_t len);
 	};
 
 
