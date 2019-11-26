@@ -22,6 +22,10 @@
 #include "../utils/socketcan-bcm.hpp"
 #include "../can/can-encoder.hpp"
 
+#ifdef USE_FEATURE_ISOTP
+#include "../utils/socketcan-isotp.hpp"
+#endif
+
 #ifdef USE_FEATURE_J1939
 #include "../utils/socketcan-j1939/socketcan-j1939-data.hpp"
 #endif
@@ -212,6 +216,16 @@ float low_can_subscription_t::get_max() const
 	return event_filter_.max;
 }
 
+canid_t low_can_subscription_t::get_rx_id() const
+{
+	return event_filter_.rx_id;
+}
+
+canid_t low_can_subscription_t::get_tx_id() const
+{
+	return event_filter_.tx_id;
+}
+
 std::shared_ptr<utils::socketcan_t> low_can_subscription_t::get_socket()
 {
 	return socket_;
@@ -232,10 +246,26 @@ void low_can_subscription_t::set_max(float max)
 	event_filter_.max = max;
 }
 
+void low_can_subscription_t::set_rx_id(canid_t rx_id)
+{
+	event_filter_.rx_id = rx_id;
+}
+
+void low_can_subscription_t::set_tx_id(canid_t tx_id)
+{
+	event_filter_.tx_id = tx_id;
+}
+
 void low_can_subscription_t::set_index(int index)
 {
 	index_ = index;
 }
+
+void low_can_subscription_t::set_signal(std::shared_ptr<signal_t> signal)
+{
+	signal_ = signal;
+}
+
 
 /// @brief Based upon which object is a subscribed CAN signal or diagnostic message
 /// it will open the socket with the required CAN bus device name.
@@ -265,6 +295,36 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 			}
 			subscription.index_ = (int)subscription.socket_->socket();
 		}
+#ifdef USE_FEATURE_ISOTP
+		else if(flags&ISOTP_PROTOCOL)
+		{
+			if(subscription.signal_ != nullptr)
+			{
+				canid_t rx = NO_CAN_ID;
+				canid_t tx = NO_CAN_ID;
+				if(flags&ISOTP_SEND)
+				{
+					rx = subscription.get_rx_id();
+					tx = subscription.signal_->get_message()->get_id();
+				}
+				else if(flags&ISOTP_RECEIVE)
+				{
+					rx = subscription.signal_->get_message()->get_id();
+					tx = subscription.get_tx_id();
+				}
+				std::shared_ptr<utils::socketcan_isotp_t> socket = std::make_shared<utils::socketcan_isotp_t>();
+				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(),rx,tx);
+				subscription.socket_ = socket;
+			}
+			else if(!bus_name.empty())
+			{
+				std::shared_ptr<utils::socketcan_isotp_t> socket = std::make_shared<utils::socketcan_isotp_t>();
+				ret = socket->open(bus_name, subscription.get_rx_id(),subscription.get_tx_id());
+				subscription.socket_ = socket;
+			}
+			subscription.index_ = (int)subscription.socket_->socket();
+		}
+#endif
 #ifdef USE_FEATURE_J1939
 		else if(flags&J1939_ADDR_CLAIM_PROTOCOL)
 		{
@@ -374,6 +434,18 @@ int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subsc
 }
 #endif
 
+int low_can_subscription_t::create_rx_filter_isotp(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig)
+{
+	subscription.signal_= sig;
+
+	// Make sure that socket is opened.
+	if(open_socket(subscription,"",ISOTP_PROTOCOL|ISOTP_RECEIVE) < 0)
+	{
+			return -1;
+	}
+	return 0;
+}
+
 /// @brief Create a RX_SETUP receive job to be used by the BCM socket for a CAN signal
 /// subscription
 ///
@@ -462,18 +534,27 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 
 int low_can_subscription_t::create_rx_filter(std::shared_ptr<signal_t> sig)
 {
-	#ifdef USE_FEATURE_J1939
-	if(sig->get_message()->is_j1939())
+	if(!sig->get_message()->is_isotp() && !sig->get_message()->is_j1939())
+	{
+		return low_can_subscription_t::create_rx_filter_can(*this, sig);
+	}
+#ifdef USE_FEATURE_ISOTP
+	else if(sig->get_message()->is_isotp())
+	{
+		return low_can_subscription_t::create_rx_filter_isotp(*this,sig);
+	}
+#endif
+#ifdef USE_FEATURE_J1939
+	else if(sig->get_message()->is_j1939())
 	{
 		return low_can_subscription_t::create_rx_filter_j1939(*this, sig);
 	}
+#endif
 	else
 	{
-	#endif
-		return low_can_subscription_t::create_rx_filter_can(*this, sig);
-	#ifdef USE_FEATURE_J1939
+		AFB_ERROR("Signal can't be j1939 and isotp");
+		return -1;
 	}
-	#endif
 }
 
 
@@ -607,3 +688,24 @@ int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, mes
 	return 0;
 }
 #endif
+
+
+int low_can_subscription_t::isotp_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name)
+{
+	//struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cfd.can_id);
+	//subscription.add_one_bcm_frame(cfd, bcm_msg);
+
+	if(subscription.open_socket(subscription, bus_name, ISOTP_PROTOCOL|ISOTP_SEND) < 0)
+	{
+		return -1;
+	}
+
+	can_message_t *cm = static_cast<can_message_t*>(message);
+	if(subscription.socket_->write_message(*cm) < 0)
+	{
+		AFB_ERROR("Error write iso tp message");
+		return -1;
+	}
+
+	return 0;
+}

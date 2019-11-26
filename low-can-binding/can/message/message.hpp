@@ -29,6 +29,7 @@
 #define CAN_MESSAGE_SIZE 8
 
 #define MAX_BCM_CAN_FRAMES 257
+#define MAX_ISOTP_FRAMES 4096
 
 
 /**
@@ -42,6 +43,8 @@
 #define J1939_PROTOCOL 0x0010
 #define J1939_ADDR_CLAIM_PROTOCOL 0x0020
 #define ISOTP_PROTOCOL 0x0040
+#define ISOTP_SEND 0x0080
+#define ISOTP_RECEIVE 0x0100
 #define FD_FRAME 0x0800
 
 /// @class message_t
@@ -69,16 +72,17 @@ public:
 	uint32_t get_length() const;
 	uint64_t get_timestamp() const;
 
-	void set_data(std::vector<uint8_t> &data);
+	void set_data(std::vector<uint8_t> data);
 	void set_sub_id(int sub_id);
 	void set_timestamp(uint64_t timestamp);
 	virtual bool is_set() = 0;
 	virtual std::string get_debug_message() = 0;
 	virtual uint32_t get_id() const = 0;
+	virtual void set_id(canid_t id) = 0;
 	uint32_t get_flags();
 	void set_flags(uint32_t flags);
+	void erase_flags();
 	uint32_t get_maxdlen();
 	void set_maxdlen(uint32_t maxdlen);
-
-
+	void set_length(uint32_t length);
 };

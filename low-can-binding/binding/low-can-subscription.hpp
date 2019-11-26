@@ -35,10 +35,12 @@ struct event_filter_t
 	float frequency; ///< frequency - Maximum frequency which will be received and pushed to a subscribed event.
 	float min; ///< min - Minimum value that the signal doesn't have to go below to be pushed.
 	float max; ///< max - Maximum value that the signal doesn't have to go above to be pushed.
+	canid_t rx_id;
+	canid_t tx_id;
 
-	event_filter_t() : frequency{0}, min{-__FLT_MAX__}, max{__FLT_MAX__} {};
+	event_filter_t() : frequency{0}, min{-__FLT_MAX__}, max{__FLT_MAX__}, rx_id{NO_CAN_ID}, tx_id{NO_CAN_ID} {};
 	bool operator==(const event_filter_t& ext) const {
-		return frequency == ext.frequency && min == ext.min && max == ext.max;
+		return frequency == ext.frequency && min == ext.min && max == ext.max && rx_id == ext.rx_id && tx_id == ext.tx_id;
 	}
 };
 
@@ -84,12 +86,17 @@ public:
 	float get_frequency() const;
 	float get_min() const;
 	float get_max() const;
+	canid_t get_rx_id() const;
+	canid_t get_tx_id() const;
 	std::shared_ptr<utils::socketcan_t> get_socket();
 
 	void set_frequency(float freq);
 	void set_min(float min);
 	void set_max(float max);
 	void set_index(int index);
+	void set_rx_id(canid_t rx_id);
+	void set_tx_id(canid_t tx_id);
+	void set_signal(std::shared_ptr<signal_t> signal);
 
 	static struct bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0,0}, const struct timeval& frequency_thinning = {0,0});
 	static void add_one_bcm_frame(struct canfd_frame& cfd, struct bcm_msg& bcm_msg);
@@ -101,8 +108,10 @@ public:
 	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
 	static int create_rx_filter_can(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig);
 	static int create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig);
+	static int create_rx_filter_isotp(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig);
 	static int create_rx_filter_bcm(low_can_subscription_t &subscription, bcm_msg& bcm_msg);
 
 	static int tx_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name);
 	static int j1939_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name);
+	static int isotp_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name);
 };

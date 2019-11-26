@@ -49,6 +49,14 @@ PROJECT_TARGET_ADD(low-can)
 		binding/application-generated.cpp
 		)
 
+
+	if(WITH_FEATURE_ISOTP)
+		set(SOURCES_ISOTP
+			utils/socketcan-isotp.cpp
+		)
+	endif()
+
+
 	if(WITH_FEATURE_J1939)
 		set(SOURCES_J1939
 			can/message/j1939-message.cpp
@@ -58,7 +66,7 @@ PROJECT_TARGET_ADD(low-can)
 		)
 	endif()
 
-	add_library(${TARGET_NAME} MODULE ${SOURCES} ${SOURCES_J1939})
+	add_library(${TARGET_NAME} MODULE ${SOURCES} ${SOURCES_J1939} ${SOURCES_ISOTP})
 
 	set(OPENAPI_DEF "binding/low-can-apidef" CACHE STRING "name and path to the JSON API definition without extension")
 	# Binder exposes a unique public entry point

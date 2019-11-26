@@ -77,6 +77,11 @@ bool message_definition_t::is_j1939() const
 	return (flags_&J1939_PROTOCOL);
 }
 
+bool message_definition_t::is_isotp() const
+{
+	return (flags_&ISOTP_PROTOCOL);
+}
+
 std::vector<std::shared_ptr<signal_t>>& message_definition_t::get_signals()
 {
 	return signals_;

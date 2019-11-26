@@ -27,6 +27,7 @@
 #include "../can/message/can-message.hpp"
 
 #define INVALID_SOCKET -1
+#define NO_CAN_ID 0xFFFFFFFFU
 
 namespace utils
 {
@@ -58,6 +59,4 @@ namespace utils
 		int bind(const struct sockaddr* addr, socklen_t len);
 		int connect(const struct sockaddr* addr, socklen_t len);
 	};
-
-
 }

@@ -135,7 +135,7 @@ uint32_t message_t::get_length() const
  *
  * @param data A vector of data
  */
-void message_t::set_data(std::vector<uint8_t> &data)
+void message_t::set_data(std::vector<uint8_t> data)
 {
 	data_ = data;
 }
@@ -170,13 +170,22 @@ void message_t::set_flags(uint32_t flags)
 	flags_ = flags_ | flags;
 }
 
+void message_t::erase_flags()
+{
+	flags_ = 0;
+}
+
 uint32_t message_t::get_maxdlen()
 {
 	return maxdlen_;
 }
 
-
 void message_t::set_maxdlen(uint32_t maxdlen)
 {
 	maxdlen_ = maxdlen;
+}
+
+void message_t::set_length(uint32_t length)
+{
+	length_ = length;
 }

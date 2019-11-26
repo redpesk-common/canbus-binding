@@ -449,6 +449,188 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
+#ifdef USE_FEATURE_ISOTP
+,				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x111,"",16,66,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
+						{std::make_shared<signal_t> (signal_t{
+							"sig1.1",// generic_name
+							0,// bit_position
+							16,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"sig1.2",// generic_name
+							16,// bit_position
+							16,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"sig2.1",// generic_name
+							32,// bit_position
+							16,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"sig2.2",// generic_name
+							48,// bit_position
+							16,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"sig3.1",// generic_name
+							64,// bit_position
+							16,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"sig3.2",// generic_name
+							80,// bit_position
+							16,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"sig4.1",// generic_name
+							96,// bit_position
+							16,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
+						})},
+						{std::make_shared<signal_t> (signal_t{
+							"sig4.2",// generic_name
+							112,// bit_position
+							16,// bit_size
+							1.00000f,// factor
+							0.00000f,// offset
+							0,// min_value
+							0,// max_value
+							frequency_clock_t(0.00000f),// frequency
+							true,// send_same
+							false,// force_send_changed
+							{
+							},// states
+							true,// writable
+							nullptr,// decoder
+							nullptr,// encoder
+							false,// received
+							std::make_pair<bool, int>(false, 0),// multiplex
+							0,// is_big_endian
+							0,// is_signed
+							""// unit
+						})}
+					} // end signals vector
+				})} // end message_definition entry
+#endif
 #ifdef USE_FEATURE_J1939
 ,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61442,"ETC1",8,18,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector

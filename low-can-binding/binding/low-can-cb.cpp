@@ -334,6 +334,12 @@ static event_filter_t generate_filter(json_object* args)
 		if (json_object_object_get_ex(filter, "max", &obj)
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
 			{event_filter.max = (float)json_object_get_double(obj);}
+		if (json_object_object_get_ex(filter, "rx_id", &obj)
+		&& (json_object_is_type(obj, json_type_int)))
+			{event_filter.rx_id = (canid_t) json_object_get_int(obj);}
+		if (json_object_object_get_ex(filter, "tx_id", &obj)
+		&& (json_object_is_type(obj, json_type_int)))
+			{event_filter.tx_id = (canid_t) json_object_get_int(obj);}
 	}
 	return event_filter;
 }
@@ -515,7 +521,7 @@ static int send_frame(struct canfd_frame& cfd, const std::string& bus_name, sock
 	}
 }
 */
-static int send_message(message_t *message, const std::string& bus_name, uint32_t flags)
+static int send_message(message_t *message, const std::string& bus_name, uint32_t flags, event_filter_t &event_filter, std::shared_ptr<signal_t> signal)
 {
 	if(bus_name.empty())
 	{
@@ -526,14 +532,22 @@ static int send_message(message_t *message, const std::string& bus_name, uint32_
 
 	if( cd.count(bus_name) == 0)
 	{
-		cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());
+		cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
 	}
+
+	cd[bus_name]->set_signal(signal);
 
 
 	if(flags&BCM_PROTOCOL)
 	{
 		return low_can_subscription_t::tx_send(*cd[bus_name], message, bus_name);
 	}
+#ifdef USE_FEATURE_ISOTP
+	else if(flags&ISOTP_PROTOCOL)
+	{
+		return low_can_subscription_t::isotp_send(*cd[bus_name], message, bus_name);
+	}
+#endif
 #ifdef USE_FEATURE_J1939
 	else if(flags&J1939_PROTOCOL)
 	{
@@ -547,7 +561,8 @@ static int send_message(message_t *message, const std::string& bus_name, uint32_
 }
 
 
-static void write_raw_frame(afb_req_t request, const std::string& bus_name, message_t *message, struct json_object *can_data, uint32_t flags)
+static void write_raw_frame(afb_req_t request, const std::string& bus_name, message_t *message,
+							struct json_object *can_data, uint32_t flags, event_filter_t &event_filter)
 {
 
 	struct utils::signals_found sf;
@@ -570,17 +585,22 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 				AFB_DEBUG("CAN_MAX_DLEN");
 				message->set_maxdlen(CAN_MAX_DLEN);
 			}
+
+			if(sf.signals[0]->get_message()->is_isotp())
+			{
+				flags = ISOTP_PROTOCOL;
+				message->set_maxdlen(MAX_ISOTP_FRAMES * message->get_maxdlen());
+			}
 		}
 
-		if((message->get_length()> 0 && (
-		((flags&BCM_PROTOCOL) && (
-				(message->get_length() <= CANFD_MAX_DLEN * MAX_BCM_CAN_FRAMES && message->get_flags() & CAN_FD_FRAME)
-			||	(message->get_length() <= CAN_MAX_DLEN * MAX_BCM_CAN_FRAMES && !(message->get_flags() & CAN_FD_FRAME))
-		))
-	#ifdef USE_FEATURE_J1939
-		|| (message->get_length() <= J1939_MAX_DLEN && flags&J1939_PROTOCOL)
-	#endif
-		)))
+#ifdef USE_FEATURE_J1939
+		if(flags&J1939_PROTOCOL)
+		{
+			message->set_maxdlen(J1939_MAX_DLEN);
+		}
+#endif
+
+		if(message->get_length() > 0 && message->get_length() <= message->get_maxdlen())
 		{
 			std::vector<uint8_t> data;
 			for (int i = 0 ; i < message->get_length() ; i++)
@@ -601,6 +621,10 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 			{
 				afb_req_fail(request, "Invalid", "Frame J1939");
 			}
+			else if(flags&ISOTP_PROTOCOL)
+			{
+				afb_req_fail(request, "Invalid", "Frame ISOTP");
+			}
 			else
 			{
 				afb_req_fail(request, "Invalid", "Frame");
@@ -608,7 +632,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 			return;
 		}
 
-		if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name),flags))
+		if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name), flags, event_filter, sf.signals[0]))
 		{
 			afb_req_success(request, nullptr, "Message correctly sent");
 		}
@@ -624,7 +648,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 
 }
 
-static void write_frame(afb_req_t request, const std::string& bus_name, json_object *json_value)
+static void write_frame(afb_req_t request, const std::string& bus_name, json_object *json_value, event_filter_t &event_filter)
 {
 	message_t *message;
 	int id;
@@ -640,7 +664,7 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 				  "can_data", &can_data))
 	{
 		message = new can_message_t(0,(uint32_t)id,(uint32_t)length,false,0,data,0);
-		write_raw_frame(request,bus_name,message,can_data,BCM_PROTOCOL);
+		write_raw_frame(request,bus_name,message,can_data,BCM_PROTOCOL,event_filter);
 	}
 #ifdef USE_FEATURE_J1939
 	else if(!wrap_json_unpack(json_value, "{si, si, so !}",
@@ -649,7 +673,7 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 				  "data", &can_data))
 	{
 		message = new j1939_message_t((uint32_t)length,data,0,J1939_NO_NAME,(pgn_t)id,J1939_NO_ADDR);
-		write_raw_frame(request,bus_name,message,can_data,J1939_PROTOCOL);
+		write_raw_frame(request,bus_name,message,can_data,J1939_PROTOCOL, event_filter);
 	}
 #endif
 	else
@@ -660,7 +684,7 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 	delete message;
 }
 
-static void write_signal(afb_req_t request, const std::string& name, json_object *json_value)
+static void write_signal(afb_req_t request, const std::string& name, json_object *json_value, event_filter_t &event_filter)
 {
 	struct canfd_frame cfd;
 	struct utils::signals_found sf;
@@ -679,7 +703,7 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 		return;
 	}
 
-	std::shared_ptr<signal_t>& sig = sf.signals[0];
+	std::shared_ptr<signal_t> sig = sf.signals[0];
 	if(! sig->get_writable())
 	{
 		afb_req_fail_f(request, "%s isn't writable. Message not sent.", sig->get_name().c_str());
@@ -696,6 +720,10 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 	{
 		flags = J1939_PROTOCOL;
 	}
+	else if(sig->get_message()->is_isotp())
+	{
+		flags = ISOTP_PROTOCOL;
+	}
 	else
 	{
 		flags = BCM_PROTOCOL;
@@ -704,7 +732,7 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 //	cfd = encoder_t::build_frame(sig, value);
 	message_t *message = encoder_t::build_message(sig,value,false,false);
 
-	if(! send_message(message, sig->get_message()->get_bus_device_name(), flags) && send)
+	if(! send_message(message, sig->get_message()->get_bus_device_name(), flags, event_filter, sig) && send)
 	{
 		afb_req_success(request, nullptr, "Message correctly sent");
 	}
@@ -727,25 +755,43 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 
 void write(afb_req_t request)
 {
-	struct json_object* args = nullptr, *json_value = nullptr;
-	const char *name = nullptr;
-
+	struct json_object* args = nullptr, *json_value = nullptr, *name = nullptr;
 	args = afb_req_json(request);
 
-	// Process about Raw CAN message on CAN bus directly
-	if (args != NULL && ! wrap_json_unpack(args, "{ss, so !}",
-						   "bus_name", &name,
-						   "frame", &json_value))
-		write_frame(request, name, json_value);
+	if(args != NULL)
+	{
+		event_filter_t event_filter = generate_filter(args);
 
-	// Search signal then encode value.
-	else if(args != NULL &&
-		! wrap_json_unpack(args, "{ss, so !}",
-				   "signal_name", &name,
-				   "signal_value", &json_value))
-		write_signal(request, std::string(name), json_value);
+		if(json_object_object_get_ex(args,"bus_name",&name))
+		{
+			if(json_object_object_get_ex(args,"frame",&json_value))
+			{
+				write_frame(request, (std::string)json_object_get_string(name), json_value, event_filter);
+			}
+			else
+			{
+				afb_req_fail(request, "Error", "Request argument malformed");
+			}
+		}
+		else if(json_object_object_get_ex(args,"signal_name",&name))
+		{
+			if(json_object_object_get_ex(args,"signal_value",&json_value))
+			{
+				write_signal(request, (std::string)json_object_get_string(name), json_value, event_filter);
+			}
+			else
+			{
+				afb_req_fail(request, "Error", "Request argument malformed");
+			}
+		}
+		else {
+			afb_req_fail(request, "Error", "Request argument malformed");
+		}
+	}
 	else
-		afb_req_fail(request, "Error", "Request argument malformed");
+	{
+		afb_req_fail(request, "Error", "Request argument null");
+	}
 }
 
 static struct json_object *get_signals_value(const std::string& name)

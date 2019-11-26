@@ -58,6 +58,23 @@ else()
 	add_definitions(-DJ1939_NAME_ECU=${J1939_NAME_ECU})
 endif()
 
+# Activate ISO TP
+# Need module in kernel
+# --------------
+
+execute_process(COMMAND ls /usr/include/linux/can/isotp.h RESULT_VARIABLE result2 OUTPUT_QUIET ERROR_QUIET)
+
+if(result2)
+    message("Feature ISO TP disabled")
+    set(WITH_FEATURE_ISOTP OFF)
+else()
+    message("Feature ISOTP enabled")
+    set(WITH_FEATURE_ISOTP ON)
+    add_definitions(-DUSE_FEATURE_ISOTP)
+endif()
+
+
+
 # Kernel selection if needed. You can choose between a
 # mandatory version to impose a minimal version.
 # Or check Kernel minimal version and just print a Warning
