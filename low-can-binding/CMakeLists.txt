@@ -45,6 +45,7 @@ PROJECT_TARGET_ADD(low-can)
 		#utils/socketcan-raw.cpp
 		utils/socketcan-bcm.cpp
 		utils/config-parser.cpp
+		utils/converter.cpp
 		binding/application-generated.cpp
 		)
 
