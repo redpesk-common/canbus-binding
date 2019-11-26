@@ -28,13 +28,12 @@
 class encoder_t
 {
 public:
-	static const canfd_frame build_frame(const std::shared_ptr<signal_t>& signal, uint64_t value);
-	static message_t* build_message(const std::shared_ptr<signal_t>& signal, uint64_t value);
-	static message_t* build_one_frame_message(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message);
-	static message_t* build_multi_frame_message(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message);
+	static message_t* build_message(const std::shared_ptr<signal_t>& signal, uint64_t value, bool factor=true, bool offset=true);
+	static message_t* build_frame(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message, bool factor=true, bool offset=true);
 	static uint64_t encode_state(const signal_t& signal, const std::string& value, bool* send);
 	static uint64_t encode_boolean(const signal_t& signal, bool value, bool* send);
 	static uint64_t encode_number(const signal_t& signal, float value, bool* send);
+	static void encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> &data, bool filter=false, bool factor=true, bool offset=true);
 
 	static uint64_t encode_DynamicField(signal_t& signal, const openxc_DynamicField& field, bool* send);
 };

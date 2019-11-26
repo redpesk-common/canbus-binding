@@ -20,75 +20,116 @@
 #include "canutil/write.h"
 #include "../utils/openxc-utils.hpp"
 #include "message-definition.hpp"
-
-/// @brief Write a value in a CAN signal in the destination buffer.
-///
-/// @param[in] signal - The CAN signal to write, including the bit position and bit size.
-/// @param[in] value - The encoded integer value to write in the CAN signal.
-/// @param[out] data - The destination buffer.
-/// @param[in] length - The length of the destination buffer.
-///
-/// @return Returns a canfd_frame struct initialized and ready to be send.
-const canfd_frame encoder_t::build_frame(const std::shared_ptr<signal_t>& signal, uint64_t value)
-{
-	struct canfd_frame cf;
-	::memset(&cf, 0, sizeof(cf));
-
-	cf.can_id = signal->get_message()->get_id();
-	cf.len = signal->get_message()->is_fd() ?
-		 CANFD_MAX_DLEN : CAN_MAX_DLEN;
-
-	signal->set_last_value((float)value);
-
-	for(const auto& sig: signal->get_message()->get_signals())
-	{
-		float last_value = sig->get_last_value();
-		bitfield_encode_float(last_value,
-					sig->get_bit_position(),
-					sig->get_bit_size(),
-					sig->get_factor(),
-					sig->get_offset(),
-					cf.data,
-					cf.len);
-	}
-	return cf;
-}
-
+#include "../utils/converter.hpp"
 
 /**
- * @brief Allows to build a single frame message with correct data to be send
+ * @brief Allows to encode data for a signal
  *
- * @param signal The CAN signal to write, including the bit position and bit size.
- * @param value The encoded integer value to write in the CAN signal.
- * @param message A single frame message to complete
- * @return message_t*  The message that is generated
+ * @param sig The signal to know its location
+ * @param data The data to encod
+ * @param filter If true that will generate the filter BCM for the signal
+ * @param factor If true that will use the factor of the signal else 1
+ * @param offset If true that will use the offset of the signal else 0
  */
-message_t* encoder_t::build_one_frame_message(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message)
+void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> &data, bool filter, bool factor, bool offset)
 {
-	signal->set_last_value((float)value);
-	uint8_t data_tab[message->get_length()];
-	::memset(&data_tab, 0, sizeof(data_tab));
-	std::vector<uint8_t> data;
+	uint32_t bit_size = sig->get_bit_size();
+	uint32_t bit_position = sig->get_bit_position();
+	int new_start_byte = 0;
+	int new_end_byte = 0;
+	int new_start_bit_tmp = 0;
+	int new_end_bit = 0;
 
-	for(const auto& sig: signal->get_message()->get_signals())
+	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit_tmp, new_end_bit);
+
+	int len_signal_bytes_tmp = new_end_byte - new_start_byte + 1;
+
+	uint8_t len_signal_bytes = 0;
+	if(len_signal_bytes_tmp > 255)
 	{
-		float last_value = sig->get_last_value();
-		bitfield_encode_float(last_value,
-					sig->get_bit_position(),
-					sig->get_bit_size(),
-					sig->get_factor(),
-					sig->get_offset(),
-					data_tab,
-					(uint8_t)message->get_length());
+		AFB_ERROR("Error signal %s too long",sig->get_name().c_str());
+	}
+	else
+	{
+		len_signal_bytes = (uint8_t) len_signal_bytes_tmp;
 	}
 
-	for (size_t i = 0; i < (uint8_t) message->get_length(); i++)
+	uint8_t new_start_bit = 0;
+	if(new_start_bit_tmp > 255)
 	{
-		data.push_back(data_tab[i]);
+		AFB_ERROR("Error signal %s too long",sig->get_name().c_str());
+	}
+	else
+	{
+		new_start_bit = (uint8_t) new_start_bit_tmp;
 	}
 
-	message->set_data(data);
-	return message;
+	uint8_t new_bit_size = 0;
+	if(bit_size > 255)
+	{
+		AFB_ERROR("Error signal %s to long bit size",sig->get_name().c_str());
+	}
+	else
+	{
+		new_bit_size = (uint8_t) bit_size;
+	}
+
+	uint8_t data_signal[len_signal_bytes] = {0};
+	float factor_v = 1;
+	if(factor)
+	{
+		factor_v = sig->get_factor();
+	}
+
+	float offset_v = 0;
+	if(factor)
+	{
+		offset_v = sig->get_offset();
+	}
+
+	if(filter)
+	{
+		uint8_t tmp = 0;
+		int j=0;
+		for(int i=0;i<new_bit_size;i++)
+		{
+			int mask = 1 << ((i%8)+new_start_bit);
+
+			uint8_t mask_v = 0;
+			if(mask > 255)
+			{
+				AFB_ERROR("Error mask too large");
+			}
+			else
+			{
+				mask_v = (uint8_t) mask;
+			}
+			tmp = tmp|mask_v;
+
+			if(i%8 == 7)
+			{
+				data_signal[j] = tmp;
+				tmp = 0;
+				j++;
+			}
+		}
+		data_signal[j]=tmp;
+	}
+	else
+	{
+		bitfield_encode_float(	sig->get_last_value(),
+						new_start_bit,
+						new_bit_size,
+						factor_v,
+						offset_v,
+						data_signal,
+						len_signal_bytes);
+	}
+
+	for(size_t i = new_start_byte; i <= new_end_byte ; i++)
+	{
+		data[i] = data[i] | data_signal[i-new_start_byte];
+	}
 }
 
 /**
@@ -97,42 +138,23 @@ message_t* encoder_t::build_one_frame_message(const std::shared_ptr<signal_t>& s
  * @param signal The CAN signal to write, including the bit position and bit size.
  * @param value The encoded integer value to write in the CAN signal.
  * @param message A multi frame message to complete
+ * @param factor If true that will use the factor of the signal else 1
+ * @param offset If true that will use the offset of the signal else 0
  * @return message_t*  The message that is generated
  */
-message_t* encoder_t::build_multi_frame_message(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message)
+message_t* encoder_t::build_frame(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message, bool factor, bool offset)
 {
 	signal->set_last_value((float)value);
 	std::vector<uint8_t> data;
-
-	uint32_t msgs_len = signal->get_message()->get_length(); // multi frame - number of bytes
-	int number_of_frame = (int) msgs_len / 8;
-
-	uint8_t data_tab[number_of_frame][8] = {0};
+	for(int i = 0; i<message->get_length();i++)
+	{
+		data.push_back(0);
+	}
 
 	for(const auto& sig: signal->get_message()->get_signals())
 	{
-
-		int frame_position = (int) sig->get_bit_position() / 64;
-		float last_value = sig->get_last_value();
-		uint8_t bit_position = sig->get_bit_position() - ((uint8_t)(64 * frame_position));
-
-		bitfield_encode_float(last_value,
-					bit_position,
-					sig->get_bit_size(),
-					sig->get_factor(),
-					sig->get_offset(),
-					data_tab[frame_position],
-					8);
+		encode_data(sig,data,false,factor,offset);
 	}
-
-	for (size_t i = 0; i < number_of_frame; i++)
-	{
-		for(size_t j = 0; j < 8 ; j++)
-		{
-			data.push_back(data_tab[i][j]);
-		}
-	}
-
 	message->set_data(data);
 	return message;
 }
@@ -142,28 +164,31 @@ message_t* encoder_t::build_multi_frame_message(const std::shared_ptr<signal_t>&
  *
  * @param signal The CAN signal to write, including the bit position and bit size.
  * @param value The encoded integer value to write in the CAN signal.
+ * @param factor If true that will use the factor of the signal else 1
+ * @param offset If true that will use the offset of the signal else 0
  * @return message_t* The message that is generated
  */
-message_t* encoder_t::build_message(const std::shared_ptr<signal_t>& signal, uint64_t value)
+message_t* encoder_t::build_message(const std::shared_ptr<signal_t>& signal, uint64_t value, bool factor, bool offset)
 {
 	message_t *message;
 	std::vector<uint8_t> data;
 	if(signal->get_message()->is_fd())
 	{
 		message = new can_message_t(CANFD_MAX_DLEN,signal->get_message()->get_id(),CANFD_MAX_DLEN,signal->get_message()->get_format(),false,CAN_FD_FRAME,data,0);
-		return build_one_frame_message(signal,value,message);
+
+		return build_frame(signal,value,message, factor, offset);
 	}
 #ifdef USE_FEATURE_J1939
 	else if(signal->get_message()->is_j1939())
 	{
 		message = new j1939_message_t(J1939_MAX_DLEN,signal->get_message()->get_length(),signal->get_message()->get_format(),data,0,J1939_NO_NAME,signal->get_message()->get_id(),J1939_NO_ADDR);
-		return build_multi_frame_message(signal,value,message);
+		return build_frame(signal,value,message, factor, offset);
 	}
 #endif
 	else
 	{
 		message = new can_message_t(CAN_MAX_DLEN,signal->get_message()->get_id(),CAN_MAX_DLEN,signal->get_message()->get_format(),false,0,data,0);
-		return build_one_frame_message(signal,value,message);
+		return build_frame(signal,value,message, factor, offset);
 	}
 }
 
