@@ -606,7 +606,7 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 				  "can_dlc", &length,
 				  "can_data", &can_data))
 	{
-		message = new can_message_t(CANFD_MAX_DLEN,(uint32_t)id,(uint32_t)length,message_format_t::STANDARD,false,0,data,0);
+		message = new can_message_t(0,(uint32_t)id,(uint32_t)length,message_format_t::STANDARD,false,0,data,0);
 		write_raw_frame(request,bus_name,message,can_data,socket_type::BCM);
 	}
 #ifdef USE_FEATURE_J1939
