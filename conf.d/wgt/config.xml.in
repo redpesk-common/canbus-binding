@@ -18,7 +18,7 @@
 		<param name="@API_NAME@" value="ws" />
 	</feature>
 
-	<feature name="urn:AGL:widget:required-api">
+	<feature name="urn:AGL:widget:required-binding">
 		<param name="@WIDGET_ENTRY_POINT@" value="local" />
 	</feature>
 </widget>
