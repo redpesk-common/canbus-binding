@@ -27,55 +27,55 @@
 
 class j1939_message_t : public message_t
 {
-    private:
-        /* J1939 NAME
-        *
-        * bit 0-20	: Identity Number
-        * bit 21-31	: Manufacturer Code
-        * bit 32-34	: ECU Instance
-        * bit 35-39	: Function Instance
-        * bit 40-47	: Function
-        * bit 48	: Reserved
-        * bit 49-55	: Vehicle System
-        * bit 56-59	: Vehicle System Instance
-        * bit 60-62	: Industry Group
-        * bit 63	: Arbitrary Address Capable
-        */
-        name_t name_;
+	private:
+		/* J1939 NAME
+		*
+		* bit 0-20	: Identity Number
+		* bit 21-31	: Manufacturer Code
+		* bit 32-34	: ECU Instance
+		* bit 35-39	: Function Instance
+		* bit 40-47	: Function
+		* bit 48	: Reserved
+		* bit 49-55	: Vehicle System
+		* bit 56-59	: Vehicle System Instance
+		* bit 60-62	: Industry Group
+		* bit 63	: Arbitrary Address Capable
+		*/
+		name_t name_;
 
-        /* J1939 Parameter Group Number
-        *
-        * bit 0-7	: PDU Specific (PS)
-        * bit 8-15	: PDU Format (PF)
-        * bit 16	: Data Page (DP)
-        * bit 17	: Reserved (R)
-        * bit 19-31	: set to zero
-        */
-        pgn_t pgn_;
+		/* J1939 Parameter Group Number
+		*
+		* bit 0-7	: PDU Specific (PS)
+		* bit 8-15	: PDU Format (PF)
+		* bit 16	: Data Page (DP)
+		* bit 17	: Reserved (R)
+		* bit 19-31	: set to zero
+		*/
+		pgn_t pgn_;
 
 
-        /* J1939 Address
-            0-255
-         */
-        uint8_t addr_;
+		/* J1939 Address
+			0-255
+		 */
+		uint8_t addr_;
 
-        /**
-         * @brief The sockanme to send a message to
-         * an other ECU
-         */
-        struct sockaddr_can sockname_;
+		/**
+		 * @brief The sockanme to send a message to
+		 * an other ECU
+		 */
+		struct sockaddr_can sockname_;
 
-    public:
-        j1939_message_t();
-        j1939_message_t(uint32_t maxdlen, uint32_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp, name_t name, pgn_t pgn, uint8_t addr);
-        uint64_t get_name() const;
-        uint32_t get_pgn() const;
-        uint8_t get_addr() const;
-        static std::shared_ptr<j1939_message_t> convert_from_addr(struct sockaddr_can& addr, uint8_t (&data)[128], size_t nbytes, uint64_t timestamp);
-        bool is_set();
-        std::string get_debug_message();
-        uint32_t get_id() const;
-        struct sockaddr_can get_sockname();
+	public:
+		j1939_message_t();
+		j1939_message_t(uint32_t maxdlen, uint32_t length, message_format_t format, std::vector<uint8_t>& data, uint64_t timestamp, name_t name, pgn_t pgn, uint8_t addr);
+		uint64_t get_name() const;
+		uint32_t get_pgn() const;
+		uint8_t get_addr() const;
+		static std::shared_ptr<j1939_message_t> convert_from_addr(struct sockaddr_can& addr, uint8_t (&data)[128], size_t nbytes, uint64_t timestamp);
+		bool is_set();
+		std::string get_debug_message();
+		uint32_t get_id() const;
+		struct sockaddr_can get_sockname();
 		void set_sockname(struct sockaddr_can sockname);
-        void set_sockname(pgn_t pgn, name_t name, uint8_t addr);
+		void set_sockname(pgn_t pgn, name_t name, uint8_t addr);
 };

@@ -192,11 +192,11 @@ static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscr
 }
 
 static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
-						     bool subscribe,
-						     std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages,
-						     struct event_filter_t& event_filter,
-						     std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
-						     bool perm_rec_diag_req)
+							 bool subscribe,
+							 std::vector<std::shared_ptr<diagnostic_message_t> > diagnostic_messages,
+							 struct event_filter_t& event_filter,
+							 std::map<int, std::shared_ptr<low_can_subscription_t> >& s,
+							 bool perm_rec_diag_req)
 {
 	int rets = 0;
 	application_t& app = application_t::instance();
@@ -257,10 +257,10 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 }
 
 static int subscribe_unsubscribe_signals(afb_req_t request,
-					     bool subscribe,
-					     std::vector<std::shared_ptr<signal_t> > signals,
-					     struct event_filter_t& event_filter,
-					     std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
+						 bool subscribe,
+						 std::vector<std::shared_ptr<signal_t> > signals,
+						 struct event_filter_t& event_filter,
+						 std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	int rets = 0;
 	for(const auto& sig: signals)
@@ -602,18 +602,18 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 	AFB_DEBUG("JSON content %s",json_object_get_string(json_value));
 
 	if(!wrap_json_unpack(json_value, "{si, si, so !}",
-			      "can_id", &id,
-			      "can_dlc", &length,
-			      "can_data", &can_data))
+				  "can_id", &id,
+				  "can_dlc", &length,
+				  "can_data", &can_data))
 	{
 		message = new can_message_t(CANFD_MAX_DLEN,(uint32_t)id,(uint32_t)length,message_format_t::STANDARD,false,0,data,0);
 		write_raw_frame(request,bus_name,message,can_data,socket_type::BCM);
 	}
 #ifdef USE_FEATURE_J1939
 	else if(!wrap_json_unpack(json_value, "{si, si, so !}",
-			      "pgn", &id,
-			      "length", &length,
-			      "data", &can_data))
+				  "pgn", &id,
+				  "length", &length,
+				  "data", &can_data))
 	{
 		message = new j1939_message_t(J1939_MAX_DLEN,(uint32_t)length,message_format_t::J1939,data,0,J1939_NO_NAME,(pgn_t)id,J1939_NO_ADDR);
 		write_raw_frame(request,bus_name,message,can_data,socket_type::J1939);
@@ -701,8 +701,8 @@ void write(afb_req_t request)
 
 	// Process about Raw CAN message on CAN bus directly
 	if (args != NULL && ! wrap_json_unpack(args, "{ss, so !}",
-					       "bus_name", &name,
-					       "frame", &json_value))
+						   "bus_name", &name,
+						   "frame", &json_value))
 		write_frame(request, name, json_value);
 
 	// Search signal then encode value.

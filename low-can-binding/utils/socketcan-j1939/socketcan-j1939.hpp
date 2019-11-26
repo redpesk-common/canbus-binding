@@ -33,15 +33,15 @@ namespace utils
 {
 
 	/**
-     * @enum state
-     * @brief The state of the address claiming
-     */
-    enum class claiming_state {
-        INITIAL, ///< INITIAL - INITIAL state
-        CLAIMING, ///< CLAIMING - CLAIMING state
-        OPERATIONAL, ///< OPERATIONAL - OPERATIONAL state
-        INVALID
-    };
+	 * @enum state
+	 * @brief The state of the address claiming
+	 */
+	enum class claiming_state {
+		INITIAL, ///< INITIAL - INITIAL state
+		CLAIMING, ///< CLAIMING - CLAIMING state
+		OPERATIONAL, ///< OPERATIONAL - OPERATIONAL state
+		INVALID
+	};
 
 	class socketcan_j1939_addressclaiming_t;
 	class socketcan_j1939_t : public socketcan_t
@@ -65,4 +65,3 @@ namespace utils
 
 	};
 }
-

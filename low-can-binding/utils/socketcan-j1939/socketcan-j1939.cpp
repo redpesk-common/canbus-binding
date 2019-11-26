@@ -96,7 +96,7 @@ namespace utils
 	 * @param recv_own_msgs - Allows you to receive your own packets
 	 * @param broadcast - Allows to write message with address brodcast (255)
 	 */
-    void socketcan_j1939_t::define_opt(bool promisc, bool recv_own_msgs, bool broadcast)
+	void socketcan_j1939_t::define_opt(bool promisc, bool recv_own_msgs, bool broadcast)
 	{
 		int promisc_i = 0;
 		int recv_own_msgs_i = 0;
