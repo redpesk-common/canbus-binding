@@ -297,6 +297,7 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 /// @param[in] afb_req request : contains original request use to subscribe or unsubscribe
 /// @param[in] subscribe boolean value, which chooses between a subscription operation or an unsubscription
 /// @param[in] signals -  struct containing vectors with signal_t and diagnostic_messages to subscribe
+/// @param[in] event_filter - stuct containing filter on the signal
 ///
 /// @return Number of correctly subscribed signal
 ///

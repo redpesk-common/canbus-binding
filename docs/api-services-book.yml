@@ -14,5 +14,7 @@ books:
       name: Installation Guide
     - url: 3-Installation-J1939.md
       name: Installation Guide for J1939
-    - url: 4-Usage.md
+    - url: 4-Installation-ISOTP.md
+      name: Installation Guide for ISOTP
+    - url: 5-Usage.md
       name: Usage Guide

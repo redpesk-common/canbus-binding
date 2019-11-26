@@ -306,6 +306,8 @@ argument filter with one or more of the filters available :
  the subscribed client(s).
 * max: Maximum value that the decoded value needs to be below to get pushed to
  the subscribed client(s)
+* rx_id : For the ISO TP protocol, define the id of source to write a message
+* tx_id : For the ISO TP protocol, define the id of emitter to receive message
 
 Order doesn't matter neither the number of filters chosen, you can use one, two
 or all of them at once.
@@ -316,6 +318,8 @@ Usage examples :
 low-can subscribe {"event": "messages.engine.speed", "filter": { "frequency": 3, "min": 1250, "max": 3500}}
 low-can subscribe {"event": "messages.engine.load", "filter": { "min": 30, "max": 100}}
 low-can subscribe {"event": "messages.vehicle.speed", "filter": { "frequency": 2}}
+# ISOTP
+low-can subscribe {"id": 273, "filter": {"tx_id" : 562}}
 ```
 
 ## Get last signal value and list of configured signals
@@ -354,9 +358,13 @@ low-can write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc": 8, "can_
 # Write a signal's value.
 low-can write { "signal_name": "engine.speed", "signal_value": 1256}
 # Write J1939 'single frame'
-low-can write { "bus_name": "j1939", "frame": { "pgn": 62420, "length":8, "data": [ 255,255,255,255,255,255,255,255]} }
+low-can write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":8, "data": [ 255,255,255,255,255,255,255,255]} }
 # Write J1939 'multi frame'
-low-can write { "bus_name": "j1939", "frame": { "pgn": 62420, "length":9, "data": [ 255,255,255,255,255,255,255,255,254]} }
+low-can write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":9, "data": [ 255,255,255,255,255,255,255,255,254]} }
+# Write ISOTP 'single frame'
+low-can write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 8, "can_data": [ 255,255,255,255,255,255,255,255]} }
+# Write ISOTP 'multi frame'
+low-can write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 9, "can_data": [ 255,255,255,255,255,255,255,255,25]} }
 ```
 
 To be able to use write capability, you need to add the permission

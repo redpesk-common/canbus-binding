@@ -124,21 +124,44 @@ int low_can_subscription_t::unsubscribe(afb_req_t request)
 	return afb_req_unsubscribe(request, event_);
 }
 
+/**
+ * @brief Getter of index of subscription
+ *
+ * @return int Index
+ */
 int low_can_subscription_t::get_index() const
 {
 	return index_;
 }
 
+/**
+ * @brief Getter of signal of subscription
+ *
+ * @return const std::shared_ptr<signal_t> A shared pointer of the signal
+ */
 const std::shared_ptr<signal_t> low_can_subscription_t::get_signal() const
 {
 	return signal_;
 }
 
+/**
+ * @brief Check if the signal and event are the same that the subscription
+ *
+ * @param signal the signal compared
+ * @param event_filter the event_filter compared
+ * @return true if they are equal
+ * @return false if they are not equal
+ */
 bool low_can_subscription_t::is_signal_subscription_corresponding(const std::shared_ptr<signal_t> signal, const struct event_filter_t& event_filter) const
 {
 	return signal_ == signal && event_filter_ == event_filter;
 }
 
+/**
+ * @brief Getter for diagnostic messages of subscription
+ *
+ * @return const vector_ptr_diag_msg_t Vector of pointer of diagnostic message
+ */
 const vect_ptr_diag_msg_t low_can_subscription_t::get_diagnostic_message() const
 {
 	return diagnostic_message_;
@@ -201,66 +224,131 @@ const std::string low_can_subscription_t::get_name(uint32_t pid) const
 	return "";
 }
 
+/**
+ * @brief Getter of the frequency of the event_filter
+ *
+ * @return float The frequency
+ */
 float low_can_subscription_t::get_frequency() const
 {
 	return event_filter_.frequency;
 }
 
+/**
+ * @brief Getter of the min of the event_filter
+ *
+ * @return float The min value filtered
+ */
 float low_can_subscription_t::get_min() const
 {
 	return event_filter_.min;
 }
 
+/**
+ * @brief Getter of the max of the event_filter
+ *
+ * @return float The max value filtered
+ */
 float low_can_subscription_t::get_max() const
 {
 	return event_filter_.max;
 }
 
+/**
+ * @brief Getter of the rx_id of the event_filter
+ *
+ * @return canid_t The rx_id value
+ */
 canid_t low_can_subscription_t::get_rx_id() const
 {
 	return event_filter_.rx_id;
 }
 
+/**
+ * @brief Getter of the tx_id of the event_filter
+ *
+ * @return canid_t The tx_id value
+ */
 canid_t low_can_subscription_t::get_tx_id() const
 {
 	return event_filter_.tx_id;
 }
 
+/**
+ * @brief Getter of the socket of the subscription
+ *
+ * @return std::shared_ptr<utils::socketcan_t> Pointer of the socket object
+ */
 std::shared_ptr<utils::socketcan_t> low_can_subscription_t::get_socket()
 {
 	return socket_;
 }
 
+/**
+ * @brief Setter for the frequency of the event_filter
+ *
+ * @param freq The new frequency
+ */
 void low_can_subscription_t::set_frequency(float freq)
 {
 	event_filter_.frequency = freq;
 }
 
+/**
+ * @brief Setter for the min of the event_filter
+ *
+ * @param min The new min
+ */
 void low_can_subscription_t::set_min(float min)
 {
 	event_filter_.min = min;
 }
 
+/**
+ * @brief Setter for the max of the event_filter
+ *
+ * @param max The new max
+ */
 void low_can_subscription_t::set_max(float max)
 {
 	event_filter_.max = max;
 }
 
+/**
+ * @brief Setter for the rx_id of the event_filter
+ *
+ * @param rx_id The new rx_id
+ */
 void low_can_subscription_t::set_rx_id(canid_t rx_id)
 {
 	event_filter_.rx_id = rx_id;
 }
 
+/**
+ * @brief Setter for the tx_id of the event_filter
+ *
+ * @param tx_id The new tx_id
+ */
 void low_can_subscription_t::set_tx_id(canid_t tx_id)
 {
 	event_filter_.tx_id = tx_id;
 }
 
+/**
+ * @brief Setter for the index of the subscription
+ *
+ * @param index The new index
+ */
 void low_can_subscription_t::set_index(int index)
 {
 	index_ = index;
 }
 
+/**
+ * @brief Setter for the signal of the subscription
+ *
+ * @param signal The new signal
+ */
 void low_can_subscription_t::set_signal(std::shared_ptr<signal_t> signal)
 {
 	signal_ = signal;
@@ -421,6 +509,13 @@ void low_can_subscription_t::remove_last_bcm_frame(struct bcm_msg& bcm_msg)
 }
 
 #ifdef USE_FEATURE_J1939
+/**
+ * @brief Create a j1939 socket to read message
+ *
+ * @param subscription The subscription
+ * @param sig The signal subscribed
+ * @return int 0 if ok else -1
+ */
 int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig)
 {
 	subscription.signal_= sig;
@@ -434,6 +529,13 @@ int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subsc
 }
 #endif
 
+/**
+ * @brief Create an iso tp socket to read message
+ *
+ * @param subscription The subscription
+ * @param sig The signal subscribed
+ * @return int 0 if ok else -1
+ */
 int low_can_subscription_t::create_rx_filter_isotp(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig)
 {
 	subscription.signal_= sig;
@@ -531,6 +633,13 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 	return create_rx_filter_bcm(subscription, bcm_msg);
 }
 
+/**
+ * @brief Create the good socket to read message
+ * depending on the signal
+ *
+ * @param sig The signal subscribed
+ * @return  0 if ok else -1
+ */
 int low_can_subscription_t::create_rx_filter(std::shared_ptr<signal_t> sig)
 {
 	if(!sig->get_message()->is_isotp() && !sig->get_message()->is_j1939())
@@ -666,6 +775,14 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 }
 
 #ifdef USE_FEATURE_J1939
+/**
+ * @brief Allows to open socket j1939 and send j1939 messsage
+ *
+ * @param subscription The subscription
+ * @param message The j1939 message to send
+ * @param bus_name The bus name where to send message
+ * @return int  0 if ok else -1
+ */
 int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name)
 {
 	//struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cfd.can_id);
@@ -689,6 +806,14 @@ int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, mes
 #endif
 
 
+/**
+ * @brief Allows to open socket isotp and send can messsage
+ *
+ * @param subscription The subscription
+ * @param message The can message to send
+ * @param bus_name The bus name where to send message
+ * @return int  0 if ok else -1
+ */
 int low_can_subscription_t::isotp_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name)
 {
 	//struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cfd.can_id);
