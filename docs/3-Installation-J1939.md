@@ -79,25 +79,3 @@ cp include/uapi/linux/can.h /usr/include/linux/can.h
 cp include/uapi/linux/can/j1939.h /usr/include/linux/can/
 ```
 
-
-
-### Activate J1939 CMAKE
-
-To activate J1939 at the compilation.
-
-Edit the file conf.d/cmake/cmake/config.cmake
-
-And change the line :
-
-```cmake
-option(WITH_FEATURE_J1939 "Activate J1939" OFF)
-```
-
-With :
-
-```cmake
-option(WITH_FEATURE_J1939 "Activate J1939" ON)
-```
-
-
-

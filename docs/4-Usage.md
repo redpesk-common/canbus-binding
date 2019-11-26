@@ -140,6 +140,20 @@ j1939="can2"
 > configuration file match those specified in your generated source file with
 > the `CAN-config-generator`.
 
+
+
+## Change name of ECU for J1939
+
+To change the name of an ECU to J1939, you must go to the file conf.d/cmake/config.cmake and modify the value at :
+
+
+```cmake
+# Define name for ECU
+set(J1939_NAME_ECU 0x1239)
+```
+
+
+
 # Run it, test it, use it.
 
 You can run the binding using **afm-util** tool, here is the classic way to go :
@@ -257,9 +271,17 @@ You can also subscribe to an event with the ID or the PGN of the message definit
 
 
 ```json
-low-can subscribe { "id" : 1568}
-low-can subscribe { "pgn" : 61442}
+low-can subscribe {"id" : 1568}
+low-can subscribe {"pgn" : 61442}
 ```
+
+And subscribe to all ID or PGN :
+
+```json
+low-can subscribe {"id" : "*"}
+low-can subscribe {"pgn" : "*"}
+```
+
 
 You can stop receiving event from it by unsubscribe the signal the same way you did for subscribe
 
@@ -325,11 +347,16 @@ and its value.
 Examples:
 
 ```json
+# Authentification
+low-can auth
 # Write a raw can frame to the CAN id 0x620
-low-can write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc":
-8, "can_data": [ 255,255,255,255,255,255,255,255]} }
+low-can write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc": 8, "can_data": [ 255,255,255,255,255,255,255,255]} }
 # Write a signal's value.
 low-can write { "signal_name": "engine.speed", "signal_value": 1256}
+# Write J1939 'single frame'
+low-can write { "bus_name": "j1939", "frame": { "pgn": 62420, "length":8, "data": [ 255,255,255,255,255,255,255,255]} }
+# Write J1939 'multi frame'
+low-can write { "bus_name": "j1939", "frame": { "pgn": 62420, "length":9, "data": [ 255,255,255,255,255,255,255,255,254]} }
 ```
 
 To be able to use write capability, you need to add the permission
