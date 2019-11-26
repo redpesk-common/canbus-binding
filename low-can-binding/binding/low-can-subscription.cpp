@@ -453,7 +453,6 @@ int low_can_subscription_t::create_rx_filter_isotp(low_can_subscription_t &subsc
 int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig)
 {
 	uint32_t flags_bcm;
-	float val;
 	struct timeval freq, timeout = {0, 0};
 	struct canfd_frame cfd;
 	subscription.signal_= sig;
