@@ -16,10 +16,10 @@
  */
 
 #include <cstring>
-#include <sstream>
 #include <iomanip>
 #include <net/if.h>
 #include "../../binding/low-can-hat.hpp"
+#include "../../utils/converter.hpp"
 #include "j1939-message.hpp"
 
 /**
@@ -86,23 +86,6 @@ uint8_t j1939_message_t::get_addr() const{
 	return addr_;
 }
 
-/**
- * @brief Convert hex data to string
- *
- * @param data An array of data
- * @param length The length of the data
- * @return std::string The string data
- */
-std::string to_hex( uint8_t data[], const size_t length)
-{
-	std::stringstream stream;
-	stream << std::hex << std::setfill('0');
-	for(int i = 0; i < length; i++)
-	{
-		stream << std::hex << ((int) data[i]);
-	}
-	return stream.str();
-}
 
 /// @brief Take a sockaddr_can struct and array of data to initialize class members
 ///
@@ -138,7 +121,7 @@ std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct socka
 	data_vector.clear();
 
 	std::string data_string;
-	data_string = to_hex(data,length);
+	data_string = converter_t::to_hex(data,length);
 
 	for(i=0;i<length;i++)
 	{
