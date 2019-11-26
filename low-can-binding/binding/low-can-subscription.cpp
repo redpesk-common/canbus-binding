@@ -95,8 +95,13 @@ int low_can_subscription_t::set_event()
  */
 int low_can_subscription_t::subscribe(afb_req_t request)
 {
-	if(set_event() < 0)
-		return -1;
+	if(! afb_event_is_valid(event_))
+	{
+		if(set_event() < 0)
+		{
+			return -1;
+		}
+	}
 	return afb_req_subscribe(request, event_);
 }
 
