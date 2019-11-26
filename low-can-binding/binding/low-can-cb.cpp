@@ -35,6 +35,7 @@
 #include "../utils/signals.hpp"
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/openxc-utils.hpp"
+#include "../utils/signals.hpp"
 
 #ifdef USE_FEATURE_J1939
 	#include "../can/message/j1939-message.hpp"
@@ -548,47 +549,79 @@ static int send_message(message_t *message, const std::string& bus_name, socket_
 
 static void write_raw_frame(afb_req_t request, const std::string& bus_name, message_t *message, struct json_object *can_data, socket_type type)
 {
-	if((message->get_length() <= 8 && message->get_length() > 0 && type == socket_type::BCM)
-#ifdef USE_FEATURE_J1939
-	|| (message->get_length() < J1939_MAX_DLEN && type == socket_type::J1939)
-#endif
-	)
-	{
 
-		std::vector<uint8_t> data;
-		for (int i = 0 ; i < message->get_length() ; i++)
-		{
-			struct json_object *one_can_data = json_object_array_get_idx(can_data, i);
-			data.push_back((json_object_is_type(one_can_data, json_type_int)) ?
-					(uint8_t)json_object_get_int(one_can_data) : 0);
-		}
-		message->set_data(data);
-	}
-	else
+	struct utils::signals_found sf;
+
+	utils::signals_manager_t::instance().lookup_signals_by_id(message->get_id(), application_t::instance().get_all_signals(), sf.signals);
+
+	if( !sf.signals.empty() )
 	{
+		AFB_DEBUG("ID WRITE RAW : %d",sf.signals[0]->get_message()->get_id());
 		if(type == socket_type::BCM)
 		{
-			afb_req_fail(request, "Invalid", "Data array must hold 1 to 8 values.");
+			if(sf.signals[0]->get_message()->is_fd())
+			{
+				AFB_DEBUG("CANFD_MAX_DLEN");
+				message->set_flags(CAN_FD_FRAME);
+				message->set_maxdlen(CANFD_MAX_DLEN);
+			}
+			else
+			{
+				AFB_DEBUG("CAN_MAX_DLEN");
+				message->set_maxdlen(CAN_MAX_DLEN);
+			}
 		}
-		else if(type == socket_type::J1939)
+
+		if((message->get_length()> 0 && (
+		((type == socket_type::BCM) && (
+				(message->get_length() <= CANFD_MAX_DLEN * MAX_BCM_CAN_FRAMES && message->get_flags() & CAN_FD_FRAME)
+			||	(message->get_length() <= CAN_MAX_DLEN * MAX_BCM_CAN_FRAMES && !(message->get_flags() & CAN_FD_FRAME))
+		))
+	#ifdef USE_FEATURE_J1939
+		|| (message->get_length() <= J1939_MAX_DLEN && type == socket_type::J1939)
+	#endif
+		)))
 		{
-			afb_req_fail(request, "Invalid", "Data array too large");
+			std::vector<uint8_t> data;
+			for (int i = 0 ; i < message->get_length() ; i++)
+			{
+				struct json_object *one_can_data = json_object_array_get_idx(can_data, i);
+				data.push_back((json_object_is_type(one_can_data, json_type_int)) ?
+						(uint8_t)json_object_get_int(one_can_data) : 0);
+			}
+			message->set_data(data);
 		}
 		else
 		{
-			afb_req_fail(request, "Invalid", "Invalid socket type");
+			if(type == socket_type::BCM)
+			{
+				afb_req_fail(request, "Invalid", "Frame BCM");
+			}
+			else if(type == socket_type::J1939)
+			{
+				afb_req_fail(request, "Invalid", "Frame J1939");
+			}
+			else
+			{
+				afb_req_fail(request, "Invalid", "Frame");
+			}
+			return;
 		}
-		return;
-	}
 
-	if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name),type))
-	{
-		afb_req_success(request, nullptr, "Message correctly sent");
+		if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name),type))
+		{
+			afb_req_success(request, nullptr, "Message correctly sent");
+		}
+		else
+		{
+			afb_req_fail(request, "Error", "sending the message. See the log for more details.");
+		}
 	}
 	else
 	{
-		afb_req_fail(request, "Error", "sending the message. See the log for more details.");
+		afb_req_fail(request, "Error", "no find id in signals. See the log for more details.");
 	}
+
 }
 
 static void write_frame(afb_req_t request, const std::string& bus_name, json_object *json_value)
