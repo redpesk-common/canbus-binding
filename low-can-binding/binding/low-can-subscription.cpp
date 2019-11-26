@@ -490,9 +490,12 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 {
 	can_message_t *cm = static_cast<can_message_t*>(message);
 
-	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cm->get_id(),cm->get_flags());
-	canfd_frame cfd = cm->convert_to_canfd_frame();
-	subscription.add_one_bcm_frame(cfd, bcm_msg);
+	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cm->get_id(),cm->get_flags() | TX_CP_CAN_ID); // TX_CP_CAN_ID -> copy in cfd the id of bcm
+	std::vector<canfd_frame> cfd_vect = cm->convert_to_canfd_frame_vector();
+	for(auto cfd: cfd_vect)
+	{
+		subscription.add_one_bcm_frame(cfd, bcm_msg);
+	}
 
 	if(subscription.open_socket(subscription, bus_name,socket_type::BCM) < 0)
 	{
