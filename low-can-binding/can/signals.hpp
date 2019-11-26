@@ -62,6 +62,7 @@ typedef openxc_DynamicField (*signal_decoder)(signal_t& signal, float value, boo
 typedef uint64_t (*signal_encoder)(signal_t& signal,
 		 const openxc_DynamicField& field, bool* send);
 
+
 class signal_t
 {
 private:
@@ -69,10 +70,10 @@ private:
 	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
 	static std::string prefix_; /*!< prefix_ - generic_name_ will be prefixed with it. It has to reflect the used protocol.
 					 * which make easier to sort message when the come in.*/
-	uint8_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
+	uint32_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
 				*	non-inverted bit numbering, i.e. the most significant bit of
 				*	each byte is 0) */
-	uint8_t bit_size_; /*!< bit_size_ - The width of the bit field in the CAN message. */
+	uint32_t bit_size_; /*!< bit_size_ - The width of the bit field in the CAN message. */
 	float factor_; /*!< factor_ - The final value will be multiplied by this factor. Use 1 if you
 			*	don't need a factor. */
 	float offset_; /*!< offset_ - The final value will be added to this offset. Use 0 if you
@@ -108,8 +109,8 @@ public:
 
 	signal_t(
 		std::string generic_name,
-		uint8_t bit_position,
-		uint8_t bit_size,
+		uint32_t bit_position,
+		uint32_t bit_size,
 		float factor,
 		float offset,
 		float min_value,
@@ -130,8 +131,8 @@ public:
 
 	signal_t(
 		std::string generic_name,
-		uint8_t bit_position,
-		uint8_t bit_size,
+		uint32_t bit_position,
+		uint32_t bit_size,
 		float factor,
 		float offset,
 		float min_value,
@@ -149,8 +150,8 @@ public:
 	std::shared_ptr<message_definition_t> get_message() const;
 	const std::string get_generic_name() const;
 	const std::string get_name() const;
-	uint8_t get_bit_position() const;
-	uint8_t get_bit_size() const;
+	uint32_t get_bit_position() const;
+	uint32_t get_bit_size() const;
 	float get_factor() const;
 	float get_offset() const;
 	frequency_clock_t& get_frequency();

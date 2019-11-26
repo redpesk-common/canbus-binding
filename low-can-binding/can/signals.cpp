@@ -30,8 +30,8 @@ std::string signal_t::prefix_ = "messages";
 
 signal_t::signal_t(
 	std::string generic_name,
-	uint8_t bit_position,
-	uint8_t bit_size,
+	uint32_t bit_position,
+	uint32_t bit_size,
 	float factor,
 	float offset,
 	float min_value,
@@ -73,8 +73,8 @@ signal_t::signal_t(
 
 signal_t::signal_t(
 	std::string generic_name,
-	uint8_t bit_position,
-	uint8_t bit_size,
+	uint32_t bit_position,
+	uint32_t bit_size,
 	float factor,
 	float offset,
 	float min_value,
@@ -119,12 +119,12 @@ const std::string signal_t::get_name() const
 	return prefix_ + "." + generic_name_;
 }
 
-uint8_t signal_t::get_bit_position() const
+uint32_t signal_t::get_bit_position() const
 {
 	return bit_position_;
 }
 
-uint8_t signal_t::get_bit_size() const
+uint32_t signal_t::get_bit_size() const
 {
 	return bit_size_;
 }
