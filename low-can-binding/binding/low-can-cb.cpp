@@ -26,7 +26,6 @@
 #include <thread>
 #include <wrap-json.h>
 #include <systemd/sd-event.h>
-
 #include "openxc.pb.h"
 #include "application.hpp"
 #include "../can/can-encoder.hpp"
@@ -37,6 +36,10 @@
 #include "../diagnostic/diagnostic-message.hpp"
 #include "../utils/openxc-utils.hpp"
 
+#ifdef USE_FEATURE_J1939
+	#include "../can/message/j1939-message.hpp"
+	#include <linux/can/j1939.h>
+#endif
 ///******************************************************************************
 ///
 ///		SystemD event loop Callbacks
@@ -82,18 +85,27 @@ static void push_n_notify(std::shared_ptr<message_t> m)
 
 int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *userdata)
 {
+
 	low_can_subscription_t* can_subscription = (low_can_subscription_t*)userdata;
 
 
 	if ((revents & EPOLLIN) != 0)
 	{
-		std::shared_ptr<utils::socketcan_t> s = can_subscription->get_socket();
-		std::shared_ptr<message_t> message = s->read_message();
-
-		// Sure we got a valid CAN message ?
-		if (! message->get_id() == 0 && ! message->get_length() == 0)
+		utils::signals_manager_t& sm = utils::signals_manager_t::instance();
+		std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
+		if(can_subscription->get_index() != -1)
 		{
-			push_n_notify(message);
+			std::shared_ptr<utils::socketcan_t> s = can_subscription->get_socket();
+			if(s->socket() && s->socket() != -1)
+			{
+				std::shared_ptr<message_t> message = s->read_message();
+
+				// Sure we got a valid CAN message ?
+				if (! message->get_id() == 0 && ! message->get_length() == 0 && message->get_msg_format() != message_format_t::INVALID)
+				{
+					push_n_notify(message);
+				}
+			}
 		}
 	}
 
@@ -164,8 +176,8 @@ static int subscribe_unsubscribe_signal(afb_req_t request,
 
 	if( (ret = s[sub_index]->unsubscribe(request)) < 0)
 		return ret;
+	s.find(sub_index)->second->set_index(-1);
 	s.erase(sub_index);
-
 	return ret;
 }
 
@@ -227,7 +239,9 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 		else
 		{
 			if(sig->get_supported())
-			{AFB_DEBUG("%s cancelled due to unsubscribe", sig->get_name().c_str());}
+			{
+				AFB_DEBUG("%s cancelled due to unsubscribe", sig->get_name().c_str());
+			}
 			else
 			{
 				AFB_WARNING("signal: %s isn't supported. Canceling operation.", sig->get_name().c_str());
@@ -240,7 +254,6 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 
 		rets++;
 	}
-
 	return rets;
 }
 
@@ -493,6 +506,10 @@ static int send_frame(struct canfd_frame& cfd, const std::string& bus_name, sock
 	{
 		return low_can_subscription_t::tx_send(*cd[bus_name], cfd, bus_name);
 	}
+	else if(type == socket_type::J1939)
+	{
+		return low_can_subscription_t::j1939_send(*cd[bus_name], cfd, bus_name);
+	}
 	else{
 		return -1;
 	}
@@ -517,6 +534,12 @@ static int send_message(message_t *message, const std::string& bus_name, socket_
 	{
 		return low_can_subscription_t::tx_send(*cd[bus_name], message, bus_name);
 	}
+#ifdef USE_FEATURE_J1939
+	else if(type == socket_type::J1939)
+	{
+		return low_can_subscription_t::j1939_send(*cd[bus_name], message, bus_name);
+	}
+#endif
 	else
 	{
 		return -1;
@@ -547,6 +570,10 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 		if(type == socket_type::BCM)
 		{
 			afb_req_fail(request, "Invalid", "Data array must hold 1 to 8 values.");
+		}
+		else if(type == socket_type::J1939)
+		{
+			afb_req_fail(request, "Invalid", "Data array too large");
 		}
 		else
 		{
@@ -583,6 +610,16 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 		message = new can_message_t(CANFD_MAX_DLEN,(uint32_t)id,(uint32_t)length,message_format_t::STANDARD,false,0,data,0);
 		write_raw_frame(request,bus_name,message,can_data,socket_type::BCM);
 	}
+#ifdef USE_FEATURE_J1939
+	else if(!wrap_json_unpack(json_value, "{si, si, so !}",
+			      "pgn", &id,
+			      "length", &length,
+			      "data", &can_data))
+	{
+		message = new j1939_message_t(J1939_MAX_DLEN,(uint32_t)length,message_format_t::J1939,data,0,J1939_NO_NAME,(pgn_t)id,J1939_NO_ADDR);
+		write_raw_frame(request,bus_name,message,can_data,socket_type::J1939);
+	}
+#endif
 	else
 	{
 		afb_req_fail(request, "Invalid", "Frame object malformed");
@@ -800,8 +837,9 @@ void list(afb_req_t request)
 /// @return Exit code, zero if success.
 int init_binding(afb_api_t api)
 {
-	uint32_t ret = 1;
-	can_bus_t& can_bus_manager = application_t::instance().get_can_bus_manager();
+	int ret = 1;
+	application_t& application = application_t::instance();
+	can_bus_t& can_bus_manager = application.get_can_bus_manager();
 
 	can_bus_manager.set_can_devices();
 	can_bus_manager.start_threads();
@@ -829,8 +867,38 @@ int init_binding(afb_api_t api)
 		subscribe_unsubscribe_diagnostic_messages(request, true, sf.diagnostic_messages, event_filter, s, true);
 	}
 
+
+#ifdef USE_FEATURE_J1939
+	std::vector<std::shared_ptr<message_definition_t>> current_messages_definition = application.get_messages_definition();
+	for(std::shared_ptr<message_definition_t> message_definition: current_messages_definition)
+	{
+		if(message_definition->is_j1939())
+		{
+			std::shared_ptr<low_can_subscription_t> low_can_j1939 = std::make_shared<low_can_subscription_t>();
+
+			application.set_subscription_address_claiming(low_can_j1939);
+
+			ret = low_can_subscription_t::open_socket(*low_can_j1939,
+													message_definition->get_bus_device_name(),
+													socket_type::J1939_ADDR_CLAIM);
+			if(ret < 0)
+			{
+				AFB_ERROR("Error open socket address claiming for j1939 protocol");
+				return -1;
+			}
+
+//			std::shared_ptr<low_can_subscription_t> saddrclaim = application.get_subscription_address_claiming();
+
+			add_to_event_loop(low_can_j1939);
+			break;
+		}
+	}
+#endif
+
 	if(ret)
+	{
 		AFB_ERROR("There was something wrong with CAN device Initialization.");
+	}
 
 	return ret;
 }

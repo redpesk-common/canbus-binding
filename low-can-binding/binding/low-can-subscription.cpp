@@ -20,9 +20,8 @@
 #include "application.hpp"
 #include "canutil/write.h"
 #include "../utils/socketcan-bcm.hpp"
-
 #ifdef USE_FEATURE_J1939
-	#include "../utils/socketcan-j1939.hpp"
+#include "../utils/socketcan-j1939/socketcan-j1939-data.hpp"
 #endif
 
 low_can_subscription_t::low_can_subscription_t()
@@ -226,40 +225,24 @@ void low_can_subscription_t::set_max(float max)
 	event_filter_.max = max;
 }
 
+void low_can_subscription_t::set_index(int index)
+{
+	index_ = index;
+}
+
 /// @brief Based upon which object is a subscribed CAN signal or diagnostic message
 /// it will open the socket with the required CAN bus device name.
 ///
 /// @return INVALID_SOCKET on failure, else positive integer
-int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, const std::string& bus_name)
+int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, const std::string& bus_name, socket_type type)
 {
-	int ret = 0;
+	int ret = -1;
 	if(! subscription.socket_)
 	{
-
-		#ifdef USE_FEATURE_J1939
-		if((subscription.signal_ != nullptr || !bus_name.empty()) && subscription.signal_->get_message()->is_j1939())
+		switch (type)
 		{
-			name_t name = J1939_NO_NAME;
-			pgn_t pgn = J1939_NO_PGN;
-			uint8_t addr = J1939_NO_ADDR;
-			pgn = subscription.signal_->get_message()->get_id();
-			if( subscription.signal_ != nullptr)
-			{
-				std::shared_ptr<utils::socketcan_j1939_t> socket = std::make_shared<utils::socketcan_j1939_t>();
-				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(), name, pgn, addr);
-				subscription.socket_ = socket;
-		}
-		else if ( !bus_name.empty())
+		case socket_type::BCM:
 		{
-				std::shared_ptr<utils::socketcan_j1939_t> socket = std::make_shared<utils::socketcan_j1939_t>();
-				ret = socket->open(bus_name, name, pgn, addr);
-				subscription.socket_ = socket;
-		}
-		subscription.index_ = (int)subscription.socket_->socket();
-		}
-		else
-		{
-		#endif
 			if( subscription.signal_ != nullptr)
 			{
 					subscription.socket_ = std::make_shared<utils::socketcan_bcm_t>();
@@ -276,12 +259,55 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 					ret = subscription.socket_->open(bus_name);
 			}
 			subscription.index_ = (int)subscription.socket_->socket();
-		#ifdef USE_FEATURE_J1939
+			break;
 		}
-		#endif
+#ifdef USE_FEATURE_J1939
+		case socket_type::J1939_ADDR_CLAIM:
+		{
+			pgn_t pgn = J1939_NO_PGN;
+			if(!bus_name.empty())
+			{
+				std::shared_ptr<utils::socketcan_j1939_addressclaiming_t> socket = std::make_shared<utils::socketcan_j1939_addressclaiming_t>();
+				ret = socket->open(bus_name, pgn);
+				subscription.socket_ = socket;
+			}
+			subscription.index_ = (int)subscription.socket_->socket();
+			break;
+		}
+		case socket_type::J1939:
+		{
+			pgn_t pgn = J1939_NO_PGN;
+			if(subscription.signal_ != nullptr)
+			{
+				pgn = subscription.signal_->get_message()->get_id();
+				std::shared_ptr<utils::socketcan_j1939_data_t> socket = std::make_shared<utils::socketcan_j1939_data_t>();
+				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(), pgn);
+				subscription.socket_ = socket;
+			}
+			else if(!bus_name.empty())
+			{
+				std::shared_ptr<utils::socketcan_j1939_data_t> socket = std::make_shared<utils::socketcan_j1939_data_t>();
+				ret = socket->open(bus_name, pgn);
+				subscription.socket_ = socket;
+			}
+			subscription.index_ = (int)subscription.socket_->socket();
+			break;
+		}
+#endif
+		default:
+		{
+			AFB_ERROR("Socket format not supported");
+			return INVALID_SOCKET;
+			break;
+		}
+		}
+	}
+	else{
+		ret = subscription.socket_->socket();
 	}
 	return ret;
 }
+
 
 /// @brief Builds a BCM message head but doesn't set can_frame.
 ///
@@ -328,7 +354,7 @@ int low_can_subscription_t::create_rx_filter_j1939(low_can_subscription_t &subsc
 	subscription.signal_= sig;
 
 	// Make sure that socket is opened.
-	if(open_socket(subscription) < 0)
+	if(open_socket(subscription,"",socket_type::J1939) < 0)
 	{
 			return -1;
 	}
@@ -421,7 +447,7 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscription, struct bcm_msg& bcm_msg)
 {
 	// Make sure that socket is opened.
-	if(subscription.open_socket(subscription) < 0)
+	if(subscription.open_socket(subscription,"",socket_type::BCM) < 0)
 		{return -1;}
 
 	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
@@ -463,8 +489,10 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 	canfd_frame cfd = cm->convert_to_canfd_frame();
 	subscription.add_one_bcm_frame(cfd, bcm_msg);
 
-	if(subscription.open_socket(subscription, bus_name) < 0)
-		{return -1;}
+	if(subscription.open_socket(subscription, bus_name,socket_type::BCM) < 0)
+	{
+			return -1;
+	}
 
 	cm->set_bcm_msg(bcm_msg);
 	subscription.socket_->write_message(*cm);
@@ -475,3 +503,26 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 
 	return 0;
 }
+
+#ifdef USE_FEATURE_J1939
+int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name)
+{
+	//struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cfd.can_id);
+	//subscription.add_one_bcm_frame(cfd, bcm_msg);
+
+	if(subscription.open_socket(subscription, bus_name, socket_type::J1939) < 0)
+	{
+		return -1;
+	}
+
+	j1939_message_t *jm = static_cast<j1939_message_t*>(message);
+	jm->set_sockname(jm->get_pgn(),J1939_NO_NAME,J1939_NO_ADDR);
+	if(subscription.socket_->write_message(*jm) < 0)
+	{
+		AFB_ERROR("Error write j1939 message");
+		return -1;
+	}
+
+	return 0;
+}
+#endif

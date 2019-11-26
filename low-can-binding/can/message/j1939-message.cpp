@@ -184,16 +184,63 @@ uint32_t j1939_message_t::get_id() const
 	return get_pgn();
 }
 
-
-struct bcm_msg j1939_message_t::get_bcm_msg()
+/**
+ * @brief Return the sockname of the message
+ *
+ * @return struct sockaddr_can The sockname of the message
+ */
+struct sockaddr_can j1939_message_t::get_sockname()
 {
-    AFB_WARNING("Not implemented");
-    struct bcm_msg bcm_msg;
-    ::memset(&bcm_msg, 0, sizeof(struct bcm_msg));
-	return bcm_msg;
+    return sockname_;
 }
 
-void j1939_message_t::set_bcm_msg(struct bcm_msg bcm_msg)
+/**
+ * @brief Allows to set a sockname at a message to send it after
+ *
+ * @param sockname The sockname of the message
+ */
+void j1939_message_t::set_sockname(struct sockaddr_can sockname)
 {
-	AFB_WARNING("Not implemented");
+    sockname_ = sockname;
+}
+
+/**
+ * @brief Allows to generate a sockname for the message
+ *
+ * @param pgn The pgn for the sockname
+ * @param name The name for the sockname
+ * @param addr The address for the sockname
+ */
+void j1939_message_t::set_sockname(pgn_t pgn, name_t name, uint8_t addr)
+{
+    memset(&sockname_, 0, sizeof(sockname_));
+    sockname_.can_family = AF_CAN;
+    sockname_.can_ifindex = 0;
+
+    if(addr <= 0 || addr >= UINT8_MAX )
+    {
+        sockname_.can_addr.j1939.addr = J1939_NO_ADDR;
+    }
+    else
+    {
+        sockname_.can_addr.j1939.addr = addr;
+    }
+
+    if(name <= 0 || name >= UINT64_MAX )
+    {
+        sockname_.can_addr.j1939.name = J1939_NO_NAME;
+    }
+    else
+    {
+        sockname_.can_addr.j1939.name = name;
+    }
+
+    if(pgn <= 0 || pgn > J1939_PGN_MAX)
+    {
+        sockname_.can_addr.j1939.pgn = J1939_NO_PGN;
+    }
+    else
+    {
+        sockname_.can_addr.j1939.pgn = pgn;
+    }
 }

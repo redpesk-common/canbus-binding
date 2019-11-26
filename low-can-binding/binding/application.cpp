@@ -154,3 +154,22 @@ bool application_t::isEngineOn()
 
 	return engine_on;
 }
+
+#ifdef USE_FEATURE_J1939
+std::shared_ptr<utils::socketcan_t> application_t::get_socket_address_claiming()
+{
+	return subscription_address_claiming_->get_socket();
+}
+
+std::shared_ptr<low_can_subscription_t> application_t::get_subscription_address_claiming()
+{
+	return subscription_address_claiming_;
+}
+
+
+void application_t::set_subscription_address_claiming(std::shared_ptr<low_can_subscription_t> new_subscription)
+{
+	subscription_address_claiming_ = new_subscription;
+}
+
+#endif
