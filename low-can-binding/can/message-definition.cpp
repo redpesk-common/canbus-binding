@@ -22,16 +22,14 @@
 message_definition_t::message_definition_t(
 	const std::string bus,
 	uint32_t id,
-	bool is_fd,
-	message_format_t format,
+	uint32_t flags,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed,
 	const std::vector<std::shared_ptr<signal_t> >& signals)
 	:  parent_{nullptr},
 	bus_{bus},
 	id_{id},
-	is_fd_(is_fd),
-	format_{format},
+	flags_{flags},
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
@@ -42,8 +40,7 @@ message_definition_t::message_definition_t(const std::string bus,
 	uint32_t id,
 	const std::string name,
 	uint32_t length,
-	bool is_fd,
-	message_format_t format,
+	uint32_t flags,
 	frequency_clock_t frequency_clock,
 	bool force_send_changed,
 	const std::vector<std::shared_ptr<signal_t> >& signals)
@@ -52,8 +49,7 @@ message_definition_t::message_definition_t(const std::string bus,
 	id_{id},
 	name_{name},
 	length_{length},
-	is_fd_(is_fd),
-	format_{format},
+	flags_{flags},
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
@@ -73,19 +69,12 @@ uint32_t message_definition_t::get_id() const
 
 bool message_definition_t::is_fd() const
 {
-	return is_fd_;
+	return (flags_&FD_FRAME);
 }
 
 bool message_definition_t::is_j1939() const
 {
-	if(format_ == message_format_t::J1939)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return (flags_&J1939_PROTOCOL);
 }
 
 std::vector<std::shared_ptr<signal_t>>& message_definition_t::get_signals()
@@ -108,7 +97,7 @@ uint32_t message_definition_t::get_length() const
 	return length_;
 }
 
-message_format_t message_definition_t::get_format() const
+uint32_t message_definition_t::get_flags() const
 {
-	return format_;
+	return flags_;
 }

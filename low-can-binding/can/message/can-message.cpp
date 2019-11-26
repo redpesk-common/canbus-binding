@@ -35,12 +35,11 @@ can_message_t::can_message_t()
 can_message_t::can_message_t(uint32_t maxdlen,
 	uint32_t id,
 	uint32_t length,
-	message_format_t format,
 	bool rtr_flag,
 	uint32_t flags,
 	std::vector<uint8_t>& data,
 	uint64_t timestamp)
-	: message_t(maxdlen, length, format, data, timestamp, flags),
+	: message_t(maxdlen, length, flags, data, timestamp),
 	id_{id},
 	rtr_flag_{rtr_flag}
 {}
@@ -62,7 +61,7 @@ uint32_t can_message_t::get_id() const
 /// @return True if object correctly initialized and false if not.
 bool can_message_t::is_correct_to_send()
 {
-	if (id_ != 0 && length_ != 0 && format_ != message_format_t::INVALID)
+	if (id_ != 0 && length_ != 0 && !(flags_&INVALID_FLAG))
 	{
 		int i;
 		for(i=0;i<length_;i++)
@@ -83,9 +82,8 @@ bool can_message_t::is_correct_to_send()
 std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes, uint64_t timestamp)
 {
 	uint32_t maxdlen = 0, length = 0;
-	uint8_t flags = 0;
+	uint32_t flags = 0;
 	uint32_t id;
-	message_format_t format;
 	bool rtr_flag;
 	std::vector<uint8_t> data;
 
@@ -106,17 +104,17 @@ std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct ca
 
 	if (frame.can_id & CAN_ERR_FLAG)
 	{
-		format = message_format_t::INVALID;
+		flags = flags|INVALID_FLAG;
 		id = frame.can_id & (CAN_ERR_MASK|CAN_ERR_FLAG);
 	}
 	else if (frame.can_id & CAN_EFF_FLAG)
 	{
-		format = message_format_t::EXTENDED;
+		flags = flags|EXTENDED_ID;
 		id = frame.can_id & CAN_EFF_MASK;
 	}
 	else
 	{
-		format = message_format_t::STANDARD;
+		flags = flags|STANDARD_ID;
 		id = frame.can_id & CAN_SFF_MASK;
 	}
 
@@ -140,8 +138,8 @@ std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct ca
 		length = (frame.len > maxdlen) ? maxdlen : frame.len;
 
 		/* Flags field only present for CAN FD frames*/
-		if(maxdlen == CANFD_MAX_DLEN)
-				flags = frame.flags & 0xF;
+		/*if(maxdlen == CANFD_MAX_DLEN)
+				flags = frame.flags & 0xF;*/
 
 		if (data.capacity() < maxdlen)
 			data.reserve(maxdlen);
@@ -155,10 +153,10 @@ std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct ca
 			};
 
 		AFB_DEBUG("Found id: %X, format: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X",
-								id, (uint8_t)format, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+								id, (uint32_t)flags, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 	}
 
-	return std::make_shared<can_message_t>(can_message_t(maxdlen, id, length, format, rtr_flag, flags, data, timestamp));
+	return std::make_shared<can_message_t>(can_message_t(maxdlen, id, length, rtr_flag, flags, data, timestamp));
 }
 
 /// @brief Take all initialized class members and build a

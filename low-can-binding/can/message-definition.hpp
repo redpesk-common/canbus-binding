@@ -45,8 +45,7 @@ private:
 	uint32_t id_; ///< id_ - The ID or the PGN (if j1939) of the message.*/
 	std::string name_; ///< name_ - J1939 PGN name
 	uint32_t length_; ///< length_ - Message data length in bytes. For J1939 message, this is the expected data size
-	bool is_fd_; /*!< uses_fd_ - Flags to enable an FD CAN message communication*/
-	message_format_t format_; ///< format_ - the format of the message's ID.*/
+	uint32_t flags_; ///< format_ - the format of the message's ID.*/
 	frequency_clock_t frequency_clock_; ///<  clock_ - an optional frequency clock to control the output of this
 							///      message, if sent raw, or simply to mark the max frequency for custom
 							///      handlers to retrieve.*/
@@ -61,11 +60,10 @@ public:
 	//message_definition_t(const message_definition_t& b);
 	message_definition_t(const std::string bus);
 	message_definition_t(const std::string bus, uint32_t id, frequency_clock_t frequency_clock, bool force_send_changed);
-	message_definition_t(const std::string bus, uint32_t id, message_format_t format, frequency_clock_t frequency_clock, bool force_send_changed);
+	message_definition_t(const std::string bus, uint32_t id, uint32_t flags, frequency_clock_t frequency_clock, bool force_send_changed);
 	message_definition_t(const std::string bus,
 				 uint32_t id,
-				 bool is_fd,
-				 message_format_t format,
+				 uint32_t flags,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
 				 const std::vector<std::shared_ptr<signal_t> >& signals);
@@ -73,8 +71,7 @@ public:
 				 uint32_t id,
 				 std::string name,
 				 uint32_t length,
-				 bool is_fd,
-				 message_format_t format,
+				 uint32_t flags,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
 				 const std::vector<std::shared_ptr<signal_t> >& signals);
@@ -87,7 +84,7 @@ public:
 	bool is_j1939() const;
 	std::vector<std::shared_ptr<signal_t>>& get_signals();
 	uint32_t get_length() const;
-	message_format_t get_format() const;
+	uint32_t get_flags() const;
 
 	void set_parent(std::shared_ptr<message_set_t> parent);
 	void set_last_value(std::shared_ptr<message_t>  m);

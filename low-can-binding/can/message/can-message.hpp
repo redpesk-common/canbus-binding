@@ -39,8 +39,7 @@ class can_message_t : public message_t {
 
 	public:
 		can_message_t();
-		can_message_t(uint32_t maxdlen, uint32_t id, uint32_t length, message_format_t format, bool rtr_flag_, uint32_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
-
+		can_message_t(uint32_t maxdlen, uint32_t id, uint32_t length, bool rtr_flag_, uint32_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
 		uint32_t get_id() const;
 
 		static std::shared_ptr<can_message_t> convert_from_frame(const canfd_frame& frame, size_t nbytes, uint64_t timestamp);

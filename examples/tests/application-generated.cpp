@@ -7,7 +7,8 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"AGL Virtual Car",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x30,"",0,false,message_format_t::EXTENDED,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x30,"",8,4,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"hvac.fan.speed",// generic_name
 							32,// bit_position
@@ -21,14 +22,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"hvac.temperature.left",// generic_name
@@ -47,10 +48,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"hvac.temperature.right",// generic_name
@@ -69,10 +70,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"hvac.temperature.average",// generic_name
@@ -91,14 +92,15 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3D9,"",0,true,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3D9,"",8,2050,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine.speed",// generic_name
 							16,// bit_position
@@ -112,14 +114,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"fuel.level.low",// generic_name
@@ -134,14 +136,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"fuel.level",// generic_name
@@ -156,18 +158,19 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3E9,"",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3E9,"",8,2,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"vehicle.average.speed",// generic_name
 							0,// bit_position
@@ -185,14 +188,15 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x4D1,"",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x4D1,"",8,2,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine.oil.temp",// generic_name
 							16,// bit_position
@@ -206,14 +210,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"engine.oil.temp.high",// generic_name
@@ -228,18 +232,19 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x620,"",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x620,"",8,2,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"doors.boot.open",// generic_name
 							47,// bit_position
@@ -253,14 +258,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"doors.front_left.open",// generic_name
@@ -275,14 +280,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"doors.front_right.open",// generic_name
@@ -297,14 +302,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"doors.rear_left.open",// generic_name
@@ -319,14 +324,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"doors.rear_right.open",// generic_name
@@ -341,18 +346,19 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x799,"",0,false,message_format_t::STANDARD,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x799,"",8,2,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"windows.front_left.open",// generic_name
 							43,// bit_position
@@ -366,14 +372,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"windows.front_right.open",// generic_name
@@ -388,14 +394,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"windows.rear_left.open",// generic_name
@@ -410,14 +416,14 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"windows.rear_right.open",// generic_name
@@ -432,18 +438,19 @@ application_t::application_t()
 							false,// force_send_changed
 							{
 							},// states
-							false,// writable
+							true,// writable
 							decoder_t::decode_boolean,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61442,"ETC1",8,false,message_format_t::J1939,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61442,"ETC1",8,18,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Momentary.Overspeed.Enable",// generic_name
 							32,// bit_position
@@ -462,13 +469,13 @@ application_t::application_t()
 								{3,"TakeNoAction"}
 							},// states
 							true,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Momentary.Eng.Max.Power.Enable",// generic_name
@@ -488,13 +495,13 @@ application_t::application_t()
 								{0,"notRqingMaxPowerAvailable"}
 							},// states
 							true,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Percent.Clutch.Slip",// generic_name
@@ -513,10 +520,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"%",// unit
+							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Progressive.Shift.Disable",// generic_name
@@ -536,13 +543,13 @@ application_t::application_t()
 								{3,"TakeNoAction"}
 							},// states
 							true,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Src.Addrss.Of.Ctrllng.Dvc.Fr.Trns.Cntrl",// generic_name
@@ -561,10 +568,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Trans.Driveline.Engaged",// generic_name
@@ -584,13 +591,13 @@ application_t::application_t()
 								{3,"NotAvailable"}
 							},// states
 							true,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Trans.Input.Shaft.Speed",// generic_name
@@ -609,10 +616,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"rpm",// unit
+							"rpm"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Trans.Output.Shaft.Speed",// generic_name
@@ -631,10 +638,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"rpm",// unit
+							"rpm"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Trans.Shift.In.Process",// generic_name
@@ -654,13 +661,13 @@ application_t::application_t()
 								{0,"ShiftIsNotInProcess"}
 							},// states
 							true,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Trns.Trq.Cnvrtr.Lckp.Trnstn.In.Prcess",// generic_name
@@ -680,13 +687,13 @@ application_t::application_t()
 								{0,"TransitionIsNotInProcess"}
 							},// states
 							true,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Trns.Trque.Converter.Lockup.Engaged",// generic_name
@@ -706,17 +713,18 @@ application_t::application_t()
 								{1,"TorqueConverterLockupEngaged"}
 							},// states
 							true,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61444,"EEC1",8,false,message_format_t::J1939,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61444,"EEC1",8,18,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Actl.Eng.Prcnt.Trque.High.Resolution",// generic_name
 							4,// bit_position
@@ -735,13 +743,13 @@ application_t::application_t()
 								{8,"1111NotAvailable"}
 							},// states
 							false,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"%",// unit
+							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Actual.Eng.Percent.Torque",// generic_name
@@ -760,10 +768,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"%",// unit
+							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Drivers.Demand.Eng.Percent.Torque",// generic_name
@@ -782,10 +790,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"%",// unit
+							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Demand.Percent.Torque",// generic_name
@@ -804,10 +812,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"%",// unit
+							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Speed",// generic_name
@@ -826,10 +834,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"rpm",// unit
+							"rpm"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Starter.Mode",// generic_name
@@ -858,13 +866,13 @@ application_t::application_t()
 								{8,"strtrInhbtdDueToStarterOvertemp"}
 							},// states
 							false,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Torque.Mode",// generic_name
@@ -893,13 +901,13 @@ application_t::application_t()
 								{6,"Transmission control"}
 							},// states
 							false,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Src.AddrssOf.Ctrllng.Dvc.Fr.Eng.Cntrl",// generic_name
@@ -918,14 +926,15 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61449,"VDC2",8,false,message_format_t::J1939,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61449,"VDC2",8,18,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Lateral.Acceleration",// generic_name
 							40,// bit_position
@@ -943,10 +952,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"m/s/s",// unit
+							"m/s/s"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Longitudinal.Acceleration",// generic_name
@@ -965,10 +974,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"m/s/s",// unit
+							"m/s/s"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Steer.Wheel.Angle",// generic_name
@@ -987,10 +996,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"rad",// unit
+							"rad"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Steer.Wheel.Angle.Sensor.Type",// generic_name
@@ -1010,13 +1019,13 @@ application_t::application_t()
 								{2,"Reserved"}
 							},// states
 							false,// writable
-							nullptr,// decoder
+							decoder_t::decode_state,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"",// unit
+							""// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Steer.Wheel.Turn.Counter",// generic_name
@@ -1035,10 +1044,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"turns",// unit
+							"turns"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Yaw.Rate",// generic_name
@@ -1057,14 +1066,15 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"rad/s",// unit
+							"rad/s"// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65215,"EBC2",8,false,message_format_t::J1939,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65215,"EBC2",8,18,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Front.Axle.Speed",// generic_name
 							0,// bit_position
@@ -1082,10 +1092,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"km/h",// unit
+							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Relative.Speed.Front.Axle.Left.Wheel",// generic_name
@@ -1104,10 +1114,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"km/h",// unit
+							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Relative.Speed.Rear.Axle1.Left.Wheel",// generic_name
@@ -1126,10 +1136,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"km/h",// unit
+							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Relative.Speed.Rear.Axle2.Left.Wheel",// generic_name
@@ -1148,10 +1158,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"km/h",// unit
+							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Rlative.Speed.Front.Axle.Right.Wheel",// generic_name
@@ -1170,10 +1180,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"km/h",// unit
+							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Rlative.Speed.Rear.Axle1.Right.Wheel",// generic_name
@@ -1192,10 +1202,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"km/h",// unit
+							"km/h"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Rlative.Speed.Rear.Axle2.Right.Wheel",// generic_name
@@ -1214,14 +1224,15 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"km/h",// unit
+							"km/h"// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65253,"HOURS",8,false,message_format_t::J1939,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65253,"HOURS",8,18,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Total.Hours.Of.Operation",// generic_name
 							0,// bit_position
@@ -1239,10 +1250,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"hr",// unit
+							"hr"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Total.Revolutions",// generic_name
@@ -1261,14 +1272,15 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"r",// unit
+							"r"// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65262,"ET1",8,false,message_format_t::J1939,frequency_clock_t(5.00000f),true,					{ // beginning signals vector
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65262,"ET1",8,18,frequency_clock_t(5.00000f),true,
+					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Coolant.Temp",// generic_name
 							0,// bit_position
@@ -1286,10 +1298,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"deg C",// unit
+							"deg C"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Fuel.Temp1",// generic_name
@@ -1308,10 +1320,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"deg C",// unit
+							"deg C"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Intercooler.Temp",// generic_name
@@ -1330,10 +1342,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"deg C",// unit
+							"deg C"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Intercooler.Thermostat.Opening",// generic_name
@@ -1352,10 +1364,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"%",// unit
+							"%"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Oil.Temp1",// generic_name
@@ -1374,10 +1386,10 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"deg C",// unit
+							"deg C"// unit
 						})},
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Turbo.Oil.Temp",// generic_name
@@ -1396,13 +1408,14 @@ application_t::application_t()
 							nullptr,// decoder
 							nullptr,// encoder
 							false,// received
-							std::make_pair<bool, int>(false,0),// multiplex
+							std::make_pair<bool, int>(false, 0),// multiplex
 							0,// is_big_endian
 							0,// is_signed
-							"deg C",// unit
+							"deg C"// unit
 						})}
 					} // end signals vector
 				})} // end message_definition entry
+
 		}, // end message_definition vector
 			{ // beginning diagnostic_messages_ vector
 				{std::make_shared<diagnostic_message_t>(diagnostic_message_t{
