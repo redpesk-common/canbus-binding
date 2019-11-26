@@ -20,6 +20,8 @@
 #include "application.hpp"
 #include "canutil/write.h"
 #include "../utils/socketcan-bcm.hpp"
+#include "../can/can-encoder.hpp"
+
 #ifdef USE_FEATURE_J1939
 #include "../utils/socketcan-j1939/socketcan-j1939-data.hpp"
 #endif
@@ -535,20 +537,41 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 {
 	can_message_t *cm = static_cast<can_message_t*>(message);
 
-	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cm->get_id(),cm->get_flags() | TX_CP_CAN_ID); // TX_CP_CAN_ID -> copy in cfd the id of bcm
+	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cm->get_id(),cm->get_flags()|TX_CP_CAN_ID); // TX_CP_CAN_ID -> copy in cfd the id of bcm
+	cm->set_bcm_msg(bcm_msg);
+
 	std::vector<canfd_frame> cfd_vect = cm->convert_to_canfd_frame_vector();
-	for(auto cfd: cfd_vect)
-	{
-		subscription.add_one_bcm_frame(cfd, bcm_msg);
-	}
 
 	if(subscription.open_socket(subscription, bus_name,socket_type::BCM) < 0)
 	{
 			return -1;
 	}
 
-	cm->set_bcm_msg(bcm_msg);
-	subscription.socket_->write_message(*cm);
+	struct bcm_msg &bcm_cm = cm->get_bcm_msg();
+
+
+
+	if(cfd_vect.size() > 1)
+	{
+		AFB_ERROR("Multi frame BCM not implemented");
+		return -1;
+	}
+	else if(cfd_vect.size() == 1) // raw or fd
+	{
+		subscription.add_one_bcm_frame(cfd_vect[0], bcm_cm);
+
+		if(subscription.socket_->write_message(*cm) < 0)
+		{
+			AFB_ERROR("Error write message id : %d",cfd_vect[0].can_id);
+			return -1;
+		}
+	}
+	else // error
+	{
+		AFB_ERROR("Error no data available");
+		return -1;
+	}
+
 	if(! subscription.socket_.get())
 	{
 			return -1;
