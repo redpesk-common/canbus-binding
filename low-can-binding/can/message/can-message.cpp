@@ -282,7 +282,7 @@ std::string can_message_t::get_debug_message()
 	return ret;
 }
 
-struct bcm_msg can_message_t::get_bcm_msg()
+struct bcm_msg& can_message_t::get_bcm_msg()
 {
 	return bcm_msg_;
 }
