@@ -32,7 +32,7 @@ std::string converter_t::to_hex(const uint8_t data[], const size_t length)
 	std::stringstream stream;
 	stream << std::hex << std::setfill('0');
 	for(int i = 0; i < length; i++)
-		stream << std::hex << ((int) data[i]);
+		stream << std::setfill('0') << std::setw(2) << std::hex << ((int) data[i]);
 
 	return stream.str();
 }
