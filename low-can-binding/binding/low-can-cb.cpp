@@ -859,7 +859,7 @@ void list(afb_req_t request)
 /// @return Exit code, zero if success.
 int init_binding(afb_api_t api)
 {
-	int ret = 1;
+	int ret = 0;
 	application_t& application = application_t::instance();
 	can_bus_t& can_bus_manager = application.get_can_bus_manager();
 
