@@ -941,7 +941,7 @@ int load_config(afb_api_t api)
 
 	if (!configPath)
 	{
-		AFB_ERROR_V3("CtlPreInit: No control-* config found invalid JSON %s ", filepath.c_str());
+		AFB_ERROR_V3("CtlPreInit: No control-%s* config found invalid JSON %s ", GetBinderName(), filepath.c_str());
 		return -1;
 	}
 
