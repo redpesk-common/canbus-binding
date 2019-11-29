@@ -1,0 +1,24 @@
+{
+	"$schema": "",
+	"metadata": {
+		"uid": "Low Can",
+		"version": "1.0",
+		"api": "low-can",
+		"info": "Low can Configuration"
+	},
+	"config": {
+		"active_message_set": 0,
+		"dev-mapping": {
+			"hs": "can0",
+			"ls": "can0"
+		},
+		"diagnostic_bus": "hs"
+	},
+	"plugins": [
+		{
+			"uid": "agl-vcar-signals",
+			"info": "agl-vcar signals",
+			"libs": "agl-vcar-signals.ctlso"
+		}
+	]
+}
