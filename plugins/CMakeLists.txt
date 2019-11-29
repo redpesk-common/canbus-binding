@@ -62,7 +62,6 @@ PROJECT_TARGET_ADD(j1939-signals)
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
 	low-can
-	ini-config
 	openxc-message-format
 	uds-c
 	isotp-c

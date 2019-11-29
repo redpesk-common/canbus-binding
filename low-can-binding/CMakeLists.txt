@@ -70,7 +70,6 @@ PROJECT_TARGET_ADD(low-can)
 	)
 
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		ini-config
 		openxc-message-format
 		uds-c
 		isotp-c
@@ -99,7 +98,6 @@ PROJECT_TARGET_ADD(low-can-binding)
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
 		low-can
-		ini-config
 		openxc-message-format
 		uds-c
 		isotp-c
