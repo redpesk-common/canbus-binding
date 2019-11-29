@@ -211,8 +211,6 @@ namespace utils
 		if(nbytes < 0)
 			return nullptr;
 
-		//AFB_DEBUG("Data available: %i bytes read", (int)nbytes);
-
 		struct timeval tv;
 		ioctl(socket(), SIOCGSTAMP, &tv);
 		uint64_t timestamp = 1000000 * tv.tv_sec + tv.tv_usec;

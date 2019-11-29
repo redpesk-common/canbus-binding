@@ -181,9 +181,7 @@ void can_bus_t::can_decode_message()
 				std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
 				map_subscription& s = sm.get_subscribed_signals();
 				if(application_t::instance().get_diagnostic_manager().is_diagnostic_response(message))
-				{
 					process_diagnostic_signals(application_t::instance().get_diagnostic_manager(), message, s);
-				}
 				else
 					process_signals(message, s);
 			}

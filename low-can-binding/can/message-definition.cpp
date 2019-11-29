@@ -87,7 +87,7 @@ bool message_definition_t::is_j1939() const
 
 bool message_definition_t::is_isotp() const
 {
-	return (flags_&ISOTP_PROTOCOL);
+	return (flags_ & ISOTP_PROTOCOL);
 }
 
 vect_ptr_signal_t& message_definition_t::get_signals()

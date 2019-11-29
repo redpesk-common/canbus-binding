@@ -58,12 +58,12 @@ void converter_t::signal_to_bits_bytes(unsigned int bit_position, unsigned int b
 
 
 /**
- * @brief 	This is to use when you have a big endian CAN frame layout.
- * 		  	It converts the bit position so it matches with little endiant CAN frame layout.
+ * @brief	This is to use when you have a big endian CAN frame layout.
+ * 		It converts the bit position so it matches with little endiant CAN frame layout.
  *
  * @param bit_position 	Original bit position.
  * @param bit_size 		Size of the data.
- * @return uint32_t 	New little endian bit position.
+ * @return uint32_t 	New bit position.
  */
 uint32_t converter_t::bit_position_swap(uint32_t bit_position,uint32_t bit_size)
 {
