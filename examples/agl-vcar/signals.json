@@ -98,7 +98,7 @@
 	},
 	"0x3D9": {
 	"bus": "hs",
-	"is_fd" : true,
+	"is_fd" : false,
 	"is_extended": false,
 	"is_j1939" : false,
 	"length" : 8,
