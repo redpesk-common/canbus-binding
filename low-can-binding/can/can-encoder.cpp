@@ -93,7 +93,7 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 		int j=0;
 		for(int i=0;i<new_bit_size;i++)
 		{
-			int mask = 1 << ((i%8)+new_start_bit);
+			int mask = 0x80 >> ((i%8)+new_start_bit);
 
 			uint8_t mask_v = 0;
 			if(mask > 255)
