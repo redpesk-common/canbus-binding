@@ -499,7 +499,7 @@ application_t::application_t()
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3D9,"",8,2050,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"hs",0x3D9,"",8,2,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"engine.speed",// generic_name
