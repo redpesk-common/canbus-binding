@@ -7,7 +7,7 @@ application_t::application_t()
 	, message_set_{
 		{std::make_shared<message_set_t>(message_set_t{0,"AGL Virtual Car",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x21,"",0,2,frequency_clock_t(5.00000f),true,
+				{std::make_shared<message_definition_t>(message_definition_t{"ls",0x21,"",8,2,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"steering_wheel.cruise.cancel",// generic_name

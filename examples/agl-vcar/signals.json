@@ -216,6 +216,10 @@
 	},
 	"0x21": {
 	"bus": "ls",
+	"is_fd" : false,
+	"is_extended": false,
+	"is_j1939" : false,
+	"length" : 8,
 	"signals": {
 		"SW_Previous": {
 			"generic_name": "steering_wheel.previous",
