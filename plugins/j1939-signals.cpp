@@ -9,7 +9,7 @@ CTLP_CAPI_REGISTER("j1939-signals");
 
 std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set_t{0,"Virtual J1939",
 			{ // beginning message_definition_ vector
-				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61442,"ETC1",8,4,true,frequency_clock_t(5.00000f),true,
+				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61442,"ETC1",8,4,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Momentary.Overspeed.Enable",// generic_name
@@ -294,7 +294,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61444,"EEC1",8,4,true,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61444,"EEC1",8,4,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Actl.Eng.Prcnt.Trque.High.Resolution",// generic_name
@@ -512,7 +512,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61449,"VDC2",8,4,true,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",61449,"VDC2",8,4,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Lateral.Acceleration",// generic_name
@@ -658,7 +658,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65215,"EBC2",8,4,true,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65215,"EBC2",8,4,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Front.Axle.Speed",// generic_name
@@ -823,7 +823,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65253,"HOURS",8,4,true,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65253,"HOURS",8,4,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Total.Hours.Of.Operation",// generic_name
@@ -873,7 +873,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 						})}
 					} // end signals vector
 				})} // end message_definition entry
-,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65262,"ET1",8,4,true,frequency_clock_t(5.00000f),true,
+,				{std::make_shared<message_definition_t>(message_definition_t{"j1939",65262,"ET1",8,4,frequency_clock_t(5.00000f),true,
 					{ // beginning signals vector
 						{std::make_shared<signal_t> (signal_t{
 							"Eng.Coolant.Temp",// generic_name

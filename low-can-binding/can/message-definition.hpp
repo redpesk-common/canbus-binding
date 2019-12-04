@@ -46,8 +46,6 @@ private:
 	std::string name_; ///< name_ - J1939 PGN name
 	uint32_t length_; ///< length_ - Message data length in bytes. For J1939 message, this is the expected data size
 	uint32_t flags_; ///< format_ - the format of the message's ID.*/
-	bool frame_layout_is_little_; ///<frame_layout_is_little_ Defines if the can frame layout is little endian or big endian.
-								  /// Default is true;
 	frequency_clock_t frequency_clock_; ///<  clock_ - an optional frequency clock to control the output of this
 							///      message, if sent raw, or simply to mark the max frequency for custom
 							///      handlers to retrieve.*/
@@ -66,7 +64,6 @@ public:
 	message_definition_t(const std::string bus,
 				 uint32_t id,
 				 uint32_t flags,
-				 bool frame_layout_is_little,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
 				 const vect_ptr_signal_t& signals);
@@ -75,7 +72,6 @@ public:
 				 std::string name,
 				 uint32_t length,
 				 uint32_t flags,
-				 bool frame_layout_is_little,
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
 				 const vect_ptr_signal_t& signals);
