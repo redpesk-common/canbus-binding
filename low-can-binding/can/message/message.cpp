@@ -177,3 +177,14 @@ void message_t::set_length(uint32_t length)
 {
 	length_ = length;
 }
+
+void message_t::frame_swap()
+{
+	int i;
+	uint8_t *temp = (uint8_t*)alloca(length_);
+
+	for(i = 0; i < length_; i++)
+		temp[i] = data_[length_ - i - 1];
+
+	memcpy(data_.data(), temp, length_);
+}

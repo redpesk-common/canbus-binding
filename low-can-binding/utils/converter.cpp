@@ -65,20 +65,24 @@ void converter_t::signal_to_bits_bytes(unsigned int bit_position, unsigned int b
  * @param bit_size 		Size of the data.
  * @return uint32_t 	New bit position.
  */
-uint32_t converter_t::bit_position_swap(uint32_t bit_position,uint32_t bit_size)
+uint32_t converter_t::bit_position_swap(unsigned int msg_length, unsigned int bit_position, unsigned int bit_size)
 {
-	uint32_t start_byte_position = (uint32_t)(bit_position/8);
-	uint32_t bit_size_rest = bit_size;
+	return msg_length - bit_position - bit_size;
+	/*
+	unsigned int start_byte_position = (unsigned int)(bit_position/8);
+	unsigned int bit_size_rest = bit_size;
 
-	if((int)(bit_size-(8 + start_byte_position*8-bit_position%8))>0)
+	if((int)(bit_size-(8 + start_byte_position * 8 - bit_position % 8)) > 0)
 	{
 		AFB_ERROR("Error: bit_position and bit_size getting out of range");
 		return bit_position;
 	}
 
-	if(bit_size<=8 && ((bit_position+bit_size)%8==bit_size || (bit_position+bit_size)%8==0))
+	if(bit_size <= 8 &&
+	   ((bit_position+bit_size) % 8 == bit_size ||
+	   (bit_position+bit_size)%8==0))
 	{
-		return (uint32_t)(start_byte_position*8 + (8-bit_size));
+		return (unsigned int)(start_byte_position*8 + (8-bit_size));
 	}
 	else
 	{
@@ -88,7 +92,7 @@ uint32_t converter_t::bit_position_swap(uint32_t bit_position,uint32_t bit_size)
 			start_byte_position--;
 			bit_position = start_byte_position*8;
 		} while (bit_size_rest>8);
-		return (uint32_t)(start_byte_position*8 + (8-bit_size_rest));
+		return (unsigned int)(start_byte_position*8 + (8-bit_size_rest));
 	}
-
+	*/
 }

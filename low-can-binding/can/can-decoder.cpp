@@ -99,6 +99,14 @@ float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message
 	uint8_t bit_size = (uint8_t) signal.get_bit_size();
 	uint32_t bit_position = signal.get_bit_position();
 
+	if(!signal.get_message()->frame_layout_is_little())
+	{
+		bit_position = converter_t::bit_position_swap(message->get_length(),
+							      signal.get_bit_position(),
+							      signal.get_bit_size());
+		message->frame_swap();
+	}
+
 	int new_start_byte = 0;
 	int new_end_byte = 0;
 	uint8_t new_start_bit = 0;
@@ -320,11 +328,6 @@ openxc_DynamicField decoder_t::decode_state(signal_t& signal, std::shared_ptr<me
 ///
 openxc_DynamicField decoder_t::translate_signal(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
-	if(!signal.get_message()->frame_layout_is_little() && !signal.bit_position_is_swapped())
-	{
-		signal.set_bit_position(converter_t::bit_position_swap(signal.get_bit_position(),signal.get_bit_size()));
-		signal.bit_position_is_swapped_reverse();
-	}
 	// Must call the decoders every time, regardless of if we are going to
 	// decide to send the signal or not.
 	openxc_DynamicField decoded_value = decoder_t::decode_signal(signal,
