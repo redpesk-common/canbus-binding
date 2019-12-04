@@ -85,28 +85,16 @@ const uint8_t* message_t::get_data() const
 ///
 const std::vector<uint8_t> message_t::get_data_vector(int start, int end) const
 {
-	std::vector<uint8_t> ret;
-	if(start >= 0)
-	{
-		if(end<length_)
-		{
-			for(int i=start;i<=end;i++)
-			{
-				ret.push_back(data_[i]);
-			}
-		}
-		else
-		{
-			for(int i=start;i<length_;i++)
-			{
-				ret.push_back(data_[i]);
-			}
-		}
-	}
-	else
+	if ( start > length_ || end > length_ )
 	{
 		AFB_ERROR("Error index to get data vector, [%d-%d] - for length %d", start, end, length_);
+		return data_;
 	}
+
+	std::vector<uint8_t>::const_iterator first = data_.begin() + start;
+	std::vector<uint8_t>::const_iterator last = data_.begin() + end;
+	std::vector<uint8_t> ret(first, last);
+
 	return ret;
 }
 
