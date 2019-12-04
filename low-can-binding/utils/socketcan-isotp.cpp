@@ -36,7 +36,7 @@ namespace utils
 	int socketcan_isotp_t::open(std::string device_name)
 	{
 		AFB_WARNING("NOT USE THIS FUNCTION !");
-		return open(device_name,NO_CAN_ID,NO_CAN_ID);
+		return open(device_name, NO_CAN_ID, NO_CAN_ID);
 	}
 
 	/**
@@ -59,11 +59,11 @@ namespace utils
 			return -1;
 		}
 
-		if(define_tx_address(device_name,rx_id,tx_id) < 0)
+		if(define_tx_address(device_name, rx_id, tx_id) < 0)
 			return -1;
 
 		struct can_isotp_options opts;
-		memset(&opts,0,sizeof(opts));
+		memset(&opts, 0, sizeof(opts));
 		setopt(SOL_CAN_ISOTP, CAN_ISOTP_OPTS, &opts, sizeof(opts));
 
 		if(bind((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
@@ -86,7 +86,7 @@ namespace utils
 
 		std::shared_ptr<can_message_t> cm = std::make_shared<can_message_t>();
 		uint8_t msg[MAX_ISOTP_FRAMES];
-		ssize_t nbytes = read(socket(),msg,MAX_ISOTP_FRAMES);
+		ssize_t nbytes = read(socket(), msg, MAX_ISOTP_FRAMES);
 
 		cm->set_id(tx_address_.can_addr.tp.rx_id);
 
@@ -101,8 +101,8 @@ namespace utils
 			data.push_back(msg[i]);
 
 		std::string data_string;
-		data_string = converter_t::to_hex(msg,nbytes);
-		AFB_DEBUG("DATA ISO TP for id : %x = %s",cm->get_id(),data_string.c_str());
+		data_string = converter_t::to_hex(msg, nbytes);
+		AFB_DEBUG("DATA ISO TP for id : %x = %s", cm->get_id(), data_string.c_str());
 
 
 		cm->set_data(data);
@@ -126,7 +126,7 @@ namespace utils
 		size_t size = m.get_length();
 		if(size < MAX_ISOTP_FRAMES)
 		{
-			ssize_t ret = write(socket(),m.get_data(),size);
+			ssize_t ret = write(socket(), m.get_data(), size);
 			if(ret < 0)
 			{
 				AFB_ERROR("Error sending : %i %s", errno, ::strerror(errno));
@@ -134,7 +134,7 @@ namespace utils
 			}
 
 			if(ret != size)
-				AFB_WARNING("ISOTP wrote only %zd byte",ret);
+				AFB_WARNING("ISOTP wrote only %zd byte", ret);
 		}
 		else
 		{

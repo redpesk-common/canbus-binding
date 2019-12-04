@@ -99,7 +99,7 @@ public:
 	void set_tx_id(canid_t tx_id);
 	void set_signal(std::shared_ptr<signal_t> signal);
 
-	static struct bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0,0}, const struct timeval& frequency_thinning = {0,0});
+	static struct bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0, 0}, const struct timeval& frequency_thinning = {0, 0});
 	static void add_one_bcm_frame(struct canfd_frame& cfd, struct bcm_msg& bcm_msg);
 	static void remove_last_bcm_frame(struct bcm_msg& bcm_msg);
 

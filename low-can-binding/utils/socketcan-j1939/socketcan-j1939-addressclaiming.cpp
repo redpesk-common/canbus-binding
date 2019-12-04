@@ -26,7 +26,7 @@ namespace utils
 	 */
 	socketcan_j1939_addressclaiming_t::socketcan_j1939_addressclaiming_t():
 	socketcan_j1939_t(),
-	table_j1939_address_{{std::make_pair(0,false)}},
+	table_j1939_address_{{std::make_pair(0, false)}},
 	signal_stop_{false},
 	claiming_state_{claiming_state::INITIAL}
 	{}
@@ -64,7 +64,7 @@ namespace utils
 
 			if(jm->get_addr() != current_address_)
 			{
-				save_addr_name(jm->get_addr(),jm->get_name());
+				save_addr_name(jm->get_addr(), jm->get_name());
 				return invalid_message;
 			}
 
@@ -76,7 +76,7 @@ namespace utils
 					return invalid_message;
 				}
 
-				save_addr_name(jm->get_addr(),jm->get_name());
+				save_addr_name(jm->get_addr(), jm->get_name());
 
 
 				if(timer_handle_->evtSource)
@@ -97,7 +97,7 @@ namespace utils
 				AFB_DEBUG("Address colision");
 				if(jm->get_name() > htole64(J1939_NAME_ECU))
 				{
-					if(claim_address(false,false) < 0)
+					if(claim_address(false, false) < 0)
 					{
 						AFB_ERROR("Claim address failed");
 						change_state(claiming_state::INVALID);
@@ -106,9 +106,9 @@ namespace utils
 					return invalid_message;
 				}
 
-				save_addr_name(jm->get_addr(),jm->get_name());
+				save_addr_name(jm->get_addr(), jm->get_name());
 
-				if(claim_address(false,true) < 0)
+				if(claim_address(false, true) < 0)
 				{
 						AFB_ERROR("Claim address failed");
 						change_state(claiming_state::INVALID);
@@ -140,7 +140,7 @@ namespace utils
 			else
 			{
 				for (int i = start_addr; i <= end_addr; i++)
-					table_j1939_address_[i] = std::make_pair(0,true);
+					table_j1939_address_[i] = std::make_pair(0, true);
 			}
 		}
 	}
@@ -152,18 +152,18 @@ namespace utils
 	 * @param name The name of the ECU that is in the address
 	 * @return int 0 if save is ok
 	 */
-	int socketcan_j1939_addressclaiming_t::save_addr_name(uint8_t addr,name_t name)
+	int socketcan_j1939_addressclaiming_t::save_addr_name(uint8_t addr, name_t name)
 	{
 		if(addr < J1939_IDLE_ADDR)
 		{
 			if(table_j1939_address_[addr].first < name)
 			{
 				table_j1939_address_[addr].first = name;
-				AFB_DEBUG("[socketcan-j1939-addressclaiming][save_addr_name] NAME : %x <--> ADDR : %d",(unsigned int)name,addr);
+				AFB_DEBUG("[socketcan-j1939-addressclaiming][save_addr_name] NAME : %x <--> ADDR : %d",(unsigned int)name, addr);
 			}
 			else if(table_j1939_address_[addr].first == name)
 			{
-				AFB_WARNING("Name %x has already adress %d",(unsigned int)name,addr);
+				AFB_WARNING("Name %x has already adress %d",(unsigned int)name, addr);
 			}
 		}
 		else
@@ -216,20 +216,20 @@ namespace utils
 		socketcan_j1939_addressclaiming_t *addressclaiming_socket = (socketcan_j1939_addressclaiming_t*) timerhandle->context;
 		// If the cache is cleared :
 		addressclaiming_socket->change_state(claiming_state::OPERATIONAL);
-		addressclaiming_socket->save_addr_name(addressclaiming_socket->current_address_,htole64(J1939_NAME_ECU));
+		addressclaiming_socket->save_addr_name(addressclaiming_socket->current_address_, htole64(J1939_NAME_ECU));
 		AFB_DEBUG("Get address %d for this ecu", addressclaiming_socket->current_address_);
 		/*Else :
 
 		uint8_t data[3]= { 0, 0, 0, };
-		std::vector<uint8_t> data_v(data,data+3);
-		int res = addressclaiming_socket->write_j1939_message(J1939_PGN_REQUEST,data_v,3);
+		std::vector<uint8_t> data_v(data, data+3);
+		int res = addressclaiming_socket->write_j1939_message(J1939_PGN_REQUEST, data_v, 3);
 		if(res < 0)
 		{
 			if(res == -99)
 			{
-				addressclaiming_socket->save_addr_name(addressclaiming_socket->current_address_,htole64(1));
+				addressclaiming_socket->save_addr_name(addressclaiming_socket->current_address_, htole64(1));
 				AFB_DEBUG("Address busy but no claming request from other ECU");
-				addressclaiming_socket->claim_address(false,true);
+				addressclaiming_socket->claim_address(false, true);
 			}
 			else
 			{
@@ -239,7 +239,7 @@ namespace utils
 		else
 		{
 			addressclaiming_socket->change_state(claiming_state::OPERATIONAL);
-			addressclaiming_socket->save_addr_name(addressclaiming_socket->current_address_,htole64(J1939_NAME_ECU));
+			addressclaiming_socket->save_addr_name(addressclaiming_socket->current_address_, htole64(J1939_NAME_ECU));
 			AFB_DEBUG("Get address %d for this ecu", addressclaiming_socket->current_address_);
 		}*/
 
@@ -268,7 +268,7 @@ namespace utils
 	 * @param new_address If true, claim a new address, else only resend a claim with same address
 	 * @return int -1 if fail
 	 */
-	int socketcan_j1939_addressclaiming_t::claim_address(bool first_claim,bool new_address)
+	int socketcan_j1939_addressclaiming_t::claim_address(bool first_claim, bool new_address)
 	{
 		if(new_address)
 		{
@@ -286,7 +286,7 @@ namespace utils
 
 		if(first_claim)
 		{
-			int ret = socketcan_j1939_t::open(device_name_,htole64(J1939_NAME_ECU),J1939_NO_PGN,current_address_);
+			int ret = socketcan_j1939_t::open(device_name_, htole64(J1939_NAME_ECU), J1939_NO_PGN, current_address_);
 
 			if(ret < 0)
 			{
@@ -295,7 +295,7 @@ namespace utils
 			}
 
 			AFB_DEBUG("[socketcan-j1939-addressclaiming][claim_address] Success open socket address claiming");
-			add_filter(J1939_NO_NAME,J1939_PGN_ADDRESS_CLAIMED,J1939_NO_ADDR,J1939_NO_NAME,J1939_PGN_PDU1_MAX,J1939_NO_ADDR);
+			add_filter(J1939_NO_NAME, J1939_PGN_ADDRESS_CLAIMED, J1939_NO_ADDR, J1939_NO_NAME, J1939_PGN_PDU1_MAX, J1939_NO_ADDR);
 			define_opt();
 		}
 		else
@@ -374,7 +374,7 @@ namespace utils
 	{
 		device_name_ = device_name;
 		initialize_table_j1939_address();
-		if(claim_address(true,true) < 0)
+		if(claim_address(true, true) < 0)
 		{
 			AFB_ERROR("Claim address failed");
 			return -1;

@@ -221,7 +221,7 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 		// poll a PID for nothing.
 		if(sig->get_supported() && subscribe)
 		{
-			if (!app.isEngineOn())
+			if (!app.is_engine_on())
 				AFB_WARNING("signal: Engine is off, %s won't received responses until it's on",  sig->get_name().c_str());
 
 			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency, perm_rec_diag_req);
@@ -382,14 +382,14 @@ static int one_subscribe_unsubscribe_events(afb_req_t request, bool subscribe, c
 	return ret;
 }
 
-static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const uint32_t& id ,json_object *args)
+static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const uint32_t& id, json_object *args)
 {
 	int ret = 0;
 	std::shared_ptr<message_definition_t> message_definition = application_t::instance().get_message_definition(id);
 	struct utils::signals_found sf;
 
 	if(message_definition)
-		sf.signals = list_ptr_signal_t(message_definition->get_signals().begin(),message_definition->get_signals().end());
+		sf.signals = list_ptr_signal_t(message_definition->get_signals().begin(), message_definition->get_signals().end());
 
 	if(sf.signals.empty())
 	{
@@ -563,7 +563,7 @@ static int send_message(message_t *message, const std::string& bus_name, uint32_
 
 
 static void write_raw_frame(afb_req_t request, const std::string& bus_name, message_t *message,
-							struct json_object *can_data, uint32_t flags, event_filter_t &event_filter)
+			    struct json_object *can_data, uint32_t flags, event_filter_t &event_filter)
 {
 
 	struct utils::signals_found sf;
@@ -572,7 +572,7 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 
 	if( !sf.signals.empty() )
 	{
-		AFB_DEBUG("ID WRITE RAW : %d",sf.signals.front()->get_message()->get_id());
+		AFB_DEBUG("ID WRITE RAW : %d", sf.signals.front()->get_message()->get_id());
 		if(flags & BCM_PROTOCOL)
 		{
 			if(sf.signals.front()->get_message()->is_fd())
@@ -639,20 +639,20 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 static void write_frame(afb_req_t request, const std::string& bus_name, json_object *json_value, event_filter_t &event_filter)
 {
 	message_t *message;
-	int id;
-	int length;
+	uint32_t id;
+	uint32_t length;
 	struct json_object *can_data = nullptr;
 	std::vector<uint8_t> data;
 
-	AFB_DEBUG("JSON content %s",json_object_get_string(json_value));
+	AFB_DEBUG("JSON content %s", json_object_get_string(json_value));
 
 	if(!wrap_json_unpack(json_value, "{si, si, so !}",
 				  "can_id", &id,
 				  "can_dlc", &length,
 				  "can_data", &can_data))
 	{
-		message = new can_message_t(0,(uint32_t)id,(uint32_t)length,false,0,data,0);
-		write_raw_frame(request,bus_name,message,can_data,BCM_PROTOCOL,event_filter);
+		message = new can_message_t(0, id, length, false, 0, data, 0);
+		write_raw_frame(request, bus_name, message, can_data, BCM_PROTOCOL, event_filter);
 	}
 #ifdef USE_FEATURE_J1939
 	else if(!wrap_json_unpack(json_value, "{si, si, so !}",
@@ -660,8 +660,8 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 				  "length", &length,
 				  "data", &can_data))
 	{
-		message = new j1939_message_t((uint32_t)length,data,0,J1939_NO_NAME,(pgn_t)id,J1939_NO_ADDR);
-		write_raw_frame(request,bus_name,message,can_data,J1939_PROTOCOL, event_filter);
+		message = new j1939_message_t(length, data, 0, J1939_NO_NAME, (pgn_t)id, J1939_NO_ADDR);
+		write_raw_frame(request, bus_name, message, can_data, J1939_PROTOCOL, event_filter);
 	}
 #endif
 	else
@@ -712,7 +712,7 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 		flags = BCM_PROTOCOL;
 
 //	cfd = encoder_t::build_frame(sig, value);
-	message_t *message = encoder_t::build_message(sig,value,false,false);
+	message_t *message = encoder_t::build_message(sig, value, false, false);
 
 	if(! send_message(message, sig->get_message()->get_bus_device_name(), flags, event_filter, sig) && send)
 		afb_req_success(request, nullptr, "Message correctly sent");
@@ -923,8 +923,8 @@ int init_binding(afb_api_t api)
 			application.set_subscription_address_claiming(low_can_j1939);
 
 			ret = low_can_subscription_t::open_socket(*low_can_j1939,
-												j1939_bus,
-												J1939_ADDR_CLAIM_PROTOCOL);
+								  j1939_bus,
+								  J1939_ADDR_CLAIM_PROTOCOL);
 
 			if(ret < 0)
 			{

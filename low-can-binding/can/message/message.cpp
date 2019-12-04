@@ -83,7 +83,7 @@ const uint8_t* message_t::get_data() const
 /// @return pointer to the first element
 ///  of class member data_
 ///
-const std::vector<uint8_t> message_t::get_data_vector(int start,int end) const
+const std::vector<uint8_t> message_t::get_data_vector(int start, int end) const
 {
 	std::vector<uint8_t> ret;
 	if(start >= 0)
@@ -105,7 +105,7 @@ const std::vector<uint8_t> message_t::get_data_vector(int start,int end) const
 	}
 	else
 	{
-		AFB_ERROR("Error index to get data vector, [%d-%d] - for length %d",start,end,length_);
+		AFB_ERROR("Error index to get data vector, [%d-%d] - for length %d", start, end, length_);
 	}
 	return ret;
 }

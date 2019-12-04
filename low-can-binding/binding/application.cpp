@@ -145,7 +145,7 @@ void application_t::set_active_message_set(uint8_t id)
 	active_message_set_ = id;
 }
 
-bool application_t::isEngineOn()
+bool application_t::is_engine_on()
 {
 	struct utils::signals_found sf;
 	openxc_DynamicField search_key = build_DynamicField("engine.speed");

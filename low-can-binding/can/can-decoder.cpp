@@ -50,13 +50,13 @@ float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message
 		data_signal.push_back(data[i]);
 
 //	if(bit_size > 255)
-//		AFB_ERROR("Error signal %s to long bit size",signal.get_name().c_str());
+//		AFB_ERROR("Error signal %s to long bit size", signal.get_name().c_str());
 
 //	if(new_start_bit > 255)
 //		AFB_ERROR("Too long signal offset %d", new_start_bit);
 
 	if(data_signal.size() > 65535)
-		AFB_ERROR("Too long data signal %s",signal.get_name().c_str());
+		AFB_ERROR("Too long data signal %s", signal.get_name().c_str());
 
 	return bitfield_parse_float(data_signal.data(), (uint16_t) data_signal.size(),
 			new_start_bit, bit_size, signal.get_factor(),

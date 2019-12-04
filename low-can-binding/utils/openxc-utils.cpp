@@ -401,7 +401,7 @@ void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value)
 	}
 	else if(field.has_bytes_value)
 	{
-		std::string s = converter_t::to_hex(field.bytes_value,field.length_array);
+		std::string s = converter_t::to_hex(field.bytes_value, field.length_array);
 
 		json_object_object_add(value, "value", json_object_new_string(s.c_str()));
 	}

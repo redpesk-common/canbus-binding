@@ -117,7 +117,7 @@ namespace utils
 		{
 			if(write_message(vobj[i])<0)
 			{
-				AFB_ERROR("Error send message %d",i);
+				AFB_ERROR("Error send message %d", i);
 				return -1;
 			}
 		}

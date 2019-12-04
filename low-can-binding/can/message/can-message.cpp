@@ -204,12 +204,12 @@ struct std::vector<canfd_frame> can_message_t::convert_to_canfd_frame_vector()
 				std::vector<uint8_t> data = get_data_vector((i*64),(i*64)+63);
 				if(data.size()<64)
 				{
-					::memset(frame.data,0,sizeof(frame.data));
-					::memcpy(frame.data,data.data(),data.size());
+					::memset(frame.data, 0, sizeof(frame.data));
+					::memcpy(frame.data, data.data(), data.size());
 				}
 				else
 				{
-					::memcpy(frame.data,data.data(),64);
+					::memcpy(frame.data, data.data(), 64);
 				}
 				ret.push_back(frame);
 				i++;
@@ -226,13 +226,13 @@ struct std::vector<canfd_frame> can_message_t::convert_to_canfd_frame_vector()
 				std::vector<uint8_t> data = get_data_vector(i*8,(i*8)+7);
 				if(data.size()<8)
 				{
-					::memset(frame.data,0,sizeof(frame.data));
-					::memcpy(frame.data,data.data(),data.size());
+					::memset(frame.data, 0, sizeof(frame.data));
+					::memcpy(frame.data, data.data(), data.size());
 				}
 				else
 				{
-					::memset(frame.data,0,sizeof(frame.data));
-					::memcpy(frame.data,data.data(),8);
+					::memset(frame.data, 0, sizeof(frame.data));
+					::memcpy(frame.data, data.data(), 8);
 				}
 				ret.push_back(frame);
 				i++;

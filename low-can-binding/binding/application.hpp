@@ -89,7 +89,7 @@ class application_t
 
 		uint32_t get_signal_id(signal_t& sig) const;
 
-		bool isEngineOn();
+		bool is_engine_on();
 
 		void set_active_message_set(uint8_t id);
 

@@ -394,12 +394,12 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 					rx = subscription.signal_->get_message()->get_id();
 					tx = subscription.get_tx_id();
 				}
-				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(),rx,tx);
+				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(), rx, tx);
 				subscription.socket_ = socket;
 			}
 			else if(! bus_name.empty())
 			{
-				ret = socket->open(bus_name, subscription.get_rx_id(),subscription.get_tx_id());
+				ret = socket->open(bus_name, subscription.get_rx_id(), subscription.get_tx_id());
 				subscription.socket_ = socket;
 			}
 			subscription.index_ = (int)subscription.socket_->socket();
@@ -495,7 +495,7 @@ void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, struct b
 void low_can_subscription_t::remove_last_bcm_frame(struct bcm_msg& bcm_msg)
 {
 	struct canfd_frame cf;
-	memset(&cf,0,sizeof(cf));
+	memset(&cf, 0, sizeof(cf));
 	bcm_msg.fd_frames[bcm_msg.msg_head.nframes] = cf;
 	bcm_msg.msg_head.nframes--;
 }
@@ -704,7 +704,7 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 {
 	can_message_t *cm = static_cast<can_message_t*>(message);
 
-	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cm->get_id(),cm->get_flags()|TX_CP_CAN_ID); // TX_CP_CAN_ID -> copy in cfd the id of bcm
+	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cm->get_id(), cm->get_flags()|TX_CP_CAN_ID); // TX_CP_CAN_ID -> copy in cfd the id of bcm
 	cm->set_bcm_msg(bcm_msg);
 
 	std::vector<canfd_frame> cfd_vect = cm->convert_to_canfd_frame_vector();

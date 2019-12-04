@@ -42,8 +42,8 @@ namespace utils
 	 */
 	void socketcan_j1939_t::add_filter(name_t name, pgn_t pgn, uint8_t addr, name_t name_mask, pgn_t pgn_mask, uint8_t addr_mask)
 	{
-	//	AFB_DEBUG("[socketcan_j1939_t][add_filter] PGN : %" PRIu32 " ; NAME : %" PRIu64 " ; ADDR : %" PRIu8,pgn,(long unsigned int)name,addr);
-	//	AFB_DEBUG("PGN_MASK : %" PRIu32 " ; NAME_MASK : %" PRIu64 "; ADDR_MASK : %" PRIu8,pgn_mask,(long unsigned int)name_mask,addr_mask);
+	//	AFB_DEBUG("[socketcan_j1939_t][add_filter] PGN : %" PRIu32 " ; NAME : %" PRIu64 " ; ADDR : %" PRIu8, pgn,(long unsigned int)name, addr);
+	//	AFB_DEBUG("PGN_MASK : %" PRIu32 " ; NAME_MASK : %" PRIu64 "; ADDR_MASK : %" PRIu8, pgn_mask,(long unsigned int)name_mask, addr_mask);
 		int filter_on = 0;
 		struct j1939_filter filter;
 		memset(&filter, 0, sizeof(filter));
@@ -152,7 +152,7 @@ namespace utils
 	 */
 	int socketcan_j1939_t::open(std::string device_name)
 	{
-		return open(device_name,0,0,0);
+		return open(device_name, 0, 0, 0);
 	}
 
 	/**
@@ -169,7 +169,7 @@ namespace utils
 
 		socket_ = socketcan_t::open(PF_CAN, SOCK_DGRAM, CAN_J1939);
 
-		define_tx_address(device_name,name,pgn,addr);
+		define_tx_address(device_name, name, pgn, addr);
 
 		if(bind((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
 		{
@@ -230,7 +230,7 @@ namespace utils
 	int socketcan_j1939_t::write_j1939_message(pgn_t pgn, std::vector<uint8_t> &data, uint32_t len_data)
 	{
 		j1939_message_t msg = j1939_message_t(len_data, data, 0, 0, pgn, 0);
-		msg.set_sockname(pgn,J1939_NO_NAME,J1939_NO_ADDR);
+		msg.set_sockname(pgn, J1939_NO_NAME, J1939_NO_ADDR);
 		return write_message(msg);
 	}
 

@@ -33,10 +33,10 @@ namespace utils
 			std::pair<uint64_t, bool> table_j1939_address_[J1939_IDLE_ADDR];
 
 		private:
-			int claim_address(bool first_claim,bool new_address);
+			int claim_address(bool first_claim, bool new_address);
 			int pgn_request();
 			void initialize_table_j1939_address();
-			int save_addr_name(uint8_t addr,name_t name);
+			int save_addr_name(uint8_t addr, name_t name);
 			uint8_t choose_new_address();
 			uint8_t get_addr_table(name_t name);
 			void change_state(claiming_state new_state);

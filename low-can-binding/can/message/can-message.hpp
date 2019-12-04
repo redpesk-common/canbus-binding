@@ -40,12 +40,12 @@ class can_message_t : public message_t {
 	public:
 		can_message_t();
 		can_message_t(  uint32_t maxdlen,
-						uint32_t id,
-						uint32_t length,
-						bool rtr_flag_,
-						uint32_t flags,
-						std::vector<uint8_t>& data,
-						uint64_t timestamp);
+				uint32_t id,
+				uint32_t length,
+				bool rtr_flag_,
+				uint32_t flags,
+				std::vector<uint8_t>& data,
+				uint64_t timestamp);
 
 		uint32_t get_id() const;
 		void set_id(const canid_t id);

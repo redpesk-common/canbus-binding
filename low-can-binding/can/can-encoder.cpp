@@ -47,7 +47,7 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 	uint8_t len_signal_bytes = 0;
 	if(len_signal_bytes_tmp > 255)
 	{
-		AFB_ERROR("Error signal %s too long",sig->get_name().c_str());
+		AFB_ERROR("Error signal %s too long", sig->get_name().c_str());
 	}
 	else
 	{
@@ -56,13 +56,13 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 /*
 	if(new_start_bit > 255)
 	{
-		AFB_ERROR("Error signal %s too long",sig->get_name().c_str());
+		AFB_ERROR("Error signal %s too long", sig->get_name().c_str());
 	}
 */
 	uint8_t new_bit_size = 0;
 	if(bit_size > 255)
 	{
-		AFB_ERROR("Error signal %s to long bit size",sig->get_name().c_str());
+		AFB_ERROR("Error signal %s to long bit size", sig->get_name().c_str());
 	}
 	else
 	{
@@ -148,7 +148,7 @@ message_t* encoder_t::build_frame(const std::shared_ptr<signal_t>& signal, uint6
 
 	for(const auto& sig: signal->get_message()->get_signals())
 	{
-		encode_data(sig,data,false,factor,offset);
+		encode_data(sig, data, false, factor, offset);
 	}
 	message->set_data(data);
 	return message;
@@ -177,7 +177,7 @@ message_t* encoder_t::build_message(const std::shared_ptr<signal_t>& signal, uin
 									 data,
 									 0);
 
-		return build_frame(signal,value,message, factor, offset);
+		return build_frame(signal, value, message, factor, offset);
 	}
 #ifdef USE_FEATURE_J1939
 	else if(signal->get_message()->is_j1939())
@@ -188,7 +188,7 @@ message_t* encoder_t::build_message(const std::shared_ptr<signal_t>& signal, uin
 									   J1939_NO_NAME,
 									   signal->get_message()->get_id(),
 									   J1939_NO_ADDR);
-		return build_frame(signal,value,message, factor, offset);
+		return build_frame(signal, value, message, factor, offset);
 	}
 #endif
 	else

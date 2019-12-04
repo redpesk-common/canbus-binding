@@ -94,7 +94,7 @@ uint8_t j1939_message_t::get_addr() const{
 /// @param[in] timestamp - timestamp of the message
 ///
 /// @return A j1939_message_t object fully initialized with sockaddr_can and data values.
-std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct sockaddr_can& addr, uint8_t (&data)[128],size_t nbytes, uint64_t timestamp)
+std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct sockaddr_can& addr, uint8_t (&data)[128], size_t nbytes, uint64_t timestamp)
 {
 	int i;
 	uint32_t length = 0;
@@ -112,7 +112,7 @@ std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct socka
 	data_vector.clear();
 
 	std::string data_string;
-	data_string = converter_t::to_hex(data,length);
+	data_string = converter_t::to_hex(data, length);
 
 	for(i=0;i<length;i++)
 	{
@@ -122,7 +122,7 @@ std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct socka
 	AFB_DEBUG("Found pgn: %X, length: %X, data %s",
 							addr.can_addr.j1939.pgn, length, data_string.c_str());
 
-	return std::make_shared<j1939_message_t>(j1939_message_t(length, data_vector, timestamp,addr.can_addr.j1939.name,addr.can_addr.j1939.pgn,addr.can_addr.j1939.addr));
+	return std::make_shared<j1939_message_t>(j1939_message_t(length, data_vector, timestamp, addr.can_addr.j1939.name, addr.can_addr.j1939.pgn, addr.can_addr.j1939.addr));
 }
 
 /// @brief Test if members pgn_ and length are set.

@@ -44,7 +44,7 @@ signal_t::signal_t(
 	signal_decoder decoder,
 	signal_encoder encoder,
 	bool received,
-	std::pair<bool,int> multiplex,
+	std::pair<bool, int> multiplex,
 	bool is_big_endian,
 	bool is_signed,
 	std::string unit)
@@ -220,7 +220,7 @@ void signal_t::set_timestamp(uint64_t timestamp)
 	frequency_.tick(timestamp);
 }
 
-std::pair<bool,int> signal_t::get_multiplex() const
+std::pair<bool, int> signal_t::get_multiplex() const
 {
 	return multiplex_;
 }

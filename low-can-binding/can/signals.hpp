@@ -96,7 +96,7 @@ private:
 	bool received_; /*!< received_ - True if this signal has ever been received.*/
 	float last_value_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
 				* this value is undefined. */
-	std::pair<bool,int> multiplex_; /*!< multiplex_ - If bool is false and int is 0 is not a multiplex signal
+	std::pair<bool, int> multiplex_; /*!< multiplex_ - If bool is false and int is 0 is not a multiplex signal
 										If bool is true, that indicate that is a multiplexor
 										If int is different of 0, that indicate the link with a multiplexor */
 	bool is_big_endian_; /*!< is_big_endian - True if the signal's data are meant to be read as a big_endian */
@@ -121,7 +121,7 @@ public:
 		signal_decoder decoder,
 		signal_encoder encoder,
 		bool received,
-		std::pair<bool,int> multiplex,
+		std::pair<bool, int> multiplex,
 		bool is_big_endian,
 		bool is_signed,
 		std::string unit);
@@ -162,7 +162,7 @@ public:
 	bool get_received() const;
 	float get_last_value() const;
 	std::pair<float, uint64_t> get_last_value_with_timestamp() const;
-	std::pair<bool,int> get_multiplex() const;
+	std::pair<bool, int> get_multiplex() const;
 	bool get_is_big_endian() const;
 	bool get_is_signed() const;
 	const std::string get_unit() const;
