@@ -38,7 +38,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"System.Time.Date",// generic_name
-					16,// bit_position
+					32,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -60,7 +60,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"System.Time.Reserved",// generic_name
-					12,// bit_position
+					48,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -82,7 +82,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"System.Time.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -104,7 +104,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"System.Time.Source",// generic_name
-					8,// bit_position
+					52,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -132,7 +132,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"System.Time.Time",// generic_name
-					32,// bit_position
+					0,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -158,7 +158,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Commanded.Rudder.Angle",// generic_name
-					24,// bit_position
+					128,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -180,7 +180,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Commanded.Rudder.Direction",// generic_name
-					21,// bit_position
+					144,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -205,7 +205,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Heading.Reference",// generic_name
-					14,// bit_position
+					152,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -231,7 +231,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Heading.To.Steer.Course",// generic_name
-					40,// bit_position
+					112,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -253,7 +253,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Off.Heading.Limit",// generic_name
-					88,// bit_position
+					64,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -275,7 +275,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Off.Heading.Limit.Exceeded",// generic_name
-					2,// bit_position
+					164,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -301,7 +301,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Off.Track.Limit",// generic_name
-					136,// bit_position
+					16,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -323,7 +323,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Off.Track.Limit.Exceeded",// generic_name
-					4,// bit_position
+					162,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -349,7 +349,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Override",// generic_name
-					6,// bit_position
+					160,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -375,7 +375,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Radius.Of.Turn.Order",// generic_name
-					104,// bit_position
+					48,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -397,7 +397,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Rate.Of.Turn.Order",// generic_name
-					120,// bit_position
+					32,// bit_position edited with low-can-generator
 					16,// bit_size
 					3.12500e-05f,// factor
 					0.00000f,// offset
@@ -419,7 +419,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Reserved",// generic_name
-					16,// bit_position
+					147,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -441,7 +441,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Rudder.Limit",// generic_name
-					72,// bit_position
+					80,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -463,7 +463,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Rudder.Limit.Exceeded",// generic_name
-					0,// bit_position
+					166,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -489,7 +489,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Steering.Mode",// generic_name
-					8,// bit_position
+					157,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -517,7 +517,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Track",// generic_name
-					56,// bit_position
+					96,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -539,7 +539,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Turn.Mode",// generic_name
-					11,// bit_position
+					154,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -564,7 +564,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Vessel.Heading",// generic_name
-					152,// bit_position
+					0,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -590,7 +590,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Rudder.Angle.Order",// generic_name
-					16,// bit_position
+					32,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -612,7 +612,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Rudder.Direction.Order",// generic_name
-					8,// bit_position
+					54,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -634,7 +634,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Rudder.Instance",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -656,7 +656,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Rudder.Position",// generic_name
-					32,// bit_position
+					16,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -678,7 +678,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Rudder.Reserved",// generic_name
-					10,// bit_position
+					48,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -704,7 +704,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Vessel.Heading.Deviation",// generic_name
-					24,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -726,7 +726,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Vessel.Heading.Heading",// generic_name
-					8,// bit_position
+					40,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -748,7 +748,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Vessel.Heading.Reference",// generic_name
-					56,// bit_position
+					6,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -774,7 +774,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Vessel.Heading.Reserved",// generic_name
-					58,// bit_position
+					0,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -796,7 +796,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Vessel.Heading.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -818,7 +818,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Vessel.Heading.Variation",// generic_name
-					40,// bit_position
+					8,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -844,7 +844,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Rate.Of.Turn.Rate",// generic_name
-					8,// bit_position
+					0,// bit_position edited with low-can-generator
 					32,// bit_size
 					3.12500e-08f,// factor
 					0.00000f,// offset
@@ -866,7 +866,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Rate.Of.Turn.Sid",// generic_name
-					0,// bit_position
+					32,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -892,7 +892,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Magnetic.Variation.Age.Of.Service",// generic_name
-					16,// bit_position
+					16,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -914,7 +914,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Magnetic.Variation.Reserved",// generic_name
-					12,// bit_position
+					32,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -936,7 +936,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Magnetic.Variation.Sid",// generic_name
-					0,// bit_position
+					40,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -958,7 +958,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Magnetic.Variation.Source",// generic_name
-					8,// bit_position
+					36,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -989,7 +989,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Magnetic.Variation.Variation",// generic_name
-					32,// bit_position
+					0,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -1015,7 +1015,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Speed.Sid",// generic_name
-					0,// bit_position
+					40,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1037,7 +1037,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Speed.Speed.Direction",// generic_name
-					48,// bit_position
+					4294967292,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1059,7 +1059,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Speed.Speed.Ground.Referenced",// generic_name
-					24,// bit_position
+					8,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -1081,7 +1081,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Speed.Speed.Water.Referenced",// generic_name
-					8,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -1103,7 +1103,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Speed.Speed.Water.Referenced.Type",// generic_name
-					40,// bit_position
+					0,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1134,7 +1134,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Water.Depth.Depth",// generic_name
-					8,// bit_position
+					0,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -1156,7 +1156,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Water.Depth.Offset",// generic_name
-					40,// bit_position
+					4294967280,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.00100000f,// factor
 					0.00000f,// offset
@@ -1178,7 +1178,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Water.Depth.Range",// generic_name
-					56,// bit_position
+					4294967272,// bit_position edited with low-can-generator
 					8,// bit_size
 					10.0000f,// factor
 					0.00000f,// offset
@@ -1200,7 +1200,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Water.Depth.Sid",// generic_name
-					0,// bit_position
+					32,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1226,7 +1226,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Distance.Log.Date",// generic_name
-					0,// bit_position
+					96,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1248,7 +1248,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Distance.Log.Log",// generic_name
-					48,// bit_position
+					32,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1270,7 +1270,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Distance.Log.Time",// generic_name
-					16,// bit_position
+					64,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -1292,7 +1292,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Distance.Log.Trip.Log",// generic_name
-					80,// bit_position
+					0,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1318,7 +1318,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Position.Rapid.Update.Latitude",// generic_name
-					0,// bit_position
+					32,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -1340,7 +1340,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Position.Rapid.Update.Longitude",// generic_name
-					32,// bit_position
+					0,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -1366,7 +1366,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Cog.Sog.Rapid.Update.Cog",// generic_name
-					16,// bit_position
+					32,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -1388,7 +1388,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Cog.Sog.Rapid.Update.Cog.Reference",// generic_name
-					8,// bit_position
+					54,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1414,7 +1414,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Cog.Sog.Rapid.Update.Reserved",// generic_name
-					48,// bit_position
+					0,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1436,7 +1436,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Cog.Sog.Rapid.Update.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1458,7 +1458,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Cog.Sog.Rapid.Update.Sog",// generic_name
-					32,// bit_position
+					16,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -1484,7 +1484,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Age.Of.Dgnss.Corrections",// generic_name
-					360,// bit_position
+					32,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -1506,7 +1506,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Altitude",// generic_name
-					184,// bit_position
+					160,// bit_position edited with low-can-generator
 					64,// bit_size
 					1.00000e-06f,// factor
 					0.00000f,// offset
@@ -1528,7 +1528,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Date",// generic_name
-					8,// bit_position
+					384,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1550,7 +1550,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Geoidal.Separation",// generic_name
-					304,// bit_position
+					72,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -1572,7 +1572,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Gnss.Type",// generic_name
-					248,// bit_position
+					156,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1603,7 +1603,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Hdop",// generic_name
-					272,// bit_position
+					120,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -1625,7 +1625,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Integrity",// generic_name
-					256,// bit_position
+					150,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1650,7 +1650,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Latitude",// generic_name
-					56,// bit_position
+					288,// bit_position edited with low-can-generator
 					64,// bit_size
 					1.00000e-16f,// factor
 					0.00000f,// offset
@@ -1672,7 +1672,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Longitude",// generic_name
-					120,// bit_position
+					224,// bit_position edited with low-can-generator
 					64,// bit_size
 					1.00000e-16f,// factor
 					0.00000f,// offset
@@ -1694,7 +1694,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Method",// generic_name
-					252,// bit_position
+					152,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1725,7 +1725,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Number.Of.Svs",// generic_name
-					264,// bit_position
+					136,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1747,7 +1747,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Pdop",// generic_name
-					288,// bit_position
+					104,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -1769,7 +1769,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Reference.Station.Id",// generic_name
-					348,// bit_position
+					48,// bit_position edited with low-can-generator
 					12,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1791,7 +1791,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Reference.Station.Type",// generic_name
-					344,// bit_position
+					60,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1822,7 +1822,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Reference.Stations",// generic_name
-					336,// bit_position
+					64,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1844,7 +1844,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Reserved",// generic_name
-					258,// bit_position
+					144,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1866,7 +1866,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Sid",// generic_name
-					0,// bit_position
+					400,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1888,7 +1888,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Time",// generic_name
-					24,// bit_position
+					352,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -1914,7 +1914,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Time.Date.Date",// generic_name
-					0,// bit_position
+					48,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1936,7 +1936,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Time.Date.Local.Offset",// generic_name
-					48,// bit_position
+					0,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -1958,7 +1958,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Time.Date.Time",// generic_name
-					16,// bit_position
+					16,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -1984,7 +1984,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Ais.Spare",// generic_name
-					208,// bit_position
+					13,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2006,7 +2006,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Ais.Transceiver.Information",// generic_name
-					163,// bit_position
+					56,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2034,7 +2034,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Cog",// generic_name
-					112,// bit_position
+					96,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -2056,7 +2056,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Communication.State",// generic_name
-					144,// bit_position
+					61,// bit_position edited with low-can-generator
 					19,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2078,7 +2078,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Heading",// generic_name
-					168,// bit_position
+					40,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -2100,7 +2100,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Latitude",// generic_name
-					72,// bit_position
+					120,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -2122,7 +2122,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Longitude",// generic_name
-					40,// bit_position
+					152,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -2144,7 +2144,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Message.Id",// generic_name
-					0,// bit_position
+					218,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2166,7 +2166,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Nav.Status",// generic_name
-					200,// bit_position
+					20,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2200,7 +2200,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Position.Accuracy",// generic_name
-					104,// bit_position
+					119,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2224,7 +2224,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Raim",// generic_name
-					105,// bit_position
+					118,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2248,7 +2248,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Rate.Of.Turn",// generic_name
-					184,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					3.12500e-05f,// factor
 					0.00000f,// offset
@@ -2270,7 +2270,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Repeat.Indicator",// generic_name
-					6,// bit_position
+					216,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2296,7 +2296,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Reserved",// generic_name
-					211,// bit_position
+					8,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2318,7 +2318,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Sequence.Id",// generic_name
-					216,// bit_position
+					0,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2340,7 +2340,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Sog",// generic_name
-					128,// bit_position
+					80,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -2362,7 +2362,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Special.Maneuver.Indicator",// generic_name
-					204,// bit_position
+					18,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2388,7 +2388,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Time.Stamp",// generic_name
-					106,// bit_position
+					112,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2414,7 +2414,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.User.Id",// generic_name
-					8,// bit_position
+					184,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2440,7 +2440,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Ais.Communication.State",// generic_name
-					200,// bit_position
+					7,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2464,7 +2464,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Ais.Mode",// generic_name
-					199,// bit_position
+					8,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2488,7 +2488,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Ais.Transceiver.Information",// generic_name
-					163,// bit_position
+					40,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2516,7 +2516,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Band",// generic_name
-					197,// bit_position
+					10,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2540,7 +2540,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Can.Handle.Msg22",// generic_name
-					198,// bit_position
+					9,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2566,7 +2566,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Cog",// generic_name
-					112,// bit_position
+					80,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -2588,7 +2588,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Communication.State",// generic_name
-					144,// bit_position
+					45,// bit_position edited with low-can-generator
 					19,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2610,7 +2610,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Dsc",// generic_name
-					196,// bit_position
+					11,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2636,7 +2636,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Heading",// generic_name
-					168,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -2658,7 +2658,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Integrated.Display",// generic_name
-					195,// bit_position
+					12,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2684,7 +2684,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Latitude",// generic_name
-					72,// bit_position
+					104,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -2706,7 +2706,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Longitude",// generic_name
-					40,// bit_position
+					136,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -2728,7 +2728,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Message.Id",// generic_name
-					0,// bit_position
+					202,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2750,7 +2750,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Position.Accuracy",// generic_name
-					104,// bit_position
+					103,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2774,7 +2774,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Raim",// generic_name
-					105,// bit_position
+					102,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2798,7 +2798,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Regional.Application",// generic_name
-					192,// bit_position
+					14,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2820,7 +2820,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Repeat.Indicator",// generic_name
-					6,// bit_position
+					200,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2846,7 +2846,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Sog",// generic_name
-					128,// bit_position
+					64,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -2868,7 +2868,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Time.Stamp",// generic_name
-					106,// bit_position
+					96,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2894,7 +2894,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Unit.Type",// generic_name
-					194,// bit_position
+					13,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2918,7 +2918,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.User.Id",// generic_name
-					8,// bit_position
+					168,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2944,7 +2944,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Ais.Mode",// generic_name
-					417,// bit_position
+					4294967142,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2966,7 +2966,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Ais.Raim.Flag",// generic_name
-					105,// bit_position
+					158,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -2990,7 +2990,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Ais.Transceiver.Information",// generic_name
-					422,// bit_position
+					4294967133,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3018,7 +3018,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Beam",// generic_name
-					208,// bit_position
+					40,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -3040,7 +3040,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Cog",// generic_name
-					112,// bit_position
+					136,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -3062,7 +3062,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Dte",// generic_name
-					416,// bit_position
+					4294967143,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3086,7 +3086,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Gnss.Type",// generic_name
-					188,// bit_position
+					72,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3117,7 +3117,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Latitude",// generic_name
-					72,// bit_position
+					160,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -3139,7 +3139,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Length",// generic_name
-					192,// bit_position
+					56,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -3161,7 +3161,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Longitude",// generic_name
-					40,// bit_position
+					192,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -3183,7 +3183,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Message.Id",// generic_name
-					0,// bit_position
+					258,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3205,7 +3205,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Name",// generic_name
-					256,// bit_position
+					4294967144,// bit_position edited with low-can-generator
 					160,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3227,7 +3227,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Position.Accuracy",// generic_name
-					104,// bit_position
+					159,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3251,7 +3251,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Position.Reference.From.Bow",// generic_name
-					240,// bit_position
+					8,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -3273,7 +3273,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Position.Reference.From.Starboard",// generic_name
-					224,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -3295,7 +3295,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Regional.Application",// generic_name
-					152,// bit_position
+					108,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3317,7 +3317,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Repeat.Indicator",// generic_name
-					6,// bit_position
+					256,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3343,7 +3343,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Reserved",// generic_name
-					418,// bit_position
+					4294967138,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3365,7 +3365,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Sog",// generic_name
-					128,// bit_position
+					120,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -3387,7 +3387,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Time.Stamp",// generic_name
-					106,// bit_position
+					152,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3413,7 +3413,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.True.Heading",// generic_name
-					168,// bit_position
+					80,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -3435,7 +3435,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Type.Of.Ship",// generic_name
-					160,// bit_position
+					96,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3504,7 +3504,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.User.Id",// generic_name
-					8,// bit_position
+					224,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3530,7 +3530,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Datum.Delta.Altitude",// generic_name
-					96,// bit_position
+					64,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-06f,// factor
 					0.00000f,// offset
@@ -3552,7 +3552,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Datum.Delta.Latitude",// generic_name
-					32,// bit_position
+					128,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -3574,7 +3574,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Datum.Delta.Longitude",// generic_name
-					64,// bit_position
+					96,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -3596,7 +3596,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Datum.Local.Datum",// generic_name
-					0,// bit_position
+					160,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3618,7 +3618,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Datum.Reference.Datum",// generic_name
-					128,// bit_position
+					32,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3644,7 +3644,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Cross.Track.Error.Navigation.Terminated",// generic_name
-					14,// bit_position
+					32,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3670,7 +3670,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Cross.Track.Error.Reserved",// generic_name
-					12,// bit_position
+					34,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3692,7 +3692,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Cross.Track.Error.Sid",// generic_name
-					0,// bit_position
+					40,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3714,7 +3714,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Cross.Track.Error.Xte",// generic_name
-					16,// bit_position
+					0,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -3736,7 +3736,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Cross.Track.Error.Xte.Mode",// generic_name
-					8,// bit_position
+					36,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3767,7 +3767,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Arrival.Circle.Entered",// generic_name
-					44,// bit_position
+					226,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3793,7 +3793,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Bearing.Origin.To.Destination.Waypoint",// generic_name
-					96,// bit_position
+					160,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -3815,7 +3815,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Bearing.Position.To.Destination.Waypoint",// generic_name
-					112,// bit_position
+					144,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -3837,7 +3837,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Calculation.Type",// generic_name
-					46,// bit_position
+					224,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3861,7 +3861,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Course.Bearing.Reference",// generic_name
-					40,// bit_position
+					230,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3887,7 +3887,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Destination.Latitude",// generic_name
-					192,// bit_position
+					48,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -3909,7 +3909,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Destination.Longitude",// generic_name
-					224,// bit_position
+					16,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -3931,7 +3931,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Destination.Waypoint.Number",// generic_name
-					160,// bit_position
+					80,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3953,7 +3953,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Distance.To.Waypoint",// generic_name
-					8,// bit_position
+					232,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -3975,7 +3975,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Eta.Date",// generic_name
-					80,// bit_position
+					176,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -3997,7 +3997,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Eta.Time",// generic_name
-					48,// bit_position
+					192,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -4019,7 +4019,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Origin.Waypoint.Number",// generic_name
-					128,// bit_position
+					112,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4041,7 +4041,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Perpendicular.Crossed",// generic_name
-					42,// bit_position
+					228,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4067,7 +4067,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Sid",// generic_name
-					0,// bit_position
+					264,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4089,7 +4089,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Waypoint.Closing.Velocity",// generic_name
-					256,// bit_position
+					0,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -4115,7 +4115,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Set.Drift.Rapid.Update.Drift",// generic_name
-					32,// bit_position
+					16,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -4137,7 +4137,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Set.Drift.Rapid.Update.Reserved",// generic_name
-					10,// bit_position
+					48,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4159,7 +4159,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Set.Drift.Rapid.Update.Set",// generic_name
-					16,// bit_position
+					32,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -4181,7 +4181,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Set.Drift.Rapid.Update.Set.Reference",// generic_name
-					8,// bit_position
+					54,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4207,7 +4207,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Set.Drift.Rapid.Update.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4233,7 +4233,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Dops.Actual.Mode",// generic_name
-					11,// bit_position
+					50,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4261,7 +4261,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Dops.Desired.Mode",// generic_name
-					8,// bit_position
+					53,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4289,7 +4289,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Dops.Hdop",// generic_name
-					16,// bit_position
+					32,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -4311,7 +4311,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Dops.Reserved",// generic_name
-					14,// bit_position
+					48,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4333,7 +4333,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Dops.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4355,7 +4355,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Dops.Tdop",// generic_name
-					48,// bit_position
+					0,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -4377,7 +4377,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Dops.Vdop",// generic_name
-					32,// bit_position
+					16,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -4403,7 +4403,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Azimuth",// generic_name
-					48,// bit_position
+					1976,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -4425,7 +4425,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Elevation",// generic_name
-					32,// bit_position
+					1992,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -4447,7 +4447,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Mode",// generic_name
-					8,// bit_position
+					2030,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4470,7 +4470,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Prn",// generic_name
-					24,// bit_position
+					2008,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4492,7 +4492,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Range.Residuals",// generic_name
-					80,// bit_position
+					1928,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4514,7 +4514,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Reserved",// generic_name
-					116,// bit_position
+					1920,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4536,7 +4536,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Sats.In.View",// generic_name
-					16,// bit_position
+					2016,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4558,7 +4558,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Sid",// generic_name
-					0,// bit_position
+					2032,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4580,7 +4580,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Snr",// generic_name
-					64,// bit_position
+					1960,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -4602,7 +4602,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Status",// generic_name
-					112,// bit_position
+					1924,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4634,7 +4634,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Ais.Transceiver.Information",// generic_name
-					163,// bit_position
+					40,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4662,7 +4662,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Communication.State",// generic_name
-					144,// bit_position
+					45,// bit_position edited with low-can-generator
 					19,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4684,7 +4684,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Gnss.Type",// generic_name
-					188,// bit_position
+					16,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4715,7 +4715,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Latitude",// generic_name
-					72,// bit_position
+					104,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -4737,7 +4737,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Longitude",// generic_name
-					40,// bit_position
+					136,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -4759,7 +4759,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Message.Id",// generic_name
-					0,// bit_position
+					202,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4781,7 +4781,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Position.Accuracy",// generic_name
-					104,// bit_position
+					103,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4805,7 +4805,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Position.Date",// generic_name
-					168,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4827,7 +4827,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Position.Time",// generic_name
-					112,// bit_position
+					64,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -4849,7 +4849,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Raim",// generic_name
-					105,// bit_position
+					102,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4873,7 +4873,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Repeat.Indicator",// generic_name
-					6,// bit_position
+					200,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4899,7 +4899,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Reserved",// generic_name
-					184,// bit_position
+					20,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4921,7 +4921,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Spare",// generic_name
-					192,// bit_position
+					8,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4943,7 +4943,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.User.Id",// generic_name
-					8,// bit_position
+					168,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4969,7 +4969,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Ais.Transceiver.Information",// generic_name
-					592,// bit_position
+					4294966891,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -4997,7 +4997,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Ais.Version.Indicator",// generic_name
-					584,// bit_position
+					4294966902,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5021,7 +5021,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Beam",// generic_name
-					312,// bit_position
+					4294967160,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -5043,7 +5043,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Callsign",// generic_name
-					72,// bit_position
+					64,// bit_position edited with low-can-generator
 					56,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5065,7 +5065,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Destination",// generic_name
-					424,// bit_position
+					4294966904,// bit_position edited with low-can-generator
 					160,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5087,7 +5087,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Draft",// generic_name
-					408,// bit_position
+					4294967064,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -5109,7 +5109,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Dte",// generic_name
-					590,// bit_position
+					4294966897,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5133,7 +5133,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Eta.Date",// generic_name
-					360,// bit_position
+					4294967112,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5155,7 +5155,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Eta.Time",// generic_name
-					376,// bit_position
+					4294967080,// bit_position edited with low-can-generator
 					32,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -5177,7 +5177,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Gnss.Type",// generic_name
-					586,// bit_position
+					4294966898,// bit_position edited with low-can-generator
 					4,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5208,7 +5208,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Imo.Number",// generic_name
-					40,// bit_position
+					120,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5230,7 +5230,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Length",// generic_name
-					296,// bit_position
+					4294967176,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -5252,7 +5252,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Message.Id",// generic_name
-					0,// bit_position
+					186,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5274,7 +5274,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Name",// generic_name
-					128,// bit_position
+					4294967200,// bit_position edited with low-can-generator
 					160,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5296,7 +5296,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Position.Reference.From.Bow",// generic_name
-					344,// bit_position
+					4294967128,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -5318,7 +5318,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Position.Reference.From.Starboard",// generic_name
-					328,// bit_position
+					4294967144,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -5340,7 +5340,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Repeat.Indicator",// generic_name
-					6,// bit_position
+					184,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5366,7 +5366,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Reserved",// generic_name
-					591,// bit_position
+					4294966896,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5388,7 +5388,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Type.Of.Ship",// generic_name
-					288,// bit_position
+					4294967192,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5457,7 +5457,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.User.Id",// generic_name
-					8,// bit_position
+					152,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5483,7 +5483,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Ais.Transceiver.Information",// generic_name
-					163,// bit_position
+					4294967192,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5511,7 +5511,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Altitude",// generic_name
-					168,// bit_position
+					4294967128,// bit_position edited with low-can-generator
 					64,// bit_size
 					1.00000e-06f,// factor
 					0.00000f,// offset
@@ -5533,7 +5533,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Cog",// generic_name
-					112,// bit_position
+					4294967232,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -5555,7 +5555,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Communication.State",// generic_name
-					144,// bit_position
+					4294967197,// bit_position edited with low-can-generator
 					19,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5577,7 +5577,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Dte",// generic_name
-					240,// bit_position
+					4294967119,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5601,7 +5601,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Latitude",// generic_name
-					72,// bit_position
+					4294967256,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -5623,7 +5623,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Longitude",// generic_name
-					40,// bit_position
+					4294967288,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000e-07f,// factor
 					0.00000f,// offset
@@ -5645,7 +5645,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Message.Id",// generic_name
-					0,// bit_position
+					58,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5667,7 +5667,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Position.Accuracy",// generic_name
-					104,// bit_position
+					4294967255,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5691,7 +5691,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Raim",// generic_name
-					105,// bit_position
+					4294967254,// bit_position edited with low-can-generator
 					1,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5715,7 +5715,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Repeat.Indicator",// generic_name
-					6,// bit_position
+					56,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5741,7 +5741,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Reserved",// generic_name
-					241,// bit_position
+					4294967112,// bit_position edited with low-can-generator
 					7,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5763,7 +5763,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Reserved.For.Regional.Applications",// generic_name
-					232,// bit_position
+					4294967120,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5785,7 +5785,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Sog",// generic_name
-					128,// bit_position
+					4294967216,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -5807,7 +5807,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Time.Stamp",// generic_name
-					106,// bit_position
+					4294967248,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5833,7 +5833,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.User.Id",// generic_name
-					8,// bit_position
+					24,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5859,7 +5859,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.A.Ais.Transceiver.Information",// generic_name
-					200,// bit_position
+					11,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5887,7 +5887,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.A.Message.Id",// generic_name
-					0,// bit_position
+					210,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5909,7 +5909,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.A.Name",// generic_name
-					40,// bit_position
+					16,// bit_position edited with low-can-generator
 					160,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5931,7 +5931,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.A.Repeat.Indicator",// generic_name
-					6,// bit_position
+					208,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5957,7 +5957,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.A.Reserved",// generic_name
-					205,// bit_position
+					8,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -5979,7 +5979,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.A.Sequence.Id",// generic_name
-					208,// bit_position
+					0,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6001,7 +6001,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.A.User.Id",// generic_name
-					8,// bit_position
+					176,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6027,7 +6027,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Ais.Transceiver.Information",// generic_name
-					264,// bit_position
+					3,// bit_position edited with low-can-generator
 					5,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6055,7 +6055,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Beam",// generic_name
-					176,// bit_position
+					80,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -6077,7 +6077,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Callsign",// generic_name
-					104,// bit_position
+					112,// bit_position edited with low-can-generator
 					56,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6099,7 +6099,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Length",// generic_name
-					160,// bit_position
+					96,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -6121,7 +6121,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Message.Id",// generic_name
-					0,// bit_position
+					266,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6143,7 +6143,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Mothership.User.Id",// generic_name
-					224,// bit_position
+					16,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6165,7 +6165,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Position.Reference.From.Bow",// generic_name
-					208,// bit_position
+					48,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -6187,7 +6187,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Position.Reference.From.Starboard",// generic_name
-					192,// bit_position
+					64,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
@@ -6209,7 +6209,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Repeat.Indicator",// generic_name
-					6,// bit_position
+					264,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6235,7 +6235,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Reserved",// generic_name
-					269,// bit_position
+					0,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6257,7 +6257,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Sequence.Id",// generic_name
-					272,// bit_position
+					4294967288,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6279,7 +6279,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Spare",// generic_name
-					258,// bit_position
+					8,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6301,7 +6301,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Type.Of.Ship",// generic_name
-					40,// bit_position
+					224,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6370,7 +6370,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.User.Id",// generic_name
-					8,// bit_position
+					232,// bit_position edited with low-can-generator
 					32,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6392,7 +6392,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Vendor.Id",// generic_name
-					48,// bit_position
+					168,// bit_position edited with low-can-generator
 					56,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6418,7 +6418,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Reference",// generic_name
-					40,// bit_position
+					21,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6445,7 +6445,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Reserved",// generic_name
-					43,// bit_position
+					0,// bit_position edited with low-can-generator
 					21,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6467,7 +6467,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6489,7 +6489,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Wind.Angle",// generic_name
-					24,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -6511,7 +6511,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Wind.Speed",// generic_name
-					8,// bit_position
+					40,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -6537,7 +6537,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Atmospheric.Pressure",// generic_name
-					40,// bit_position
+					8,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6559,7 +6559,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Outside.Ambient.Air.Temperature",// generic_name
-					24,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -6581,7 +6581,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Reserved",// generic_name
-					56,// bit_position
+					0,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6603,7 +6603,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6625,7 +6625,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Water.Temperature",// generic_name
-					8,// bit_position
+					40,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -6651,7 +6651,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Atmospheric.Pressure",// generic_name
-					48,// bit_position
+					0,// bit_position edited with low-can-generator
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6673,7 +6673,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Humidity",// generic_name
-					32,// bit_position
+					16,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.00400000f,// factor
 					0.00000f,// offset
@@ -6695,7 +6695,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Humidity.Source",// generic_name
-					14,// bit_position
+					48,// bit_position edited with low-can-generator
 					2,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6719,7 +6719,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6741,7 +6741,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Temperature",// generic_name
-					16,// bit_position
+					32,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -6763,7 +6763,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Temperature.Source",// generic_name
-					8,// bit_position
+					50,// bit_position edited with low-can-generator
 					6,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6804,7 +6804,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Temperature.Actual.Temperature",// generic_name
-					24,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -6826,7 +6826,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Temperature.Instance",// generic_name
-					8,// bit_position
+					48,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6848,7 +6848,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Temperature.Set.Temperature",// generic_name
-					40,// bit_position
+					8,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
@@ -6870,7 +6870,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Temperature.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -6892,7 +6892,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Temperature.Source",// generic_name
-					16,// bit_position
+					40,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset

@@ -1,0 +1,441 @@
+{
+  "name": "Sensors",
+  "version":"2.0",
+  "extra_sources": [],
+  "initializers": [],
+  "loopers": [],
+  "buses": {
+    "hs": {
+      "speed": 500000
+    }
+  },
+  "commands": [{}],
+  "messages":
+  {
+      "0x701":{"name":"Cluster Info",
+        "bus":"hs",
+        "length":8,
+        "continental_bit_position":true,
+        "signals":{
+          "Target_ID":{
+            "generic_name": "0.Target_ID",
+            "bit_position": 0,
+            "bit_size": 8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Target_DistLong":{
+            "generic_name": "0.Target_DistLong",
+            "bit_position": 19,
+            "bit_size": 13,
+            "factor":0.2,
+            "offset":-500,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Target_DistLat":{
+            "generic_name": "0.Target_DistLat",
+            "bit_position": 24,
+            "bit_size": 10,
+            "factor":0.2,
+            "offset":-102.3,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Target_VrelLong":{
+            "generic_name": "0.Target_VrelLong",
+            "bit_position": 46,
+            "bit_size": 10,
+            "factor":0.25,
+            "offset":-128.0,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Target_VrelLat":{
+            "generic_name": "0.Target_VrelLat",
+            "bit_position": 53,
+            "bit_size": 9,
+            "factor":0.25,
+            "offset":-64.0,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Target_DynProp":{
+            "generic_name": "0.Target_DynProp",
+            "bit_position": 48,
+            "bit_size": 3,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Target_RCS":{
+            "generic_name": "0.Target_RCS",
+            "bit_position": 56,
+            "bit_size": 8,
+            "factor":0.5,
+            "offset":-64.0,
+            "decoder": "decoder_t::decode_noop"
+        }
+      }
+    },
+      "0x600":{"name":"Cluster List Status",
+        "bus":"hs",
+        "length":8,
+        "continental_bit_position":true,
+        "signals":{
+          "Target_NofTargetsNear":{
+            "generic_name": "0.Target_NofTargetsNear",
+            "bit_position":0,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Target_NofTargetsFar":{
+            "generic_name": "0.Target_NofTargetsFar",
+            "bit_position":8,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Target_MeasCounter":{
+            "generic_name": "0.Target_MeasCounter",
+            "bit_position":24,
+            "bit_size":16,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Target_InterfaceVersion":{
+            "generic_name": "0.Target_InterfaceVersion",
+            "bit_position":36,
+            "bit_size":4,
+            "decoder": "decoder_t::decode_noop"
+        }
+      }
+    },
+      "0x700":{"name":"Sorfware Version",
+        "bus":"hs",
+        "length":8,
+        "continental_bit_position":true,
+        "signals":{
+          "Version_MajorRelease":{
+            "generic_name": "0.Major_Release",
+            "bit_position":0,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Version_MinorRelease":{
+            "generic_name": "0.Minor_Release",
+            "bit_position":8,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Version_PatchLevel":{
+            "generic_name": "0.Patch_Level",
+            "bit_position":16,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        }
+      }
+    },
+      "0x201":{"name":"Radar State",
+        "bus":"hs",
+        "length":8,
+        "continental_bit_position":true,
+        "signals":{
+          "RadarState_NVMReadStatus":{
+            "generic_name": "0.NVMReadStatus",
+            "bit_position":6,
+            "bit_size":1,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_NVMWriteStatus":{
+            "generic_name": "0.NVMWriteStatus",
+            "bit_position":7,
+            "bit_size":1,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_MaxDistanceCfg":{
+            "generic_name": "0.Max_Distance",
+            "bit_position":22,
+            "bit_size":10,
+            "factor":2,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_SensorID":{
+            "generic_name": "0.Radar_Power_Config",
+            "bit_position":32,
+            "bit_size":3,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_SortIndex":{
+            "generic_name": "0.Sorting_Index",
+            "bit_position":36,
+            "bit_size":3,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_RadarPowerCfg":{
+          "generic_name": "0.RadarPowerCfg",
+          "bit_position":39,
+          "bit_size":3,
+          "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_CtrlRelayCfg":{
+            "generic_name": "0.CtrlRelayCfg",
+            "bit_position":41,
+            "bit_size":1,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_OutputTypeCfg":{
+            "generic_name": "0.OutputTypeCfg",
+            "bit_position":42,
+            "bit_size":2,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_SendQualityCfg":{
+            "generic_name": "0.Send_Quality_Config",
+            "bit_position":44,
+            "bit_size":1,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_SendExtInfoCfg":{
+          "generic_name": "0.SendExtInfoCfg",
+          "bit_position":45,
+          "bit_size":1,
+          "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_MotionRxState":{
+            "generic_name": "0.MotionRxState",
+            "bit_position":46,
+            "bit_size":2,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "RadarState_RCS_Threshold":{
+            "generic_name": "0.RCS_Threshold",
+            "bit_position":58,
+            "bit_size":3,
+            "decoder": "decoder_t::decode_noop"
+        }
+      }
+    },
+      "0x60A":{"name":"Object_List_Status",
+        "bus":"hs",
+        "length":8,
+        "continental_bit_position":true,
+        "signals":{
+          "Obj_NofObjects":{
+            "generic_name": "0.Number_of_Objects",
+            "bit_position":0,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_MeasCounter":{
+            "generic_name": "0.Measurement_Cycle_Counter",
+            "bit_position":16,
+            "bit_size":16,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_InterfaceVersion":{
+            "generic_name": "0.Interface_Version",
+            "bit_position":28,
+            "bit_size":4,
+            "decoder": "decoder_t::decode_noop"
+        }
+      }
+    },
+      "0x60B":{"name":"Object_General_Info",
+        "bus":"hs",
+        "length":8,
+        "continental_bit_position":true,
+        "signals":{
+          "Obj_ID":{
+            "generic_name": "0.Object ID",
+            "bit_position":0,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_DistLong":{
+            "generic_name": "0.Object_Longitudinal_Coordinate",
+            "bit_position":19,
+            "bit_size":13,
+            "factor":0.2,
+            "offset":-500,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_DistLat":{
+            "generic_name": "0.Object_Lateral_Coordinate",
+            "bit_position":24,
+            "bit_size":11,
+            "factor":0.2,
+            "offset":-204.6,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_VrelLong":{
+            "generic_name": "0.Relative_Longitudinal_Velocity",
+            "bit_position":46,
+            "bit_size":10,
+            "factor":0.25,
+            "offset":-128.0,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_VrelLat":{
+            "generic_name": "0.Relative_Lateral_Velocity",
+            "bit_position":53,
+            "bit_size":9,
+            "factor":0.25,
+            "offset":-64.0,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_DynProp":{
+            "generic_name": "0.Dynamic_Cluster_Property",
+            "bit_position":48,
+            "bit_size":3,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_RCS":{
+            "generic_name": "0.Radar_Cross_Section",
+            "bit_position":56,
+            "bit_size":8,
+            "factor":0.5,
+            "offset":-64.0,
+            "decoder": "decoder_t::decode_noop"
+        }
+      }
+    },
+      "0x60C":{"name":"Object Quality Info",
+        "bus":"hs",
+        "length":8,
+        "continental_bit_position":true,
+        "signals":{
+          "Obj_ID":{
+            "generic_name": "0.Object_ID",
+            "bit_position":0,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_DisLong_rms":{
+            "generic_name": "0.DisLong_rms",
+            "bit_position":11,
+            "bit_size":5,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_DisLat_rms":{
+            "generic_name": "0.DisLat_rms",
+            "bit_position":22,
+            "bit_size":5,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_VrelLong_rms":{
+            "generic_name": "0.VrelLong_rms",
+            "bit_position":17,
+            "bit_size":5,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_VrelLat_rms":{
+            "generic_name": "0.VrelLat_rms",
+            "bit_position":28,
+            "bit_size":5,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_ArelLong_rms":{
+            "generic_name": "0.ArelLong_rms",
+            "bit_position":39,
+            "bit_size":5,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_ArelLat_rms":{
+            "generic_name": "0.ArelLat_rms",
+            "bit_position":34,
+            "bit_size":5,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_Orientation_rms":{
+            "generic_name": "0.Orientation_rms",
+            "bit_position":45,
+            "bit_size":5,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_ProbOfExist":{
+            "generic_name": "0.ProbOfExist",
+            "bit_position":53,
+            "bit_size":3,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_MeasState":{
+            "generic_name": "0.MeasState",
+            "bit_position":50,
+            "bit_size":3,
+            "decoder": "decoder_t::decode_noop"
+        }
+      }
+    },
+      "0x60D":{"name":"Object Extended Info",
+        "bus":"hs",
+        "length":8,
+        "continental_bit_position":true,
+        "signals":{
+          "Obj_ID":{
+            "generic_name": "0.Object_ID",
+            "bit_position":0,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_ArellLong":{
+            "generic_name": "0.ArellLong",
+            "bit_position":21,
+            "bit_size":11,
+            "factor":0.01,
+            "offset":-10.0,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_ArelLat":{
+            "generic_name": "0.ArelLat",
+            "bit_position":28,
+            "bit_size":9,
+            "factor":0.01,
+            "offset":-2.50,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_Class":{
+            "generic_name": "0.Class",
+            "bit_position":24,
+            "bit_size":3,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_OrientationAngle":{
+            "generic_name": "0.OrientationAngle",
+            "bit_position":46,
+            "bit_size":10,
+            "factor":0.4,
+            "offset":-180.0,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_Length":{
+            "generic_name": "0.Length",
+            "bit_position":48,
+            "bit_size":8,
+            "factor":0.2,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_Width":{
+            "generic_name": "0.Width",
+            "bit_position":56,
+            "bit_size":8,
+            "factor":0.2,
+            "decoder": "decoder_t::decode_noop"
+        }
+      }
+    },
+      "0x60E":
+      {
+        "name":"Object Collision Detection Warning",
+        "bus":"hs",
+  "length":8,
+  "continental_bit_position":true,
+        "signals":
+        {
+          "Obj_ID":{
+            "generic_name": "0.Object_ID",
+            "bit_position":0,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        },
+          "Obj_CollDetRegionBitfield":{
+            "generic_name": "0.Collision_Detection_Region_Bitfield",
+            "bit_position":8,
+            "bit_size":8,
+            "decoder": "decoder_t::decode_noop"
+        }
+      }
+    }
+  }
+}

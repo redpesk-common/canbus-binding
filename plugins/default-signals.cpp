@@ -633,7 +633,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Reference",// generic_name
-					40,// bit_position
+					21,// bit_position edited with low-can-generator
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -660,7 +660,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Reserved",// generic_name
-					43,// bit_position
+					0,// bit_position edited with low-can-generator
 					21,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -682,7 +682,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Sid",// generic_name
-					0,// bit_position
+					56,// bit_position edited with low-can-generator
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
@@ -704,7 +704,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Wind.Angle",// generic_name
-					24,// bit_position
+					24,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.000100000f,// factor
 					0.00000f,// offset
@@ -726,7 +726,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})},
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Wind.Speed",// generic_name
-					8,// bit_position
+					40,// bit_position edited with low-can-generator
 					16,// bit_size
 					0.0100000f,// factor
 					0.00000f,// offset
