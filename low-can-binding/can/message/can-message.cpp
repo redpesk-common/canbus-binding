@@ -131,9 +131,7 @@ std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct ca
 			if(rtr_flag)
 				length = frame.len& 0xF;
 			else
-			{
 				length = (frame.len > maxdlen) ? maxdlen : frame.len;
-			}
 		}
 	}
 	else
@@ -178,7 +176,9 @@ struct canfd_frame can_message_t::convert_to_canfd_frame()
 		::memcpy(frame.data, get_data(), length_);
 	}
 	else
+	{
 		AFB_ERROR("can_message_t not correctly initialized to be sent");
+	}
 
 	return frame;
 }
@@ -261,7 +261,9 @@ struct can_frame can_message_t::convert_to_can_frame()
 		::memcpy(frame.data, get_data(), length_);
 	}
 	else
+	{
 		AFB_ERROR("can_message_t not correctly initialized to be sent");
+	}
 
 	return frame;
 }
@@ -276,9 +278,7 @@ std::string can_message_t::get_debug_message()
 	std::string ret = "";
 	ret = ret + "Here is the next can message : id " + std::to_string(id_)  + " length " + std::to_string(length_) + ", data ";
 	for (size_t i = 0; i < data_.size(); i++)
-	{
 		ret = ret + std::to_string(data_[i]);
-	}
 
 	return ret;
 }

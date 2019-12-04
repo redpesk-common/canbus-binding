@@ -648,7 +648,6 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 	diagnostic_message_.push_back(sig);
 
 	struct timeval freq = frequency_clock_t(event_filter_.frequency).get_timeval_from_period();
-	//struct timeval timeout = frequency_clock_t(10).get_timeval_from_period();
 	struct timeval timeout = {0, 0};
 
 	struct bcm_msg bcm_msg =  make_bcm_head(RX_SETUP, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER | RX_NO_AUTOTIMER | RX_FILTER_ID, timeout, freq);
@@ -669,13 +668,11 @@ int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscri
 	if(subscription.open_socket(subscription, "", CAN_PROTOCOL) < 0)
 		return -1;
 
-	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
-	// else monitor all standard 8 CAN OBD2 ID response.
-
 	can_message_t msg = can_message_t();
-
 	msg.set_bcm_msg(bcm_msg);
 
+	// If it's not an OBD2 CAN ID then just add a simple RX_SETUP job
+	// else monitor all standard 8 CAN OBD2 ID response.
 	if(bcm_msg.msg_head.can_id != OBD2_FUNCTIONAL_BROADCAST_ID)
 	{
 		subscription.socket_->write_message(msg);
@@ -713,8 +710,6 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 		return -1;
 
 	struct bcm_msg &bcm_cm = cm->get_bcm_msg();
-
-
 
 	if(cfd_vect.size() > 1)
 	{

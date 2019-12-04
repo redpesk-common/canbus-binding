@@ -83,6 +83,22 @@ uint8_t j1939_message_t::get_addr() const{
 	return addr_;
 }
 
+/**
+ * @brief Convert hex data to string
+ *
+ * @param data An array of data
+ * @param length The length of the data
+ * @return std::string The string data
+ */
+std::string to_hex( uint8_t data[], const size_t length)
+{
+	std::stringstream stream;
+	stream << std::hex << std::setfill('0');
+	for(int i = 0; i < length; i++)
+		stream << std::hex << ((int) data[i]);
+
+	return stream.str();
+}
 
 /// @brief Take a sockaddr_can struct and array of data to initialize class members
 ///
@@ -115,12 +131,10 @@ std::shared_ptr<j1939_message_t> j1939_message_t::convert_from_addr(struct socka
 	data_string = converter_t::to_hex(data, length);
 
 	for(i=0;i<length;i++)
-	{
 		data_vector.push_back(data[i]);
-	};
 
 	AFB_DEBUG("Found pgn: %X, length: %X, data %s",
-							addr.can_addr.j1939.pgn, length, data_string.c_str());
+		   addr.can_addr.j1939.pgn, length, data_string.c_str());
 
 	return std::make_shared<j1939_message_t>(j1939_message_t(length, data_vector, timestamp, addr.can_addr.j1939.name, addr.can_addr.j1939.pgn, addr.can_addr.j1939.addr));
 }
@@ -197,30 +211,10 @@ void j1939_message_t::set_sockname(pgn_t pgn, name_t name, uint8_t addr)
 	sockname_.can_family = AF_CAN;
 	sockname_.can_ifindex = 0;
 
-	if(addr <= 0 || addr >= UINT8_MAX )
-	{
-		sockname_.can_addr.j1939.addr = J1939_NO_ADDR;
-	}
-	else
-	{
-		sockname_.can_addr.j1939.addr = addr;
-	}
-
-	if(name <= 0 || name >= UINT64_MAX )
-	{
-		sockname_.can_addr.j1939.name = J1939_NO_NAME;
-	}
-	else
-	{
-		sockname_.can_addr.j1939.name = name;
-	}
-
-	if(pgn <= 0 || pgn > J1939_PGN_MAX)
-	{
-		sockname_.can_addr.j1939.pgn = J1939_NO_PGN;
-	}
-	else
-	{
-		sockname_.can_addr.j1939.pgn = pgn;
-	}
+	sockname_.can_addr.j1939.addr = addr <= 0 || addr >= UINT8_MAX ?
+					J1939_NO_ADDR : addr;
+	sockname_.can_addr.j1939.name = name <= 0 || name >= UINT64_MAX ?
+					J1939_NO_NAME : name;
+	sockname_.can_addr.j1939.pgn = pgn <= 0 || pgn > J1939_PGN_MAX ?
+					J1939_NO_PGN : pgn;
 }
