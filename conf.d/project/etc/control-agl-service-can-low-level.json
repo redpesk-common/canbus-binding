@@ -20,6 +20,11 @@
 			"uid": "clement-signals",
 			"info": "clement signals",
 			"libs": "clement-signals.ctlso"
+		},
+		{
+			"uid": "gps-signals",
+			"info": "gps signals",
+			"libs": "gps-signals.ctlso"
 		}
 	]
 }
