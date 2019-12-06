@@ -38,6 +38,7 @@ namespace utils
 		socket_ = socketcan_t::open(PF_CAN, SOCK_DGRAM, CAN_BCM);
 
 		// Attempts to open a socket to CAN bus
+		tx_address_.can_family = AF_CAN;
 		::strcpy(ifr.ifr_name, device_name.c_str());
 		AFB_DEBUG("BCM socket ifr_name is : %s", ifr.ifr_name);
 		if(::ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
@@ -46,19 +47,17 @@ namespace utils
 			close();
 			return -1;
 		}
-		else
-		{
-			tx_address_.can_family = AF_CAN;
-			tx_address_.can_ifindex = ifr.ifr_ifindex;
 
-			if(connect((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
-			{
-				AFB_ERROR("Connect failed. %s", strerror(errno));
-				close();
-			}
-			// Needed because of using systemD event loop. See sd_event_add_io manual.
-			fcntl(socketcan_t::socket_, F_SETFL, O_NONBLOCK);
+		tx_address_.can_ifindex = ifr.ifr_ifindex;
+		if(connect((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
+		{
+			AFB_ERROR("Connect failed. %s", strerror(errno));
+			close();
+			return -1;
 		}
+		// Needed because of using systemD event loop. See sd_event_add_io manual.
+		fcntl(socketcan_t::socket_, F_SETFL, O_NONBLOCK);
+
 		return socket_;
 	}
 
@@ -101,7 +100,6 @@ namespace utils
 
 	int socketcan_bcm_t::write_message(message_t& m)
 	{
-
 		can_message_t&  cm = reinterpret_cast<can_message_t&>(m);
 		struct bcm_msg obj = cm.get_bcm_msg();
 		size_t size = (obj.msg_head.flags & CAN_FD_FRAME) ?
