@@ -72,6 +72,11 @@ bool diagnostic_manager_t::initialize(std::string diagnostic_bus)
 	return initialized_;
 }
 
+bool diagnostic_manager_t::is_initialized() const
+{
+	return initialized_;
+}
+
 /// @brief initialize shims used by UDS lib and set initialized_ to true.
 ///  It is needed before used the diagnostic manager fully because shims are
 ///  required by most member functions.
@@ -116,6 +121,8 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 	bcm_msg.msg_head.can_id  = arbitration_id;
 	bcm_msg.msg_head.flags = SETTIMER|STARTTIMER|TX_CP_CAN_ID;
 	bcm_msg.msg_head.count = 0;
+	bcm_msg.msg_head.ival1.tv_sec = 0;
+	bcm_msg.msg_head.ival1.tv_usec = 0;
 	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec;
 	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
 	bcm_msg.msg_head.nframes = 1;

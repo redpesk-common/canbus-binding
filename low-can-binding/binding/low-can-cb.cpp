@@ -63,7 +63,7 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 
 	application_t *application = (application_t*) ctrlConfig->external;
 
-	if(wrap_json_unpack(json_obj, "{si, ss}",
+	if(wrap_json_unpack(json_obj, "{si, s?s}",
 			      "active_message_set", &active_message_set,
 			      "diagnostic_bus", &diagnotic_bus))
 		return -1;
@@ -78,11 +78,8 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 
 	/// Initialize Diagnostic manager that will handle obd2 requests.
 	/// We pass by default the first CAN bus device to its Initialization.
-	if(! application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
-	{
-		AFB_ERROR("Diagnostic Manager: error at initialization");
-		return -1;
-	}
+	if(! diagnotic_bus || application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
+		AFB_WARNING("Diagnostic Manager: not initialized");
 
 	return 0;
 }
@@ -872,22 +869,24 @@ int init_binding(afb_api_t api)
 	can_bus_manager.start_threads();
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
-	// Add a recurring dignostic message request to get engine speed at all times.
-	openxc_DynamicField search_key = build_DynamicField("diagnostic_messages.engine.speed");
-	struct utils::signals_found sf = sm.find_signals(search_key);
-
-	if(sf.signals.empty() && sf.diagnostic_messages.size() == 1)
+	if (application.get_diagnostic_manager().is_initialized())
 	{
-		afb_req_t request = nullptr;
+		// Add a recurring dignostic message request to get engine speed at all times.
+		openxc_DynamicField search_key = build_DynamicField("diagnostic_messages.engine.speed");
+		struct utils::signals_found sf = sm.find_signals(search_key);
 
-		struct event_filter_t event_filter;
-		event_filter.frequency = sf.diagnostic_messages.front()->get_frequency();
+		if(sf.signals.empty() && sf.diagnostic_messages.size() == 1)
+		{
+			afb_req_t request = nullptr;
 
-		map_subscription& s = sm.get_subscribed_signals();
+			struct event_filter_t event_filter;
+			event_filter.frequency = sf.diagnostic_messages.front()->get_frequency();
 
-		subscribe_unsubscribe_diagnostic_messages(request, true, sf.diagnostic_messages, event_filter, s, true);
+			map_subscription& s = sm.get_subscribed_signals();
+
+			subscribe_unsubscribe_diagnostic_messages(request, true, sf.diagnostic_messages, event_filter, s, true);
+		}
 	}
-
 
 #ifdef USE_FEATURE_J1939
 	std::string j1939_bus;

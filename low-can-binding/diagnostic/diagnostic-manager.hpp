@@ -60,6 +60,7 @@ public:
 	~diagnostic_manager_t();
 
 	bool initialize(std::string diagnostic_bus);
+	bool is_initialized() const;
 
 	const std::string get_bus_name() const;
 	const std::string get_bus_device_name() const;
