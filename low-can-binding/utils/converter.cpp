@@ -19,6 +19,7 @@
 #include <sstream>
 #include <net/if.h>
 #include <afb/afb-binding>
+#include <climits>
 
 /**
  * @brief Convert hex data to string
@@ -51,9 +52,9 @@ std::string converter_t::to_hex(const uint8_t data[], const size_t length)
 void converter_t::signal_to_bits_bytes(unsigned int bit_position, unsigned int bit_size, int &new_start_byte, int &new_end_byte, uint8_t &new_start_bit, uint8_t &new_end_bit)
 {
 	new_start_byte = bit_position >> 3;
-	new_start_bit = bit_position % 8;
+	new_start_bit = bit_position % CHAR_BIT;
 	new_end_byte = (bit_position + bit_size - 1) >> 3;
-	new_end_bit = (bit_position + bit_size - 1) % 8;
+	new_end_bit = (bit_position + bit_size - 1) % CHAR_BIT;
 }
 
 
@@ -61,38 +62,27 @@ void converter_t::signal_to_bits_bytes(unsigned int bit_position, unsigned int b
  * @brief	This is to use when you have a big endian CAN frame layout.
  * 		It converts the bit position so it matches with little endiant CAN frame layout.
  *
+ * @param msg_length 	Message length in bytes.
  * @param bit_position 	Original bit position.
- * @param bit_size 		Size of the data.
+ * @param bit_size	Size of the data.
  * @return uint32_t 	New bit position.
  */
 uint32_t converter_t::bit_position_swap(unsigned int msg_length, unsigned int bit_position, unsigned int bit_size)
 {
-	return msg_length - bit_position - bit_size;
-	/*
-	unsigned int start_byte_position = (unsigned int)(bit_position/8);
-	unsigned int bit_size_rest = bit_size;
+	return (msg_length * CHAR_BIT) - bit_position - bit_size;
+}
 
-	if((int)(bit_size-(8 + start_byte_position * 8 - bit_position % 8)) > 0)
-	{
-		AFB_ERROR("Error: bit_position and bit_size getting out of range");
-		return bit_position;
-	}
-
-	if(bit_size <= 8 &&
-	   ((bit_position+bit_size) % 8 == bit_size ||
-	   (bit_position+bit_size)%8==0))
-	{
-		return (unsigned int)(start_byte_position*8 + (8-bit_size));
-	}
-	else
-	{
-		do
-		{
-			bit_size_rest = bit_size_rest - ((start_byte_position+1)*8-bit_position);
-			start_byte_position--;
-			bit_position = start_byte_position*8;
-		} while (bit_size_rest>8);
-		return (unsigned int)(start_byte_position*8 + (8-bit_size_rest));
-	}
-	*/
+/**
+ * @brief	This allow to get the correct bit_position using the weird Continental.
+ *		bit numbering method where the Frame is read using little endianness
+ *		and bit count using a big endianness
+ *
+ * @param msg_length	Message length in bytes.
+ * @param bit_position	Original bit position.
+ * @param bit_size	Size of the data.
+ * @return uint32_t	New bit position.
+ */
+uint32_t converter_t::continental_bit_position_mess(unsigned int msg_length, unsigned int bit_position, unsigned int bit_size)
+{
+	return bit_position + (CHAR_BIT - bit_position % CHAR_BIT) - bit_size;
 }

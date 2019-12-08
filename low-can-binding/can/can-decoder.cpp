@@ -16,6 +16,7 @@
  */
 
 #include "can-decoder.hpp"
+#include <climits>
 
 #include "canutil/read.h"
 #include "../utils/openxc-utils.hpp"
@@ -41,9 +42,9 @@ int decoder_t::handle_sign(const signal_t& signal, std::vector<uint8_t>& data_si
 	if(signal.get_sign() == sign_t::UNSIGNED)
 		return 1;
 	else if(signal.get_sign() == sign_t::SIGN_BIT_EXTERN) {
-		end_bit = signal.get_bit_sign_position()%8;
+		end_bit = signal.get_bit_sign_position() % CHAR_BIT;
 		mask = static_cast<uint8_t>((1 << (end_bit + 1)) - 1);
-		data_byte = can_data[signal.get_bit_sign_position()/8] & mask;
+		data_byte = can_data[signal.get_bit_sign_position() / CHAR_BIT] & mask;
 	}
 	else {
 		end_bit = new_end_bit;
@@ -152,7 +153,7 @@ openxc_DynamicField decoder_t::decode_bytes(signal_t& signal, std::shared_ptr<me
 	uint32_t bit_size = signal.get_bit_size();
 
 	std::vector<uint8_t> new_data = std::vector<uint8_t>();
-	new_data.reserve((bit_size / 8) + 1);
+	new_data.reserve((bit_size / CHAR_BIT) + 1);
 
 	int new_start_byte = 0;
 	int new_end_byte = 0;

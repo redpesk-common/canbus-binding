@@ -32,4 +32,7 @@ class converter_t
 		static uint32_t bit_position_swap(unsigned int msg_length,
 						  unsigned int bit_position,
 						  unsigned int bit_size);
+		static uint32_t continental_bit_position_mess(unsigned int msg_length,
+							      unsigned int bit_position,
+							      unsigned int bit_size);
 };
