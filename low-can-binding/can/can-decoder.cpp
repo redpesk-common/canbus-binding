@@ -99,7 +99,7 @@ float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message
 	uint8_t bit_size = (uint8_t) signal.get_bit_size();
 	uint32_t bit_position = signal.get_bit_position();
 
-	if(!signal.get_message()->frame_layout_is_little())
+	if(signal.get_message()->frame_layout_is_bigendian())
 	{
 		bit_position = converter_t::bit_position_swap(message->get_length(),
 							      signal.get_bit_position(),

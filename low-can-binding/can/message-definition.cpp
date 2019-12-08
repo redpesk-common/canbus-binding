@@ -111,6 +111,6 @@ uint32_t message_definition_t::get_flags() const
 	return flags_;
 }
 
-bool message_definition_t::frame_layout_is_little() const{
-	return (flags_ & FRAME_LAYOUT_IS_LE);
+bool message_definition_t::frame_layout_is_bigendian() const{
+	return (flags_ & FRAME_LAYOUT_IS_BIGENDIAN);
 }

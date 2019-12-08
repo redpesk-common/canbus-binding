@@ -44,7 +44,7 @@
 #define ISOTP_SEND 0x0020
 #define ISOTP_RECEIVE 0x0040
 #define CAN_PROTOCOL_WITH_FD_FRAME 0x0080
-#define FRAME_LAYOUT_IS_LE 0x0100 // LE stand for Little Endian
+#define FRAME_LAYOUT_IS_BIGENDIAN 0x0100 // LE stand for Little Endian
 
 /// @class message_t
 ///

@@ -87,7 +87,7 @@ public:
 	vect_ptr_signal_t& get_signals();
 	uint32_t get_length() const;
 	uint32_t get_flags() const;
-	bool frame_layout_is_little() const;
+	bool frame_layout_is_bigendian() const;
 
 	void set_parent(std::shared_ptr<message_set_t> parent);
 	void set_last_value(std::shared_ptr<message_t>  m);
