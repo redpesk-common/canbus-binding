@@ -67,3 +67,29 @@ PROJECT_TARGET_ADD(gps-signals)
 	bitfield-c
 	afb-helpers
 	${link_libraries})
+
+PROJECT_TARGET_ADD(joystick-signals)
+
+	# Define targets
+	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
+
+	# Alsa Plugin properties
+	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
+			LABELS "PLUGIN"
+			PREFIX ""
+			SUFFIX ".ctlso"
+			OUTPUT_NAME ${TARGET_NAME}
+	)
+
+	target_include_directories(${TARGET_NAME}
+	PRIVATE "../low-can-binding")
+
+	# Library dependencies (include updates automatically)
+	TARGET_LINK_LIBRARIES(${TARGET_NAME}
+	low-can
+	openxc-message-format
+	uds-c
+	isotp-c
+	bitfield-c
+	afb-helpers
+	${link_libraries})
