@@ -460,6 +460,7 @@ bool jsonify_simple(const openxc_SimpleMessage& s_msg, json_object* json)
 ///
 bool jsonify_vehicle(const openxc_VehicleMessage& v_msg, std::shared_ptr<signal_t> sig, json_object* json)
 {
+	json_object_object_add(json,"id", json_object_new_int(sig->get_message()->get_id()));
 	if(jsonify_simple(get_simple_message(v_msg), json))
 	{
 		if(sig != nullptr && sig->get_unit() != "")
