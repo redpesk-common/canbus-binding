@@ -394,11 +394,9 @@ static int process_one_subscribe_args(afb_req_t request, bool subscribe, json_ob
 	// 2 cases : ID(PGN) and event
 
 	json_object_object_get_ex(args,"event",&event);
-	json_bool test_id = json_object_object_get_ex(args,"id",&id);
-	if(!test_id)
-		test_id = json_object_object_get_ex(args,"pgn",&id);
+	json_object_object_get_ex(args,"id",&id) || json_object_object_get_ex(args,"pgn",&id);
 
-	if(	args == NULL || (id && ((std::string)json_object_get_string(id)).compare("*") == 0))
+	if( args == NULL || (id && ((std::string)json_object_get_string(id)).compare("*") == 0))
 	{
 		rc = one_subscribe_unsubscribe_events(request, subscribe, "*", args);
 	}
