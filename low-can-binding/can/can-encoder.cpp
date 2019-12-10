@@ -44,14 +44,12 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 	uint8_t new_end_bit = 0;
 
 	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit, new_end_bit);
-	std::vector<uint8_t> data_signal(new_end_byte - new_start_byte + 1);
+	std::vector<uint8_t> data_signal(new_end_byte - new_start_byte + 1, 0xFF);
 
 	if(filter)
 	{
-		for (auto& elt: data_signal)
-			elt = 0xFF;
-		uint8_t mask_first_v = static_cast<uint8_t>(0xFF << new_start_bit);
-		uint8_t mask_last_v = static_cast<uint8_t>(0xFF >> (7 - new_end_bit));
+		uint8_t mask_first_v = static_cast<uint8_t>(0xFF >> new_start_bit);
+		uint8_t mask_last_v = static_cast<uint8_t>(0xFF << (7 - new_end_bit));
 
 		if(new_start_byte == new_end_byte)
 		{
