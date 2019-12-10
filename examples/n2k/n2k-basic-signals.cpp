@@ -34,7 +34,7 @@ CTLP_CAPI_REGISTER("nmea2000");
 
 std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set_t{0,"NMEA2000",
 	{ // beginning message_definition_ vector
-		{std::make_shared<message_definition_t>(message_definition_t{"j1939",126992,"System.Time",8,392,frequency_clock_t(5.00000f),true,
+		{std::make_shared<message_definition_t>(message_definition_t{"j1939",126992,"System.Time",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"System.Time.Date",// generic_name
@@ -154,7 +154,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127237,"Heading.Track.Control",21,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127237,"Heading.Track.Control",21,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Heading.Track.Control.Commanded.Rudder.Angle",// generic_name
@@ -586,7 +586,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127245,"Rudder",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127245,"Rudder",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Rudder.Angle.Order",// generic_name
@@ -700,7 +700,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127250,"Vessel.Heading",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127250,"Vessel.Heading",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Vessel.Heading.Deviation",// generic_name
@@ -840,7 +840,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127251,"Rate.Of.Turn",5,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127251,"Rate.Of.Turn",5,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Rate.Of.Turn.Rate",// generic_name
@@ -888,7 +888,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127258,"Magnetic.Variation",6,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",127258,"Magnetic.Variation",6,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Magnetic.Variation.Age.Of.Service",// generic_name
@@ -1011,7 +1011,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",128259,"Speed",6,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",128259,"Speed",6,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Speed.Sid",// generic_name
@@ -1130,7 +1130,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",128267,"Water.Depth",5,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",128267,"Water.Depth",5,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Water.Depth.Depth",// generic_name
@@ -1222,7 +1222,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",128275,"Distance.Log",14,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",128275,"Distance.Log",14,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Distance.Log.Date",// generic_name
@@ -1314,7 +1314,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129025,"Position.Rapid.Update",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129025,"Position.Rapid.Update",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Position.Rapid.Update.Latitude",// generic_name
@@ -1362,7 +1362,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129026,"Cog.Sog.Rapid.Update",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129026,"Cog.Sog.Rapid.Update",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Cog.Sog.Rapid.Update.Cog",// generic_name
@@ -1480,7 +1480,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129029,"Gnss.Position.Data",51,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129029,"Gnss.Position.Data",51,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Position.Data.Age.Of.Dgnss.Corrections",// generic_name
@@ -1910,7 +1910,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129033,"Time.Date",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129033,"Time.Date",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Time.Date.Date",// generic_name
@@ -1980,7 +1980,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129038,"Ais.Class.APosition.Report",28,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129038,"Ais.Class.APosition.Report",28,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.APosition.Report.Ais.Spare",// generic_name
@@ -2436,7 +2436,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129039,"Ais.Class.BPosition.Report",26,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129039,"Ais.Class.BPosition.Report",26,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BPosition.Report.Ais.Communication.State",// generic_name
@@ -2940,7 +2940,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129040,"Ais.Class.BExtended.Position.Report",33,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129040,"Ais.Class.BExtended.Position.Report",33,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BExtended.Position.Report.Ais.Mode",// generic_name
@@ -3526,7 +3526,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129044,"Datum",24,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129044,"Datum",24,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Datum.Delta.Altitude",// generic_name
@@ -3640,7 +3640,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129283,"Cross.Track.Error",6,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129283,"Cross.Track.Error",6,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Cross.Track.Error.Navigation.Terminated",// generic_name
@@ -3763,7 +3763,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129284,"Navigation.Data",34,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129284,"Navigation.Data",34,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Navigation.Data.Arrival.Circle.Entered",// generic_name
@@ -4111,7 +4111,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129291,"Set.Drift.Rapid.Update",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129291,"Set.Drift.Rapid.Update",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Set.Drift.Rapid.Update.Drift",// generic_name
@@ -4229,7 +4229,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129539,"Gnss.Dops",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129539,"Gnss.Dops",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Dops.Actual.Mode",// generic_name
@@ -4399,7 +4399,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129540,"Gnss.Sats.In.View",255,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129540,"Gnss.Sats.In.View",255,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Gnss.Sats.In.View.Azimuth",// generic_name
@@ -4630,7 +4630,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129793,"Ais.Utc.And.Date.Report",26,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129793,"Ais.Utc.And.Date.Report",26,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Utc.And.Date.Report.Ais.Transceiver.Information",// generic_name
@@ -4965,7 +4965,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129794,"Ais.Class.AStatic.And.Voyage.Related.Data",24,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129794,"Ais.Class.AStatic.And.Voyage.Related.Data",24,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.AStatic.And.Voyage.Related.Data.Ais.Transceiver.Information",// generic_name
@@ -5479,7 +5479,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129798,"Ais.Sar.Aircraft.Position.Report",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129798,"Ais.Sar.Aircraft.Position.Report",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Sar.Aircraft.Position.Report.Ais.Transceiver.Information",// generic_name
@@ -5855,7 +5855,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129809,"Ais.Class.BStatic.Data.Msg24.Part.A",27,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129809,"Ais.Class.BStatic.Data.Msg24.Part.A",27,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.A.Ais.Transceiver.Information",// generic_name
@@ -6023,7 +6023,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129810,"Ais.Class.BStatic.Data.Msg24.Part.B",34,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",129810,"Ais.Class.BStatic.Data.Msg24.Part.B",34,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Ais.Class.BStatic.Data.Msg24.Part.B.Ais.Transceiver.Information",// generic_name
@@ -6414,7 +6414,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130306,"Wind.Data",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130306,"Wind.Data",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Wind.Data.Reference",// generic_name
@@ -6533,7 +6533,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130310,"Environmental.Parameters",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130310,"Environmental.Parameters",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Atmospheric.Pressure",// generic_name
@@ -6647,7 +6647,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130311,"Environmental.Parameters",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130311,"Environmental.Parameters",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Environmental.Parameters.Atmospheric.Pressure",// generic_name
@@ -6800,7 +6800,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130312,"Temperature",8,392,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130312,"Temperature",8,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"Temperature.Actual.Temperature",// generic_name
@@ -6920,6 +6920,146 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					},// states
 					false,// writable
 					decoder_t::decode_state,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})}
+			} // end signals vector
+		})} // end message_definition entry
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",60160,"Iso.Transport.Protocol.Data.Transfer",8,136,frequency_clock_t(5.00000f),true,
+			{ // beginning signals vector
+				{std::make_shared<signal_t> (signal_t{
+					"Iso.Transport.Protocol.Data.Transfer.Data",// generic_name
+					0,// bit_position edited with low-can-generator
+					56,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					0,// min_value
+					0,// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Iso.Transport.Protocol.Data.Transfer.Sid",// generic_name
+					56,// bit_position edited with low-can-generator
+					8,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					0,// min_value
+					0,// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})}
+			} // end signals vector
+		})} // end message_definition entry
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",60416,"Iso.Transport.Protocol.Connection.Management.Abort",8,136,frequency_clock_t(5.00000f),true,
+			{ // beginning signals vector
+				{std::make_shared<signal_t> (signal_t{
+					"Iso.Transport.Protocol.Connection.Management.Abort.Group.Function.Code",// generic_name
+					56,// bit_position edited with low-can-generator
+					8,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					0,// min_value
+					0,// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Iso.Transport.Protocol.Connection.Management.Abort.Pgn",// generic_name
+					8,// bit_position edited with low-can-generator
+					24,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					0,// min_value
+					0,// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					decoder_t::decode_noop,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Iso.Transport.Protocol.Connection.Management.Abort.Reason",// generic_name
+					48,// bit_position edited with low-can-generator
+					8,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					0,// min_value
+					0,// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					decoder_t::decode_bytes,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Iso.Transport.Protocol.Connection.Management.Abort.Reserved",// generic_name
+					32,// bit_position edited with low-can-generator
+					16,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					0,// min_value
+					0,// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					decoder_t::decode_bytes,// decoder
 					nullptr,// encoder
 					false,// received
 					std::make_pair<bool, int>(false, 0),// multiplex
