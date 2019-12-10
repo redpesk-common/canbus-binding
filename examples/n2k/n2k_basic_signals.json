@@ -221,7 +221,7 @@
 					"bit_position": 24,
 					"bit_size": 16,
 					"factor": 0.0001,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad",
 					"generic_name": "Heading.Track.Control.Commanded.Rudder.Angle"
 				},
@@ -261,7 +261,7 @@
 					"bit_position": 104,
 					"bit_size": 16,
 					"factor": 0.0001,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad",
 					"generic_name": "Heading.Track.Control.Radius.Of.Turn.Order"
 				},
@@ -269,14 +269,14 @@
 					"bit_position": 120,
 					"bit_size": 16,
 					"factor": 3.125e-05,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad/s",
 					"generic_name": "Heading.Track.Control.Rate.Of.Turn.Order"
 				},
 				"Off.Track.Limit": {
 					"bit_position": 136,
 					"bit_size": 16,
-					"sign": 1,
+					"sign": 2,
 					"unit":"m",
 					"generic_name": "Heading.Track.Control.Off.Track.Limit"
 				},
@@ -325,7 +325,7 @@
 					"bit_position": 16,
 					"bit_size": 16,
 					"factor": 0.0001,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad",
 					"generic_name": "Rudder.Angle.Order"
 				},
@@ -333,7 +333,7 @@
 					"bit_position": 32,
 					"bit_size": 16,
 					"factor": 0.0001,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad",
 					"generic_name": "Rudder.Position"
 				}
@@ -368,7 +368,7 @@
 					"bit_position": 24,
 					"bit_size": 16,
 					"factor": 0.0001,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad",
 					"generic_name": "Vessel.Heading.Deviation"
 				},
@@ -376,7 +376,7 @@
 					"bit_position": 40,
 					"bit_size": 16,
 					"factor": 0.0001,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad",
 					"generic_name": "Vessel.Heading.Variation"
 				},
@@ -424,7 +424,7 @@
 					"bit_position": 8,
 					"bit_size": 32,
 					"factor": 3.125e-08,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad/s",
 					"generic_name": "Rate.Of.Turn.Rate"
 				}
@@ -487,7 +487,7 @@
 					"bit_position": 32,
 					"bit_size": 16,
 					"factor": 0.0001,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad",
 					"generic_name": "Magnetic.Variation.Variation"
 				}
@@ -579,7 +579,7 @@
 					"bit_size": 16,
 					"factor": 0.001,
 					"comment": "Distance between transducer and surface (positive) or keel (negative)",
-					"sign": 1,
+					"sign": 2,
 					"unit":"m",
 					"generic_name": "Water.Depth.Offset"
 				},
@@ -659,7 +659,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Position.Rapid.Update.Latitude"
 				},
@@ -668,7 +668,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Position.Rapid.Update.Longitude"
 				}
@@ -780,7 +780,7 @@
 					"bit_size": 64,
 					"factor": 0.0000000000000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Gnss.Position.Data.Latitude"
 				},
@@ -789,7 +789,7 @@
 					"bit_size": 64,
 					"factor": 0.0000000000000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Gnss.Position.Data.Longitude"
 				},
@@ -798,7 +798,7 @@
 					"bit_size": 64,
 					"factor": 1e-06,
 					"comment": "Altitude referenced to WGS-84",
-					"sign": 1,
+					"sign": 2,
 					"unit":"m",
 					"generic_name": "Gnss.Position.Data.Altitude"
 				},
@@ -870,7 +870,7 @@
 					"bit_size": 16,
 					"factor": 0.01,
 					"comment": "Horizontal dilution of precision",
-					"sign": 1,
+					"sign": 2,
 					"generic_name": "Gnss.Position.Data.Hdop"
 				},
 				"Pdop": {
@@ -878,7 +878,7 @@
 					"bit_size": 16,
 					"factor": 0.01,
 					"comment": "Probable dilution of precision",
-					"sign": 1,
+					"sign": 2,
 					"generic_name": "Gnss.Position.Data.Pdop"
 				},
 				"Geoidal.Separation": {
@@ -886,7 +886,7 @@
 					"bit_size": 32,
 					"factor": 0.01,
 					"comment": "Geoidal Separation",
-					"sign": 1,
+					"sign": 2,
 					"unit":"m",
 					"generic_name": "Gnss.Position.Data.Geoidal.Separation"
 				},
@@ -969,7 +969,7 @@
 					"factor": 1,
 					"comment": "Minutes",
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"minutes",
 					"generic_name": "Time.Date.Local.Offset"
 				}
@@ -1019,7 +1019,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Class.APosition.Report.Longitude"
 				},
@@ -1028,7 +1028,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Class.APosition.Report.Latitude"
 				},
@@ -1120,7 +1120,7 @@
 					"bit_position": 184,
 					"bit_size": 16,
 					"factor": 3.125e-05,
-					"sign": 1,
+					"sign": 2,
 					"unit":"rad/s",
 					"generic_name": "Ais.Class.APosition.Report.Rate.Of.Turn"
 				},
@@ -1235,7 +1235,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Class.BPosition.Report.Longitude"
 				},
@@ -1244,7 +1244,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Class.BPosition.Report.Latitude"
 				},
@@ -1475,7 +1475,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Class.BExtended.Position.Report.Longitude"
 				},
@@ -1484,7 +1484,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Class.BExtended.Position.Report.Latitude"
 				},
@@ -1753,7 +1753,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Datum.Delta.Latitude"
 				},
@@ -1762,7 +1762,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Datum.Delta.Longitude"
 				},
@@ -1770,7 +1770,7 @@
 					"bit_position": 96,
 					"bit_size": 32,
 					"factor": 1e-06,
-					"sign": 1,
+					"sign": 2,
 					"unit":"m",
 					"generic_name": "Datum.Delta.Altitude"
 				},
@@ -1840,7 +1840,7 @@
 					"bit_position": 16,
 					"bit_size": 32,
 					"factor": 0.01,
-					"sign": 1,
+					"sign": 2,
 					"unit":"m",
 					"generic_name": "Cross.Track.Error.Xte"
 				}
@@ -1974,7 +1974,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Navigation.Data.Destination.Latitude"
 				},
@@ -1983,7 +1983,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Navigation.Data.Destination.Longitude"
 				},
@@ -1991,7 +1991,7 @@
 					"bit_position": 256,
 					"bit_size": 16,
 					"factor": 0.01,
-					"sign": 1,
+					"sign": 2,
 					"unit":"m/s",
 					"generic_name": "Navigation.Data.Waypoint.Closing.Velocity"
 				}
@@ -2115,7 +2115,7 @@
 					"bit_size": 16,
 					"factor": 0.01,
 					"comment": "Horizontal dilution of precision",
-					"sign": 1,
+					"sign": 2,
 					"generic_name": "Gnss.Dops.Hdop"
 				},
 				"Vdop": {
@@ -2123,7 +2123,7 @@
 					"bit_size": 16,
 					"factor": 0.01,
 					"comment": "Vertical dilution of precision",
-					"sign": 1,
+					"sign": 2,
 					"generic_name": "Gnss.Dops.Vdop"
 				},
 				"Tdop": {
@@ -2131,7 +2131,7 @@
 					"bit_size": 16,
 					"factor": 0.01,
 					"comment": "Time dilution of precision",
-					"sign": 1,
+					"sign": 2,
 					"generic_name": "Gnss.Dops.Tdop"
 				}
 			}
@@ -2210,7 +2210,7 @@
 				"Range.Residuals": {
 					"bit_position": 80,
 					"bit_size": 32,
-					"sign": 1,
+					"sign": 2,
 					"generic_name": "Gnss.Sats.In.View.Range.Residuals"
 				},
 				"Status": {
@@ -2282,7 +2282,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Utc.And.Date.Report.Longitude"
 				},
@@ -2291,7 +2291,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Utc.And.Date.Report.Latitude"
 				},
@@ -2696,7 +2696,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Sar.Aircraft.Position.Report.Longitude"
 				},
@@ -2705,7 +2705,7 @@
 					"bit_size": 32,
 					"factor": 0.0000001,
 					"decoder": "decoder_t::decode_noop",
-					"sign": 1,
+					"sign": 2,
 					"unit":"deg",
 					"generic_name": "Ais.Sar.Aircraft.Position.Report.Latitude"
 				},
@@ -2788,7 +2788,7 @@
 					"bit_position": 168,
 					"bit_size": 64,
 					"factor": 1e-06,
-					"sign": 1,
+					"sign": 2,
 					"unit":"m",
 					"generic_name": "Ais.Sar.Aircraft.Position.Report.Altitude"
 				},
@@ -3272,7 +3272,7 @@
 					"bit_position": 32,
 					"bit_size": 16,
 					"factor": 0.004,
-					"sign": 1,
+					"sign": 2,
 					"unit":"%",
 					"generic_name": "Environmental.Parameters.Humidity"
 				},
