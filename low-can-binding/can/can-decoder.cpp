@@ -106,13 +106,16 @@ float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message
 	uint8_t new_start_bit = 0;
 	uint8_t new_end_bit = 0;
 
-	if(signal.get_message()->frame_layout_is_bigendian())
-	{
+	if(signal.get_message()->get_flags() & CONTINENTAL_BIT_POSITION)
+		bit_position = converter_t::continental_bit_position_mess(message->get_length(),
+							      signal.get_bit_position(),
+							      bit_size);
+	if(signal.get_message()->get_flags() & BIT_POSITION_REVERSED)
 		bit_position = converter_t::bit_position_swap(message->get_length(),
 							      signal.get_bit_position(),
 							      bit_size);
+	if(signal.get_message()->get_flags() & FRAME_LAYOUT_IS_BIGENDIAN)
 		message->frame_swap();
-	}
 
 	data = message->get_data_vector();
 	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit, new_end_bit);
