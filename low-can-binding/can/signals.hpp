@@ -160,6 +160,8 @@ public:
 	uint32_t get_bit_size() const;
 	float get_factor() const;
 	float get_offset() const;
+	float get_min_value() const;
+	float get_max_value() const;
 	frequency_clock_t& get_frequency();
 	bool get_send_same() const;
 	const std::string get_states(uint8_t value);

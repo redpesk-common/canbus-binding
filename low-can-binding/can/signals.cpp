@@ -139,6 +139,16 @@ float signal_t::get_offset() const
 	return offset_;
 }
 
+float signal_t::get_min_value() const
+{
+	return min_value_;
+}
+
+float signal_t::get_max_value() const
+{
+	return max_value_;
+}
+
 frequency_clock_t& signal_t::get_frequency()
 {
 	return frequency_;
