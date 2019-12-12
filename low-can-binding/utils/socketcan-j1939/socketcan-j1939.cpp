@@ -87,18 +87,16 @@ namespace utils
 	/**
 	 * @brief Define some parameters on the socket
 	 *
-	 * @param promisc - Allows to accept all packets that the socket receives even if they are not addressed directly to it
-	 * @param recv_own_msgs - Allows you to receive your own packets
 	 * @param broadcast - Allows to write message with address brodcast (255)
+	 * @param promisc - Allows to accept all packets that the socket receives even if they are not addressed directly to it
 	 */
-	void socketcan_j1939_t::define_opt(bool promisc, bool recv_own_msgs, bool broadcast)
+	void socketcan_j1939_t::define_opt(bool broadcast, bool promisc)
 	{
-		int promisc_i = promisc ? 1 : 0;
-		//int recv_own_msgs_i = recv_own_msgs ? 1 : 0;
 		int broadcast_i = broadcast ? 1 : 0;
+		int promisc_i = promisc ? 1 : 0;
 
-		setopt(SOL_CAN_J1939, SO_J1939_PROMISC, &promisc_i, sizeof(promisc_i));
 		setopt(SOL_SOCKET, SO_BROADCAST, &broadcast_i, sizeof(broadcast_i));
+		setopt(SOL_CAN_J1939, SO_J1939_PROMISC, &promisc_i, sizeof(promisc_i));
 	}
 
 

@@ -314,6 +314,9 @@ static event_filter_t generate_filter(json_object* args)
 		if (json_object_object_get_ex(filter, "max", &obj)
 		&& (json_object_is_type(obj, json_type_double) || json_object_is_type(obj, json_type_int)))
 			event_filter.max = (float)json_object_get_double(obj);
+		if (json_object_object_get_ex(filter, "promisc", &obj)
+			&& (json_object_is_type(obj, json_type_boolean)))
+			event_filter.promisc = (bool)json_object_get_boolean(obj);
 		if (json_object_object_get_ex(filter, "rx_id", &obj)
 		&& (json_object_is_type(obj, json_type_int)))
 			event_filter.rx_id = (canid_t) json_object_get_int(obj);

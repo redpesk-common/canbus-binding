@@ -31,15 +31,7 @@ namespace utils
 	 */
 	int socketcan_j1939_data_t::open(std::string device_name, pgn_t pgn)
 	{
-		int ret = socketcan_j1939_t::open(device_name, htole64(J1939_NAME_ECU), pgn, J1939_NO_ADDR);
-		if(ret >= 0)
-		{
-			if(tx_address_.can_addr.j1939.pgn != J1939_NO_PGN)
-				add_filter(J1939_NO_NAME, tx_address_.can_addr.j1939.pgn, J1939_NO_ADDR, J1939_NO_NAME, J1939_NO_PGN, J1939_NO_ADDR);
-
-			define_opt();
-		}
-		return ret;
+		return socketcan_j1939_t::open(device_name, htole64(J1939_NAME_ECU), pgn, J1939_NO_ADDR);
 	}
 
 	/**

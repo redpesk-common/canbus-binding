@@ -35,12 +35,13 @@ struct event_filter_t
 	float frequency; ///< frequency - Maximum frequency which will be received and pushed to a subscribed event.
 	float min; ///< min - Minimum value that the signal doesn't have to go below to be pushed.
 	float max; ///< max - Maximum value that the signal doesn't have to go above to be pushed.
+	bool promisc; //<promisc - Active mode promisc on socket that permit this feature (j1939)
 	canid_t rx_id; ///< rx_id - RX_ID for ISO_TP protocol
 	canid_t tx_id; ///< tx_id - TX_ID for ISO_TP protocol
 
-	event_filter_t() : frequency{0}, min{-__FLT_MAX__}, max{__FLT_MAX__}, rx_id{NO_CAN_ID}, tx_id{NO_CAN_ID} {};
+	event_filter_t() : frequency{0}, min{-__FLT_MAX__}, max{__FLT_MAX__}, promisc{false}, rx_id{NO_CAN_ID}, tx_id{NO_CAN_ID} {};
 	bool operator==(const event_filter_t& ext) const {
-		return frequency == ext.frequency && min == ext.min && max == ext.max && rx_id == ext.rx_id && tx_id == ext.tx_id;
+		return frequency == ext.frequency && min == ext.min && max == ext.max && promisc == ext.promisc && rx_id == ext.rx_id && tx_id == ext.tx_id;
 	}
 };
 
@@ -87,6 +88,7 @@ public:
 	float get_frequency() const;
 	float get_min() const;
 	float get_max() const;
+	bool get_promisc() const;
 	canid_t get_rx_id() const;
 	canid_t get_tx_id() const;
 	std::shared_ptr<utils::socketcan_t> get_socket();
@@ -95,6 +97,7 @@ public:
 	void set_min(float min);
 	void set_max(float max);
 	void set_index(int index);
+	void set_promisc(bool promisc);
 	void set_rx_id(canid_t rx_id);
 	void set_tx_id(canid_t tx_id);
 	void set_signal(std::shared_ptr<signal_t> signal);

@@ -50,7 +50,7 @@ namespace utils
 		{
 			if(jm->get_addr() >= J1939_IDLE_ADDR)
 			{
-				AFB_DEBUG("Get invalid address claiming by name : %x",(unsigned int)jm->get_name());
+				AFB_DEBUG("Get invalid address claiming by name (maybe logout) : %x",(unsigned int)jm->get_name());
 				return invalid_message;
 			}
 

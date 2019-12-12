@@ -254,6 +254,11 @@ float low_can_subscription_t::get_max() const
 	return event_filter_.max;
 }
 
+bool low_can_subscription_t::get_promisc() const
+{
+	return event_filter_.promisc;
+}
+
 /**
  * @brief Getter of the rx_id of the event_filter
  *
@@ -312,6 +317,11 @@ void low_can_subscription_t::set_min(float min)
 void low_can_subscription_t::set_max(float max)
 {
 	event_filter_.max = max;
+}
+
+void low_can_subscription_t::set_promisc(bool promisc)
+{
+	event_filter_.promisc = promisc;
 }
 
 /**
@@ -409,30 +419,32 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 		else if(flags & J1939_ADDR_CLAIM_PROTOCOL)
 		{
 			pgn_t pgn = J1939_NO_PGN;
+			std::shared_ptr<utils::socketcan_j1939_addressclaiming_t> socket = std::make_shared<utils::socketcan_j1939_addressclaiming_t>();
 			if(!bus_name.empty())
 			{
-				std::shared_ptr<utils::socketcan_j1939_addressclaiming_t> socket = std::make_shared<utils::socketcan_j1939_addressclaiming_t>();
 				ret = socket->open(bus_name, pgn);
-				subscription.socket_ = socket;
 			}
+			subscription.socket_ = socket;
 			subscription.index_ = (int)subscription.socket_->socket();
 		}
 		else if(flags & J1939_PROTOCOL)
 		{
 			pgn_t pgn = J1939_NO_PGN;
+			std::shared_ptr<utils::socketcan_j1939_data_t> socket = std::make_shared<utils::socketcan_j1939_data_t>();
 			if(subscription.signal_)
 			{
 				pgn = subscription.signal_->get_message()->get_id();
-				std::shared_ptr<utils::socketcan_j1939_data_t> socket = std::make_shared<utils::socketcan_j1939_data_t>();
 				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(), pgn);
-				subscription.socket_ = socket;
 			}
 			else if(!bus_name.empty())
 			{
-				std::shared_ptr<utils::socketcan_j1939_data_t> socket = std::make_shared<utils::socketcan_j1939_data_t>();
 				ret = socket->open(bus_name, pgn);
-				subscription.socket_ = socket;
 			}
+
+			if(ret)
+				socket->define_opt(!j1939_pgn_is_pdu1(pgn),subscription.event_filter_.promisc);
+
+			subscription.socket_ = socket;
 			subscription.index_ = (int)subscription.socket_->socket();
 		}
 #endif

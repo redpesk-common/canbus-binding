@@ -29,6 +29,17 @@
 #define J1939_NAME_ECU 0x1234
 #endif
 
+#define J1939_CAN_ID CAN_EFF_FLAG
+#define J1939_CAN_MASK (CAN_EFF_FLAG | CAN_RTR_FLAG)
+
+
+// PDU 1 = NO BROADCAST
+// PDU 2 = BRODCAST
+static inline bool j1939_pgn_is_pdu1(pgn_t pgn)
+{
+	return (pgn & 0xff00) < 0xf000;
+}
+
 namespace utils
 {
 
@@ -54,6 +65,7 @@ namespace utils
 			virtual std::shared_ptr<message_t> read_message(int flag);
 			virtual int write_message(message_t& obj);
 			virtual int write_j1939_message(pgn_t pgn, std::vector<uint8_t> &data, uint32_t len_data);
+			void define_opt(bool broadcast = true, bool promisc = false);
 
 		protected:
 			struct ifreq ifr_;
@@ -61,7 +73,7 @@ namespace utils
 			static std::condition_variable signal_address_claiming_;
 			void define_tx_address(std::string device_name, name_t name, pgn_t pgn, uint8_t addr);
 			int add_filter(name_t name, pgn_t pgn, uint8_t addr, name_t name_mask, pgn_t pgn_mask, uint8_t addr_mask);
-			void define_opt(bool promisc = true, bool recv_own_msgs = true, bool broadcast = true);
+
 
 	};
 }
