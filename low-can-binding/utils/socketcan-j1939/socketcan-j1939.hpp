@@ -60,7 +60,7 @@ namespace utils
 			static std::mutex mutex_claiming_;
 			static std::condition_variable signal_address_claiming_;
 			void define_tx_address(std::string device_name, name_t name, pgn_t pgn, uint8_t addr);
-			void add_filter(name_t name, pgn_t pgn, uint8_t addr, name_t name_mask, pgn_t pgn_mask, uint8_t addr_mask);
+			int add_filter(name_t name, pgn_t pgn, uint8_t addr, name_t name_mask, pgn_t pgn_mask, uint8_t addr_mask);
 			void define_opt(bool promisc = true, bool recv_own_msgs = true, bool broadcast = true);
 
 	};

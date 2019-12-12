@@ -40,7 +40,7 @@ namespace utils
 	 * @param pgn_mask - The mask to apply to the pgn (No mask : J1939_NO_PGN)
 	 * @param addr_mask - The mask to apply to the addr (No mask : J1939_NO_ADDR)
 	 */
-	void socketcan_j1939_t::add_filter(name_t name, pgn_t pgn, uint8_t addr, name_t name_mask, pgn_t pgn_mask, uint8_t addr_mask)
+	int socketcan_j1939_t::add_filter(name_t name, pgn_t pgn, uint8_t addr, name_t name_mask, pgn_t pgn_mask, uint8_t addr_mask)
 	{
 	//	AFB_DEBUG("[socketcan_j1939_t][add_filter] PGN : %" PRIu32 " ; NAME : %" PRIu64 " ; ADDR : %" PRIu8, pgn,(long unsigned int)name, addr);
 	//	AFB_DEBUG("PGN_MASK : %" PRIu32 " ; NAME_MASK : %" PRIu64 "; ADDR_MASK : %" PRIu8, pgn_mask,(long unsigned int)name_mask, addr_mask);
@@ -79,7 +79,9 @@ namespace utils
 		}
 
 		if(filter_on)
-			setopt(SOL_CAN_J1939, SO_J1939_FILTER, &filter, sizeof(filter));
+			return setopt(SOL_CAN_J1939, SO_J1939_FILTER, &filter, sizeof(filter));
+
+		return 0;
 	}
 
 	/**
