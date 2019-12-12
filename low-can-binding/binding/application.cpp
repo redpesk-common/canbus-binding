@@ -71,10 +71,13 @@ int application_t::add_message_set(std::shared_ptr<message_set_t> new_message_se
 					return -1;
 			}
 
-			for(auto new_diag_msg : new_message_set->get_diagnostic_messages())
+			if(diagnostic_manager_.is_initialized())
 			{
-				if(old_msg_set->add_diagnostic_message(new_diag_msg) < 0)
-					return -1;
+				for(auto new_diag_msg : new_message_set->get_diagnostic_messages())
+				{
+					if(old_msg_set->add_diagnostic_message(new_diag_msg) < 0)
+						return -1;
+				}
 			}
 			return 0;
 		}

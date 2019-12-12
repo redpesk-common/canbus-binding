@@ -79,7 +79,7 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	/// Initialize Diagnostic manager that will handle obd2 requests.
 	/// We pass by default the first CAN bus device to its Initialization.
 	if(! diagnotic_bus || application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
-		AFB_WARNING("Diagnostic Manager: not initialized");
+		AFB_WARNING("Diagnostic Manager: not initialized. No diagnostic messages will be processed.");
 
 	return 0;
 }
