@@ -17,6 +17,7 @@
 
 #include "can-decoder.hpp"
 #include <climits>
+#include <cmath>
 
 #include "canutil/read.h"
 #include "../utils/openxc-utils.hpp"
@@ -253,6 +254,21 @@ openxc_DynamicField decoder_t::decode_time(signal_t& signal, std::shared_ptr<mes
 openxc_DynamicField decoder_t::decode_noop(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
 	float value = decoder_t::parse_signal_bitfield(signal, message);
+
+	float min_value = signal.get_min_value();
+	float max_value = signal.get_max_value();
+
+	if( min_value != std::nanf("") ||  max_value != std::nanf("")  )
+	{
+		if( (min_value == max_value && value != min_value) ||
+			(min_value != std::nanf("") && value < min_value) || (max_value != std::nanf("") && value > max_value))
+		{
+			AFB_DEBUG("Value doesn't match for signal %s", signal.get_generic_name());
+			return build_DynamicField_error();
+		}
+
+	}
+
 	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);
 	openxc_DynamicField decoded_value = build_DynamicField(value);
 

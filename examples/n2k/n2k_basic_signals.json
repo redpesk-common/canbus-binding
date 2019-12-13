@@ -53,8 +53,30 @@
 				"Data": {
 					"bit_position": 8,
 					"bit_size": 56,
+					"decoder": "decoder_t::decode_bytes",
 					"sign": 0,
 					"generic_name": "Iso.Transport.Protocol.Data.Transfer.Data"
+				}
+			}
+		},
+		"60160#1": {
+			"name": "60160",
+			"bus":"j1939",
+			"comment":"Abstract signals for 60160",
+			"length": 8,
+			"is_fd": false,
+			"is_extended": false,
+			"is_j1939": true,
+			"byte_frame_is_big_endian": true,
+			"bit_position_reversed": true,
+			"signals": {
+				"signal.60160": {
+					"bit_position": 0,
+					"bit_size": 64,
+					"comment": "One signals",
+					"decoder": "decoder_t::decode_60160",
+					"sign": 0,
+					"generic_name": "signal.60160"
 				}
 			}
 		},
@@ -72,6 +94,7 @@
 				"Group.Function.Code": {
 					"bit_position": 0,
 					"bit_size": 8,
+					"value_to_match": 16,
 					"comment": "RTS",
 					"sign": 0,
 					"generic_name": "Iso.Transport.Protocol.Connection.Management.Request.To.Send.Group.Function.Code"
@@ -108,7 +131,7 @@
 				}
 			}
 		},
-		"60416": {
+		"60416#1": {
 			"name": "Iso.Transport.Protocol.Connection.Management.Clear.To.Send",
 			"bus":"j1939",
 			"comment":"ISO Transport Protocol, Connection Management - Clear To Send",
@@ -122,6 +145,7 @@
 				"Group.Function.Code": {
 					"bit_position": 0,
 					"bit_size": 8,
+					"value_to_match": 17,
 					"comment": "CTS",
 					"sign": 0,
 					"generic_name": "Iso.Transport.Protocol.Connection.Management.Clear.To.Send.Group.Function.Code"
@@ -158,7 +182,7 @@
 				}
 			}
 		},
-		"60416": {
+		"60416#2": {
 			"name": "Iso.Transport.Protocol.Connection.Management.End.Of.Message",
 			"bus":"j1939",
 			"comment":"ISO Transport Protocol, Connection Management - End Of Message",
@@ -172,6 +196,7 @@
 				"Group.Function.Code": {
 					"bit_position": 0,
 					"bit_size": 8,
+					"value_to_match": 19,
 					"comment": "EOM",
 					"sign": 0,
 					"generic_name": "Iso.Transport.Protocol.Connection.Management.End.Of.Message.Group.Function.Code"
@@ -208,7 +233,7 @@
 				}
 			}
 		},
-		"60416": {
+		"60416#3": {
 			"name": "Iso.Transport.Protocol.Connection.Management.Broadcast.Announce",
 			"bus":"j1939",
 			"comment":"ISO Transport Protocol, Connection Management - Broadcast Announce",
@@ -222,6 +247,7 @@
 				"Group.Function.Code": {
 					"bit_position": 0,
 					"bit_size": 8,
+					"value_to_match": 32,
 					"comment": "BAM",
 					"sign": 0,
 					"generic_name": "Iso.Transport.Protocol.Connection.Management.Broadcast.Announce.Group.Function.Code"
@@ -258,7 +284,7 @@
 				}
 			}
 		},
-		"60416": {
+		"60416#4": {
 			"name": "Iso.Transport.Protocol.Connection.Management.Abort",
 			"bus":"j1939",
 			"comment":"ISO Transport Protocol, Connection Management - Abort",
@@ -272,6 +298,7 @@
 				"Group.Function.Code": {
 					"bit_position": 0,
 					"bit_size": 8,
+					"value_to_match": 255,
 					"comment": "Abort",
 					"sign": 0,
 					"generic_name": "Iso.Transport.Protocol.Connection.Management.Abort.Group.Function.Code"
@@ -298,6 +325,27 @@
 					"decoder": "decoder_t::decode_noop",
 					"sign": 0,
 					"generic_name": "Iso.Transport.Protocol.Connection.Management.Abort.Pgn"
+				}
+			}
+		},
+		"60416#5": {
+			"name": "60416",
+			"bus":"j1939",
+			"comment":"Abstract signals for 60416",
+			"length": 8,
+			"is_fd": false,
+			"is_extended": false,
+			"is_j1939": true,
+			"byte_frame_is_big_endian": true,
+			"bit_position_reversed": true,
+			"signals": {
+				"signal.60416": {
+					"bit_position": 0,
+					"bit_size": 64,
+					"comment": "One signals",
+					"decoder": "decoder_t::decode_60416",
+					"sign": 0,
+					"generic_name": "signal.60416"
 				}
 			}
 		},
