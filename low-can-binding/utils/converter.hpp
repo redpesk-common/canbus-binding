@@ -23,6 +23,7 @@ class converter_t
 {
 	public:
 		static std::string to_hex(const uint8_t data[], const size_t length);
+		static std::string to_ascii(const uint8_t data[], const size_t length);
 		static void signal_to_bits_bytes(unsigned int bit_position,
 						 unsigned int bit_size,
 						 int &new_start_byte,

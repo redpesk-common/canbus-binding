@@ -195,6 +195,67 @@ openxc_DynamicField decoder_t::decode_bytes(signal_t& signal, std::shared_ptr<me
 	return decoded_value;
 }
 
+
+/// @brief Decode and return string bytes (hex) for a CAN signal's.
+///
+/// This is an implementation of the Signal type signature, and can be
+/// used directly in the signal_t.decoder field.
+///
+/// @param[in] signal  - The details of the signal.
+/// @param[in] message - The message with data to decode.
+/// @param[out] send - An output argument that will be set to false if the value should
+///     not be sent for any reason.
+///
+/// @return Returns a DynamicField with a string value of bytes (hex)
+///
+openxc_DynamicField decoder_t::decode_ascii(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
+{
+	std::string ret_s = "";
+	openxc_DynamicField openxc_bytes = decode_bytes(signal,message,send);
+	if(!openxc_bytes.has_bytes_value)
+	{
+		AFB_ERROR("Error no bytes value to translate to ascii");
+	}
+	ret_s = converter_t::to_ascii(openxc_bytes.bytes_value,openxc_bytes.length_array);
+	openxc_DynamicField ret = build_DynamicField(ret_s);
+	return ret;
+}
+
+//edit
+openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
+{
+	float value = decoder_t::parse_signal_bitfield(signal, message);
+	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);
+	openxc_DynamicField decoded_value = build_DynamicField(value);
+
+	// Don't send if they is no changes
+	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
+	{
+		*send = false;
+	}
+	signal.set_last_value(value);
+
+	return decoded_value;
+}
+
+//edit
+openxc_DynamicField decoder_t::decode_time(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
+{
+	float value = decoder_t::parse_signal_bitfield(signal, message);
+	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);
+	openxc_DynamicField decoded_value = build_DynamicField(value);
+
+	// Don't send if they is no changes
+	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
+	{
+		*send = false;
+	}
+	signal.set_last_value(value);
+
+	return decoded_value;
+}
+
+
 /// @brief Wraps a raw CAN signal value in a DynamicField without modification.
 ///
 /// This is an implementation of the Signal type signature, and can be

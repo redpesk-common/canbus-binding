@@ -22,11 +22,11 @@
 #include <climits>
 
 /**
- * @brief Convert hex data to string
+ * @brief Convert data to hex string
  *
  * @param data An array of data
  * @param length The length of the data
- * @return std::string The string data
+ * @return std::string The hex string
  */
 std::string converter_t::to_hex(const uint8_t data[], const size_t length)
 {
@@ -35,6 +35,21 @@ std::string converter_t::to_hex(const uint8_t data[], const size_t length)
 	for(int i = 0; i < length; i++)
 		stream << std::setfill('0') << std::setw(2) << std::hex << ((int) data[i]);
 
+	return stream.str();
+}
+
+/**
+ * @brief Convert data to ascii string
+ *
+ * @param data An array of data
+ * @param length The length of the data
+ * @return std::string The ascii string
+ */
+std::string converter_t::to_ascii(const uint8_t data[], const size_t length)
+{
+	std::stringstream stream;
+	for(int i = 0; i < length; i++)
+		stream << ((char) data[i]);
 	return stream.str();
 }
 
