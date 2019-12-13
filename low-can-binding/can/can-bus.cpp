@@ -116,19 +116,7 @@ void can_bus_t::process_signals(std::shared_ptr<message_t> message, map_subscrip
 		// messages
 		if(subscription->get_message_definition() != nullptr)
 		{
-			openxc_DynamicField dynamicField_tmp;
-			json_object *signal_json_tmp;
-			decoded_message = build_DynamicField_json(json_object_new_array());
-			for(std::shared_ptr<signal_t> sig : subscription->get_message_definition()->get_signals())
-			{
-				signal_json_tmp = json_object_new_object();
-				dynamicField_tmp = decoder_t::translate_signal(*sig, message, &send);
-				json_object_object_add(signal_json_tmp,"name", json_object_new_string(sig->get_name().c_str()));
-				jsonify_DynamicField(dynamicField_tmp,signal_json_tmp);
-				if(sig != nullptr && sig->get_unit() != "")
-					json_object_object_add(signal_json_tmp, "unit", json_object_new_string(sig->get_unit().c_str()));
-				json_object_array_add(decoded_message.json_value,signal_json_tmp);
-			}
+			decoded_message = generate_openxc_DynamicField_from_message(subscription->get_message_definition(), message, send);
 		}
 		else // signal
 		{

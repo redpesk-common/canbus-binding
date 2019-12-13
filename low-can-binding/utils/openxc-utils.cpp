@@ -19,7 +19,7 @@
 #include "openxc-utils.hpp"
 #include "converter.hpp"
 #include "../binding/application.hpp"
-
+#include "../can/can-decoder.hpp"
 
 ///
 /// @brief Build a specific VehicleMessage containing a DiagnosticResponse.
@@ -377,6 +377,37 @@ const openxc_DynamicField build_DynamicField_error()
 	d.has_json_value = false;
 	d.error = true;
 	return d;
+}
+
+const openxc_DynamicField generate_openxc_DynamicField_from_message(std::shared_ptr<message_definition_t> messages_definition, std::shared_ptr<message_t> message, bool &send)
+{
+	openxc_DynamicField ret = build_DynamicField_json(json_object_new_array());
+	openxc_DynamicField dynamicField_tmp;
+	json_object *signal_json_tmp;
+
+	for (std::shared_ptr<signal_t> sig : messages_definition->get_signals())
+	{
+		signal_json_tmp = json_object_new_object();
+		dynamicField_tmp = decoder_t::translate_signal(*sig, message, &send);
+		if (!dynamicField_tmp.error) // Not Error Match
+		{
+			if (dynamicField_tmp.has_type)
+			{
+				json_object_object_add(signal_json_tmp, "name", json_object_new_string(sig->get_name().c_str()));
+				jsonify_DynamicField(dynamicField_tmp, signal_json_tmp);
+				if (sig != nullptr && sig->get_unit() != "")
+					json_object_object_add(signal_json_tmp, "unit", json_object_new_string(sig->get_unit().c_str()));
+				json_object_array_add(ret.json_value, signal_json_tmp);
+			}
+			send = true;
+		}
+		else // Error Match
+		{
+			send = false;
+			break;
+		}
+	}
+	return ret;
 }
 
 int get_bool_from_DynamicField(const openxc_VehicleMessage& v_msg, bool* ret)

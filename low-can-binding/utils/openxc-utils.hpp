@@ -41,6 +41,9 @@ const openxc_DynamicField build_DynamicField(bool value);
 const openxc_DynamicField build_DynamicField(std::vector<uint8_t> &array);
 const openxc_DynamicField build_DynamicField_json(json_object *value);
 const openxc_DynamicField build_DynamicField_error();
+const openxc_DynamicField generate_openxc_DynamicField_from_message(std::shared_ptr<message_definition_t> messages_definition,
+								    std::shared_ptr<message_t> message,
+								    bool &send);
 
 int get_bool_from_DynamicField(const openxc_VehicleMessage& v_msg, bool& ret);
 double get_numerical_from_DynamicField(const openxc_VehicleMessage& v_msg);
