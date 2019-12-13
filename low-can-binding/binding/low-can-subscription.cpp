@@ -440,7 +440,8 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 			}
 
 			if(ret)
-				socket->define_opt(!j1939_pgn_is_pdu1(pgn),subscription.event_filter_.promisc);
+				socket->define_opt(!j1939_pgn_is_pdu1(pgn) | (pgn == 60160) | (pgn == 60416),
+									subscription.event_filter_.promisc);
 
 			subscription.socket_ = socket;
 			subscription.index_ = (int)subscription.socket_->socket();
