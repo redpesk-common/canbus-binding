@@ -620,7 +620,15 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 
 int low_can_subscription_t::create_rx_filter(std::shared_ptr<message_definition_t> msg)
 {
-	std::shared_ptr<signal_t> signal_message =
+	std::shared_ptr<signal_t> signal_message;
+	std::vector<std::shared_ptr<signal_t>> signals =  msg->get_signals();
+	if(signals.size() == 1)
+	{
+		signal_message = signals.back();
+	}
+	else
+	{
+		signal_message =
 		std::make_shared<signal_t>(signal_t{msg->get_name(),
 						    0,
 						    msg->get_length() * 8,
@@ -640,6 +648,7 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<message_definition_
 						    static_cast<sign_t>(0),
 						    -1,
 						    ""});
+	}
 
 	signal_message->set_parent(msg);
 	return create_rx_filter(signal_message);
