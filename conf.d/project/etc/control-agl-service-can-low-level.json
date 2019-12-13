@@ -17,9 +17,9 @@
 	},
 	"plugins": [
 		{
-			"uid": "default-signals",
-			"info": "default signals",
-			"libs": "default-signals.ctlso"
+			"uid": "clement-signals",
+			"info": "clement signals",
+			"libs": "clement-signals.ctlso"
 		}
 	]
 }

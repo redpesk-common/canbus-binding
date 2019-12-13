@@ -16,9 +16,9 @@
 	},
 	"plugins": [
 		{
-			"uid": "agl-vcar-signals",
-			"info": "agl-vcar signals",
-			"libs": "agl-vcar-signals.ctlso"
+			"uid": "clement-signals",
+			"info": "clement-signals",
+			"libs": "clement-signals.ctlso"
 		}
 	]
 }

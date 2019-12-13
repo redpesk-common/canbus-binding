@@ -35,6 +35,8 @@ public:
 	static openxc_DynamicField decode_ascii(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
 	static openxc_DynamicField decode_date(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
 	static openxc_DynamicField decode_time(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
+	static openxc_DynamicField decode_60160(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
+	static openxc_DynamicField decode_60416(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
 
 	static openxc_DynamicField translate_signal(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
 
