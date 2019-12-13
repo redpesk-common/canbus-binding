@@ -173,6 +173,7 @@ typedef struct _openxc_DynamicField {
     bool has_bytes_value;
     json_object* json_value;
     bool has_json_value;
+    bool error;
 } openxc_DynamicField;
 
 typedef struct _openxc_NetworkOperatorSettings_NetworkDescriptor {
