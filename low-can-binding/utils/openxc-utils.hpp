@@ -23,6 +23,7 @@
 #include <sys/timeb.h>
 
 #include "openxc.pb.h"
+#include "../can/signals.hpp"
 #include "../diagnostic/active-diagnostic-request.hpp"
 
 const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value);
@@ -48,4 +49,4 @@ void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value);
 
 bool jsonify_simple(const openxc_SimpleMessage& s_msg, json_object* json);
 
-bool jsonify_vehicle(const openxc_VehicleMessage& v_msg, json_object* json);
+bool jsonify_vehicle(const openxc_VehicleMessage& v_msg, std::shared_ptr<signal_t> sig, json_object* json);

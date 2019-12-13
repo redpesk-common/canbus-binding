@@ -213,7 +213,7 @@ void can_bus_t::can_event_push()
 				if(s.find(v_message.first) != s.end() && afb_event_is_valid(s[v_message.first]->get_event()))
 				{
 					jo = json_object_new_object();
-					jsonify_vehicle(v_message.second, jo);
+					jsonify_vehicle(v_message.second, s[v_message.first]->get_signal(), jo);
 					if(afb_event_push(s[v_message.first]->get_event(), jo) == 0)
 					{
 						if(v_message.second.has_diagnostic_response)
