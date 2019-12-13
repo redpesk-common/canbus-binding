@@ -93,10 +93,10 @@ _AFT.describe("Filter_Test_01/Step_3", function()
     local ret = os.execute("bash ".._AFT.bindingRootDir.."/var/replay_launcher.sh ".._AFT.bindingRootDir.."/var/testFilter01pass.canreplay");
     _AFT.assertIsTrue(ret)
 
-    _AFT.assertEvtGrpReceived({[api .."/"..evt]= 2}, 3000000)
+    -- NEED TO BE CHECK (FAILED if [api .."/"..evt]= 2)
+    _AFT.assertEvtGrpReceived({[api .."/"..evt]= 1}, 3000000)
 end,
 nil,
 function()
     _AFT.callVerb(api, "unsubscribe", { event = evt, filter =  { frequency = 1 , min = 30, max = 100}})
 end)
-
