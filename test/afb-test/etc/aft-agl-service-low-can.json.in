@@ -16,7 +16,7 @@
         "action": "lua://AFT#_launch_test",
         "args": {
             "trace": "low-can",
-            "files": ["low-can_BasicAPITest.lua", "low-can_FilterTest01.lua"@J1939_TEST_CONFFILE@]
+            "files": ["low-can_BasicAPITest.lua", "low-can_FilterTest01.lua", "low-can_ValueTestCan.lua"@J1939_TEST_CONFFILE@]
         }
     }
 }

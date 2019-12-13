@@ -21,7 +21,7 @@
 ##################################################
 PROJECT_TARGET_ADD(afb-test-config)
 	if(WITH_FEATURE_J1939)
-		set(J1939_TEST_CONFFILE ",\"low-can_J1939Test.lua\"")
+		set(J1939_TEST_CONFFILE ",\"low-can_J1939Test.lua\",\"low-can_ValueJ1939Test.lua\"")
 	endif()
 
 	configure_file("aft-agl-service-low-can.json.in" "aft-agl-service-low-can.json")
