@@ -168,7 +168,7 @@ std::string j1939_message_t::get_debug_message()
 ///
 uint32_t j1939_message_t::get_id() const
 {
-	AFB_DEBUG("Prefer method get_pgn() for j1939 messages");
+	//AFB_DEBUG("Prefer method get_pgn() for j1939 messages");
 	return get_pgn();
 }
 
