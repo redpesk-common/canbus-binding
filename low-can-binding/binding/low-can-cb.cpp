@@ -364,7 +364,9 @@ static int one_subscribe_unsubscribe_events(afb_req_t request, bool subscribe, c
 
 static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const uint32_t& id, json_object *args)
 {
-	std::shared_ptr<message_definition_t> message_definition = application_t::instance().get_message_definition(id);
+	std::vector<std::shared_ptr<message_definition_t>> messages_definition = application_t::instance().get_messages_definition(id);
+	for(auto message_definition : messages_definition)
+	{
 	struct utils::signals_found sf;
 
 	if(message_definition)
@@ -391,6 +393,7 @@ static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const
 
 	if(subscribe_unsubscribe_signal(request, subscribe, can_subscription, s) < 0)
 		return -1;
+	}
 
 	return 0;
 }
@@ -751,9 +754,12 @@ static struct json_object *get_signals_value(const std::string& name)
 
 static struct json_object *get_id_value(const uint32_t& id)
 {
-	std::shared_ptr<message_definition_t> message_definition = application_t::instance().get_message_definition(id);
-	struct utils::signals_found sf;
-	struct json_object *ans = nullptr;
+	std::vector<std::shared_ptr<message_definition_t>> messages_definition = application_t::instance().get_messages_definition(id);
+	struct json_object *ret = json_object_new_array();
+	for(auto message_definition : messages_definition)
+	{
+		struct utils::signals_found sf;
+		struct json_object *ans = nullptr;
 
 	if(message_definition)
 		sf.signals = list_ptr_signal_t(message_definition->get_signals().begin(), message_definition->get_signals().end());
@@ -775,7 +781,8 @@ static struct json_object *get_id_value(const uint32_t& id)
 		json_object_array_add(jsignals, jobj);
 	}
 
-	return ans;
+		json_object_array_add(ret, ans);
+	}
 }
 
 void get(afb_req_t request)

@@ -108,16 +108,15 @@ vect_ptr_msg_def_t application_t::get_messages_definition()
 }
 
 
-std::shared_ptr<message_definition_t> application_t::get_message_definition(uint32_t id)
+std::vector<std::shared_ptr<message_definition_t>> application_t::get_messages_definition(uint32_t id)
 {
-	std::shared_ptr<message_definition_t> ret = nullptr;
+	std::vector<std::shared_ptr<message_definition_t>> ret = std::vector<std::shared_ptr<message_definition_t>>();
 	vect_ptr_msg_def_t messages_definition = get_messages_definition();
 	for(std::shared_ptr<message_definition_t> &msg_def : messages_definition)
 	{
 		if(msg_def->get_id() == id)
 		{
-			ret = msg_def;
-			break;
+			ret.push_back(msg_def);
 		}
 	}
 	return ret;
