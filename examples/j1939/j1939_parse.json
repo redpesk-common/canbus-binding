@@ -23,7 +23,7 @@
 					"offset": 0,
 					"comment": "State signal which indicates whether the torque converter lockup is engaged.",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true,
 					"states": {
 						"TorqueConverterLockupDisengaged": [0],
@@ -40,7 +40,7 @@
 					"offset": 0,
 					"comment": "State signal indicating whether or not the transmission torque converter lock up clutch is transitioning between being",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true,
 					"states": {
 						"TransitionIsNotInProcess": [0],
@@ -57,7 +57,7 @@
 					"offset": 0,
 					"comment": "The source address of the SAE J1939 device currently controlling the transmission.",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true
 				},
 				"Momentary.Eng.Max.Power.Enable" : {
@@ -68,7 +68,7 @@
 					"offset": 0,
 					"comment": "Momentarily Requesting highest torque map from the engine control",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true,
 					"states": {
 						"notRqingMaxPowerAvailable": [0],
@@ -86,7 +86,7 @@
 					"comment": "Rotational velocity of the primary shaft transferring power into the transmission.",
 					"unit": "rpm",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true
 				},
 				"Progressive.Shift.Disable" : {
@@ -97,7 +97,7 @@
 					"offset": 0,
 					"comment": "Command signal used to indicate that progressive shifting by the engine should be disallowed.",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true,
 					"states": {
 						"ProgressiveShiftIsNotDisabled": [0],
@@ -114,7 +114,7 @@
 					"offset": 0,
 					"comment": "Command signal used to indicate that the engine speed may be boosted up to the maximum engine overspeed value to",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true,
 					"states": {
 						"MomentaryEngOverspeedIsDisabled": [0],
@@ -132,7 +132,7 @@
 					"comment": "Parameter which represents the ratio of input shaft speed to current engine speed (in percent).",
 					"unit": "%",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true
 				},
 				"Trans.Output.Shaft.Speed" : {
@@ -144,7 +144,7 @@
 					"comment": "Calculated speed of the transmission output shaft.",
 					"unit": "rpm",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true
 				},
 				"Trans.Shift.In.Process" : {
@@ -155,7 +155,7 @@
 					"offset": 0,
 					"comment": "Indicates that the transmission is in process of shifting from the current gear to the selected gear.",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true,
 					"states": {
 						"ShiftIsNotInProcess": [0],
@@ -172,7 +172,7 @@
 					"offset": 0,
 					"comment": "Driveline engaged indicates the transmission controlled portion of the driveline is engaged sufficiently to allow a transfer",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"writable" : true,
 					"states": {
 						"DrivelineDisengaged": [0],
@@ -199,7 +199,7 @@
 					"offset": 0,
 					"comment": "The source address of the SAE J1939 device currently controlling the engine.",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Actl.Eng.Prcnt.Trque.High.Resolution" : {
 					"generic_name": "Actl.Eng.Prcnt.Trque.High.Resolution",
@@ -210,7 +210,7 @@
 					"comment": "This parameter displays an additional torque in percent of the reference engine torque.",
 					"unit": "%",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"states": {
 						"0000": [0],
 						"0125": [1],
@@ -227,7 +227,7 @@
 					"comment": "The requested torque output of the engine by all dynamic internal inputs, including smoke control, noise control and low",
 					"unit": "%",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Eng.Starter.Mode" : {
 					"generic_name": "Eng.Starter.Mode",
@@ -237,7 +237,7 @@
 					"offset": 0,
 					"comment": "There are several phases in a starting action and different reasons why a start cannot take place.",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"states": {
 						"startNotRqed": [0],
 						"starterActiveGearNotEngaged": [1],
@@ -263,7 +263,7 @@
 					"comment": "Actual engine speed which is calculated over a minimum crankshaft angle of 720 degrees divided by the number of cylinders.",
 					"unit": "rpm",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Actual.Eng.Percent.Torque" : {
 					"generic_name": "Actual.Eng.Percent.Torque",
@@ -274,7 +274,7 @@
 					"comment": "The calculated output torque of the engine.",
 					"unit": "%",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Drivers.Demand.Eng.Percent.Torque" : {
 					"generic_name": "Drivers.Demand.Eng.Percent.Torque",
@@ -285,7 +285,7 @@
 					"comment": "The requested torque output of the engine by the driver.",
 					"unit": "%",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Eng.Torque.Mode" : {
 					"generic_name": "Eng.Torque.Mode",
@@ -295,7 +295,7 @@
 					"offset": 0,
 					"comment": "State signal which indicates which engine torque mode is currently generating, limiting, or controlling the torque.",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"states": {
 						"Low idle governor/no request (de": [0],
 						"Accelerator pedal/operator selec": [1],
@@ -331,7 +331,7 @@
 					"comment": "Accumulated number of revolutions of engine crankshaft during its operation.",
 					"unit": "r",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Eng.Total.Hours.Of.Operation" : {
 					"generic_name": "Eng.Total.Hours.Of.Operation",
@@ -342,7 +342,7 @@
 					"comment": "Accumulated time of operation of engine.",
 					"unit": "hr",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				}
 			}
 		},
@@ -363,7 +363,7 @@
 					"comment": "The main operator`s steering wheel angle (on the steering column, not the actual wheel angle).",
 					"unit": "rad",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Longitudinal.Acceleration" : {
 					"generic_name": "Longitudinal.Acceleration",
@@ -374,7 +374,7 @@
 					"comment": "Indicates the longitudinal acceleration of the vehicle.",
 					"unit": "m/s/s",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Lateral.Acceleration" : {
 					"generic_name": "Lateral.Acceleration",
@@ -385,7 +385,7 @@
 					"comment": "Indicates a lateral acceleration of the vehicle.",
 					"unit": "m/s/s",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Yaw.Rate" : {
 					"generic_name": "Yaw.Rate",
@@ -396,7 +396,7 @@
 					"comment": "Indicates the rotation about the vertical axis.",
 					"unit": "rad/s",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Steer.Wheel.Angle.Sensor.Type" : {
 					"generic_name": "Steer.Wheel.Angle.Sensor.Type",
@@ -406,7 +406,7 @@
 					"offset": 0,
 					"comment": "Indicates whether the steering wheel angle sensor is capable of absolute measuring of the number of steering wheel",
 					"is_big_endian": false,
-					"is_signed": false,
+					"sign": 0,
 					"states": {
 						"RelativeMeasuringPrinciple": [0],
 						"AbsMeasuringPrinciple": [1],
@@ -423,7 +423,7 @@
 					"comment": "Indicates number of steering wheel turns, absolute position or relative position at ignition on.",
 					"unit": "turns",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				}
 			}
 		},
@@ -444,7 +444,7 @@
 					"comment": "The speed of the rear axle #2, right wheel relative to the front axle speed, SPN 904.",
 					"unit": "km/h",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Relative.Speed.Rear.Axle2.Left.Wheel" : {
 					"generic_name": "Relative.Speed.Rear.Axle2.Left.Wheel",
@@ -455,7 +455,7 @@
 					"comment": "The speed of the rear axle #2, left wheel relative to the front axle speed, SPN 904.",
 					"unit": "km/h",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Rlative.Speed.Rear.Axle1.Right.Wheel" : {
 					"generic_name": "Rlative.Speed.Rear.Axle1.Right.Wheel",
@@ -466,7 +466,7 @@
 					"comment": "The speed of the rear axle #1, right wheel relative to the front axle speed, SPN 904.",
 					"unit": "km/h",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Relative.Speed.Rear.Axle1.Left.Wheel" : {
 					"generic_name": "Relative.Speed.Rear.Axle1.Left.Wheel",
@@ -477,7 +477,7 @@
 					"comment": "The speed of the rear axle #1, left wheel relative to the front axle speed, SPN 904.",
 					"unit": "km/h",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Rlative.Speed.Front.Axle.Right.Wheel" : {
 					"generic_name": "Rlative.Speed.Front.Axle.Right.Wheel",
@@ -488,7 +488,7 @@
 					"comment": "The speed of the front axle, right wheel relative to the front axle speed, SPN 904.",
 					"unit": "km/h",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Relative.Speed.Front.Axle.Left.Wheel" : {
 					"generic_name": "Relative.Speed.Front.Axle.Left.Wheel",
@@ -499,7 +499,7 @@
 					"comment": "The speed of the front axle, left wheel relative to the front axle speed, SPN 904.",
 					"unit": "km/h",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Front.Axle.Speed" : {
 					"generic_name": "Front.Axle.Speed",
@@ -510,7 +510,7 @@
 					"comment": "The average speed of the two front wheels.",
 					"unit": "km/h",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				}
 			}
 		},
@@ -531,7 +531,7 @@
 					"comment": "Temperature of fuel (or gas) passing through the first fuel control system.",
 					"unit": "deg C",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Eng.Intercooler.Thermostat.Opening" : {
 					"generic_name": "Eng.Intercooler.Thermostat.Opening",
@@ -542,7 +542,7 @@
 					"comment": "The current position of the thermostat used to regulate the temperature of the engine intercooler.",
 					"unit": "%",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Eng.Intercooler.Temp" : {
 					"generic_name": "Eng.Intercooler.Temp",
@@ -553,7 +553,7 @@
 					"comment": "Temperature of liquid found in the intercooler located after the turbocharger.",
 					"unit": "deg C",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Eng.Turbo.Oil.Temp" : {
 					"generic_name": "Eng.Turbo.Oil.Temp",
@@ -564,7 +564,7 @@
 					"comment": "Temperature of the turbocharger lubricant.",
 					"unit": "deg C",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Eng.Oil.Temp1" : {
 					"generic_name": "Eng.Oil.Temp1",
@@ -575,7 +575,7 @@
 					"comment": "Temperature of the engine lubricant.",
 					"unit": "deg C",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				},
 				"Eng.Coolant.Temp" : {
 					"generic_name": "Eng.Coolant.Temp",
@@ -586,7 +586,7 @@
 					"comment": "Temperature of liquid found in engine cooling system.",
 					"unit": "deg C",
 					"is_big_endian": false,
-					"is_signed": false
+					"sign": 0
 				}
 			}
 		}
