@@ -221,7 +221,7 @@ const openxc_DynamicField build_DynamicField(std::vector<uint8_t> &array)
 	d.has_numeric_value = false;
 	d.has_boolean_value = false;
 	d.has_bytes_value = true;
-
+	d.error = false;
 
 	size_t size = array.size();
 
@@ -262,6 +262,7 @@ const openxc_DynamicField build_DynamicField(const char* value)
 	d.has_bytes_value = false;
 	d.has_json_value = false;
 	::strncpy(d.string_value, value, 100);
+	d.error = false;
 
 	return d;
 }
@@ -286,6 +287,7 @@ const openxc_DynamicField build_DynamicField(const std::string& value)
 	d.has_bytes_value = false;
 	d.has_json_value = false;
 	::strncpy(d.string_value, value.c_str(), 100);
+	d.error = false;
 
 	return d;
 }
@@ -311,6 +313,7 @@ const openxc_DynamicField build_DynamicField(double value)
 	d.has_bytes_value = false;
 	d.has_json_value = false;
 	d.numeric_value = value;
+	d.error = false;
 
 	return d;
 }
@@ -334,6 +337,7 @@ const openxc_DynamicField build_DynamicField(bool value)
 	d.has_bytes_value = false;
 	d.has_json_value = false;
 	d.boolean_value = value;
+	d.error = false;
 
 	return d;
 }
@@ -357,7 +361,21 @@ const openxc_DynamicField build_DynamicField_json(json_object *value)
 	d.has_bytes_value = false;
 	d.has_json_value = true;
 	d.json_value = value;
+	d.error = false;
 
+	return d;
+}
+
+const openxc_DynamicField build_DynamicField_error()
+{
+	openxc_DynamicField d;
+	d.has_type = false;
+	d.has_string_value = false;
+	d.has_numeric_value = false;
+	d.has_boolean_value = false;
+	d.has_bytes_value = false;
+	d.has_json_value = false;
+	d.error = true;
 	return d;
 }
 
