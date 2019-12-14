@@ -31,6 +31,7 @@
 
 #include <utils/signals.hpp>
 #include <utils/openxc-utils.hpp>
+#include <algorithm>
 class pgn_60416_BAM_t
 {
 private:
@@ -99,11 +100,45 @@ public:
     };
 };
 
+class fast_packet_t
+{
+public:
+	pgn_t pgn_;
+	uint8_t data_[8];
+    fast_packet_t(){};
+    fast_packet_t(pgn_t pgn, const uint8_t data[])
+    {
+        pgn_ = pgn;
+        //data_ = [8];
+        for (int i = 0; i < 8; i++)
+            data_[7-i] = data[i];
+    };
+	int get_pgn()
+    {
+        return pgn_;
+    };
+    uint8_t *get_data()
+    {
+        return data_;
+    };
+	uint8_t get_sid()
+	{
+		return data_[0];
+	}
+	uint8_t get_size()
+	{
+		// ONLY VALID IF FIRST FAST PACKET
+		return data_[1];
+	}
+};
+
+
 class stack_message_t
 {
 private:
     static std::vector<pgn_60416_BAM_t> stack_60416_;
     static std::vector<pgn_60160_t> stack_60160_;
+	static std::list<fast_packet_t> stack_fast_packet_;
     application_t *app_;
 
 public:
@@ -124,6 +159,10 @@ public:
     std::vector<pgn_60160_t> *get_stack_60160()
     {
         return &stack_60160_;
+    };
+	std::list<fast_packet_t> *get_stack_fast_packet()
+    {
+        return &stack_fast_packet_;
     };
 
     std::map<std::string, openxc_DynamicField> translate_message(std::shared_ptr<message_t> message, pgn_t pgn)
@@ -158,7 +197,7 @@ public:
         return std::map<std::string, openxc_DynamicField>();
     };
 
-    std::shared_ptr<j1939_message_t> get_message()
+    j1939_message_t get_multi_packet_message()
     {
         int need_nb_packet = 0;
         for (auto pgn_60416 : stack_60416_)
@@ -202,22 +241,104 @@ public:
                 }
             }
 
-            std::shared_ptr<j1939_message_t> jm = std::make_shared<j1939_message_t>(j1939_message_t(last_60416.get_size(),
-                                                                                                    data,
-                                                                                                    12,
-                                                                                                    1,
-                                                                                                    last_60416.get_pgn(),
-                                                                                                    1));
+            j1939_message_t jm = j1939_message_t(last_60416.get_size(),
+							data,
+							12,
+							1,
+							last_60416.get_pgn(),
+							1);
 
             return jm;
         }
 
-        return std::make_shared<j1939_message_t>(j1939_message_t());
+        return j1939_message_t();
+    }
+
+
+    j1939_message_t get_fast_packet_message()
+    {
+
+		fast_packet_t first = stack_fast_packet_.front();
+		int size_bytes = first.get_size();
+
+		int nb_packet = ((size_bytes - 1) >> 3) + 1;
+
+		if(stack_fast_packet_.size() < nb_packet)
+			return j1939_message_t();
+
+		int sid = first.get_sid();
+		std::vector<fast_packet_t*> all = std::vector<fast_packet_t*>();
+		all.push_back(&first);
+		for (fast_packet_t packet : stack_fast_packet_)
+		{
+			if(packet.get_sid() == sid + 1 && packet.get_pgn() == first.get_pgn())
+			{
+				all.push_back(&packet);
+				sid++;
+			}
+		}
+
+		if(all.size() != nb_packet)
+			return j1939_message_t();
+
+
+		std::vector<uint8_t> data = std::vector<uint8_t>();
+
+
+		int cpt = size_bytes;
+
+		for(int i = 2; i < 8; i++)
+		{
+			data.push_back(first.get_data()[i]);
+			cpt--;
+		}
+
+		for(int i = 1; i < nb_packet; i++)
+		{
+			for(int j = 1; j < 8; j++)
+			{
+
+				data.push_back(all[i]->get_data()[j]);
+				cpt--;
+				if(cpt == 0)
+				{
+					break;
+				}
+			}
+			if(cpt == 0)
+			{
+				break;
+			}
+		}
+
+		std::reverse(data.begin(), data.end());
+
+        j1939_message_t jm = j1939_message_t(size_bytes,
+						data,
+						12,
+						1,
+						first.get_pgn(),
+						1);
+
+	for(auto packet_remove : all)
+	{
+		for(std::list<fast_packet_t>::iterator i = stack_fast_packet_.begin(); i != stack_fast_packet_.end(); i++)
+		{
+			if(packet_remove->get_pgn() == (*i).get_pgn() && packet_remove->get_sid() == (*i).get_sid())
+			{
+				stack_fast_packet_.erase(i);
+				break;
+			}
+		}
+	}
+
+	return jm;
     }
 };
 
 std::vector<pgn_60416_BAM_t> stack_message_t::stack_60416_ = std::vector<pgn_60416_BAM_t>();
 std::vector<pgn_60160_t> stack_message_t::stack_60160_ = std::vector<pgn_60160_t>();
+std::list<fast_packet_t> stack_message_t::stack_fast_packet_ = std::list<fast_packet_t>();
 
 openxc_DynamicField decoder_t::decode_60416(signal_t &signal, std::shared_ptr<message_t> message, bool *send)
 {
@@ -253,9 +374,9 @@ openxc_DynamicField decoder_t::decode_60160(signal_t &signal, std::shared_ptr<me
         stack.get_stack_60160()->push_back(pgn_60160);
     }
 
-    std::shared_ptr<j1939_message_t> jm = stack.get_message();
+    j1939_message_t jm = stack.get_multi_packet_message();
 
-    if (!(jm->get_flags() & J1939_PROTOCOL))
+    if (!(jm.get_flags() & J1939_PROTOCOL))
         return build_DynamicField_error();
 
     utils::signals_manager_t &sm = utils::signals_manager_t::instance();
@@ -263,11 +384,44 @@ openxc_DynamicField decoder_t::decode_60160(signal_t &signal, std::shared_ptr<me
 
     for (auto it : s)
     {
-        if (it.second->get_message_definition()->get_id() == jm->get_pgn())
-            jm->set_sub_id(it.first);
+        if (it.second->get_message_definition()->get_id() == jm.get_pgn() &&
+				it.second->get_message_definition()->get_signals().size() != 1)
+	{
+		jm.set_sub_id(it.first);
+		app->get_can_bus_manager().push_new_can_message(std::make_shared<j1939_message_t>(jm));
+	}
     }
 
-    app->get_can_bus_manager().push_new_can_message(jm);
+    return build_DynamicField_error();
+}
+
+openxc_DynamicField decoder_t::decode_fast_packet(signal_t &signal, std::shared_ptr<message_t> message, bool *send)
+{
+    application_t *app = &application_t::instance();
+    stack_message_t stack = stack_message_t::instance(app);
+
+	fast_packet_t fast = fast_packet_t(signal.get_message()->get_id(), message->get_data());
+
+
+	stack.get_stack_fast_packet()->push_back(fast);
+
+    j1939_message_t jm = stack.get_fast_packet_message();
+
+    if (!(jm.get_flags() & J1939_PROTOCOL))
+        return build_DynamicField_error();
+
+    utils::signals_manager_t &sm = utils::signals_manager_t::instance();
+    map_subscription &s = sm.get_subscribed_signals();
+
+    for (auto it : s)
+    {
+        if (it.second->get_message_definition()->get_id() == jm.get_pgn() &&
+				it.second->get_message_definition()->get_signals().size() != 1)
+	{
+		jm.set_sub_id(it.first);
+		app->get_can_bus_manager().push_new_can_message(std::make_shared<j1939_message_t>(jm));
+	}
+    }
 
     return build_DynamicField_error();
 }
@@ -9044,15 +9198,15 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					3,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
-					4.00000f,// min_value
-					4.00000f,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
 					{
 					},// states
 					false,// writable
-					decoder_t::decode_state,// decoder
+					nullptr,// decoder
 					nullptr,// encoder
 					false,// received
 					std::make_pair<bool, int>(false, 0),// multiplex
@@ -9345,6 +9499,32 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					},// states
 					false,// writable
 					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})}
+			} // end signals vector
+		})} // end message_definition entry
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130850,"130850",12,136,frequency_clock_t(5.00000f),true,
+			{ // beginning signals vector
+				{std::make_shared<signal_t> (signal_t{
+					"130850",// generic_name
+					0,// bit_position edited with low-can-generator
+					96,// bit_size
+					0.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					decoder_t::decode_fast_packet,// decoder
 					nullptr,// encoder
 					false,// received
 					std::make_pair<bool, int>(false, 0),// multiplex
