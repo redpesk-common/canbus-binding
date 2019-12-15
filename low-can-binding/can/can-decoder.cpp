@@ -65,11 +65,9 @@ int decoder_t::handle_sign(const signal_t& signal, std::vector<uint8_t>& data_si
 			case sign_t::TWOS_COMPLEMENT:
 				//complement only until end_bit
 				data_signal[0] = ((data_signal[0] ^ mask) & mask);
-				if(data_signal.size() > 1) {
-					for(int i=1; i < data_signal.size(); i++) {
+				if(data_signal.size() > 1)
+					for(int i=1; i < data_signal.size(); i++)
 						data_signal[i] = data_signal[i] ^ 0xFF;
-					}
-				}
 				if(signal.get_sign() == sign_t::TWOS_COMPLEMENT)
 					data_signal[data_signal.size() - 1] = static_cast<uint8_t>(data_signal[data_signal.size() - 1] + 1);
 				break;
@@ -213,9 +211,7 @@ openxc_DynamicField decoder_t::decode_ascii(signal_t& signal, std::shared_ptr<me
 	std::string ret_s = "";
 	openxc_DynamicField openxc_bytes = decode_bytes(signal,message,send);
 	if(!openxc_bytes.has_bytes_value)
-	{
 		AFB_ERROR("Error no bytes value to translate to ascii");
-	}
 	ret_s = converter_t::to_ascii(openxc_bytes.bytes_value,openxc_bytes.length_array);
 	openxc_DynamicField ret = build_DynamicField(ret_s);
 	return ret;
@@ -230,9 +226,7 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 
 	// Don't send if they is no changes
 	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
-	{
 		*send = false;
-	}
 	signal.set_last_value(value);
 
 	return decoded_value;
@@ -246,10 +240,7 @@ openxc_DynamicField decoder_t::decode_time(signal_t& signal, std::shared_ptr<mes
 	openxc_DynamicField decoded_value = build_DynamicField(value);
 
 	// Don't send if they is no changes
-	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
-	{
-		*send = false;
-	}
+	*send = (signal.get_last_value() == value && !signal.get_send_same()) || !*send ? false : true;
 	signal.set_last_value(value);
 
 	return decoded_value;
@@ -278,9 +269,7 @@ openxc_DynamicField decoder_t::decode_noop(signal_t& signal, std::shared_ptr<mes
 
 	// Don't send if they is no changes
 	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
-	{
 		*send = false;
-	}
 	signal.set_last_value(value);
 
 	return decoded_value;
@@ -369,9 +358,7 @@ openxc_DynamicField decoder_t::decode_state(signal_t& signal, std::shared_ptr<me
 
 	// Don't send if they is no changes
 	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
-	{
 		*send = false;
-	}
 	signal.set_last_value(value);
 
 

@@ -102,12 +102,9 @@ int low_can_subscription_t::set_event()
 int low_can_subscription_t::subscribe(afb_req_t request)
 {
 	if(! afb_event_is_valid(event_))
-	{
 		if(set_event() < 0)
-		{
 			return -1;
-		}
-	}
+
 	return afb_req_subscribe(request, event_);
 }
 
@@ -175,12 +172,9 @@ const vect_ptr_diag_msg_t low_can_subscription_t::get_diagnostic_message() const
 const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnostic_message(uint32_t pid) const
 {
 	for(const auto& diag: diagnostic_message_)
-	{
 		if(diag->get_pid() == pid)
-		{
 			return diag;
-		}
-	}
+
 	return nullptr;
 }
 
@@ -190,12 +184,9 @@ const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnost
 const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnostic_message(const std::string& name) const
 {
 	for(const auto& diag: diagnostic_message_)
-	{
 		if(diag->get_name() == name)
-		{
 			return diag;
-		}
-	}
+
 	return nullptr;
 }
 
@@ -421,9 +412,7 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 			pgn_t pgn = J1939_NO_PGN;
 			std::shared_ptr<utils::socketcan_j1939_addressclaiming_t> socket = std::make_shared<utils::socketcan_j1939_addressclaiming_t>();
 			if(!bus_name.empty())
-			{
 				ret = socket->open(bus_name, pgn);
-			}
 			subscription.socket_ = socket;
 			subscription.index_ = (int)subscription.socket_->socket();
 		}
@@ -628,26 +617,17 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 int low_can_subscription_t::create_rx_filter(std::shared_ptr<signal_t> sig)
 {
 	if(!sig->get_message()->is_isotp() && !sig->get_message()->is_j1939())
-	{
 		return low_can_subscription_t::create_rx_filter_can(*this, sig);
-	}
 #ifdef USE_FEATURE_ISOTP
 	else if(sig->get_message()->is_isotp())
-	{
 		return low_can_subscription_t::create_rx_filter_isotp(*this, sig);
-	}
 #endif
 #ifdef USE_FEATURE_J1939
 	else if(sig->get_message()->is_j1939())
-	{
 		return low_can_subscription_t::create_rx_filter_j1939(*this, sig);
-	}
 #endif
-	else
-	{
-		AFB_ERROR("Signal can't be j1939 and isotp");
-		return -1;
-	}
+	AFB_ERROR("Signal can't be j1939 and isotp");
+	return -1;
 }
 
 

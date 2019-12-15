@@ -126,9 +126,7 @@ static int subscribe_unsubscribe_signal(afb_req_t request,
 		 * subsciptions.
 		 */
 		if(! request)
-		{
 			return 0;
-		}
 
 		// Event doesn't exist , so let's create it
 		if ((ret = can_subscription->subscribe(request)) < 0)
@@ -485,35 +483,6 @@ void unsubscribe(afb_req_t request)
 	do_subscribe_unsubscribe(request, false);
 }
 
-/*
-static int send_frame(struct canfd_frame& cfd, const std::string& bus_name, socket_type type)
-{
-	if(bus_name.empty())
-	{
-		return -1;
-	}
-
-	std::map<std::string, std::shared_ptr<low_can_subscription_t> >& cd = application_t::instance().get_can_devices();
-
-	if( cd.count(bus_name) == 0)
-	{
-		cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());
-	}
-
-
-	if(type == socket_type::BCM)
-	{
-		return low_can_subscription_t::tx_send(*cd[bus_name], cfd, bus_name);
-	}
-	else if(type == socket_type::J1939)
-	{
-		return low_can_subscription_t::j1939_send(*cd[bus_name], cfd, bus_name);
-	}
-	else{
-		return -1;
-	}
-}
-*/
 static int send_message(message_t *message, const std::string& bus_name, uint32_t flags, event_filter_t &event_filter, std::shared_ptr<signal_t> signal)
 {
 	if(bus_name.empty())

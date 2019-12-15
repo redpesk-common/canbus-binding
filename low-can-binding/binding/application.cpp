@@ -154,13 +154,9 @@ bool application_t::is_engine_on()
 
 		if(sf.signals.front()->get_last_value_with_timestamp().first > 0 &&
 		   std::difftime(std::time(nullptr), last_timestamp_in_s) < ENGINE_VALUE_TIMEOUT)
-		{
 			engine_on = true;
-		}
 		else
-		{
 			AFB_NOTICE("is_engine_on: engine.speed CAN signal found, but engine seems off");
-		}
 	}
 	else
 	{
