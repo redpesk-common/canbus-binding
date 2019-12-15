@@ -99,5 +99,5 @@ uint32_t converter_t::bit_position_swap(unsigned int msg_length, unsigned int bi
  */
 uint32_t converter_t::continental_bit_position_mess(unsigned int msg_length, unsigned int bit_position, unsigned int bit_size)
 {
-	return bit_position + (CHAR_BIT - bit_position % CHAR_BIT) - bit_size;
+	return bit_position + CHAR_BIT - 2 * (bit_position % CHAR_BIT) - bit_size;
 }
