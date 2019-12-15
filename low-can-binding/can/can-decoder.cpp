@@ -112,7 +112,7 @@ float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message
 		bit_position = converter_t::bit_position_swap(message->get_length(),
 							      signal.get_bit_position(),
 							      bit_size);
-	if(signal.get_message()->get_flags() & FRAME_LAYOUT_IS_BIGENDIAN)
+	if(signal.get_message()->get_flags() & BYTE_FRAME_IS_BIG_ENDIAN)
 		message->frame_swap();
 
 	data = message->get_data_vector();

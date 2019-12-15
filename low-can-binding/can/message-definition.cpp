@@ -113,5 +113,5 @@ uint32_t message_definition_t::get_flags() const
 }
 
 bool message_definition_t::frame_layout_is_bigendian() const{
-	return (flags_ & FRAME_LAYOUT_IS_BIGENDIAN);
+	return (flags_ & BYTE_FRAME_IS_BIG_ENDIAN);
 }
