@@ -107,7 +107,6 @@ private:
 	std::pair<bool, int> multiplex_; /*!< multiplex_ - If bool is false and int is 0 is not a multiplex signal
 										If bool is true, that indicate that is a multiplexor
 										If int is different of 0, that indicate the link with a multiplexor */
-	bool is_big_endian_; /*!< is_big_endian - True if the signal's data are meant to be read as a big_endian */
 	sign_t sign_; /* !< sign_ - if the data is signed it indicates the encode */
 	int32_t bit_sign_position_; /*!< bit_sign_position_ - The bit that indicates the sign of the signal in its CAN message*/
 	std::string unit_; /* !< unit_ - The unit of the data */
@@ -131,7 +130,6 @@ public:
 		signal_encoder encoder,
 		bool received,
 		std::pair<bool, int> multiplex,
-		bool is_big_endian,
 		sign_t sign,
 		int32_t bit_sign_position,
 		std::string unit);
@@ -173,7 +171,6 @@ public:
 	float get_last_value() const;
 	std::pair<float, uint64_t> get_last_value_with_timestamp() const;
 	std::pair<bool, int> get_multiplex() const;
-	bool get_is_big_endian() const;
 	sign_t get_sign() const;
 	int32_t get_bit_sign_position() const;
 	const std::string get_unit() const;

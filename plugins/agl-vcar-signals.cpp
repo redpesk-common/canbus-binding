@@ -29,7 +29,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -52,7 +51,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -75,7 +73,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -98,7 +95,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -125,7 +121,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -148,7 +143,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -171,7 +165,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -198,7 +191,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -225,7 +217,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -248,7 +239,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -275,7 +265,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -298,7 +287,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -321,7 +309,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -344,7 +331,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -367,7 +353,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -394,7 +379,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -417,7 +401,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -440,7 +423,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit
@@ -463,7 +445,6 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 							nullptr,// encoder
 							false,// received
 							std::make_pair<bool, int>(false, 0),// multiplex
-							false,// is_big_endian
 							static_cast<sign_t>(0),// signed
 							-1,// bit_sign_position
 							""// unit

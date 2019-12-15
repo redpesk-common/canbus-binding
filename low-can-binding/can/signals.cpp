@@ -45,7 +45,6 @@ signal_t::signal_t(
 	signal_encoder encoder,
 	bool received,
 	std::pair<bool, int> multiplex,
-	bool is_big_endian,
 	sign_t sign,
 	int32_t bit_sign_position,
 	std::string unit)
@@ -67,7 +66,6 @@ signal_t::signal_t(
 	, received_{received}
 	, last_value_{.0f}
 	, multiplex_{multiplex}
-	, is_big_endian_{is_big_endian}
 	, sign_{sign}
 	, bit_sign_position_{bit_sign_position}
 	, unit_{unit}
@@ -230,11 +228,6 @@ void signal_t::set_bit_position(uint32_t bit_position)
 std::pair<bool,int> signal_t::get_multiplex() const
 {
 	return multiplex_;
-}
-
-bool signal_t::get_is_big_endian() const
-{
-	return is_big_endian_;
 }
 
 sign_t signal_t::get_sign() const
