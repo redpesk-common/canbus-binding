@@ -280,6 +280,11 @@ std::shared_ptr<utils::socketcan_t> low_can_subscription_t::get_socket()
 	return socket_;
 }
 
+std::shared_ptr<message_definition_t> low_can_subscription_t::get_message_definition()
+{
+	return message_;
+}
+
 /**
  * @brief Setter for the frequency of the event_filter
  *
@@ -355,6 +360,10 @@ void low_can_subscription_t::set_signal(std::shared_ptr<signal_t> signal)
 	signal_ = signal;
 }
 
+void low_can_subscription_t::set_message_definition(std::shared_ptr<message_definition_t> message)
+{
+	message_ = message;
+}
 
 /// @brief Based upon which object is a subscribed CAN signal or diagnostic message
 /// it will open the socket with the required CAN bus device name.
@@ -607,6 +616,35 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 	return create_rx_filter_bcm(subscription, bcm_msg);
 }
 
+
+int low_can_subscription_t::create_rx_filter(std::shared_ptr<message_definition_t> msg)
+{
+	std::shared_ptr<signal_t> signal_message =
+		std::make_shared<signal_t>(signal_t{msg->get_name(),
+						    0,
+						    msg->get_length() * 8,
+						    1.00000f,
+						    0.00000f,
+						    0,
+						    0,
+						    frequency_clock_t(0.00000f),
+						    true,
+						    false,
+						    {},
+						    true,
+						    nullptr,
+						    nullptr,
+						    false,
+						    std::make_pair<bool, int>(false, 0),
+						    static_cast<sign_t>(0),
+						    -1,
+						    ""});
+
+	signal_message->set_parent(msg);
+	return create_rx_filter(signal_message);
+}
+
+
 /**
  * @brief Create the good socket to read message
  * depending on the signal
@@ -626,7 +664,7 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<signal_t> sig)
 	else if(sig->get_message()->is_j1939())
 		return low_can_subscription_t::create_rx_filter_j1939(*this, sig);
 #endif
-	AFB_ERROR("Signal can't be j1939 and isotp");
+	AFB_ERROR("Signal can't be created (check config)");
 	return -1;
 }
 
