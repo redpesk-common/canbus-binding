@@ -4,6 +4,7 @@
 #ifndef PB_OPENXC_PB_H_INCLUDED
 #define PB_OPENXC_PB_H_INCLUDED
 #include <pb.h>
+#include <json-c/json.h>
 
 #if PB_PROTO_HEADER_VERSION != 30
 #error Regenerate this file with the current version of nanopb generator.
@@ -76,7 +77,8 @@ typedef enum _openxc_DynamicField_Type {
     openxc_DynamicField_Type_STRING = 1,
     openxc_DynamicField_Type_NUM = 2,
     openxc_DynamicField_Type_BOOL = 3,
-    openxc_DynamicField_Type_BYTES = 4
+    openxc_DynamicField_Type_BYTES = 4,
+    openxc_DynamicField_Type_JSON = 5
 } openxc_DynamicField_Type;
 
 /* Struct definitions */
@@ -169,6 +171,8 @@ typedef struct _openxc_DynamicField {
     uint8_t bytes_value[MAX_ISOTP_BYTES];
     uint32_t length_array;
     bool has_bytes_value;
+    json_object* json_value;
+    bool has_json_value;
 } openxc_DynamicField;
 
 typedef struct _openxc_NetworkOperatorSettings_NetworkDescriptor {

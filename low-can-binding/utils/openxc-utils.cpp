@@ -235,7 +235,6 @@ const openxc_DynamicField build_DynamicField(std::vector<uint8_t> &array)
 		 d.length_array = (uint32_t) size;
 	}
 
-
 	for(int i=0;i<size;i++)
 		d.bytes_value[i] = array[i];
 
@@ -261,6 +260,7 @@ const openxc_DynamicField build_DynamicField(const char* value)
 	d.has_numeric_value = false;
 	d.has_boolean_value = false;
 	d.has_bytes_value = false;
+	d.has_json_value = false;
 	::strncpy(d.string_value, value, 100);
 
 	return d;
@@ -284,6 +284,7 @@ const openxc_DynamicField build_DynamicField(const std::string& value)
 	d.has_numeric_value = false;
 	d.has_boolean_value = false;
 	d.has_bytes_value = false;
+	d.has_json_value = false;
 	::strncpy(d.string_value, value.c_str(), 100);
 
 	return d;
@@ -308,6 +309,7 @@ const openxc_DynamicField build_DynamicField(double value)
 	d.has_numeric_value = true;
 	d.has_boolean_value = false;
 	d.has_bytes_value = false;
+	d.has_json_value = false;
 	d.numeric_value = value;
 
 	return d;
@@ -330,8 +332,31 @@ const openxc_DynamicField build_DynamicField(bool value)
 	d.has_numeric_value = false;
 	d.has_boolean_value = true;
 	d.has_bytes_value = false;
+	d.has_json_value = false;
 	d.boolean_value = value;
 
+	return d;
+}
+
+///
+/// @brief Build an openxc_DynamicField with a json value
+///
+/// @param[in] value - json value to assign to builded openxc_DynamicField.
+///
+/// @return openxc_DynamicField initialized with a json value.
+///
+const openxc_DynamicField build_DynamicField_json(json_object *value)
+{
+	openxc_DynamicField d;
+	d.has_type = true;
+	d.type = openxc_DynamicField_Type_JSON;
+
+	d.has_string_value = false;
+	d.has_numeric_value = false;
+	d.has_boolean_value = false;
+	d.has_bytes_value = false;
+	d.has_json_value = true;
+	d.json_value = value;
 
 	return d;
 }
@@ -388,22 +413,15 @@ const openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg
 void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value)
 {
 	if(field.has_numeric_value)
-	{
 		json_object_object_add(value, "value", json_object_new_double(field.numeric_value));
-	}
 	else if(field.has_boolean_value)
-	{
 		json_object_object_add(value, "value", json_object_new_boolean(field.boolean_value));
-	}
 	else if(field.has_string_value)
-	{
 		json_object_object_add(value, "value", json_object_new_string(field.string_value));
-	}
 	else if(field.has_bytes_value)
-	{
-		std::string s = converter_t::to_hex(field.bytes_value, field.length_array);
-		json_object_object_add(value, "value", json_object_new_string(s.c_str()));
-	}
+		json_object_object_add(value, "value", json_object_new_string(converter_t::to_hex(field.bytes_value, field.length_array).c_str()));
+	else if(field.has_json_value)
+		json_object_object_add(value, "signals", json_object_new_string(json_object_get_string(field.json_value)));
 }
 
 ///
