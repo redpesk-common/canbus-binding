@@ -54,7 +54,7 @@ else()
 	set(WITH_FEATURE_J1939 ON)
 	add_definitions(-DUSE_FEATURE_J1939)
 	# Define name for ECU
-	set(J1939_NAME_ECU 0x1239)
+	set(J1939_NAME_ECU 0xC0509600227CC7AA)
 	add_definitions(-DJ1939_NAME_ECU=${J1939_NAME_ECU})
 endif()
 
