@@ -74,7 +74,11 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 				if (message->get_id() &&
 				    message->get_length() &&
 				    ! (message->get_flags() & INVALID_FLAG) )
+				{
+					if(can_subscription->get_signal() != nullptr && can_subscription->get_signal()->get_message()->get_flags() & BYTE_FRAME_IS_BIG_ENDIAN)
+						message->frame_swap();
 					push_n_notify(message);
+				}
 			}
 		}
 	}
