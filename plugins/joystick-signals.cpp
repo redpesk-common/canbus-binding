@@ -15,8 +15,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -37,8 +37,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -59,8 +59,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					8,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -81,8 +81,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					16,// bit_size
 					1.00000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
