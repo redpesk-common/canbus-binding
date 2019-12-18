@@ -7,7 +7,7 @@ CTLP_CAPI_REGISTER("gps");
 
 std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set_t{0,"gps",
 	{ // beginning message_definition_ vector
-		{std::make_shared<message_definition_t>(message_definition_t{"hs",0x123,"",8,0,frequency_clock_t(5.00000f),true,
+		{std::make_shared<message_definition_t>(message_definition_t{"hs",0x123,"gps.simulateur",8,0,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"gps.simulateur.bearing",// generic_name
@@ -15,8 +15,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					10,// bit_size
 					0.500000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -37,8 +37,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					22,// bit_size
 					0.000100000f,// factor
 					-90.0000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -59,8 +59,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					22,// bit_size
 					0.000100000f,// factor
 					-180.000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -81,8 +81,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					10,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -99,7 +99,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"hs",0x124,"",8,0,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"hs",0x124,"gps.attack",8,0,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"gps.attack.bearing",// generic_name
@@ -107,8 +107,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					10,// bit_size
 					0.500000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -129,8 +129,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					22,// bit_size
 					0.000100000f,// factor
 					-90.0000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -151,8 +151,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					22,// bit_size
 					0.000100000f,// factor
 					-180.000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -173,8 +173,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					10,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -191,7 +191,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
-,		{std::make_shared<message_definition_t>(message_definition_t{"hs",0x125,"",8,0,frequency_clock_t(5.00000f),true,
+,		{std::make_shared<message_definition_t>(message_definition_t{"hs",0x125,"gps.accelero",8,0,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
 					"gps.accelero.bearing",// generic_name
@@ -199,8 +199,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					10,// bit_size
 					0.500000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -221,8 +221,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					22,// bit_size
 					0.000100000f,// factor
 					-90.0000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -243,8 +243,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					22,// bit_size
 					0.000100000f,// factor
 					-180.000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed
@@ -265,8 +265,8 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					10,// bit_size
 					0.100000f,// factor
 					0.00000f,// offset
-					0,// min_value
-					0,// max_value
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
 					frequency_clock_t(0.00000f),// frequency
 					true,// send_same
 					false,// force_send_changed

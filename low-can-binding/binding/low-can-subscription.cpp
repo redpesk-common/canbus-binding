@@ -795,7 +795,7 @@ int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, mes
 	if(subscription.open_socket(subscription, bus_name, J1939_PROTOCOL) < 0)
 		return -1;
 
-	j1939_message_t *jm = static_cast<j1939_message_t*>(message);
+	j1939_message_t *jm = dynamic_cast<j1939_message_t*>(message);
 	jm->set_sockname(jm->get_pgn(), J1939_NO_NAME, J1939_NO_ADDR);
 	if(subscription.socket_->write_message(*jm) < 0)
 	{

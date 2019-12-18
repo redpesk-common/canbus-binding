@@ -503,8 +503,7 @@ static int send_message(message_t *message, const std::string& bus_name, uint32_
 
 	std::map<std::string, std::shared_ptr<low_can_subscription_t> >& cd = application_t::instance().get_can_devices();
 
-	if( cd.count(bus_name) == 0)
-		cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
+	cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
 
 	cd[bus_name]->set_signal(signal);
 

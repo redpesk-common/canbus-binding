@@ -384,7 +384,7 @@ openxc_DynamicField decoder_t::decode_60160(signal_t &signal, std::shared_ptr<me
 
     for (auto it : s)
     {
-        if (it.second->get_message_definition()->get_id() == jm.get_pgn() &&
+        if (it.second->get_message_definition() && it.second->get_message_definition()->get_id() == jm.get_pgn() &&
 				it.second->get_message_definition()->get_signals().size() != 1)
 	{
 		jm.set_sub_id(it.first);
@@ -415,7 +415,7 @@ openxc_DynamicField decoder_t::decode_fast_packet(signal_t &signal, std::shared_
 
     for (auto it : s)
     {
-        if (it.second->get_message_definition()->get_id() == jm.get_pgn() &&
+        if (it.second->get_message_definition() && it.second->get_message_definition()->get_id() == jm.get_pgn() &&
 				it.second->get_message_definition()->get_signals().size() != 1)
 	{
 		jm.set_sub_id(it.first);
@@ -9041,6 +9041,247 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 				})}
 			} // end signals vector
 		})} // end message_definition entry
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130851,"Simnet.Event.Command.Ap.Reply",12,136,frequency_clock_t(5.00000f),true,
+			{ // beginning signals vector
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.Angle",// generic_name
+					8,// bit_position edited with low-can-generator
+					16,// bit_size
+					0.000100000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(2),// signed
+					-1,// bit_sign_position
+					"rad"// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.B",// generic_name
+					56,// bit_position edited with low-can-generator
+					16,// bit_size
+					0.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.Controlling.Device",// generic_name
+					48,// bit_position edited with low-can-generator
+					8,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.Direction",// generic_name
+					24,// bit_position edited with low-can-generator
+					8,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+						{4,"Left rudder (port)"},
+						{2,"Port"},
+						{5,"Right rudder (starboard)"},
+						{3,"Starboard"}
+					},// states
+					false,// writable
+					decoder_t::decode_state,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.Event",// generic_name
+					32,// bit_position edited with low-can-generator
+					16,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+						{9,"Auto mode"},
+						{19,"C-Turn"},
+						{26,"Change Course"},
+						{24,"Depth (Turn)"},
+						{23,"Lazy-S (Turn)"},
+						{10,"Nav mode"},
+						{13,"Non Follow Up mode"},
+						{21,"Spiral (Turn)"},
+						{18,"Square (Turn)"},
+						{6,"Standby"},
+						{20,"U-Turn"},
+						{15,"Wind mode"},
+						{22,"Zig Zag (Turn)"}
+					},// states
+					false,// writable
+					decoder_t::decode_state,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.G",// generic_name
+					0,// bit_position edited with low-can-generator
+					8,// bit_size
+					0.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.Industry.Code",// generic_name
+					80,// bit_position edited with low-can-generator
+					3,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.Manufacturer.Code",// generic_name
+					85,// bit_position edited with low-can-generator
+					11,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					1857.00f,// min_value
+					1857.00f,// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					decoder_t::decode_noop,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.Proprietary.Id",// generic_name
+					72,// bit_position edited with low-can-generator
+					8,// bit_size
+					1.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					decoder_t::decode_state,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})},
+				{std::make_shared<signal_t> (signal_t{
+					"Simnet.Event.Command.Ap.Reply.Reserved",// generic_name
+					83,// bit_position edited with low-can-generator
+					2,// bit_size
+					0.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})}
+			} // end signals vector
+		})} // end message_definition entry
 ,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130850,"Simnet.Event.Command.Ap.Command",12,136,frequency_clock_t(5.00000f),true,
 			{ // beginning signals vector
 				{std::make_shared<signal_t> (signal_t{
@@ -9061,7 +9302,7 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					nullptr,// encoder
 					false,// received
 					std::make_pair<bool, int>(false, 0),// multiplex
-					static_cast<sign_t>(0),// signed
+					static_cast<sign_t>(2),// signed
 					-1,// bit_sign_position
 					"rad"// unit
 				})},
@@ -9499,6 +9740,32 @@ std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set
 					},// states
 					false,// writable
 					nullptr,// decoder
+					nullptr,// encoder
+					false,// received
+					std::make_pair<bool, int>(false, 0),// multiplex
+					static_cast<sign_t>(0),// signed
+					-1,// bit_sign_position
+					""// unit
+				})}
+			} // end signals vector
+		})} // end message_definition entry
+,		{std::make_shared<message_definition_t>(message_definition_t{"j1939",130851,"130851",12,136,frequency_clock_t(5.00000f),true,
+			{ // beginning signals vector
+				{std::make_shared<signal_t> (signal_t{
+					"130851",// generic_name
+					0,// bit_position edited with low-can-generator
+					96,// bit_size
+					0.00000f,// factor
+					0.00000f,// offset
+					std::nanf(""),// min_value
+					std::nanf(""),// max_value
+					frequency_clock_t(0.00000f),// frequency
+					true,// send_same
+					false,// force_send_changed
+					{
+					},// states
+					false,// writable
+					decoder_t::decode_fast_packet,// decoder
 					nullptr,// encoder
 					false,// received
 					std::make_pair<bool, int>(false, 0),// multiplex

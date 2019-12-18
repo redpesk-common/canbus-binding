@@ -263,7 +263,7 @@ openxc_DynamicField decoder_t::decode_60160(signal_t &signal, std::shared_ptr<me
 
     for (auto it : s)
     {
-        if (it.second->get_message_definition()->get_id() == jm->get_pgn())
+        if (it.second->get_message_definition() && it.second->get_message_definition()->get_id() == jm->get_pgn())
             jm->set_sub_id(it.first);
     }
 

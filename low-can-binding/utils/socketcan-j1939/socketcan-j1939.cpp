@@ -166,6 +166,7 @@ namespace utils
 	 */
 	int socketcan_j1939_t::open(std::string device_name, name_t name, pgn_t pgn, uint8_t addr)
 	{
+		close();
 
 		socket_ = socketcan_t::open(PF_CAN, SOCK_DGRAM, CAN_J1939);
 		if (socket_ < 0)
@@ -249,6 +250,11 @@ namespace utils
 		for(int i=0; i<jm.get_data_vector().size(); i++)
 			data[i] = jm.get_data_vector()[i];
 
+		//sockname.can_family = 29;
+		if(socket_ < 0) {
+			AFB_ERROR("SOCKET SHOULD NOT BE CLOSED! %d", socket_);
+			return 0;
+		}
 		if (sendto(socket_, &data, sizeof(data), 0, (const struct sockaddr *)&sockname, sizeof(sockname)) < 0)
 		{
 			AFB_ERROR("Error sending : %i %s", errno, ::strerror(errno));
