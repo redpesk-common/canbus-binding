@@ -364,7 +364,6 @@ static int one_subscribe_unsubscribe_events(afb_req_t request, bool subscribe, c
 
 static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const uint32_t& id, json_object *args)
 {
-	int ret = 0;
 	std::shared_ptr<message_definition_t> message_definition = application_t::instance().get_message_definition(id);
 	struct utils::signals_found sf;
 
@@ -374,15 +373,26 @@ static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const
 	if(sf.signals.empty())
 	{
 		AFB_NOTICE("No signal(s) found for %d.", id);
-		ret = -1;
-	}
-	else
-	{
-		event_filter_t event_filter = generate_filter(args);
-		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);
+		return -1;
 	}
 
-	return ret;
+	event_filter_t event_filter = generate_filter(args);
+	std::shared_ptr<low_can_subscription_t> can_subscription = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
+	can_subscription->set_message_definition(message_definition);
+
+	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
+	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
+	map_subscription& s = sm.get_subscribed_signals();
+
+	if(can_subscription->create_rx_filter(message_definition) < 0)
+		return -1;
+	if(add_to_event_loop(can_subscription) < 0)
+		return -1;
+
+	if(subscribe_unsubscribe_signal(request, subscribe, can_subscription, s) < 0)
+		return -1;
+
+	return 0;
 }
 
 

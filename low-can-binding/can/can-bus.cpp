@@ -110,17 +110,39 @@ void can_bus_t::process_signals(std::shared_ptr<message_t> message, map_subscrip
 	{
 		bool send = true;
 		// First we have to found which signal_t it is
-		std::shared_ptr<low_can_subscription_t> sig = s[subscription_id];
+		std::shared_ptr<low_can_subscription_t> subscription = s[subscription_id];
+		openxc_SimpleMessage s_message;
 
-		decoded_message = decoder_t::translate_signal(*sig->get_signal(), message, &send);
-		openxc_SimpleMessage s_message = build_SimpleMessage(sig->get_name(), decoded_message);
+		// messages
+		if(subscription->get_message_definition() != nullptr)
+		{
+			openxc_DynamicField dynamicField_tmp;
+			json_object *signal_json_tmp;
+			decoded_message = build_DynamicField_json(json_object_new_array());
+			for(std::shared_ptr<signal_t> sig : subscription->get_message_definition()->get_signals())
+			{
+				signal_json_tmp = json_object_new_object();
+				dynamicField_tmp = decoder_t::translate_signal(*sig, message, &send);
+				json_object_object_add(signal_json_tmp,"name", json_object_new_string(sig->get_name().c_str()));
+				jsonify_DynamicField(dynamicField_tmp,signal_json_tmp);
+				if(sig != nullptr && sig->get_unit() != "")
+					json_object_object_add(signal_json_tmp, "unit", json_object_new_string(sig->get_unit().c_str()));
+				json_object_array_add(decoded_message.json_value,signal_json_tmp);
+			}
+		}
+		else // signal
+		{
+			decoded_message = decoder_t::translate_signal(*subscription->get_signal(), message, &send);
+		}
+
+		s_message = build_SimpleMessage(subscription->get_name(), decoded_message);
 		vehicle_message = build_VehicleMessage(s_message, message->get_timestamp());
 
-		if(send && apply_filter(vehicle_message, sig))
+		if(send && apply_filter(vehicle_message, subscription))
 		{
 			std::lock_guard<std::mutex> decoded_can_message_lock(decoded_can_message_mutex_);
 			push_new_vehicle_message(subscription_id, vehicle_message);
-			AFB_DEBUG("%s CAN signals processed.", sig->get_name().c_str());
+			AFB_DEBUG("%s CAN signals processed.", subscription->get_name().c_str());
 		}
 	}
 }
