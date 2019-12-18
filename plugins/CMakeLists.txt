@@ -16,33 +16,6 @@
 # limitations under the License.
 ###########################################################################
 
-PROJECT_TARGET_ADD(agl-vcar-signals)
-
-	# Define targets
-	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
-
-	# Alsa Plugin properties
-	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-			LABELS "PLUGIN"
-			PREFIX ""
-			SUFFIX ".ctlso"
-			OUTPUT_NAME ${TARGET_NAME}
-	)
-
-	target_include_directories(${TARGET_NAME}
-	PRIVATE "../low-can-binding")
-
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-	low-can
-	openxc-message-format
-	uds-c
-	isotp-c
-	bitfield-c
-	afb-helpers
-	${link_libraries})
-
-if(WITH_FEATURE_J1939)
 PROJECT_TARGET_ADD(default-signals)
 
 	# Define targets
@@ -68,4 +41,3 @@ PROJECT_TARGET_ADD(default-signals)
 	bitfield-c
 	afb-helpers
 	${link_libraries})
-endif()
