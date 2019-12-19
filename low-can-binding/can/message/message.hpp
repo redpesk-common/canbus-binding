@@ -68,7 +68,6 @@ public:
 	int get_sub_id() const;
 	const uint8_t* get_data() const;
 	const std::vector<uint8_t> get_data_vector() const;
-	const std::vector<uint8_t> get_data_vector(int start, int end) const;
 	uint32_t get_length() const;
 	uint64_t get_timestamp() const;
 

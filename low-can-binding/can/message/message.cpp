@@ -76,28 +76,6 @@ const uint8_t* message_t::get_data() const
 	return data_.data();
 }
 
-
-///
-/// @brief Retrieve data_ member value.
-///
-/// @return pointer to the first element
-///  of class member data_
-///
-const std::vector<uint8_t> message_t::get_data_vector(int start, int end) const
-{
-	if ( start > length_ || end > length_ )
-	{
-		AFB_ERROR("Error index to get data vector, [%d-%d] - for length %d", start, end, length_);
-		return data_;
-	}
-
-	std::vector<uint8_t>::const_iterator first = data_.begin() + start;
-	std::vector<uint8_t>::const_iterator last = data_.begin() + end;
-	std::vector<uint8_t> ret(first, last);
-
-	return ret;
-}
-
 ///
 /// @brief Retrieve data_ member whole vector
 ///

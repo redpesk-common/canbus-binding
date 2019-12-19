@@ -191,56 +191,33 @@ struct canfd_frame can_message_t::convert_to_canfd_frame()
 struct std::vector<canfd_frame> can_message_t::convert_to_canfd_frame_vector()
 {
 	std::vector<canfd_frame> ret;
+	int i = 0;
+
 	if(is_correct_to_send())
 	{
-		if(flags_ & CAN_FD_FRAME)
+		while (i < length_)
 		{
-			int i=0;
-			do
+			canfd_frame frame;
+			frame.can_id = id_;
+			if(flags_ & CAN_FD_FRAME)
 			{
-				canfd_frame frame;
-				frame.can_id = id_;
-				frame.len = 64;
-				std::vector<uint8_t> data = get_data_vector((i*64),(i*64)+63);
-				if(data.size()<64)
-				{
-					::memset(frame.data, 0, sizeof(frame.data));
-					::memcpy(frame.data, data.data(), data.size());
-				}
-				else
-				{
-					::memcpy(frame.data, data.data(), 64);
-				}
-				ret.push_back(frame);
-				i++;
-			} while (i<(length_ >> 6));
-		}
-		else
-		{
-			int i=0;
-			do
+				frame.len = (length_ - (i * CANFD_MAX_DLC)) > CANFD_MAX_DLC - 1 ? CANFD_MAX_DLC : (uint8_t)(length_ - (i * CANFD_MAX_DLC));
+				::memcpy(frame.data, &data_.data()[i*CANFD_MAX_DLC], frame.len);
+				i += CANFD_MAX_DLC;
+			}
+			else
 			{
-				canfd_frame frame;
-				frame.can_id = id_;
-				frame.len = 8;
-				std::vector<uint8_t> data = get_data_vector(i*8,(i*8)+7);
-				if(data.size()<8)
-				{
-					::memset(frame.data, 0, sizeof(frame.data));
-					::memcpy(frame.data, data.data(), data.size());
-				}
-				else
-				{
-					::memset(frame.data, 0, sizeof(frame.data));
-					::memcpy(frame.data, data.data(), 8);
-				}
-				ret.push_back(frame);
-				i++;
-			} while (i<(length_ >> 3));
+				frame.len = (length_ - (i * CAN_MAX_DLC)) > CAN_MAX_DLC - 1 ? CAN_MAX_DLC : (uint8_t)(length_ - (i * CAN_MAX_DLC));
+				::memcpy(frame.data, &data_.data()[i*CAN_MAX_DLEN], frame.len);
+				i += CAN_MAX_DLC;
+			}
+			ret.push_back(frame);
 		}
 	}
 	else
+	{
 		AFB_ERROR("can_message_t not correctly initialized to be sent");
+	}
 
 	return ret;
 }
