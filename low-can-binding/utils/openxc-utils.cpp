@@ -421,7 +421,7 @@ void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value)
 	else if(field.has_bytes_value)
 		json_object_object_add(value, "value", json_object_new_string(converter_t::to_hex(field.bytes_value, field.length_array).c_str()));
 	else if(field.has_json_value)
-		json_object_object_add(value, "signals", json_object_new_string(json_object_get_string(field.json_value)));
+		json_object_object_add(value, "signals", json_object_get(field.json_value));
 }
 
 ///
