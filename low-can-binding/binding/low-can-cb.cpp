@@ -746,6 +746,36 @@ static struct json_object *get_signals_value(const std::string& name)
 
 	return ans;
 }
+
+static struct json_object *get_id_value(const uint32_t& id)
+{
+	std::shared_ptr<message_definition_t> message_definition = application_t::instance().get_message_definition(id);
+	struct utils::signals_found sf;
+	struct json_object *ans = nullptr;
+
+	if(message_definition)
+		sf.signals = list_ptr_signal_t(message_definition->get_signals().begin(), message_definition->get_signals().end());
+
+	if(sf.signals.empty())
+	{
+		AFB_WARNING("no signal(s) found for %d.", id);
+		return NULL;
+	}
+
+	ans = json_object_new_object();
+	struct json_object *jsignals = json_object_new_array();
+	json_object_object_add(ans, "signals", jsignals);
+	for(const auto& sig: sf.signals)
+	{
+		struct json_object *jobj = json_object_new_object();
+		json_object_object_add(jobj, "name", json_object_new_string(sig->get_name().c_str()));
+		json_object_object_add(jobj, "value", json_object_new_double(sig->get_last_value()));
+		json_object_array_add(jsignals, jobj);
+	}
+
+	return ans;
+}
+
 void get(afb_req_t request)
 {
 	int rc = 0;
@@ -760,6 +790,37 @@ void get(afb_req_t request)
 		(json_object_object_get_ex(args, "event", &json_name) && json_object_is_type(json_name, json_type_string) ))
 	{
 		ans = get_signals_value(json_object_get_string(json_name));
+		if (!ans)
+			rc = -1;
+	}
+	else if (args != nullptr &&
+		(json_object_object_get_ex(args, "id", &json_name)))
+	{
+		if (json_object_get_type(json_name) == json_type_string) // id is set before and check if it's an array
+		{
+			ans = get_id_value(json_object_get_int(json_name));
+		}
+		else if(json_object_get_type(json_name) == json_type_array)
+		{
+			ans = json_object_new_array();
+			for (int i = 0 ; i < json_object_array_length(json_name); i++)
+			{
+				json_object *sub_ans = nullptr;
+				json_object *x = json_object_array_get_idx(json_name, i);
+				sub_ans = get_id_value(json_object_get_int(x));
+				if(!sub_ans)
+					rc = -1;
+				else {
+					struct json_object *jobj = json_object_new_object();
+					struct json_object *jid = json_object_new_string(json_object_get_string(x));
+					json_object_object_add(jobj, "id", jid);
+					json_object_object_add(jobj, "data", sub_ans);
+					json_object_array_add(ans, jobj);
+				}
+			}
+		}
+		else
+			rc = -1;
 		if (!ans)
 			rc = -1;
 	}
