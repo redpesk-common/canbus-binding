@@ -21,6 +21,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+
 #include "./socketcan-j1939.hpp"
 #include "socketcan-j1939-addressclaiming.hpp"
 
@@ -98,13 +99,9 @@ namespace utils
 	 */
 	void socketcan_j1939_t::define_opt(bool promisc, bool recv_own_msgs, bool broadcast)
 	{
-		int promisc_i = 0;
-		int recv_own_msgs_i = 0;
-		int broadcast_i = 0;
-
-		if(promisc) promisc_i = 1;
-		if(recv_own_msgs) recv_own_msgs_i=1;
-		if(broadcast) broadcast_i = 1;
+		int promisc_i = promisc ? 1 : 0;
+		//int recv_own_msgs_i = recv_own_msgs ? 1 : 0;
+		int broadcast_i = broadcast ? 1 : 0;
 
 		setopt(SOL_CAN_J1939, SO_J1939_PROMISC, &promisc_i, sizeof(promisc_i));
 		setopt(SOL_SOCKET, SO_BROADCAST, &broadcast_i, sizeof(broadcast_i));
