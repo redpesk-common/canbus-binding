@@ -24,6 +24,7 @@
 #include <mutex>
 #include <vector>
 #include <thread>
+#include <algorithm>
 #include <wrap-json.h>
 #include <systemd/sd-event.h>
 #include <ctl-config.h>
