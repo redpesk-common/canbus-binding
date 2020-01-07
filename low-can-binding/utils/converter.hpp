@@ -30,10 +30,4 @@ class converter_t
 						 int &new_end_byte,
 						 uint8_t &new_start_bit,
 						 uint8_t &new_end_bit);
-		static uint32_t bit_position_swap(unsigned int msg_length,
-						  unsigned int bit_position,
-						  unsigned int bit_size);
-		static uint32_t continental_bit_position_mess(unsigned int msg_length,
-							      unsigned int bit_position,
-							      unsigned int bit_size);
 };

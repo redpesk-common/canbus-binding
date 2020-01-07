@@ -72,33 +72,3 @@ void converter_t::signal_to_bits_bytes(unsigned int bit_position, unsigned int b
 	new_end_byte = (bit_position + bit_size - 1) >> 3;
 	new_end_bit = (bit_position + bit_size - 1) % CHAR_BIT;
 }
-
-
-/**
- * @brief	This is to use when you have a big endian CAN frame layout.
- * 		It converts the bit position so it matches with little endiant CAN frame layout.
- *
- * @param msg_length 	Message length in bytes.
- * @param bit_position 	Original bit position.
- * @param bit_size	Size of the data.
- * @return uint32_t 	New bit position.
- */
-uint32_t converter_t::bit_position_swap(unsigned int msg_length, unsigned int bit_position, unsigned int bit_size)
-{
-	return (msg_length * CHAR_BIT) - bit_position - bit_size;
-}
-
-/**
- * @brief	This allow to get the correct bit_position using the weird Continental.
- *		bit numbering method where the Frame is read using little endianness
- *		and bit count using a big endianness
- *
- * @param msg_length	Message length in bytes.
- * @param bit_position	Original bit position.
- * @param bit_size	Size of the data.
- * @return uint32_t	New bit position.
- */
-uint32_t converter_t::continental_bit_position_mess(unsigned int msg_length, unsigned int bit_position, unsigned int bit_size)
-{
-	return bit_position + CHAR_BIT - 2 * (bit_position % CHAR_BIT) - bit_size;
-}

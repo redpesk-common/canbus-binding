@@ -112,6 +112,8 @@ set(INSTALL_PREFIX $ENV{HOME}/opt)
 # -----------------------------
 list (APPEND link_libraries -pthread)
 
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
+
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language
 # Values are prefilled with default options that is currently used.
