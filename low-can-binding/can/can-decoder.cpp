@@ -94,30 +94,32 @@ int decoder_t::handle_sign(const signal_t& signal, std::vector<uint8_t>& data_si
 ///
 float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message_t> message)
 {
-	const std::vector<uint8_t> data = message->get_data_vector();
+	int sign;
+	std::vector<uint8_t> data;
 	std::vector<uint8_t> data_signal;
 	uint8_t bit_size = (uint8_t) signal.get_bit_size();
 	uint32_t bit_position = signal.get_bit_position();
-
-	if(signal.get_message()->frame_layout_is_bigendian())
-	{
-		bit_position = converter_t::bit_position_swap(message->get_length(),
-							      signal.get_bit_position(),
-							      signal.get_bit_size());
-		message->frame_swap();
-	}
 
 	int new_start_byte = 0;
 	int new_end_byte = 0;
 	uint8_t new_start_bit = 0;
 	uint8_t new_end_bit = 0;
 
+	if(signal.get_message()->frame_layout_is_bigendian())
+	{
+		bit_position = converter_t::bit_position_swap(message->get_length(),
+							      signal.get_bit_position(),
+							      bit_size);
+		message->frame_swap();
+	}
+
+	data = message->get_data_vector();
 	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit, new_end_bit);
 
 	for(int i=new_start_byte;i<=new_end_byte;i++)
 		data_signal.push_back(data[i]);
 
-	int sign = decoder_t::handle_sign(signal, data_signal, new_end_bit, data);
+	sign = handle_sign(signal, data_signal, new_end_bit, data);
 
 	if(data_signal.size() > 65535)
 		AFB_ERROR("Too long data signal %s", signal.get_name().c_str());
