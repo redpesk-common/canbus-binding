@@ -23,6 +23,12 @@ class converter_t
 {
 	public:
 		static std::string to_hex(const uint8_t data[], const size_t length);
-		static void signal_to_bits_bytes(uint32_t bit_position, uint32_t bit_size, int &new_start_byte, int &new_end_byte, uint8_t &new_start_bit, uint8_t &new_end_bit);
-		static uint32_t bit_position_swap(uint32_t bit_position,uint32_t bit_size);
+		static void signal_to_bits_bytes(unsigned int bit_position,
+						 unsigned int bit_size,
+						 int &new_start_byte,
+						 int &new_end_byte,
+						 uint8_t &new_start_bit,
+						 uint8_t &new_end_bit);
+		static uint32_t bit_position_swap(unsigned int bit_position,
+						  unsigned int bit_size);
 };
