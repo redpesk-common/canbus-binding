@@ -21,19 +21,34 @@
 
 PROJECT_TARGET_ADD(low-can)
 
-	# Define project Targets
-	set (SOURCES
-		binding/${TARGET_NAME}-cb.cpp
-		binding/${TARGET_NAME}-subscription.cpp
+	if(WITH_FEATURE_ISOTP)
+	set(SOURCES_ISOTP
+		utils/socketcan-isotp.cpp
+	)
+	endif()
+
+
+	if(WITH_FEATURE_J1939)
+	set(SOURCES_J1939
+		can/message/j1939-message.cpp
+		utils/socketcan-j1939/socketcan-j1939.cpp
+		utils/socketcan-j1939/socketcan-j1939-data.cpp
+		utils/socketcan-j1939/socketcan-j1939-addressclaiming.cpp
+	)
+	endif()
+
+	set (SOURCES_LIB
+		binding/low-can-hat.cpp
+		binding/low-can-subscription.cpp
 		binding/application.cpp
 		can/can-bus.cpp
+		can/can-decoder.cpp
+		can/can-encoder.cpp
 		can/message-set.cpp
 		can/message-definition.cpp
 		can/message/message.cpp
 		can/message/can-message.cpp
 		can/signals.cpp
-		can/can-decoder.cpp
-		can/can-encoder.cpp
 		diagnostic/diagnostic-message.cpp
 		diagnostic/diagnostic-manager.cpp
 		diagnostic/active-diagnostic-request.cpp
@@ -45,26 +60,26 @@ PROJECT_TARGET_ADD(low-can)
 		utils/socketcan-bcm.cpp
 		utils/config-parser.cpp
 		utils/converter.cpp
+	)
+
+	add_library(${TARGET_NAME} SHARED ${SOURCES_LIB} ${SOURCES_J1939} ${SOURCES_ISOTP})
+
+	TARGET_LINK_LIBRARIES(${TARGET_NAME}
+		ini-config
+		openxc-message-format
+		uds-c
+		isotp-c
+		bitfield-c
+		${link_libraries})
+
+PROJECT_TARGET_ADD(low-can-binding)
+
+	# Define project Targets
+	set (SOURCES
+		binding/low-can-cb.cpp
 		)
 
-
-	if(WITH_FEATURE_ISOTP)
-		set(SOURCES_ISOTP
-			utils/socketcan-isotp.cpp
-		)
-	endif()
-
-
-	if(WITH_FEATURE_J1939)
-		set(SOURCES_J1939
-			can/message/j1939-message.cpp
-			utils/socketcan-j1939/socketcan-j1939.cpp
-			utils/socketcan-j1939/socketcan-j1939-data.cpp
-			utils/socketcan-j1939/socketcan-j1939-addressclaiming.cpp
-		)
-	endif()
-
-	add_library(${TARGET_NAME} MODULE ${SOURCES} ${SOURCES_J1939} ${SOURCES_ISOTP})
+	add_library(${TARGET_NAME} MODULE ${SOURCES})
 
 	set(OPENAPI_DEF "binding/low-can-apidef" CACHE STRING "name and path to the JSON API definition without extension")
 	# Binder exposes a unique public entry point
@@ -77,6 +92,7 @@ PROJECT_TARGET_ADD(low-can)
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
+		low-can
 		ini-config
 		openxc-message-format
 		uds-c
@@ -84,4 +100,3 @@ PROJECT_TARGET_ADD(low-can)
 		bitfield-c
 		appcontroller
 		${link_libraries})
-

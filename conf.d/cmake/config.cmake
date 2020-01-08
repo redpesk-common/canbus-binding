@@ -29,6 +29,8 @@ set(PROJECT_LICENSE "APL2.0")
 set(PROJECT_LANGUAGES "C;CXX")
 set(API_NAME "low-can")
 
+set(INSTALL_RPATH "$ORIGIN")
+
 # Where are stored the project configuration files
 # relative to the root project directory
 set(PROJECT_CMAKE_CONF_DIR "conf.d")
