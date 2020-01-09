@@ -21,9 +21,9 @@
 
 
 _AFT.setBeforeAll(function()
-    local can = io.open("/sys/class/net/can2")
+    local can = io.open("/sys/class/net/can0")
     if can == nil then
-        print("# You do not have 'can2' device set. Please run the following command:\n### sudo modprobe vcan; sudo ip link add can2 type vcan; sudo ip link set can2 up ")
+        print("# You do not have 'can0' device set. Please run the following command:\n### sudo modprobe vcan; sudo ip link add can2 type vcan; sudo ip link set can2 up ")
         return -1
     end
     return 0

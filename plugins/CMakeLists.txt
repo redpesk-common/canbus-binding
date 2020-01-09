@@ -43,7 +43,7 @@ PROJECT_TARGET_ADD(agl-vcar-signals)
 	${link_libraries})
 
 if(WITH_FEATURE_J1939)
-PROJECT_TARGET_ADD(j1939-signals)
+PROJECT_TARGET_ADD(default-signals)
 
 	# Define targets
 	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)

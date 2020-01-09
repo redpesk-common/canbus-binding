@@ -10,15 +10,16 @@
 		"active_message_set": 0,
 		"dev-mapping": {
 			"hs": "can0",
-			"ls": "can0"
+			"ls": "can0",
+			"j1939": "can0"
 		},
 		"diagnostic_bus": "hs"
 	},
 	"plugins": [
 		{
-			"uid": "agl-vcar-signals",
-			"info": "agl-vcar signals",
-			"libs": "agl-vcar-signals.ctlso"
+			"uid": "default-signals",
+			"info": "default signals",
+			"libs": "default-signals.ctlso"
 		}
 	]
 }

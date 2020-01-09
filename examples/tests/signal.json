@@ -604,6 +604,8 @@
 		"is_fd": false,
 		"is_extended": false,
 		"is_j1939": true,
+		"byte_frame_is_big_endian": true,
+		"bit_position_reversed": true,
 		"signals": {
 			"Sid": {
 				"bit_position": 0,
