@@ -16,7 +16,7 @@
 # limitations under the License.
 ###########################################################################
 
-PROJECT_TARGET_ADD(agl-signals)
+PROJECT_TARGET_ADD(agl-vcar-signals)
 
 	# Define targets
 	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
