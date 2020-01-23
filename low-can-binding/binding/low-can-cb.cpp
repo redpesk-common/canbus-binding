@@ -297,7 +297,7 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 
 static event_filter_t generate_filter(json_object* args)
 {
-	event_filter_t event_filter;
+	event_filter_t event_filter = {};
 	struct json_object  *filter, *obj;
 
 		// computes the filter
