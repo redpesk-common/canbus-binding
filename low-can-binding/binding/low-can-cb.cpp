@@ -617,7 +617,9 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 		}
 #endif
 
-		if(message->get_length() > 0 && message->get_length() <= message->get_maxdlen())
+		if(message->get_length() > 0 &&
+		   message->get_length() <= message->get_maxdlen() &&
+		   json_object_get_type(can_data) == json_type_array)
 		{
 			std::vector<uint8_t> data;
 			for (int i = 0 ; i < message->get_length() ; i++)
