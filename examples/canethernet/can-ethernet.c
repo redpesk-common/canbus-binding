@@ -147,7 +147,7 @@ CTLP_ONLOAD(plugin, callbacks)
             return -1;
         }
 
-        if(!IsInterfaceAvailableAndUP(pluginData->ipCanConnectiontable->vcan)) {
+        if(!IsInterfaceAvailableAndUP(pluginData->ipCanConnectiontable[i].vcan)) {
             AFB_API_ERROR(plugin->api,
                           "Interface %s is not available or DOWN",
                           pluginData->ipCanConnectiontable[i].vcan);
