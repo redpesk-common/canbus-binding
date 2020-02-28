@@ -44,7 +44,7 @@ set(BUILD_TYPE "DEBUG" CACHE STRING "Default Build variant chosen. (Overwritten 
 # Need module in kernel
 # --------------
 
-execute_process(COMMAND ls /usr/include/linux/can/j1939.h RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+execute_process(COMMAND ls $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/j1939.h RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
 
 if(result)
 	message("Feature J1939 disabled")
@@ -62,7 +62,7 @@ endif()
 # Need module in kernel
 # --------------
 
-execute_process(COMMAND ls /usr/include/linux/can/isotp.h RESULT_VARIABLE result2 OUTPUT_QUIET ERROR_QUIET)
+execute_process(COMMAND ls $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/isotp.h RESULT_VARIABLE result2 OUTPUT_QUIET ERROR_QUIET)
 
 if(result2)
     message("Feature ISO TP disabled")
