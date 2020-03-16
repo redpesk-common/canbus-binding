@@ -65,7 +65,7 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 	{
 		bitfield_encode_float(sig->get_last_value(),
 				      new_start_bit,
-				      bit_size,
+				      (uint8_t)bit_size,
 				      factor_v,
 				      offset_v,
 				      data_signal.data(),
