@@ -37,20 +37,20 @@ extern "C" {
  *
  * Returns the value of the requested bit field, right aligned in a uint64_t.
  */
-uint64_t get_bitfield(const uint8_t source[], const unsigned int source_length,
-                const unsigned int offset, const unsigned int bit_count);
+uint64_t get_bitfield(const uint8_t source[], const uint32_t source_length,
+                const uint32_t offset, const uint8_t bit_count);
 
 /* Public: Return a single nibble from the byte array, with range checking.
  *
  * source - the source byte array.
  * source_length - the total length of the source array.
- * nibble_index - the index of the nibble to retreive. The leftmost nibble is
+ * nibble_index - the index of the nibble to retrieve. The leftmost nibble is
  *      index 0.
  *
- * Returns the retreived nibble, right aligned in a unsigned int.
+ * Returns the retrieved nibble, right aligned in a unsigned int.
  */
-unsigned int get_nibble(const uint8_t source[], const unsigned int source_length,
-                const unsigned int nibble_index);
+uint8_t get_nibble(const uint8_t source[], const uint32_t source_length,
+                const uint32_t nibble_index);
 
 /* Public: Return a single byte from the byte array, with range checking.
  *
@@ -60,8 +60,8 @@ unsigned int get_nibble(const uint8_t source[], const unsigned int source_length
  *
  * Returns the retreived byte.
  */
-unsigned int get_byte(const uint8_t source[], const unsigned int source_length,
-        const unsigned int byte_index);
+uint8_t get_byte(const uint8_t source[], const uint32_t source_length,
+        const uint32_t byte_index);
 
 /* Public: Copy a range of bits from one bit array to another.
  *
@@ -105,10 +105,10 @@ unsigned int get_byte(const uint8_t source[], const unsigned int source_length,
  * Returns true if the copy was successful and false if the range exceeded the
  * size of the source or destination, or if the range size negative or 0.
  */
-bool copy_bits(const uint8_t* source_origin, const unsigned int source_length,
-        const unsigned int source_offset, unsigned int bit_count,
-        uint8_t* destination_origin, const unsigned int destination_length,
-        const unsigned int destination_offset);
+bool copy_bits(const uint8_t* source_origin, const uint32_t source_length,
+        const uint32_t source_offset, uint32_t bit_count,
+        uint8_t* destination_origin, const uint32_t destination_length,
+        const uint32_t destination_offset);
 
 /* Public: Copy a range of bits from one array to another, right aligning the
  * result.
@@ -177,8 +177,8 @@ bool copy_bytes_right_aligned(const uint8_t source[], const unsigned int source_
  * Returns true if the bit_count is enough to fully represent the value, and
  *      false if it will not fit.
  */
-bool set_nibble(const unsigned int nibble_index, const unsigned int value,
-                uint8_t* destination, const unsigned int destination_length);
+bool set_nibble(const uint32_t nibble_index, const uint8_t value,
+                uint8_t* destination, const uint32_t destination_length);
 
 /* Public: Set the bit field in the given data array to the new value.
  *
@@ -192,19 +192,19 @@ bool set_nibble(const unsigned int nibble_index, const unsigned int value,
  * Returns true if the bit_count is enough to fully represent the value, and
  *      false if it will not fit.
  */
-bool set_bitfield(const uint64_t value, const unsigned int offset,
-        const unsigned int bit_count, uint8_t destination[],
-        unsigned int destination_length);
+bool set_bitfield(const uint64_t value, const uint8_t offset,
+        const uint8_t bit_count, uint8_t destination[],
+		uint32_t destination_length);
 
 /* Public: Return a right aligned bitmask for a uint64_t.
  *
  * bit_count - the number of bits to mask, right aligned.
  */
-uint64_t bitmask(const unsigned int bit_count);
+uint64_t bitmask(const uint8_t bit_count);
 
 /* Private:
  */
-unsigned int bits_to_bytes(uint32_t bits);
+uint16_t bits_to_bytes(uint32_t bits);
 
 /* Private: A union to assist swapping between uint64_t and a unsigned int array.
  */

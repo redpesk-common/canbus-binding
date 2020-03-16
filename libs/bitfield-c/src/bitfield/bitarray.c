@@ -15,15 +15,15 @@
         bit_count = 0;                                              \
     } } while (0)
 
-static const unsigned int reverse_mask[] =
+static const uint8_t reverse_mask[] =
     { 0x55, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff };
-static const unsigned int reverse_mask_xor[] =
+static const uint8_t reverse_mask_xor[] =
     { 0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01, 0x00 };
 
-bool copy_bits(const uint8_t* source_origin, const unsigned int source_length,
-        const unsigned int source_offset, unsigned int bit_count,
-        uint8_t* destination_origin, const unsigned int destination_length,
-        const unsigned int destination_offset) {
+bool copy_bits(const uint8_t* source_origin, const uint32_t source_length,
+        const uint32_t source_offset, uint32_t bit_count,
+        uint8_t* destination_origin, const uint32_t destination_length,
+        const uint32_t destination_offset) {
     if(bit_count < 1) {
         return false;
     }
@@ -69,15 +69,15 @@ bool copy_bits(const uint8_t* source_origin, const unsigned int source_length,
             bit_diff_left_shift = source_offset_modulo - destination_offset_modulo;
             bit_diff_right_shift = CHAR_BIT - bit_diff_left_shift;
 
-            c = *source++ << bit_diff_left_shift;
-            c |= *source >> bit_diff_right_shift;
+            c = (uint8_t) (*source++ << bit_diff_left_shift);
+            c |= (uint8_t) (*source >> bit_diff_right_shift);
             c &= reverse_mask_xor[destination_offset_modulo];
         } else {
             bit_diff_right_shift = destination_offset_modulo - source_offset_modulo;
             bit_diff_left_shift = CHAR_BIT - bit_diff_right_shift;
 
-            c = *source >> bit_diff_right_shift &
-                    reverse_mask_xor[destination_offset_modulo];
+            c = (uint8_t) (*source >> bit_diff_right_shift &
+                    reverse_mask_xor[destination_offset_modulo]);
         }
         PREPARE_FIRST_COPY();
         *destination++ |= c;
@@ -87,8 +87,8 @@ bool copy_bits(const uint8_t* source_origin, const unsigned int source_length,
          */
         int byte_len = bit_count / CHAR_BIT;
         while(--byte_len >= 0) {
-            c = *source++ << bit_diff_left_shift;
-            c |= *source >> bit_diff_right_shift;
+            c = (uint8_t) (*source++ << bit_diff_left_shift);
+            c |= (uint8_t) (*source >> bit_diff_right_shift);
             *destination++ = c;
         }
 
@@ -97,9 +97,9 @@ bool copy_bits(const uint8_t* source_origin, const unsigned int source_length,
          */
         int bit_count_modulo = bit_count % CHAR_BIT;
         if(bit_count_modulo > 0) {
-            c = *source++ << bit_diff_left_shift;
-            c |= *source >> bit_diff_right_shift;
-            c &= reverse_mask[bit_count_modulo];
+            c = (uint8_t) (*source++ << bit_diff_left_shift);
+            c |= (uint8_t) (*source >> bit_diff_right_shift);
+            c &= (uint8_t) reverse_mask[bit_count_modulo];
 
             *destination &= reverse_mask_xor[bit_count_modulo];
             *destination |= c;
@@ -108,8 +108,8 @@ bool copy_bits(const uint8_t* source_origin, const unsigned int source_length,
     return true;
 }
 
-unsigned int bits_to_bytes(uint32_t bits) {
-    unsigned int byte_count = bits / CHAR_BIT;
+uint16_t bits_to_bytes(uint32_t bits) {
+	uint16_t byte_count = (uint16_t) (bits / CHAR_BIT);
     if(bits % CHAR_BIT != 0) {
         ++byte_count;
     }
@@ -121,14 +121,14 @@ unsigned int bits_to_bytes(uint32_t bits) {
  *
  * Returns: a bit position from 0 to 7.
  */
-unsigned int find_end_bit(const unsigned int numBits) {
-    int endBit = numBits % CHAR_BIT;
+uint32_t find_end_bit(const uint32_t numBits) {
+	uint32_t endBit = numBits % CHAR_BIT;
     return endBit == 0 ? CHAR_BIT : endBit;
 }
 
-bool copy_bits_right_aligned(const uint8_t source[], const unsigned int source_length,
-                const unsigned int offset, const unsigned int bit_count,
-                uint8_t* destination, const unsigned int destination_length) {
+bool copy_bits_right_aligned(const uint8_t source[], const uint32_t source_length,
+                const uint32_t offset, const uint32_t bit_count,
+                uint8_t* destination, const uint32_t destination_length) {
     return copy_bits(source, source_length, offset, bit_count, destination,
             destination_length,
             // provide a proper destination offset so the result is right
@@ -137,9 +137,9 @@ bool copy_bits_right_aligned(const uint8_t source[], const unsigned int source_l
                  CHAR_BIT - find_end_bit(bit_count));
 }
 
-bool copy_bytes_right_aligned(const uint8_t source[], const unsigned int source_length,
-                const unsigned int offset, const unsigned int byte_count,
-                uint8_t* destination, const unsigned int destination_length) {
+bool copy_bytes_right_aligned(const uint8_t source[], const uint32_t source_length,
+                const uint32_t offset, const uint32_t byte_count,
+                uint8_t* destination, const uint32_t destination_length) {
     return copy_bits_right_aligned(source, source_length, offset * CHAR_BIT,
             byte_count * CHAR_BIT, destination, destination_length);
 }

@@ -1,5 +1,6 @@
 #include <uds/extras.h>
 #include <uds/uds.h>
+#include <string.h>
 
 // TODO everything below here is for future work...not critical for now.
 
@@ -9,12 +10,14 @@ DiagnosticRequestHandle diagnostic_request_malfunction_indicator_status(
     // TODO request malfunction indicator light (MIL) status - request mode 1
     // pid 1, parse first bit
     DiagnosticRequestHandle handle;
+    memset(&handle, 0, sizeof(handle));
     return handle;
 }
 
 DiagnosticRequestHandle diagnostic_request_vin(DiagnosticShims* shims,
         DiagnosticVinReceived callback) {
     DiagnosticRequestHandle handle;
+    memset(&handle, 0, sizeof(handle));
     return handle;
 }
 
@@ -22,6 +25,7 @@ DiagnosticRequestHandle diagnostic_request_dtc(DiagnosticShims* shims,
         DiagnosticTroubleCodeType dtc_type,
         DiagnosticTroubleCodesReceived callback) {
     DiagnosticRequestHandle handle;
+    memset(&handle, 0, sizeof(handle));
     return handle;
 }
 
@@ -35,5 +39,6 @@ DiagnosticRequestHandle diagnostic_enumerate_pids(DiagnosticShims* shims,
     // chunks depending on the mode so the final pid list is actual 1 or 2 byte PIDs
     // TODO request supported PIDs  - request PID 0 and parse 4 bytes in response
     DiagnosticRequestHandle handle;
+    memset(&handle, 0, sizeof(handle));
     return handle;
 }

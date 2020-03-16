@@ -32,7 +32,7 @@ bool isotp_send_flow_control_frame(IsoTpShims* shims, IsoTpMessage* message) {
     }
 
     shims->send_can_message(message->arbitration_id - ARBITRATION_ID_OFFSET, can_data,
-            shims->frame_padding ? 8 : 1 + message->size);
+           (uint8_t) (shims->frame_padding ? 8 : 1 + message->size));
     return true;
 }
 
@@ -100,7 +100,7 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
         //If multi-frame, then the payload length is contained in the 12
         //bits following the first nibble of Byte 0. 
         case PCI_FIRST_FRAME: {
-            uint16_t payload_length = (get_nibble(data, size, 1) << 8) + get_byte(data, size, 1);
+            uint16_t payload_length = (uint16_t) ((get_nibble(data, size, 1) << 8) + get_byte(data, size, 1));
 
             if(payload_length > OUR_MAX_ISO_TP_MESSAGE_SIZE) {
                 shims->log("Multi-frame response too large for receive buffer.");
@@ -130,16 +130,16 @@ IsoTpMessage isotp_continue_receive(IsoTpShims* shims,
             break;
         }
         case PCI_CONSECUTIVE_FRAME: {
-            uint8_t start_index = handle->received_buffer_size;
-            uint8_t remaining_bytes = handle->incoming_message_size - start_index;
+            uint16_t start_index = handle->received_buffer_size;
+            uint16_t remaining_bytes = (uint16_t) (handle->incoming_message_size - start_index);
             message.multi_frame = true;
 
             if(remaining_bytes > 7) {
                 memcpy(&handle->receive_buffer[start_index], &data[1], CAN_MESSAGE_BYTE_SIZE - 1);
-                handle->received_buffer_size = start_index + 7;
+                handle->received_buffer_size = (uint16_t)(start_index + 7);
             } else {
                 memcpy(&handle->receive_buffer[start_index], &data[1], remaining_bytes);
-                handle->received_buffer_size = start_index + remaining_bytes;
+                handle->received_buffer_size = (uint16_t) (start_index + remaining_bytes);
 
                 if(handle->received_buffer_size != handle->incoming_message_size){
                     free(handle->receive_buffer);

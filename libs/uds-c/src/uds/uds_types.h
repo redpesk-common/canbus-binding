@@ -16,7 +16,7 @@ extern "C" {
 #define MAX_RESPONDING_ECU_COUNT 8
 #define VIN_LENGTH 17
 
-/* Private: The four main types of diagnositc requests that determine how the
+/* Private: The four main types of diagnostic requests that determine how the
  * request should be parsed and what type of callback should be used.
  *
  * TODO this may not be used...yet?

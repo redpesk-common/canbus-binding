@@ -26,7 +26,7 @@ IsoTpSendHandle isotp_send_single_frame(IsoTpShims* shims, IsoTpMessage* message
         return handle;
     }
 
-    if(!set_nibble(PAYLOAD_LENGTH_NIBBLE_INDEX, message->size, can_data,
+    if(!set_nibble(PAYLOAD_LENGTH_NIBBLE_INDEX, (uint8_t)message->size, can_data,
                 sizeof(can_data))) {
         shims->log("Unable to set payload length in CAN data");
         return handle;
@@ -37,7 +37,7 @@ IsoTpSendHandle isotp_send_single_frame(IsoTpShims* shims, IsoTpMessage* message
     }
 
     shims->send_can_message(message->arbitration_id, can_data,
-            shims->frame_padding ? 8 : 1 + message->size);
+            (uint8_t)(shims->frame_padding ? 8 : 1 + message->size));
     handle.success = true;
     isotp_complete_send(shims, message, true, callback);
     return handle;

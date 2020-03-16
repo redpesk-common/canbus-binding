@@ -50,12 +50,12 @@ static void setup_receive_handle(DiagnosticRequestHandle* handle) {
     }
 }
 
-static uint16_t autoset_pid_length(uint8_t mode, uint16_t pid,
+static uint8_t autoset_pid_length(uint8_t mode, uint16_t pid,
         uint8_t pid_length) {
     if(pid_length == 0) {
         if(mode <= 0xa || mode == 0x3e ) {
             pid_length = 1;
-        } else if(pid > 0xffff || ((pid & 0xFF00) > 0x0)) {
+        } else if ((pid & 0xFF00) > 0x0) {
             pid_length = 2;
         } else {
             pid_length = 1;
@@ -72,7 +72,7 @@ static void send_diagnostic_request(DiagnosticShims* shims,
         handle->request.pid_length = autoset_pid_length(handle->request.mode,
                 handle->request.pid, handle->request.pid_length);
         set_bitfield(handle->request.pid, PID_BYTE_INDEX * CHAR_BIT,
-                handle->request.pid_length * CHAR_BIT, payload,
+                (uint8_t)(handle->request.pid_length * CHAR_BIT), payload,
                 sizeof(payload));
     }
 
@@ -82,8 +82,8 @@ static void send_diagnostic_request(DiagnosticShims* shims,
     }
 
     handle->isotp_send_handle = isotp_send(&handle->isotp_shims,
-            handle->request.arbitration_id, payload,
-            1 + handle->request.payload_length + handle->request.pid_length,
+            (uint16_t)handle->request.arbitration_id, payload,
+            (uint16_t)(1 + handle->request.payload_length + handle->request.pid_length),
             NULL);
     if(handle->isotp_send_handle.completed &&
             !handle->isotp_send_handle.success) {
@@ -202,7 +202,7 @@ static bool handle_positive_response(DiagnosticRequestHandle* handle,
         if(handle->request.has_pid && message->size > 1) {
             response->has_pid = true;
             if(handle->request.pid_length == 2) {
-                response->pid = get_bitfield(message->payload, message->size,
+                response->pid = (uint16_t)get_bitfield(message->payload, message->size,
                         PID_BYTE_INDEX * CHAR_BIT, sizeof(uint16_t) * CHAR_BIT);
             } else {
                 response->pid = message->payload[PID_BYTE_INDEX];
@@ -215,8 +215,8 @@ static bool handle_positive_response(DiagnosticRequestHandle* handle,
             response->success = true;
             response->completed = true;
 
-            uint8_t payload_index = 1 + handle->request.pid_length;
-            response->payload_length = MAX(0, message->size - payload_index);
+            uint8_t payload_index = (uint8_t)(1 + handle->request.pid_length);
+            response->payload_length = (uint8_t)MAX(0, message->size - payload_index);
             if(response->payload_length > 0) {
                 memcpy(response->payload, &message->payload[payload_index],
                         response->payload_length);
@@ -241,7 +241,7 @@ DiagnosticResponse diagnostic_receive_can_frame(DiagnosticShims* shims,
 
     if(!handle->isotp_send_handle.completed) {
         isotp_continue_send(&handle->isotp_shims,
-                &handle->isotp_send_handle, arbitration_id, data, size);
+                &handle->isotp_send_handle, (uint16_t) arbitration_id, data, size);
     } else {
         uint8_t i;
         for(i = 0; i < handle->isotp_receive_handle_count; ++i) {
@@ -286,23 +286,23 @@ DiagnosticResponse diagnostic_receive_can_frame(DiagnosticShims* shims,
 }
 
 int diagnostic_payload_to_integer(const DiagnosticResponse* response) {
-    return get_bitfield(response->payload, response->payload_length, 0,
-            response->payload_length * CHAR_BIT);
+    return (int)get_bitfield(response->payload, response->payload_length, 0,
+            (uint8_t)(response->payload_length * CHAR_BIT));
 }
 
 float diagnostic_decode_obd2_pid(const DiagnosticResponse* response) {
     // handles on the single number values, not the bit encoded ones
     switch(response->pid) {
         case 0xa:
-            return response->payload[0] * 3;
+            return (float)(response->payload[0] * 3);
         case 0xc:
-            return (response->payload[0] * 256 + response->payload[1]) / 4.0;
+            return (float)((response->payload[0] * 256 + response->payload[1]) / 4.0);
         case 0xd:
         case 0x33:
         case 0xb:
             return response->payload[0];
         case 0x10:
-            return (response->payload[0] * 256 + response->payload[1]) / 100.0;
+            return (float)((response->payload[0] * 256 + response->payload[1]) / 100.0);
         case 0x11:
         case 0x2f:
         case 0x45:
@@ -310,16 +310,16 @@ float diagnostic_decode_obd2_pid(const DiagnosticResponse* response) {
         case 0x52:
         case 0x5a:
         case 0x4:
-            return response->payload[0] * 100.0 / 255.0;
+            return (float)(response->payload[0] * 100.0 / 255.0);
         case 0x46:
         case 0x5c:
         case 0xf:
         case 0x5:
-            return response->payload[0] - 40;
+            return (float)(response->payload[0] - 40);
         case 0x62:
-            return response->payload[0] - 125;
+            return (float)(response->payload[0] - 125);
         default:
-            return diagnostic_payload_to_integer(response);
+            return (float)diagnostic_payload_to_integer(response);
     }
 }
 
@@ -374,7 +374,7 @@ void diagnostic_request_to_string(const DiagnosticRequest* request,
                 request->pid);
     }
 
-    int remaining_space = destination_length - bytes_used;
+    size_t remaining_space = destination_length - bytes_used;
     if(request->payload_length > 0) {
         snprintf(destination + bytes_used, remaining_space,
                 "payload: 0x%02x%02x%02x%02x%02x%02x%02x",
