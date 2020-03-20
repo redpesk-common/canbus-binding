@@ -263,7 +263,7 @@ openxc_DynamicField decoder_t::decode_noop(signal_t& signal, std::shared_ptr<mes
 		if( (min_value == max_value && value != min_value) ||
 			(min_value != std::nanf("") && value < min_value) || (max_value != std::nanf("") && value > max_value))
 		{
-			AFB_DEBUG("Value doesn't match for signal %s", signal.get_generic_name());
+			AFB_DEBUG("Value doesn't match for signal %s", signal.get_generic_name().c_str());
 			return build_DynamicField_error();
 		}
 
