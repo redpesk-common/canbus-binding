@@ -760,28 +760,30 @@ static struct json_object *get_id_value(const uint32_t& id)
 		struct utils::signals_found sf;
 		struct json_object *ans = nullptr;
 
-	if(message_definition)
-		sf.signals = list_ptr_signal_t(message_definition->get_signals().begin(), message_definition->get_signals().end());
+		if(message_definition)
+			sf.signals = list_ptr_signal_t(message_definition->get_signals().begin(), message_definition->get_signals().end());
 
-	if(sf.signals.empty())
-	{
-		AFB_WARNING("no signal(s) found for %d.", id);
-		return NULL;
+		if(sf.signals.empty())
+		{
+			AFB_WARNING("no signal(s) found for %d.", id);
+			return NULL;
+		}
+
+		ans = json_object_new_object();
+		struct json_object *jsignals = json_object_new_array();
+		json_object_object_add(ans, "signals", jsignals);
+		for(const auto& sig: sf.signals)
+		{
+			struct json_object *jobj = json_object_new_object();
+			json_object_object_add(jobj, "name", json_object_new_string(sig->get_name().c_str()));
+			json_object_object_add(jobj, "value", json_object_new_double(sig->get_last_value()));
+			json_object_array_add(jsignals, jobj);
+		}
+
+			json_object_array_add(ret, ans);
 	}
 
-	ans = json_object_new_object();
-	struct json_object *jsignals = json_object_new_array();
-	json_object_object_add(ans, "signals", jsignals);
-	for(const auto& sig: sf.signals)
-	{
-		struct json_object *jobj = json_object_new_object();
-		json_object_object_add(jobj, "name", json_object_new_string(sig->get_name().c_str()));
-		json_object_object_add(jobj, "value", json_object_new_double(sig->get_last_value()));
-		json_object_array_add(jsignals, jobj);
-	}
-
-		json_object_array_add(ret, ans);
-	}
+	return ret;
 }
 
 void get(afb_req_t request)
