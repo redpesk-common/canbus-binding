@@ -122,6 +122,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 # ----------------------------------------------------------------------------
 set(COMPILE_OPTIONS
  -Wall
+ -Werror
  -Wextra
  -Wconversion
  -Wno-unused-parameter
