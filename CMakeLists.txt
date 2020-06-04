@@ -21,3 +21,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 include(CTest)
 enable_testing()
 include(${CMAKE_CURRENT_SOURCE_DIR}/conf.d/cmake/config.cmake)
+
+include(GNUInstallDirs)
+configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
+
+INSTALL(FILES
+	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+	DESTINATION
+	${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
