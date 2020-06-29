@@ -153,11 +153,59 @@ This generator will follow OpenXC support status of the low level CAN signaling 
 
 Clone the binding repository, copy the generated file and updated the git submodules.
 
-Execute the following commands from this repository:
+Step 1 - Execute the following commands from this repository:
 
 ```bash
 cd ${WD}/agl-service-can-low-level
-cp ${WD}/low-level-can-generator/build/application-generated.cpp ../low-can-binding/binding
+cp ${WD}/low-level-can-generator/build/application-generated.cpp ../low-can-binding/plugins
+```
+
+Step 2 - Update the CMakeLists.txt from ${WD}/low-can-binding/plugins.
+
+Add a new project's target
+
+```make
+PROJECT_TARGET_ADD(my_signals)
+	# Define targets
+	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
+
+	# Alsa Plugin properties
+	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
+			LABELS "PLUGIN"
+			PREFIX ""
+			SUFFIX ".ctlso"
+			OUTPUT_NAME ${TARGET_NAME}
+	)
+
+	target_include_directories(${TARGET_NAME}
+	PRIVATE "../low-can-binding")
+
+	# Library dependencies (include updates automatically)
+	TARGET_LINK_LIBRARIES(${TARGET_NAME}
+	low-can
+	openxc-message-format
+	uds-c
+	isotp-c
+	bitfield-c
+	afb-helpers
+	${link_libraries})
+```
+
+Step 3 - add the plugin in conf.d/project/control-agl-service-can-low-level.json
+
+```json
+"plugins": [
+    {
+        "uid": "default-signals",
+        "info": "default signals",
+        "libs": "default-signals.ctlso"
+    },
+    {
+        "uid": "application-signals",
+        "info": "application signals",
+        "libs": "application-signals.ctlso"
+    }
+]
 ```
 
 ### Installation
