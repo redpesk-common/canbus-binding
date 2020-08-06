@@ -24,14 +24,12 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-
-#include "can-bus.hpp"
-
-#include "signals.hpp"
-#include "can-decoder.hpp"
-#include "../binding/application.hpp"
-#include "../utils/signals.hpp"
-#include "../utils/openxc-utils.hpp"
+#include <low-can/can/can-bus.hpp>
+#include <low-can/can/signals.hpp>
+#include <low-can/can/can-decoder.hpp>
+#include <low-can/binding/application.hpp>
+#include <low-can/utils/signals.hpp>
+#include <low-can/utils/openxc-utils.hpp>
 
 /// @brief Class destructor
 ///

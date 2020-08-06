@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "signals.hpp"
+#include <low-can/utils/signals.hpp>
 
 namespace utils
 {

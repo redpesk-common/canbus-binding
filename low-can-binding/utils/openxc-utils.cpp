@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-#include "openxc-utils.hpp"
+#include <low-can/binding/application.hpp>
+#include <low-can/can/can-decoder.hpp>
+#include <low-can/utils/openxc-utils.hpp>
+
 #include "converter.hpp"
-#include "../binding/application.hpp"
-#include "../can/can-decoder.hpp"
+
 
 ///
 /// @brief Build a specific VehicleMessage containing a DiagnosticResponse.

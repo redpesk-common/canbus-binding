@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "low-can-hat.hpp"
+#include <low-can/binding/low-can-hat.hpp>
 #include "low-can-apidef.h"
 
 #include <map>
@@ -29,18 +29,17 @@
 #include <systemd/sd-event.h>
 #include <ctl-config.h>
 #include "openxc.pb.h"
-#include "application.hpp"
-#include "../can/can-encoder.hpp"
-#include "../can/can-bus.hpp"
-#include "../can/signals.hpp"
-#include "../can/message/message.hpp"
-#include "../utils/signals.hpp"
-#include "../diagnostic/diagnostic-message.hpp"
-#include "../utils/openxc-utils.hpp"
-#include "../utils/signals.hpp"
+#include <low-can/binding/application.hpp>
+#include <low-can/can/can-encoder.hpp>
+#include <low-can/can/can-bus.hpp>
+#include <low-can/can/signals.hpp>
+#include <low-can/can/message/message.hpp>
+#include <low-can/diagnostic/diagnostic-message.hpp>
+#include <low-can/utils/signals.hpp>
+#include <low-can/utils/openxc-utils.hpp>
 
 #ifdef USE_FEATURE_J1939
-	#include "../can/message/j1939-message.hpp"
+	#include <low-can/can/message/j1939-message.hpp>
 	#include <linux/can/j1939.h>
 #endif
 

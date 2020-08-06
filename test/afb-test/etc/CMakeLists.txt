@@ -24,7 +24,7 @@ PROJECT_TARGET_ADD(afb-test-config)
 		set(J1939_TEST_CONFFILE ",\"low-can_J1939Test.lua\",\"low-can_ValueJ1939Test.lua\"")
 	endif()
 
-	configure_file("aft-agl-service-low-can.json.in" "aft-agl-service-low-can.json")
+	configure_file("aft-rp-low-can.json.in" "aft-rp-low-can.json")
 	file(GLOB CONF_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.json")
 
 	add_input_files("${CONF_FILES}")

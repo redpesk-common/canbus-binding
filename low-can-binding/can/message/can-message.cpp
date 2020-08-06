@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-#include "./can-message.hpp"
-
 #include <cstring>
-
-#include "../../binding/low-can-hat.hpp"
+#include <low-can/can/message/can-message.hpp>
+#include <low-can/binding/low-can-hat.hpp>
 
 ///
 /// @brief Class constructor

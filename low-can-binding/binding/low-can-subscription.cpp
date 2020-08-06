@@ -16,18 +16,18 @@
  * limitations under the License.
  */
 
-#include "low-can-subscription.hpp"
-#include "application.hpp"
-#include "canutil/write.h"
-#include "../utils/socketcan-bcm.hpp"
-#include "../can/can-encoder.hpp"
+#include <low-can/binding/low-can-subscription.hpp>
+#include <low-can/binding/application.hpp>
+#include <low-can/utils/socketcan-bcm.hpp>
+#include <low-can/can/can-encoder.hpp>
 
+#include "canutil/write.h"
 #ifdef USE_FEATURE_ISOTP
-#include "../utils/socketcan-isotp.hpp"
+#include <low-can/utils/socketcan-isotp.hpp>
 #endif
 
 #ifdef USE_FEATURE_J1939
-#include "../utils/socketcan-j1939/socketcan-j1939-data.hpp"
+#include <low-can/utils/socketcan-j1939/socketcan-j1939-data.hpp>
 #endif
 
 low_can_subscription_t::low_can_subscription_t()

@@ -16,10 +16,10 @@
  */
 #include <map>
 
-#include "diagnostic-message.hpp"
+#include <low-can/diagnostic/diagnostic-message.hpp>
 
-#include "../binding/application.hpp"
-#include "../utils/signals.hpp"
+#include <low-can/binding/application.hpp>
+#include <low-can/utils/signals.hpp>
 
 const char *UNIT_NAMES[10] = {
 	"POURCENT",

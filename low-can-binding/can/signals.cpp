@@ -17,13 +17,13 @@
 
 #include <fnmatch.h>
 
-#include "signals.hpp"
+#include <low-can/can/signals.hpp>
+#include <low-can/binding/application.hpp>
+#include <low-can/can/can-decoder.hpp>
+#include <low-can/can/can-bus.hpp>
+#include <low-can/diagnostic/diagnostic-message.hpp>
+#include <low-can/utils/signals.hpp>
 
-#include "../binding/application.hpp"
-#include "../utils/signals.hpp"
-#include "can-decoder.hpp"
-#include "can-bus.hpp"
-#include "../diagnostic/diagnostic-message.hpp"
 #include "canutil/write.h"
 
 std::string signal_t::prefix_ = "messages";

@@ -18,10 +18,10 @@
 
 # Project Info
 # ------------------
-set(PROJECT_NAME agl-service-can-low-level)
+set(PROJECT_NAME rp-can-low-level)
 set(PROJECT_PRETTY_NAME "Low level CAN binding")
 set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
-set(PROJECT_URL "https://gerrit.automotivelinux.org/gerrit/apps/agl-service-can-low-level")
+set(PROJECT_URL "https://git.ovh.iot/redpesk-common/rp-can-low-level.git")
 set(PROJECT_ICON "icon.png")
 set(PROJECT_AUTHOR "Romain Forlot")
 set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
@@ -38,7 +38,7 @@ set(PROJECT_CMAKE_CONF_DIR "conf.d")
 
 # Compilation Mode (DEBUG, RELEASE)
 # ----------------------------------
-set(BUILD_TYPE "DEBUG" CACHE STRING "Default Build variant chosen. (Overwritten by cli if given)")
+set(BUILD_TYPE "RELEASE" CACHE STRING "Default Build variant chosen. (Overwritten by cli if given)")
 
 # Activate J1939
 # Need module in kernel
@@ -112,7 +112,7 @@ set(INSTALL_PREFIX $ENV{HOME}/opt)
 # -----------------------------
 list (APPEND link_libraries -pthread)
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
+include_directories(BEFORE SYSTEM ${CMAKE_SOURCE_DIR}/include)
 
 # Compilation options definition
 # Use CMake generator expressions to specify only for a specific language
@@ -124,8 +124,7 @@ set(COMPILE_OPTIONS
  -Wall
  -Werror
  -Wextra
- -Wconversion
- -Wno-unused-parameter
+  -Wno-unused-parameter
  -Wno-sign-compare
  -Wno-sign-conversion
  -Werror=maybe-uninitialized
