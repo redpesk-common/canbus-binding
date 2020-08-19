@@ -79,3 +79,7 @@ cp include/uapi/linux/can.h /usr/include/linux/can.h
 cp include/uapi/linux/can/j1939.h /usr/include/linux/can/
 ```
 
+## Enable support at build time
+
+To enable J1939 support, the binding must be built with -DWITH_FEATURE_J1939=ON.
+If using the autobuild script, add CONFIGURE_ARGS="-DWITH_FEATURE_J1939=ON" to the command used.

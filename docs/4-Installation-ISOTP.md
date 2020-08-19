@@ -48,3 +48,8 @@ sudo insmod ./net/can/can-isotp.ko
 ```bash
 sudo cp include/uapi/linux/can/isotp.h /usr/include/linux/can/
 ```
+
+## Enable support at build time
+
+To enable ISO TP support, the binding must be built with -DWITH_FEATURE_ISOTP=ON.
+If using the autobuild script, add CONFIGURE_ARGS="-DWITH_FEATURE_ISOTP=ON" to the command used.

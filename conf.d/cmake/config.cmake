@@ -44,33 +44,53 @@ set(BUILD_TYPE "DEBUG" CACHE STRING "Default Build variant chosen. (Overwritten 
 # Need module in kernel
 # --------------
 
+# Default to off
+set(WITH_FEATURE_J1939 OFF CACHE BOOL "")
+
 execute_process(COMMAND ls $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/j1939.h RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
 
 if(result)
-	message("Feature J1939 disabled")
+	message("J1939 header not detected!")
+	# Over-ride cached value
 	set(WITH_FEATURE_J1939 OFF)
 else()
-	message("Feature J1939 enabled")
-	set(WITH_FEATURE_J1939 ON)
-	add_definitions(-DUSE_FEATURE_J1939)
+	message("J1939 header detected")
+	# Check cache to allow over-ride
+	set(WITH_FEATURE_J1939 ON CACHE BOOL "")
 	# Define name for ECU
-	set(J1939_NAME_ECU 0x1239)
+	set(J1939_NAME_ECU 0x1239 CACHE STRING "")
+endif()
+if(WITH_FEATURE_J1939)
+	message("Feature J1939 enabled")
+	add_definitions(-DUSE_FEATURE_J1939)
 	add_definitions(-DJ1939_NAME_ECU=${J1939_NAME_ECU})
+else()
+	message("Feature J1939 disabled")
 endif()
 
 # Activate ISO TP
 # Need module in kernel
 # --------------
 
+# Default to off
+set(WITH_FEATURE_ISOTP OFF CACHE BOOL "")
+
 execute_process(COMMAND ls $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/isotp.h RESULT_VARIABLE result2 OUTPUT_QUIET ERROR_QUIET)
 
 if(result2)
-    message("Feature ISO TP disabled")
-    set(WITH_FEATURE_ISOTP OFF)
+	message("ISO TP header not detected!")
+	# Over-ride cached value
+	set(WITH_FEATURE_ISOTP OFF)
 else()
-    message("Feature ISOTP enabled")
-    set(WITH_FEATURE_ISOTP ON)
-    add_definitions(-DUSE_FEATURE_ISOTP)
+	message("ISO TP header detected")
+	# Check cache to allow over-ride
+	set(WITH_FEATURE_ISOTP ON CACHE BOOL "")
+endif()
+if(WITH_FEATURE_ISOTP)
+	message("Feature ISOTP enabled")
+	add_definitions(-DUSE_FEATURE_ISOTP)
+else()
+	message("Feature ISO TP disabled")
 endif()
 
 
