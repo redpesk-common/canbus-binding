@@ -991,7 +991,7 @@ int load_config(afb_api_t api)
 
 	if (!configPath)
 	{
-		AFB_ERROR_V3("CtlPreInit: No control-%s* config found invalid JSON %s ", GetBinderName(), filepath.c_str());
+		AFB_ERROR("CtlPreInit: No control-%s* config found invalid JSON %s ", GetBinderName(), filepath.c_str());
 		return -1;
 	}
 
@@ -999,7 +999,7 @@ int load_config(afb_api_t api)
 	ctlConfig = CtlLoadMetaData(api, configPath);
 	if (!ctlConfig)
 	{
-		AFB_ERROR_V3("CtrlPreInit No valid control config file in:\n-- %s", configPath);
+		AFB_ERROR("CtrlPreInit No valid control config file in:\n-- %s", configPath);
 		return -1;
 	}
 
