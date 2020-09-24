@@ -58,10 +58,13 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	json_object *dev_mapping = nullptr;
 	const char *diagnotic_bus = nullptr;
 
-	if(! ctrlConfig || ! ctrlConfig->external)
+	if(! ctrlConfig)
 		return -1;
 
-	application_t *application = (application_t*) ctrlConfig->external;
+	application_t *application = (application_t*) getExternalData(ctrlConfig);
+
+	if(! application)
+		return -1;
 
 	if(wrap_json_unpack(json_obj, "{si, s?s}",
 			      "active_message_set", &active_message_set,
@@ -991,7 +994,7 @@ int load_config(afb_api_t api)
 
 	if (!configPath)
 	{
-		AFB_ERROR_V3("CtlPreInit: No control-%s* config found invalid JSON %s ", GetBinderName(), filepath.c_str());
+		AFB_ERROR("CtlPreInit: No control-%s* config found invalid JSON %s ", GetBinderName(), filepath.c_str());
 		return -1;
 	}
 
@@ -999,7 +1002,7 @@ int load_config(afb_api_t api)
 	ctlConfig = CtlLoadMetaData(api, configPath);
 	if (!ctlConfig)
 	{
-		AFB_ERROR_V3("CtrlPreInit No valid control config file in:\n-- %s", configPath);
+		AFB_ERROR("CtrlPreInit No valid control config file in:\n-- %s", configPath);
 		return -1;
 	}
 

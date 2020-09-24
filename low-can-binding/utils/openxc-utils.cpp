@@ -277,19 +277,7 @@ const openxc_DynamicField build_DynamicField(const char* value)
 ///
 const openxc_DynamicField build_DynamicField(const std::string& value)
 {
-	openxc_DynamicField d;
-	d.has_type = true;
-	d.type = openxc_DynamicField_Type_STRING;
-
-	d.has_string_value = true;
-	d.has_numeric_value = false;
-	d.has_boolean_value = false;
-	d.has_bytes_value = false;
-	d.has_json_value = false;
-	::strncpy(d.string_value, value.c_str(), 100);
-	d.error = false;
-
-	return d;
+	return build_DynamicField(value.c_str());
 }
 
 ///
