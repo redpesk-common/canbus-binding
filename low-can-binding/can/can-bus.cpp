@@ -47,24 +47,42 @@ can_bus_t::can_bus_t()
 
 /// @brief Fills the CAN device map member with value from device
 ///
+/// @param[in] Linux CAN device name to test
+int can_bus_t::test_can_device(std::string dev) const
+{
+	utils::socketcan_bcm_t can_socket;
+	return can_socket.open(dev);
+}
+
+
+/// @brief Fills the CAN device map member with value from device
+///
 /// @param[in] mapping configuration section.
-void can_bus_t::set_can_devices(json_object *mapping)
+int can_bus_t::set_can_devices(json_object *mapping)
 {
 	if (! mapping)
 	{
 		AFB_ERROR("Can't initialize CAN buses with this empty mapping.");
-		return;
+		return -1;
 	}
 
 	struct json_object_iterator it = json_object_iter_begin(mapping);
 	struct json_object_iterator end = json_object_iter_end(mapping);
 	while (! json_object_iter_equal(&it, &end)) {
+		std::string logical_name = json_object_iter_peek_name(&it);
+		std::string device_name = json_object_get_string(json_object_iter_peek_value(&it));
 		can_devices_mapping_.push_back(std::make_pair(
-			json_object_iter_peek_name(&it),
-			json_object_get_string(json_object_iter_peek_value(&it))
-			));
+						logical_name, device_name)
+					);
+		if(test_can_device(device_name) < 0)
+		{
+			AFB_ERROR("Can't initialize linux CAN device '%s'. Bailing out.", device_name.c_str());
+			return -1;
+		}
+
 		json_object_iter_next(&it);
 	}
+	return 0;
 }
 
 /// @brief Take a decoded message to determine if its value complies with the desired

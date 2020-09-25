@@ -69,7 +69,8 @@ public:
 	can_bus_t(can_bus_t&&);
 	~can_bus_t();
 
-	void set_can_devices(json_object *mapping);
+	int test_can_device(std::string dev) const;
+	int set_can_devices(json_object *mapping);
 
 	int get_can_device_index(const std::string& bus_name) const;
 	const std::string get_can_device_name(const std::string& id_name) const;
