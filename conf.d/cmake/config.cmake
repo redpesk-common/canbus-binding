@@ -46,7 +46,7 @@ set(BUILD_TYPE "RELEASE" CACHE STRING "Default Build variant chosen. (Overwritte
 
 execute_process(COMMAND ls $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/j1939.h RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
 
-if(result)
+if(result OR NOT WITH_FEATURE_J1939)
 	message("Feature J1939 disabled")
 	set(WITH_FEATURE_J1939 OFF)
 else()
@@ -64,7 +64,7 @@ endif()
 
 execute_process(COMMAND ls $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/isotp.h RESULT_VARIABLE result2 OUTPUT_QUIET ERROR_QUIET)
 
-if(result2)
+if(result2 OR NOT WITH_FEATURE_ISOTP)
     message("Feature ISO TP disabled")
     set(WITH_FEATURE_ISOTP OFF)
 else()
