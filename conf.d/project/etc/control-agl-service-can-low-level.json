@@ -13,7 +13,15 @@
 			"ls": "can0",
 			"j1939": "can0"
 		},
-		"diagnostic_bus": "hs"
+		"diagnostic_bus": "hs",
+		"preinit": {
+			"uid": "preinit",
+			"action": "plugin://default-signals#preinit"
+		},
+		"postinit": {
+			"uid": "postinit",
+			"action": "plugin://default-signals#postinit"
+		}
 	},
 	"plugins": [
 		{

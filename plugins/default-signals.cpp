@@ -5,6 +5,18 @@
 extern "C" {
 CTLP_CAPI_REGISTER("agl-virtual-car");
 
+CTLP_CAPI(preinit, source, argsJ, eventJ)
+{
+	AFB_INFO("PREINIT BABY");
+	return 0;
+}
+
+CTLP_CAPI(postinit, source, argsJ, eventJ)
+{
+	AFB_INFO("POSTINIT BABY");
+	return 0;
+}
+
 std::shared_ptr<message_set_t> cms = std::make_shared<message_set_t>(message_set_t{0,"AGL Virtual Car",
 	{ // beginning message_definition_ vector
 /*		{std::make_shared<message_definition_t>(message_definition_t{"ls",0x111,"",16,16,frequency_clock_t(5.00000f),true,

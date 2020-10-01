@@ -56,6 +56,8 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	CtlConfigT *ctrlConfig = (CtlConfigT *) afb_api_get_userdata(apiHandle);
 	int active_message_set = 0;
 	json_object *dev_mapping = nullptr;
+	json_object *preinit = nullptr;
+	json_object *postinit = nullptr;
 	const char *diagnotic_bus = nullptr;
 
 	if(! ctrlConfig)
@@ -66,10 +68,17 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	if(! application)
 		return -1;
 
-	if(wrap_json_unpack(json_obj, "{si, s?s}",
+	if(wrap_json_unpack(json_obj, "{si, s?s, s?o, s?o}",
 			      "active_message_set", &active_message_set,
-			      "diagnostic_bus", &diagnotic_bus))
+			      "diagnostic_bus", &diagnotic_bus,
+			      "preinit", &preinit,
+			      "postinit", &postinit))
 		return -1;
+
+	AFB_DEBUG("PREINIT: %s", json_object_get_string(preinit));
+	AFB_DEBUG("POSTINIT: %s", json_object_get_string(postinit));
+	application->set_preinit(preinit);
+	application->set_postinit(postinit);
 
 	application->set_active_message_set((uint8_t)active_message_set);
 
@@ -83,6 +92,8 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	/// We pass by default the first CAN bus device to its Initialization.
 	if(! diagnotic_bus || application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
 		AFB_WARNING("Diagnostic Manager: not initialized. No diagnostic messages will be processed.");
+
+
 
 	return 0;
 }
@@ -914,6 +925,8 @@ int init_binding(afb_api_t api)
 	application_t& application = application_t::instance();
 	can_bus_t& can_bus_manager = application.get_can_bus_manager();
 
+	ActionExecUID(NULL, (CtlConfigT*)afb_api_get_userdata(api), "preinit", nullptr);
+
 	if(application.get_message_set().empty())
 	{
 		AFB_ERROR("No message_set defined");
@@ -970,9 +983,11 @@ int init_binding(afb_api_t api)
 		}
 	}
 #endif
+	if (application.get_postinit())
+		ActionExecUID(NULL, (CtlConfigT*)afb_api_get_userdata(api), "postinit", nullptr);
 
 	if(ret)
-		AFB_ERROR("There was something wrong with CAN device Initialization.");
+		AFB_ERROR("There was something wrong with the binding initialization.");
 
 	return ret;
 }
@@ -984,6 +999,9 @@ int load_config(afb_api_t api)
 	const char *dirList = getenv("CONTROL_CONFIG_PATH");
 	std::string bindingDirPath = GetBindingDirPath(api);
 	std::string filepath = bindingDirPath + "/etc";
+	application_t& application = application_t::instance();
+	json_object *preinit  = nullptr;
+	json_object *postinit = nullptr;
 
 	if (!dirList)
 		dirList=CONTROL_CONFIG_PATH;
@@ -1009,8 +1027,24 @@ int load_config(afb_api_t api)
 	// Save the config in the api userdata field
 	afb_api_set_userdata(api, ctlConfig);
 
-	setExternalData(ctlConfig, (void*) &application_t::instance());
+	setExternalData(ctlConfig, (void*) &application);
 	ret= CtlLoadSections(api, ctlConfig, ctlSections_);
+
+	// Add preinit and postinit functions to the config section now that
+	// plugins are loaded
+	preinit = application.get_preinit();
+	if (preinit && AddActionsToSection(api, &ctlSections_[0], preinit, 0))
+	{
+		AFB_API_ERROR (api, "Preinit config fail processing actions for section %s", ctlSections_[0].uid);
+		return -1;
+	}
+
+	postinit = application.get_postinit();
+	if (postinit && AddActionsToSection(api, &ctlSections_[0], postinit, 0))
+	{
+		AFB_API_ERROR (api, "Preinit config fail processing actions for section %s", ctlSections_[0].uid);
+		return -1;
+	}
 
 	return ret;
 }
