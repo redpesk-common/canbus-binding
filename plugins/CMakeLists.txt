@@ -29,14 +29,3 @@ PROJECT_TARGET_ADD(default-signals)
 		OUTPUT_NAME ${TARGET_NAME}
 	)
 
-	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
-		PUBLIC "/opt/AGL/include"
-	)
-
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		low-can
-		appcontroller
-		lua
-		afb-helpers
-	)
