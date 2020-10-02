@@ -24,14 +24,12 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-
-#include "can-bus.hpp"
-
-#include "signals.hpp"
-#include "can-decoder.hpp"
-#include "../binding/application.hpp"
-#include "../utils/signals.hpp"
-#include "../utils/openxc-utils.hpp"
+#include <low-can/can/can-bus.hpp>
+#include <low-can/can/signals.hpp>
+#include <low-can/can/can-decoder.hpp>
+#include <low-can/binding/application.hpp>
+#include <low-can/utils/signals.hpp>
+#include <low-can/utils/openxc-utils.hpp>
 
 /// @brief Class destructor
 ///
@@ -49,24 +47,42 @@ can_bus_t::can_bus_t()
 
 /// @brief Fills the CAN device map member with value from device
 ///
+/// @param[in] Linux CAN device name to test
+int can_bus_t::test_can_device(std::string dev) const
+{
+	utils::socketcan_bcm_t can_socket;
+	return can_socket.open(dev);
+}
+
+
+/// @brief Fills the CAN device map member with value from device
+///
 /// @param[in] mapping configuration section.
-void can_bus_t::set_can_devices(json_object *mapping)
+int can_bus_t::set_can_devices(json_object *mapping)
 {
 	if (! mapping)
 	{
 		AFB_ERROR("Can't initialize CAN buses with this empty mapping.");
-		return;
+		return -1;
 	}
 
 	struct json_object_iterator it = json_object_iter_begin(mapping);
 	struct json_object_iterator end = json_object_iter_end(mapping);
 	while (! json_object_iter_equal(&it, &end)) {
+		std::string logical_name = json_object_iter_peek_name(&it);
+		std::string device_name = json_object_get_string(json_object_iter_peek_value(&it));
 		can_devices_mapping_.push_back(std::make_pair(
-			json_object_iter_peek_name(&it),
-			json_object_get_string(json_object_iter_peek_value(&it))
-			));
+						logical_name, device_name)
+					);
+		if(test_can_device(device_name) < 0)
+		{
+			AFB_ERROR("Can't initialize linux CAN device '%s'. Bailing out.", device_name.c_str());
+			return -1;
+		}
+
 		json_object_iter_next(&it);
 	}
+	return 0;
 }
 
 /// @brief Take a decoded message to determine if its value complies with the desired
@@ -223,7 +239,8 @@ void can_bus_t::can_event_push()
 				if(s.find(v_message.first) != s.end() && afb_event_is_valid(s[v_message.first]->get_event()))
 				{
 					jo = json_object_new_object();
-					jsonify_vehicle(v_message.second, s[v_message.first]->get_signal(), jo);
+					std::shared_ptr<signal_t> signal = s[v_message.first]->get_signal();
+					jsonify_vehicle(v_message.second, signal, jo);
 					if(afb_event_push(s[v_message.first]->get_event(), jo) == 0)
 					{
 						if(v_message.second.has_diagnostic_response)

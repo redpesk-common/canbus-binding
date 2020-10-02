@@ -23,10 +23,10 @@
 #include <string>
 #include <memory>
 
-#include "openxc.pb.h"
-#include "message-definition.hpp"
-#include "../utils/timer.hpp"
-#include "../diagnostic/diagnostic-message.hpp"
+#include <openxc.pb.h>
+#include <low-can/utils/timer.hpp>
+#include <low-can/can/message-definition.hpp>
+#include <low-can/diagnostic/diagnostic-message.hpp>
 
 #define MESSAGE_SET_ID 0
 

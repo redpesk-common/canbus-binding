@@ -21,13 +21,12 @@
 #include <vector>
 #include <string>
 #include <fnmatch.h>
+#include <low-can/binding/application.hpp>
+#include <low-can/can/signals.hpp>
+#include <low-can/diagnostic/diagnostic-message.hpp>
+#include <low-can/binding/low-can-subscription.hpp>
+#include <openxc.pb.h>
 
-#include "openxc.pb.h"
-#include "../binding/application.hpp"
-#include "../can/signals.hpp"
-#include "../diagnostic/diagnostic-message.hpp"
-
-#include "../binding/low-can-subscription.hpp"
 
 typedef std::list<std::shared_ptr<signal_t>> list_ptr_signal_t;
 typedef std::list<std::shared_ptr<diagnostic_message_t>> list_ptr_diag_msg_t;

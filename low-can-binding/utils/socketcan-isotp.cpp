@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-#include "socketcan-isotp.hpp"
+#include <low-can/utils/socketcan-isotp.hpp>
 
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <low-can/binding/application.hpp>
+
 #include "../utils/converter.hpp"
-#include "../binding/application.hpp"
 
 namespace utils
 {

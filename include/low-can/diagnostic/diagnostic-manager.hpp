@@ -21,11 +21,11 @@
 #include <map>
 #include <vector>
 
-#include "../utils/socketcan-bcm.hpp"
-#include "uds/uds.h"
-#include "openxc.pb.h"
-#include "../can/can-bus.hpp"
-#include "active-diagnostic-request.hpp"
+#include <low-can/utils/socketcan-bcm.hpp>
+#include <uds/uds.h>
+#include <openxc.pb.h>
+#include <low-can/can/can-bus.hpp>
+#include <low-can/diagnostic/active-diagnostic-request.hpp>
 
 ///  Each CAN bus requires its own set of shim functions, so this should
 /// match the maximum CAN controller count.

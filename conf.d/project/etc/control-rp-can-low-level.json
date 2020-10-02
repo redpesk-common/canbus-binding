@@ -25,19 +25,9 @@
 	},
 	"plugins": [
 		{
-			"uid": "clement-signals",
-			"info": "clement signals",
-			"libs": "clement-signals.ctlso"
-		},
-		{
-			"uid": "gps-signals",
-			"info": "gps signals",
-			"libs": "gps-signals.ctlso"
-		},
-		{
-			"uid": "joystick-signals",
-			"info": "joystick signals",
-			"libs": "joystick-signals.ctlso"
+			"uid": "default-signals",
+			"info": "default signals",
+			"libs": "default-signals.ctlso"
 		}
 	]
 }

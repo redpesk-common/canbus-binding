@@ -22,13 +22,13 @@
 #include <string>
 #include <memory>
 
-#include "../can/can-bus.hpp"
-#include "../can/message-set.hpp"
-#include "../can/signals.hpp"
-#include "../diagnostic/diagnostic-manager.hpp"
+#include <low-can/can/can-bus.hpp>
+#include <low-can/can/message-set.hpp>
+#include <low-can/can/signals.hpp>
+#include <low-can/diagnostic/diagnostic-manager.hpp>
 #ifdef USE_FEATURE_J1939
-	#include "../utils/socketcan-j1939/socketcan-j1939-data.hpp"
-	#include "../utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp"
+#include <low-can/utils/socketcan-j1939/socketcan-j1939-data.hpp>
+#include <low-can/utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp>
 #endif
 
 ///

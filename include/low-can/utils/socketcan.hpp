@@ -24,8 +24,8 @@
 #include <linux/sockios.h>
 #include <string.h>
 
-#include "../binding/low-can-hat.hpp"
-#include "../can/message/can-message.hpp"
+#include <low-can/binding/low-can-hat.hpp>
+#include <low-can/can/message/can-message.hpp>
 
 #define INVALID_SOCKET -1
 #define NO_CAN_ID 0xFFFFFFFFU

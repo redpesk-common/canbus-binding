@@ -69,6 +69,8 @@ PROJECT_TARGET_ADD(low-can)
 	IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET_NAME}.so
 	)
 
+	target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
 		openxc-message-format
 		uds-c
@@ -94,6 +96,8 @@ PROJECT_TARGET_ADD(low-can-binding)
 		INSTALL_RPATH "$ORIGIN"
 		OUTPUT_NAME ${TARGET_NAME}
 	)
+
+	target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}

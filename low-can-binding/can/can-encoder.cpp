@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "can-encoder.hpp"
+#include <low-can/can/can-encoder.hpp>
+#include <low-can/can/message-definition.hpp>
+#include <low-can/utils/openxc-utils.hpp>
 
 #include "canutil/write.h"
-#include "../utils/openxc-utils.hpp"
-#include "message-definition.hpp"
 #include "../utils/converter.hpp"
 
 /**

@@ -20,10 +20,10 @@
 #include <vector>
 #include <string>
 
-#include "uds/uds.h"
-#include "../can/message-set.hpp"
-#include "../can/message/can-message.hpp"
-#include "active-diagnostic-request.hpp"
+#include <uds/uds.h>
+#include <low-can/can/message-set.hpp>
+#include <low-can/can/message/can-message.hpp>
+#include <low-can/diagnostic/active-diagnostic-request.hpp>
 
 enum UNIT {
 	POURCENT,

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2019, 2020 "IoT.bzh"
- * Author "Arthur Guyader" <arthur.guyader@iot.bzh>
- *
+ * Copyright (C) 2015, 2016 , 2017, 2018, 2019 "IoT\.bzh"
+ * Author "Romain Forlot" <romain.forlot@iot.bzh>
+ * Author "Loïc Collignon" <loic.collignon@iot.bzh>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,23 +17,22 @@
 
 #pragma once
 
-#include <linux/can/isotp.h>
-#include "socketcan.hpp"
-#include "../can/message/can-message.hpp"
-
-#define CAN_ISOTP_MAX_DLEN 4096
+#include <low-can/utils/socketcan.hpp>
+#include <low-can/can/message/can-message.hpp>
 
 namespace utils
 {
-	class socketcan_isotp_t : public socketcan_t
+	/// @brief derivated socketcan class specialized for BCM CAN socket.make_bcm_head
+	class socketcan_bcm_t : public socketcan_t
 	{
 	public:
 		using socketcan_t::socketcan_t;
 
 		virtual int open(std::string device_name);
-		virtual int open(std::string device_name, canid_t rx_id, canid_t tx_id);
 		virtual std::shared_ptr<message_t> read_message();
 		virtual int write_message(message_t& obj);
-		int define_tx_address(std::string device_name, canid_t rx_id, canid_t tx_id);
+
 	};
+
+
 }

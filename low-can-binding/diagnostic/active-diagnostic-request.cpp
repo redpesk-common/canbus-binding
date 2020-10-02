@@ -19,9 +19,8 @@
 #include <fnmatch.h>
 #include <map>
 
-#include "active-diagnostic-request.hpp"
-
-#include "../binding/application.hpp"
+#include <low-can/diagnostic/active-diagnostic-request.hpp>
+#include <low-can/binding/application.hpp>
 
 #define AFB_ERROR_PID 0xFF
 

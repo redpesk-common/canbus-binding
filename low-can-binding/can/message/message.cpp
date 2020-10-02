@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-#include "./message.hpp"
-
+#include <low-can/can/message/message.hpp>
+#include <low-can/binding/low-can-hat.hpp>
 #include <cstring>
-
-#include "../../binding/low-can-hat.hpp"
 
 /**
  * @brief Construct a new message t::message t object

@@ -18,9 +18,10 @@
 #include <cstring>
 #include <iomanip>
 #include <net/if.h>
-#include "../../binding/low-can-hat.hpp"
+#include <low-can/binding/low-can-hat.hpp>
+#include <low-can/can/message/j1939-message.hpp>
+
 #include "../../utils/converter.hpp"
-#include "j1939-message.hpp"
 
 /**
  * @brief Construct a new j1939 message t::j1939 message t object

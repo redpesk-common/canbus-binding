@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <cmath>
 
-#include "timer.hpp"
+#include <low-can/utils/timer.hpp>
 
 long long int system_time_us()
 {

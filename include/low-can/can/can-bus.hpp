@@ -24,9 +24,9 @@
 #include <thread>
 #include <linux/can.h>
 #include <condition_variable>
-#include "openxc.pb.h"
-#include "message/can-message.hpp"
-#include "../binding/low-can-subscription.hpp"
+#include <openxc.pb.h>
+#include <low-can/can/message/can-message.hpp>
+#include <low-can/binding/low-can-subscription.hpp>
 
 #define CAN_ACTIVE_TIMEOUT_S 30
 
@@ -69,7 +69,8 @@ public:
 	can_bus_t(can_bus_t&&);
 	~can_bus_t();
 
-	void set_can_devices(json_object *mapping);
+	int test_can_device(std::string dev) const;
+	int set_can_devices(json_object *mapping);
 
 	int get_can_device_index(const std::string& bus_name) const;
 	const std::string get_can_device_name(const std::string& id_name) const;

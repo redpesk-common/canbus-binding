@@ -16,7 +16,7 @@
  */
 
 #pragma once
-#include "./message.hpp"
+#include <low-can/can/message/message.hpp>
 
 struct bcm_msg
 {

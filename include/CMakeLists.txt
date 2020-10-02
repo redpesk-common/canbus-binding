@@ -16,4 +16,5 @@
 # limitations under the License.
 ###########################################################################
 
-INSTALL(DIRECTORY low-can DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+INSTALL(DIRECTORY low-can uds isotp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+INSTALL(FILES openxc.pb.h pb.h DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})

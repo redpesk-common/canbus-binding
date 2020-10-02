@@ -2,7 +2,7 @@
 	"$schema": "",
 	"metadata": {
 		"uid": "Low Can",
-		"version": "1.0",
+		"version": "2.0",
 		"api": "low-can",
 		"info": "Low can Configuration"
 	},
@@ -16,9 +16,9 @@
 	},
 	"plugins": [
 		{
-			"uid": "clement-signals",
-			"info": "clement-signals",
-			"libs": "clement-signals.ctlso"
+			"uid": "test-signals",
+			"info": "test-signals",
+			"libs": "test-signals.ctlso"
 		}
 	]
 }

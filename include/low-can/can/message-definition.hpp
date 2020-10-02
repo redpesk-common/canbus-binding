@@ -28,10 +28,10 @@
 #include <vector>
 #include <memory>
 
-#include "signals.hpp"
-#include "message-set.hpp"
-#include "../utils/timer.hpp"
-#include "message/message.hpp"
+#include <low-can/can/signals.hpp>
+#include <low-can/can/message-set.hpp>
+#include <low-can/utils/timer.hpp>
+#include <low-can/can/message/message.hpp>
 
 class message_set_t;
 

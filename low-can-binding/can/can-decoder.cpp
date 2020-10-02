@@ -20,9 +20,9 @@
 #include <cmath>
 
 #include "canutil/read.h"
-#include "../utils/openxc-utils.hpp"
-#include "message-definition.hpp"
-#include "../binding/low-can-hat.hpp"
+#include <low-can/utils/openxc-utils.hpp>
+#include <low-can/can/message-definition.hpp>
+#include <low-can/binding/low-can-hat.hpp>
 #include "../utils/converter.hpp"
 
 /// @brief Handle sign of the signal according to several decoding methods

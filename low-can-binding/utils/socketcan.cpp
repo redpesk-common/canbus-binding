@@ -20,8 +20,7 @@
 #include <linux/can/raw.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
-
-#include "socketcan.hpp"
+#include <low-can/utils/socketcan.hpp>
 
 namespace utils
 {

@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-#include "openxc-utils.hpp"
+#include <low-can/binding/application.hpp>
+#include <low-can/can/can-decoder.hpp>
+#include <low-can/utils/openxc-utils.hpp>
+
 #include "converter.hpp"
-#include "../binding/application.hpp"
-#include "../can/can-decoder.hpp"
+
 
 ///
 /// @brief Build a specific VehicleMessage containing a DiagnosticResponse.
@@ -497,10 +499,11 @@ bool jsonify_simple(const openxc_SimpleMessage& s_msg, json_object* json)
 ///
 bool jsonify_vehicle(const openxc_VehicleMessage& v_msg, std::shared_ptr<signal_t> sig, json_object* json)
 {
-	json_object_object_add(json,"id", json_object_new_int(sig->get_message()->get_id()));
+	if(sig)
+		json_object_object_add(json,"id", json_object_new_int(sig->get_message()->get_id()));
 	if(jsonify_simple(get_simple_message(v_msg), json))
 	{
-		if(sig != nullptr && sig->get_unit() != "")
+		if(sig && sig->get_unit() != "")
 			json_object_object_add(json, "unit", json_object_new_string(sig->get_unit().c_str()));
 
 		if(v_msg.has_timestamp)

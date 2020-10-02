@@ -22,8 +22,8 @@
 #include <condition_variable>
 #include <linux/can/j1939.h>
 #include <net/if.h>
-#include "../socketcan.hpp"
-#include "../../can/message/j1939-message.hpp"
+#include <low-can/utils/socketcan.hpp>
+#include <low-can/can/message/j1939-message.hpp>
 
 #ifndef J1939_NAME_ECU
 #define J1939_NAME_ECU 0x1234

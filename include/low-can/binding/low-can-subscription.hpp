@@ -21,10 +21,10 @@
 #include <cmath>
 #include <utility>
 
-#include "../can/signals.hpp"
-#include "../diagnostic/diagnostic-message.hpp"
-#include "../utils/socketcan.hpp"
-
+#include <low-can/can/signals.hpp>
+#include <low-can/can/message/can-message.hpp>
+#include <low-can/diagnostic/diagnostic-message.hpp>
+#include <low-can/utils/socketcan.hpp>
 
 #define OBDII_MAX_SIMULTANEOUS_RESPONSES 8
 

@@ -24,7 +24,33 @@
 #include <memory>
 #include <linux/can.h>
 #include <linux/can/bcm.h>
-#include <low-can/can-message.hpp>
+
+#define CAN_MESSAGE_SIZE 8
+
+#define MAX_BCM_CAN_FRAMES 257
+#define MAX_ISOTP_FRAMES 4096
+
+#define J1939_CAN_ID CAN_EFF_FLAG
+#define J1939_CAN_MASK (CAN_EFF_FLAG | CAN_RTR_FLAG)
+
+#define CAN_ISOTP_MAX_DLEN 4096
+
+#define NO_CAN_ID 0xFFFFFFFFU
+
+/**
+ * FLAGS defining how to open socket and how you could decode the frame
+ */
+#define CAN_PROTOCOL		   0x0001
+#define CAN_PROTOCOL_WITH_FD_FRAME 0x0002
+#define J1939_ADDR_CLAIM_PROTOCOL  0x0004
+#define J1939_PROTOCOL		   0x0008
+#define ISOTP_PROTOCOL		   0x0010
+#define ISOTP_SEND		   0x0020
+#define ISOTP_RECEIVE		   0x0040
+#define BYTE_FRAME_IS_BIG_ENDIAN   0x0080
+#define BIT_POSITION_REVERSED	   0x0100
+#define CONTINENTAL_BIT_POSITION   0x0200
+#define INVALID_FLAG		   0x8000
 
 /// @class message_t
 ///
