@@ -52,6 +52,9 @@ class application_t
 		std::vector<std::shared_ptr<message_set_t> > message_set_; ///< Vector holding all message set from JSON signals description file
 
 		std::map<std::string, std::shared_ptr<low_can_subscription_t> > can_devices_; ///< Map containing all independant opened CAN sockets, key is the socket int value.
+
+		json_object *preinit_ = nullptr; ///< Json object coming from config Json section holding the plugin and function name to execute as preinit
+		json_object *postinit_ = nullptr; ///< Json object coming from config Json section holding the plugin and function name to execute as postinit
 #ifdef USE_FEATURE_J1939
 		std::shared_ptr<low_can_subscription_t> subscription_address_claiming_; ///< Subscription holding the socketcan J1939 which is in charge of handling the address claiming protocol
 		//std::shared_ptr<utils::socketcan_j1939_addressclaiming_t> socket_address_claiming_;
@@ -92,6 +95,10 @@ class application_t
 
 		void set_active_message_set(uint8_t id);
 
+		json_object* get_preinit() const;
+		json_object* get_postinit() const;
+		void set_preinit(json_object *preinit);
+		void set_postinit(json_object *postinit);
 #ifdef USE_FEATURE_J1939
 		std::shared_ptr<utils::socketcan_t> get_socket_address_claiming();
 

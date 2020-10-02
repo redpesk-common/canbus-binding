@@ -197,6 +197,26 @@ void application_t::set_parents(std::shared_ptr<message_set_t> new_message_set)
 		dm->set_parent(new_message_set);
 }
 
+json_object* application_t::get_preinit() const
+{
+	return preinit_;
+}
+
+json_object* application_t::get_postinit() const
+{
+	return postinit_;
+}
+
+void application_t::set_preinit(json_object *preinit)
+{
+	preinit_ = preinit;
+}
+
+void application_t::set_postinit(json_object *postinit)
+{
+	postinit_ = postinit;
+}
+
 #ifdef USE_FEATURE_J1939
 std::shared_ptr<utils::socketcan_t> application_t::get_socket_address_claiming()
 {
