@@ -16,16 +16,3 @@
 # limitations under the License.
 ###########################################################################
 
-PROJECT_TARGET_ADD(default-signals)
-
-	# Define targets
-	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
-
-	# Alsa Plugin properties
-	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-		LABELS "PLUGIN"
-		PREFIX ""
-		SUFFIX ".ctlso"
-		OUTPUT_NAME ${TARGET_NAME}
-	)
-
