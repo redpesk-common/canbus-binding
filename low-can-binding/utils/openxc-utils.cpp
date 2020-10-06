@@ -180,7 +180,7 @@ const openxc_SimpleMessage build_SimpleMessage(const std::string& name, const op
 	openxc_SimpleMessage s;
 
 	s.has_name = true;
-	::strncpy(s.name, name.c_str(), 100);
+	::strncpy(s.name, name.c_str(), 99);
 	s.has_value = true;
 	s.value = value;
 
@@ -263,7 +263,7 @@ const openxc_DynamicField build_DynamicField(const char* value)
 	d.has_boolean_value = false;
 	d.has_bytes_value = false;
 	d.has_json_value = false;
-	::strncpy(d.string_value, value, 100);
+	::strncpy(d.string_value, value, 99);
 	d.error = false;
 
 	return d;
