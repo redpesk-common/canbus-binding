@@ -171,6 +171,7 @@ public:
 	signal_encoder& get_encoder();
 	bool get_received() const;
 	float get_last_value() const;
+	json_object* afb_verb_get_last_value();
 	std::pair<float, uint64_t> get_last_value_with_timestamp() const;
 	std::pair<bool, int> get_multiplex() const;
 	sign_t get_sign() const;

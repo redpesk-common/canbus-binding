@@ -205,6 +205,36 @@ float signal_t::get_last_value() const
 	return last_value_;
 }
 
+json_object* signal_t::afb_verb_get_last_value()
+{
+	json_object *jobj = json_object_new_object();
+
+	if(! received_)
+		return nullptr;
+
+	if(states_.empty())
+	{
+		json_object_object_add(jobj, "name",
+					json_object_new_string(get_name().c_str()));
+		json_object_object_add(jobj, "value",
+					json_object_new_double(last_value_));
+		json_object_object_add(jobj, "timestamp",
+					json_object_new_double(frequency_.get_last_tick()));
+	}
+	else
+	{
+		json_object_object_add(jobj, "name",
+					json_object_new_string(get_name().c_str()));
+		std::string val = states_[(uint8_t) last_value_];
+		json_object_object_add(jobj, "value",
+					json_object_new_string(val.c_str()));
+		json_object_object_add(jobj, "timestamp",
+					json_object_new_double(frequency_.get_last_tick()));
+	}
+
+	return jobj;
+}
+
 std::pair<float, uint64_t> signal_t::get_last_value_with_timestamp() const
 {
 	return std::make_pair(last_value_, frequency_.get_last_tick());

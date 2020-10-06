@@ -22,6 +22,7 @@
 #include <map>
 #include <queue>
 #include <mutex>
+#include <regex>
 #include <vector>
 #include <thread>
 #include <algorithm>
@@ -120,7 +121,7 @@ CtlSectionT ctlSections_[] = {
 
 ///*****************************************************************************
 ///
-///		Subscription and unsubscription
+///		Api Verbs implementation
 ///
 ///****************************************************************************/
 
@@ -919,6 +920,18 @@ void list(afb_req_t request)
 
 }
 
+/// Generic callback for signal's get verb
+void get_signal_last_value(afb_req_t request)
+{
+	signal_t *signal = (signal_t*) afb_req_get_vcbdata(request);
+	json_object *jobj = signal->afb_verb_get_last_value();
+
+	if (jobj)
+		afb_req_success(request, jobj, NULL);
+	else
+		afb_req_fail(request, "Error: No value retrieved. Signal might be never received.", NULL);
+}
+
 /// @brief Initialize the binding.
 ///
 /// @param[in] service Structure which represent the Application Framework Binder.
@@ -1049,6 +1062,35 @@ int load_config(afb_api_t api)
 	{
 		AFB_API_ERROR (api, "Preinit config fail processing actions for section %s", ctlSections_[0].uid);
 		return -1;
+	}
+
+	struct utils::signals_found all_signals;
+
+	openxc_DynamicField search_key = build_DynamicField("*");
+	all_signals = utils::signals_manager_t::instance().find_signals(search_key);
+	std::regex forbidden_char("[^a-zA-Z_]");
+
+	std::string verbname = "", info = "";
+	for(const auto& sig: all_signals.signals)
+	{
+		verbname = std::regex_replace(sig->get_name(), forbidden_char, "_");
+		info = "Get last value of signal: ";
+		info.append(sig->get_name());
+
+		if(afb_api_add_verb(api, verbname.c_str(), info.c_str(),
+				get_signal_last_value,(void*) sig.get(), 0, 0,0))
+			return -1;
+	}
+
+	for(const auto& sig: all_signals.diagnostic_messages)
+	{
+		verbname = std::regex_replace(sig->get_name(), forbidden_char, "_");
+		info = "Get last value of diagnostic signal: ";
+		info.append(sig->get_name());
+
+		if(afb_api_add_verb(api, verbname.c_str(), info.c_str(),
+				get_signal_last_value,(void*) sig.get(), 0, 0,0))
+			return -1;
 	}
 
 	return ret;
