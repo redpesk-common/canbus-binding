@@ -920,8 +920,30 @@ void list(afb_req_t request)
 
 }
 
+/// Generic callback for signal's write verb
+static void write_signal_last_value(afb_req_t request)
+{
+	json_object* args = nullptr;
+	args = afb_req_json(request);
+
+	if(! args)
+	{
+		afb_req_fail(request, "Error: No value to write.", NULL);
+		return;
+	}
+
+	signal_t *signal = (signal_t*) afb_req_get_vcbdata(request);
+	if (signal->afb_verb_write_on_bus(args))
+	{
+		afb_req_fail(request, "Error: Writing on bus using argument:", json_object_get_string(args));
+		return;
+	}
+
+	afb_req_success(request, NULL, NULL);
+}
+
 /// Generic callback for signal's get verb
-void get_signal_last_value(afb_req_t request)
+static void read_signal_last_value(afb_req_t request)
 {
 	signal_t *signal = (signal_t*) afb_req_get_vcbdata(request);
 	json_object *jobj = signal->afb_verb_get_last_value();
@@ -930,6 +952,55 @@ void get_signal_last_value(afb_req_t request)
 		afb_req_success(request, jobj, NULL);
 	else
 		afb_req_fail(request, "Error: No value retrieved. Signal might be never received.", NULL);
+}
+
+static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_ptr<diagnostic_message_t> diag_sig)
+{
+	static std::regex forbidden_char("[^a-zA-Z_]");
+	std::string get_info = "Get last value of ";
+	std::string set_info = "Write a new value for ";
+	std::string get_prefix = "r_";
+	std::string set_prefix = "w_";
+	std::string verbname;
+	std::string signame;
+	void *s = nullptr;
+	bool writable = false;
+
+	if (sig)
+	{
+		signame = sig->get_name();
+		writable = sig->get_writable();
+		s = (void *) sig.get();
+		get_info.append("signal: ");
+		set_info.append("signal: ");
+	}
+	else if(diag_sig)
+	{
+		signame = diag_sig->get_name();
+		s = (void *) diag_sig.get();
+		get_info.append("diagnostic signal: ");
+		set_info.append("diagnostic signal: ");
+	}
+	else
+	{
+		return -1;
+	}
+
+	verbname = std::regex_replace(signame, forbidden_char, "_");
+	get_prefix.append(verbname);
+	set_prefix.append(verbname);
+	get_info.append(signame);
+	set_info.append(signame);
+
+	if(afb_api_add_verb(api, get_prefix.c_str(), get_info.c_str(),
+			read_signal_last_value,(void*) s, 0, 0,0))
+		return -1;
+
+	if(writable)
+		if(afb_api_add_verb(api, set_prefix.c_str(), set_info.c_str(),
+				write_signal_last_value, (void*) s, 0, 0,0))
+			return -1;
+	return 0;
 }
 
 /// @brief Initialize the binding.
@@ -1068,29 +1139,19 @@ int load_config(afb_api_t api)
 
 	openxc_DynamicField search_key = build_DynamicField("*");
 	all_signals = utils::signals_manager_t::instance().find_signals(search_key);
-	std::regex forbidden_char("[^a-zA-Z_]");
 
-	std::string verbname = "", info = "";
 	for(const auto& sig: all_signals.signals)
 	{
-		verbname = std::regex_replace(sig->get_name(), forbidden_char, "_");
-		info = "Get last value of signal: ";
-		info.append(sig->get_name());
-
-		if(afb_api_add_verb(api, verbname.c_str(), info.c_str(),
-				get_signal_last_value,(void*) sig.get(), 0, 0,0))
-			return -1;
+		ret = add_verb(api, sig, nullptr);
+		if (ret)
+			break;
 	}
 
 	for(const auto& sig: all_signals.diagnostic_messages)
 	{
-		verbname = std::regex_replace(sig->get_name(), forbidden_char, "_");
-		info = "Get last value of diagnostic signal: ";
-		info.append(sig->get_name());
-
-		if(afb_api_add_verb(api, verbname.c_str(), info.c_str(),
-				get_signal_last_value,(void*) sig.get(), 0, 0,0))
-			return -1;
+		ret = add_verb(api, nullptr, sig);
+		if (ret)
+			break;
 	}
 
 	return ret;

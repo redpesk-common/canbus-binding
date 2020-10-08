@@ -152,7 +152,6 @@ public:
 		signal_encoder encoder,
 		bool received);
 
-
 	std::shared_ptr<message_definition_t> get_message() const;
 	const std::string get_generic_name() const;
 	const std::string get_name() const;
@@ -172,6 +171,7 @@ public:
 	bool get_received() const;
 	float get_last_value() const;
 	json_object* afb_verb_get_last_value();
+	int afb_verb_write_on_bus(json_object *value);
 	std::pair<float, uint64_t> get_last_value_with_timestamp() const;
 	std::pair<bool, int> get_multiplex() const;
 	sign_t get_sign() const;

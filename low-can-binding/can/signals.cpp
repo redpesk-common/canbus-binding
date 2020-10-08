@@ -16,13 +16,16 @@
  */
 
 #include <fnmatch.h>
+#include <memory>
 
 #include <low-can/can/signals.hpp>
 #include <low-can/binding/application.hpp>
 #include <low-can/can/can-decoder.hpp>
+#include <low-can/can/can-encoder.hpp>
 #include <low-can/can/can-bus.hpp>
 #include <low-can/diagnostic/diagnostic-message.hpp>
 #include <low-can/utils/signals.hpp>
+#include <low-can/utils/openxc-utils.hpp>
 
 #include "canutil/write.h"
 
@@ -214,25 +217,73 @@ json_object* signal_t::afb_verb_get_last_value()
 
 	if(states_.empty())
 	{
-		json_object_object_add(jobj, "name",
-					json_object_new_string(get_name().c_str()));
-		json_object_object_add(jobj, "value",
+		json_object_object_add(jobj, get_name().c_str(),
 					json_object_new_double(last_value_));
-		json_object_object_add(jobj, "timestamp",
-					json_object_new_double(frequency_.get_last_tick()));
 	}
 	else
 	{
-		json_object_object_add(jobj, "name",
-					json_object_new_string(get_name().c_str()));
 		std::string val = states_[(uint8_t) last_value_];
-		json_object_object_add(jobj, "value",
+		json_object_object_add(jobj, get_name().c_str(),
 					json_object_new_string(val.c_str()));
-		json_object_object_add(jobj, "timestamp",
-					json_object_new_double(frequency_.get_last_tick()));
+
 	}
+	json_object_object_add(jobj, "timestamp",
+				json_object_new_double(frequency_.get_last_tick()));
 
 	return jobj;
+}
+
+int signal_t::afb_verb_write_on_bus(json_object *json_value)
+{
+	openxc_DynamicField dynafield_value = build_DynamicField(json_value);
+	std::shared_ptr<signal_t> sig = std::make_shared<signal_t>(*this);
+	std::string bus_name = sig->get_message()->get_bus_device_name();
+	bool send = true;
+
+	uint64_t value = encoder_ ?
+			encoder_(*this, dynafield_value, &send) :
+			encoder_t::encode_DynamicField(*this, dynafield_value, &send);
+
+	uint32_t flags = INVALID_FLAG;
+
+	if(get_message()->is_j1939())
+		flags = J1939_PROTOCOL;
+	else if(get_message()->is_isotp())
+		flags = ISOTP_PROTOCOL;
+	else
+		flags = CAN_PROTOCOL;
+
+	message_t *message = encoder_t::build_message(sig, value, false, false);
+
+	std::map<std::string, std::shared_ptr<low_can_subscription_t> >& cd = application_t::instance().get_can_devices();
+
+	cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());
+	cd[bus_name]->set_signal(sig);
+
+
+	if(flags & CAN_PROTOCOL)
+		return low_can_subscription_t::tx_send(*cd[bus_name], message, bus_name);
+#ifdef USE_FEATURE_ISOTP
+	else if(flags & ISOTP_PROTOCOL)
+		return low_can_subscription_t::isotp_send(*cd[bus_name], message, bus_name);
+#endif
+#ifdef USE_FEATURE_J1939
+	else if(flags & J1939_PROTOCOL)
+		return low_can_subscription_t::j1939_send(*cd[bus_name], message, bus_name);
+#endif
+	else
+		return -1;
+
+	if(get_message()->is_j1939())
+#ifdef USE_FEATURE_J1939
+		delete (j1939_message_t*) message;
+#else
+		AFB_WARNING("Warning: You do not have J1939 feature activated.");
+#endif
+	else
+		delete (can_message_t*) message;
+
+	return -1;
 }
 
 std::pair<float, uint64_t> signal_t::get_last_value_with_timestamp() const
