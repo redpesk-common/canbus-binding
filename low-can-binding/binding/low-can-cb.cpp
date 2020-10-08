@@ -694,7 +694,6 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 	else
 		flags = CAN_PROTOCOL;
 
-//	cfd = encoder_t::build_frame(sig, value);
 	message_t *message = encoder_t::build_message(sig, value, false, false);
 
 	if(! send_message(message, sig->get_message()->get_bus_device_name(), flags, event_filter, sig) && send)
@@ -762,9 +761,7 @@ static struct json_object *get_signals_value(const std::string& name)
 	ans = json_object_new_array();
 	for(const auto& sig: sf.signals)
 	{
-		struct json_object *jobj = json_object_new_object();
-		json_object_object_add(jobj, "event", json_object_new_string(sig->get_name().c_str()));
-		json_object_object_add(jobj, "value", json_object_new_double(sig->get_last_value()));
+		struct json_object *jobj = sig->afb_verb_get_last_value();
 		json_object_array_add(ans, jobj);
 	}
 
@@ -794,13 +791,10 @@ static struct json_object *get_id_value(const uint32_t& id)
 		json_object_object_add(ans, "signals", jsignals);
 		for(const auto& sig: sf.signals)
 		{
-			struct json_object *jobj = json_object_new_object();
-			json_object_object_add(jobj, "name", json_object_new_string(sig->get_name().c_str()));
-			json_object_object_add(jobj, "value", json_object_new_double(sig->get_last_value()));
+			struct json_object *jobj = sig->afb_verb_get_last_value();
 			json_object_array_add(jsignals, jobj);
 		}
-
-			json_object_array_add(ret, ans);
+		json_object_array_add(ret, ans);
 	}
 
 	return ret;
@@ -817,7 +811,7 @@ void get(afb_req_t request)
 
 	// Process about Raw CAN message on CAN bus directly
 	if (args != nullptr &&
-		(json_object_object_get_ex(args, "event", &json_name) && json_object_is_type(json_name, json_type_string) ))
+		(json_object_object_get_ex(args, "event", &json_name) &&json_object_is_type(json_name, json_type_string) ))
 	{
 		ans = get_signals_value(json_object_get_string(json_name));
 		if (!ans)
