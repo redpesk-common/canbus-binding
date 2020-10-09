@@ -1,5 +1,5 @@
 {   "name": "AGL Virtual Car",
-	"version": "1.0",
+	"version": "2.0",
 	"extra_sources": ["signals-header-template.cpp"],
 	"initializers": [],
 	"loopers": [],
