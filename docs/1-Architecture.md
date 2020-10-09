@@ -1,12 +1,12 @@
-# AGL CAN binding architecture proposal
+# redpesk@ CAN binding architecture proposal
 
 It's meant to generate, from a JSON file describing CAN messages and diagnostic message \(OBD2 for now\), a cpp file to integrate with the project.
 
-Once generated binding is built with it and result will be a widget file to install on an AGL target system.
+Once generated binding is built with it and result will be a widget file to install on an redpesk@ target system.
 
-![From OpenXC firmware to AGL binding](images/OpenXC_to_AGL.png)
+![From OpenXC firmware to redpesk@ binding](images/OpenXC_to_AGL.png)
 
-Bringing CAN management into the AGL project is more than allowing decode and print CAN messages, lot of tools can do that (Wireshark, CAN-utils, ...).
+Bringing CAN management into the redpesk@ project is more than allowing decode and print CAN messages, lot of tools can do that (Wireshark, CAN-utils, ...).
 
 The goal is to provide a common API and abstraction to the CAN bus then you can bring some more high level functionalities to the system.
 
@@ -22,4 +22,4 @@ It will provides valuable access to the CAN bus by aggregate signals or providin
 
 ![Communication between CAN bindings and third applications](images/CAN_bindings_communication.png)
 
-Last but not least, the low level binding can be shipped as binary only using OpenXC inspired [AGL low level CAN binding Generator](https://gerrit.automotivelinux.org/gerrit/gitweb?p=src/low-level-can-generator.git;a=summary).
+Last but not least, the low level binding can be shipped as binary only using OpenXC inspired [redpesk@ low level CAN binding Generator](https://gerrit.automotivelinux.org/gerrit/gitweb?p=src/low-level-can-generator.git;a=summary).

@@ -1,4 +1,4 @@
-# Configure the AGL system
+# Configure the system
 
 ## Virtual CAN device
 
@@ -11,8 +11,7 @@ ip link add vcan0 type vcan
 ip link set vcan0 up
 ```
 
-You also can named your linux CAN device like you want and if you need name it
-`can0` :
+You can also call your linux CAN device as you like, for example if you need to name it `can0` :
 
 ```bash
 modprobe vcan
@@ -22,13 +21,12 @@ ip link set can0 up
 
 ## CAN device using the USB CAN adapter
 
-Using real connection to CAN bus of your car using the USB CAN adapter
-connected to the OBD2 connector.
+Use the real connection to CAN bus of your device using an USB CAN adapter.
 
-Once connected, launch `dmesg` command and search which device to use:
+Once connected, launch dmesg command and search which device to use:
 
 ```bash
-dmesg
+$ dmesg
 [...]
 [  131.871441] usb 1-3: new full-speed USB device number 4 using ohci-pci
 [  161.860504] can: controller area network core (rev 20120528 abi 9)
@@ -46,12 +44,12 @@ dmesg
 Here device is named `can0`.
 
 This instruction assuming a speed of 500000kbps for your CAN bus, you can try
-others supported bitrate like 125000, 250000 if 500000 doesn't work:
+others supported bitrate like 125000, 250000 if 500000 doesn’t work:
 
 ```bash
-ip link set can0 type can bitrate 500000
-ip link set can0 up
-ip link show can0
+$ ip link set can0 type can bitrate 500000
+$ ip link set can0 up
+$ ip link show can0
   can0: <NOARP, UP, LOWER_UP, ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
     link/can
     can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
@@ -61,29 +59,31 @@ ip link show can0
     clock 16000000
 ```
 
-On a Rcar Gen3 board, you'll have your CAN device as `can1` because `can0`
-already exists as an embedded device.
+On a Rcar Gen3 board for example, you’ll have your CAN device as can1 because `can0` already
+exists as an embedded device.
 
 The instructions will be the same:
 
 ```bash
-ip link set can1 type can bitrate 500000
-ip link set can1 up
-ip link show can1
+$ ip link set can1 type can bitrate 500000
+$ ip link set can1 up
+$ ip link show can1
   can0: <NOARP, UP, LOWER_UP, ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
     link/can
     can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
     bitrate 500000 sample-point 0.875
     tq 125 prop-seg 6 phase-seg1 7 phase-seg2 2 sjw 1
     sja1000: tseg1 1..16 tseg2 1..8 sjw 1..4 brp 1..64 brp-inc 1
-    clock 16000000
+    clock 1600000
 ```
+
 
 ## Rename an existing CAN device
 
-You can rename an existing CAN device using following command and doing so move
-an existing `can0` device to anything else and then use another device as `can0`
-. For a Rcar Gen3 board do the following by example:
+You can rename an existing CAN device using following command and thus move
+an existing `can0` device to anything else. You will then be able to use 
+another device as `can0`. For example, using a Rcar Gen3 board,
+do the following :
 
 ```bash
 sudo ip link set can0 down
@@ -91,54 +91,97 @@ sudo ip link set can0 name bsp-can0
 sudo ip link set bsp-can0 up
 ```
 
-Then connect your USB CAN device that will be named `can0` by default.
+Then connect your USB CAN device which will be named `can0` by default.
 
 # Configure the binding
 
-The binding reads system configuration file _/etc/dev-mapping.conf_ at start to
+The binding reads system configuration file 
+_/usr/local/rp-can-low-level/etc/control-rp-can-low-level.json_ at start to
 map logical name from signals described in JSON file to linux devices name
 initialized by the system.
 
-Edit file _/etc/dev-mapping.conf_ and add mapping in section `CANbus-mapping`.
+Edit file _control-rp-can-low-level.json_ and add mapping in section `config`.
 
 Default binding configuration use a CAN bus named `hs` so you need to map it to
 the real one, here are some examples:
 
 * Using virtual CAN device as described in the previous chapter:
 
-```ini
-[CANbus-mapping]
-hs="vcan0"
-ls="vcan1"
+```json
+"config": {
+  "dev-mapping": {
+			"hs": "vcan0",
+			"ls": "vcan1"
+    }
+}
 ```
 
 * Using real CAN device, this example assume CAN bus traffic will be on can0.
 
-```ini
-[CANbus-mapping]
-hs="can0"
-ls="can1"
+```json
+"config": {
+  "dev-mapping": {
+			"hs": "can0",
+			"ls": "can1"
+    }
+}
 ```
 
 * On a Rcar Gen3 board there is an embedded CAN device so `can0` already exists. So you might want to use your USB CAN adapter plugged to the OBD2 connector, in this case use `can1`:
 
-```ini
-[CANbus-mapping]
-hs="can1"
+```json
+"config": {
+  "dev-mapping": {
+			"hs": "can1"
+    }
+}
 ```
 
 * You can use this configuration for j1939:
 
-```ini
-[CANbus-mapping]
-hs="can0"
-ls="can1"
-j1939="can2"
+```json
+"config": {
+  "dev-mapping": {
+			"hs": "can0",
+      "ls": "can1",
+      "j1939": "can0"
+    }
+}
+```
+
+The _control-rp-can-low-level.json_ file should have this structure:
+
+```json
+{
+	"$schema": "",
+	"metadata": {
+		"uid": "Low Can",
+		"version": "2.0",
+		"api": "low-can",
+		"info": "Low can Configuration"
+	},
+	"config": {
+		"active_message_set": 0,
+		"dev-mapping": {
+			"hs": "can0",
+			"ls": "can0",
+			"j1939": "can0"
+		},
+		"diagnostic_bus": "hs"
+	},
+	"plugins": [
+		{
+			"uid": "generated-plugin",
+			"info": "custom generated plugin",
+			"libs": "generated-plugin.ctlso"
+		}
+	]
+}
 ```
 
 > **CAUTION VERY IMPORTANT:** Make sure the CAN bus\(es\) you specify in your
 > configuration file match those specified in your generated source file with
-> the `CAN-config-generator`.
+> the `can-config-generator`.
 
 
 
@@ -378,7 +421,7 @@ which controls usage of verb **write**.
 ## Using CAN utils to monitor CAN activity
 
 You can watch CAN traffic and send custom CAN messages using can-utils
-preinstalled on AGL target.
+preinstalled on redpesk@ targets.
 
 To watch watch going on a CAN bus use:
 
