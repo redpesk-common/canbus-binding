@@ -500,9 +500,7 @@ void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, struct b
 	bcm_msg.msg_head.nframes++;
 }
 
-/// @brief Take an existing bcm_msg struct and add a can_frame.
-/// Currently only 1 uniq can_frame can be added, it's not possible to build
-/// a multiplexed message with several can_frame.
+/// @brief Take an existing bcm_msg struct and remove the latest can_frame.
 void low_can_subscription_t::remove_last_bcm_frame(struct bcm_msg& bcm_msg)
 {
 	struct canfd_frame cf;
