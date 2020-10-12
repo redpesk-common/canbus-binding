@@ -34,7 +34,7 @@ sudo make install
 
 # Write your json mapping file <p>
 
-In this json will be defined all the messages you will recieve from your
+In this json file will be defined all the messages you will recieve from your
 connected device.
 
 The generator uses OpenXC.[Here is the original documentation.](https://github.com/openxc/vi-firmware/blob/master/docs/config/reference.rst)
@@ -79,9 +79,11 @@ or 29 bits long.
 * *`is_j1939`* <p> Either True or False. Determines if you devices uses the
 j1939 protocol.
 
-* *`byte_frame_is_big_endian`* <p> Either True or False.
+* *`byte_frame_is_big_endian`* <p> Either True or False. Determines if the
+whole frame will be read as a big endian or not.
 
-* *`bit_position_reversed`* <p> Either True or False.
+* *`bit_position_reversed`* <p> Either True or False. Determines if index 0 of a byte starts at 0 or 0+size-1.
+<img src="images/example_reversed.png" width="66%">
 
 * *`signals`* <p> A list of CAN signal objects (described in the 
 [signal](#signal) section) that are in this message, with the name of the

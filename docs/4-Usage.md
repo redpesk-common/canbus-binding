@@ -41,10 +41,11 @@ $ dmesg
 [ 1872.809356] usbcore: registered new interface driver usb_8dev
 ```
 
-Here device is named `can0`.
+Here the device is named `can0`.
 
-This instruction assuming a speed of 500000kbps for your CAN bus, you can try
-others supported bitrate like 125000, 250000 if 500000 doesn’t work:
+For this instruction, we are assuming a speed of 500000kbps for your CAN bus,
+you can try others supported bitrate like 125000,
+250000 if 500000 doesn’t work:
 
 ```bash
 $ ip link set can0 type can bitrate 500000
@@ -218,22 +219,14 @@ example, it will use port **1234** and left empty security token for testing
 purpose:
 
 ```bash
-afb-daemon --binding=/var/lib/afm/applications/low-can-service/4.0/lib/afb-low-can.so --rootdir=/var/lib/afm/applications/low-can-service/4.0/ --port=1234 --token=1
-NOTICE: binding [/usr/lib/afb/afb-dbus-binding.so] calling registering function afbBindingV1Register
-NOTICE: binding /usr/lib/afb/afb-dbus-binding.so loaded with API prefix dbus
-NOTICE: binding [/usr/lib/afb/authLogin.so] calling registering function afbBindingV1Register
-NOTICE: binding /usr/lib/afb/authLogin.so loaded with API prefix auth
-NOTICE: binding [/var/lib/afm/applications/low-can-service/4.0/libs//low-can-binding.so] calling registering function afbBindingV1Register
-NOTICE: binding /var/lib/afm/applications/low-can-service/4.0/libs//low-can-binding.so loaded with API prefix low-can
-NOTICE: Waiting port=1234 rootdir=/var/lib/afm/applications/low-can-service/4.0/
-NOTICE: Browser URL= http:/*localhost:1234
+afb-daemon --name=afbd-rp-low-can-level --workdir=/usr/local/rp-can-low-level --binding=lib/afb-low-can-binding.so --port=1234 --token=1 --tracereq=common -vvv
 ```
 
 On another terminal, connect to the binding using previously installed
 **AFB Websocket CLI** tool:
 
 ```bash
-afb-client-demo ws://localhost:1234/api?token=1
+afb-client-demo -H ws://localhost:1234/api?token=1
 ```
 
 You will be on an interactive session where you can communicate directly with
@@ -411,7 +404,7 @@ low-can write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id":
 ```
 
 To be able to use write capability, you need to add the permission
- ```urn:AGL:permission::platform:can:write``` to your package configuration
+ ```urn:redpesk:permission::platform:can:write``` to your package configuration
  file that need to write on CAN bus through **low-can** api.
 
 Then in order to write on bus, your app needs to call verb **auth**
