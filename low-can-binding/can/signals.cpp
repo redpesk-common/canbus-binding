@@ -50,6 +50,51 @@ signal_t::signal_t(
 	std::pair<bool, int> multiplex,
 	sign_t sign,
 	int32_t bit_sign_position,
+	std::string unit,
+	struct afb_auth* auth)
+	: parent_{nullptr},
+	 generic_name_{ generic_name }
+	, bit_position_{ bit_position }
+	, bit_size_{ bit_size }
+	, factor_{ factor }
+	, offset_{ offset }
+	, min_value_{min_value}
+	, max_value_{max_value}
+	, frequency_{frequency}
+	, send_same_{send_same}
+	, force_send_changed_{force_send_changed}
+	, states_{states}
+	, writable_{writable}
+	, decoder_{decoder}
+	, encoder_{encoder}
+	, received_{received}
+	, last_value_{.0f}
+	, multiplex_{multiplex}
+	, sign_{sign}
+	, bit_sign_position_{bit_sign_position}
+	, unit_{unit}
+	, auth_{auth}
+{}
+
+signal_t::signal_t(
+	std::string generic_name,
+	uint32_t bit_position,
+	uint32_t bit_size,
+	float factor,
+	float offset,
+	float min_value,
+	float max_value,
+	frequency_clock_t frequency,
+	bool send_same,
+	bool force_send_changed,
+	std::map<uint8_t, std::string> states,
+	bool writable,
+	signal_decoder decoder,
+	signal_encoder encoder,
+	bool received,
+	std::pair<bool, int> multiplex,
+	sign_t sign,
+	int32_t bit_sign_position,
 	std::string unit)
 	: parent_{nullptr},
 	 generic_name_{ generic_name }
@@ -334,4 +379,9 @@ int32_t signal_t::get_bit_sign_position() const
 const std::string signal_t::get_unit() const
 {
 	return unit_;
+}
+
+const struct afb_auth* signal_t::get_auth() const
+{
+	return auth_;
 }

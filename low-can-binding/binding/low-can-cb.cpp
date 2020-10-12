@@ -957,6 +957,7 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 	std::string set_prefix = "w_";
 	std::string verbname;
 	std::string signame;
+	const struct afb_auth *auth;
 	void *s = nullptr;
 	bool writable = false;
 
@@ -967,6 +968,7 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 		s = (void *) sig.get();
 		get_info.append("signal: ");
 		set_info.append("signal: ");
+		auth = sig->get_auth();
 	}
 	else if(diag_sig)
 	{
@@ -974,6 +976,7 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 		s = (void *) diag_sig.get();
 		get_info.append("diagnostic signal: ");
 		set_info.append("diagnostic signal: ");
+		auth = nullptr;
 	}
 	else
 	{
@@ -987,12 +990,12 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 	set_info.append(signame);
 
 	if(afb_api_add_verb(api, get_prefix.c_str(), get_info.c_str(),
-			read_signal_last_value,(void*) s, 0, 0,0))
+			read_signal_last_value,(void*) s, auth, 0,0))
 		return -1;
 
 	if(writable)
 		if(afb_api_add_verb(api, set_prefix.c_str(), set_info.c_str(),
-				write_signal_last_value, (void*) s, 0, 0,0))
+				write_signal_last_value, (void*) s, auth, 0,0))
 			return -1;
 	return 0;
 }

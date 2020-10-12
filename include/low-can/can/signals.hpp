@@ -110,8 +110,30 @@ private:
 	sign_t sign_; /* !< sign_ - if the data is signed it indicates the encode */
 	int32_t bit_sign_position_; /*!< bit_sign_position_ - The bit that indicates the sign of the signal in its CAN message*/
 	std::string unit_; /* !< unit_ - The unit of the data */
+	struct afb_auth *auth_; /* !< auth_ - An AFB authentication structure if you need to protect the signal from the API.*/
 
 public:
+	signal_t(
+		std::string generic_name,
+		uint32_t bit_position,
+		uint32_t bit_size,
+		float factor,
+		float offset,
+		float min_value,
+		float max_value,
+		frequency_clock_t frequency,
+		bool send_same,
+		bool force_send_changed,
+		std::map<uint8_t, std::string> states,
+		bool writable,
+		signal_decoder decoder,
+		signal_encoder encoder,
+		bool received,
+		std::pair<bool, int> multiplex,
+		sign_t sign,
+		int32_t bit_sign_position,
+		std::string unit,
+		struct afb_auth *auth);
 
 	signal_t(
 		std::string generic_name,
@@ -177,6 +199,7 @@ public:
 	sign_t get_sign() const;
 	int32_t get_bit_sign_position() const;
 	const std::string get_unit() const;
+	const struct afb_auth* get_auth() const;
 
 	void set_parent(std::shared_ptr<message_definition_t> parent);
 	void set_received(bool r);
