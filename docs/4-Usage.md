@@ -153,8 +153,7 @@ The _control-rp-can-low-level.json_ file should have this structure:
 		"active_message_set": 0,
 		"dev-mapping": {
 			"hs": "can0",
-			"ls": "can0",
-			"j1939": "can0"
+			"ls": "can0"
 		},
 		"diagnostic_bus": "hs"
 	},

@@ -56,8 +56,7 @@ make it look like the example down below. This file should be located in
 		"active_message_set": 0,
 		"dev-mapping": {
 			"hs": "can0",
-			"ls": "can0",
-			"j1939": "can0"
+			"ls": "can0"
 		},
 		"diagnostic_bus": "hs"
 	},

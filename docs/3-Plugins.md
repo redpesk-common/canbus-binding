@@ -307,7 +307,7 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 	"messages": {
 		"60160": {
 			"name": "Iso.Transport.Protocol.Data.Transfer",
-			"bus":"j1939",
+			"bus":"hs",
 			"comment":"ISO Transport Protocol, Data Transfer",
 			"length": 8,
 			"is_fd": false,
@@ -333,7 +333,7 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 		},
 		"60160#1": {
 			"name": "60160",
-			"bus":"j1939",
+			"bus":"hs",
 			"comment":"Abstract signals for 60160",
 			"length": 8,
 			"is_fd": false,
@@ -395,8 +395,7 @@ make it look like the example down below. This file should be located in
 		"active_message_set": 0,
 		"dev-mapping": {
 			"hs": "can0",
-			"ls": "can0",
-			"j1939": "can0"
+			"ls": "can0"
 		},
 		"diagnostic_bus": "hs"
 	},
