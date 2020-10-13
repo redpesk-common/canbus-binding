@@ -23,7 +23,7 @@ ip link set can0 up
 
 Use the real connection to CAN bus of your device using an USB CAN adapter.
 
-Once connected, launch dmesg command and search which device to use:
+Once connected, launch `dmesg` command and search which device to use:
 
 ```bash
 $ dmesg
@@ -92,7 +92,7 @@ sudo ip link set can0 name bsp-can0
 sudo ip link set bsp-can0 up
 ```
 
-Then connect your USB CAN device which will be named `can0` by default.
+Then connect your USB CAN device which should be named `can0` by default.
 
 # Configure the binding
 
@@ -134,18 +134,6 @@ the real one, here are some examples:
 "config": {
   "dev-mapping": {
 			"hs": "can1"
-    }
-}
-```
-
-* You can use this configuration for j1939:
-
-```json
-"config": {
-  "dev-mapping": {
-			"hs": "can0",
-      "ls": "can1",
-      "j1939": "can0"
     }
 }
 ```
