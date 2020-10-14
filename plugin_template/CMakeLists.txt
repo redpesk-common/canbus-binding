@@ -58,6 +58,15 @@ set(TARGET_NAME generated_plugin)
 	# Define targets
 	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
 
+	# Create dedicated generate targets
+	find_program(ccg can-config-generator REQUIRED)
+	get_target_property(dir ${TARGET_NAME} SOURCE_DIR)
+	add_custom_command( COMMAND ${ccg} -m ${dir}/${TARGET_NAME}.json -o ${TARGET_NAME}.cpp
+						OUTPUT ${TARGET_NAME}.cpp
+					)
+	add_custom_target(generate_${TARGET_NAME})
+	target_sources(${TARGET_NAME} PRIVATE ${TARGET_NAME}.cpp)
+
 	# Alsa Plugin properties
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 		LABELS "PLUGIN"
@@ -66,9 +75,14 @@ set(TARGET_NAME generated_plugin)
 		OUTPUT_NAME ${TARGET_NAME}
 	)
 
-add_custom_target(install_${target}
-COMMAND install -m644 ${bdir}/${pre}${out}${suf} ${CMAKE_INSTALL_PREFIX}/${CAN_LOW_LEVEL_BINDING_NAME}/lib/plugins
-COMMAND
-)
-add_dependencies(install_${target} ${target})
+	get_target_property(pre ${TARGET_NAME} PREFIX)
+	get_target_property(out ${TARGET_NAME} OUTPUT_NAME)
+	get_target_property(suf ${TARGET_NAME} SUFFIX)
+	get_target_property(bdir ${TARGET_NAME} BINARY_DIR)
+
+	add_custom_target(install_${TARGET_NAME}
+	COMMAND install -m644 ${bdir}/${pre}${out}${suf} ${CMAKE_INSTALL_PREFIX}/${CAN_LOW_LEVEL_BINDING_NAME}/lib/plugins
+	COMMAND
+	)
+	add_dependencies(install_${TARGET_NAME} ${TARGET_NAME})
 

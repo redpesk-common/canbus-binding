@@ -359,17 +359,21 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 # Generate your plugin 
 
 To generate your plugin you'll have to use the low-level-can-generator.
-Once you have installed the generator and wrote your json mapping file, execute
-this command: 
+Once you have installed the generator and wrote your json mapping file,
+simply use CMake to do it automatically (see [next section](#build))
+or execute this command: 
 
  ```bash
 can-config-generator -m you-mapping-file.json -o your-plugin-name.cpp
  ```
 
-# Build and install your plugin
+# Build and install your plugin <a name="#build"></a>
+
+To be able to build your plugin, change ```set(TARGET_NAME generated_plugin)``` in
+the CMakeLists.txt with your plugin's name.
 
 At the root of your plugin project (replace "generated-plugin" by the name of
-your plugin).
+your plugin). 
 
 ```bash
 mkdir build && cd build
@@ -377,6 +381,9 @@ cmake ..
 make generated-plugin
 make install_generated-plugin
 ```
+
+The `make generated-plugin` will automatically generate you plugin's sources.
+You can also manually generate it with `make generate_generated-plugin`.
 
 Now activate the plugin in the can-low-level.
 To do so, edit the control-rp-can-low-level.json file to
