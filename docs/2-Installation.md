@@ -1,235 +1,187 @@
 # Prerequisites
 
-* An AGL system installed with latest Daring Dab version with latest Application
-framework version >= 0.6.
+This part is only useful if you plan to install the package from source.
 
-* Make sure you built the AGL generator else you will not be able to generate custom low-level CAN binding.
+If you aren't planing to build it from source, add the redpesk@ repository
+to your package manager.
+Here is the url for redpesk and fedora:
+`download.redpesk.bzh`
 
-It will produce a _application-generated.cpp_ file to paste in the source, _CAN-binder/low-can-binding/binding/_, directory.
+## From source
 
-* Make sure you already set up the AGL SDK using the following [Download or Build Your SDK Installer](../../../getting_started/reference/getting-started/app-workflow-sdk.html). Alternatively, please refer to official guides available on [AGL Developer Site](../../../devguides).
+We advise you to use the [local builder](http://redpesk-doc.lorient.iot/docs/en/master/getting_started/local-builder/local-builder.html) for from source installation. The
+local builder comes with everything setup to build redpesk@ projects.
+Some of the dependecies below will still be needed, like **lua** for example. 
 
-If you need to have the graphic stack inside your SDK, you have to prepare your environment with the **iotbzh**, or **Daring Dab** flavor using _prepare_meta_ tool. To do so, run the following command in your docker image in the step 4 in place of `... [ prepare build environment ] ...`:
+Here is the [local builder documentation](http://redpesk-doc.lorient.iot/docs/en/master/getting_started/local-builder/local-builder.html).
 
-> **NOTE** These commands assume that proprietary graphic drivers for Renesas Porter board are located in _/home/devel/share/proprietary-renesas-rcar_ directory.
+Else install the building tools
+* git
+* cmake
+* make
+* G++, Clang++ or any C++11 compliant compiler
 
-```bash
-prepare_meta -f iotbzh -o /xdt -l /home/devel/mirror -p /home/devel/share/proprietary-renesas-rcar/ -t m3ulcb -e wipeconfig -e rm_work -e cleartemp
-/xdt/build/m3ulcb/agl-init-build-env
-```
+Then the following dependencies:
 
-* (Optionnal) An [USB CAN adapter](https://shop.8devices.com/index.php?route=product/product&path=67&product_id=54) connected to connector through the [right cable](https://www.mouser.fr/ProductDetail/EasySync/OBD-M-DB9-F-ES?qs=pLQRQR43dtrcAQQLCUAIxA%3D%3D) if you want to connect to a real car through the OBD2 connector.
-
-<!-- pagebreak -->
+* json-c 
+* libsystemd >= 222
+* afb-daemon
+* afb-helpers
+* appcontroller
+* lua >= 5.3
 
 # Getting started
 
-## CAN config generator usage
+## Easy installation
 
-### Build requirements
+If you are on redpesk@ or if you have installed the required repositories
+simply install "rp-can-low-level" with you package manager.
 
-* CMake version 3.3 or later
-* G++, Clang++ or any C++11 compliant compiler.
-
-### Compile
-
+Example for redpesk@ distro:
 ```bash
-source /xdt/sdk/environment-setup-aarch64-agl-linux
-export PATH=$PATH:/xdt/sdk/sysroots/x86_64-aglsdk-linux/usr/bin
-export WD=$(pwd)
-git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/agl-service-can-low-level -b Renesas_delivery_Q2
-git clone --recursive https://gerrit.automotivelinux.org/gerrit/apps/low-level-can-generator
-cd ${WD}/low-level-can-generator
-mkdir -p build
-cd build
-cmake -G "Unix Makefiles" ..
-make
+dnf install rp-can-low-level
 ```
-
-### Naming convention
-
-We chose a doted naming convention because it's a well know schema.
-
-It separates and organize names into hierarchy. From the left to right, you describe your names using the more common ancestor at the left then more you go to the right the more it will be accurate.
-
-Let's take an example, here is an example about standard PID name following this convention:
-
-```
-engine.load
-engine.coolant.temperature
-fuel.pressure
-intake.manifold.pressure
-engine.speed
-vehicle.speed
-intake.air.temperature
-mass.airflow
-throttle.position
-running.time
-EGR.error
-fuel.level
-barometric.pressure
-commanded.throttle.position
-ethanol.fuel.percentage
-accelerator.pedal.position
-hybrid.battery-pack.remaining.life
-engine.oil.temperature
-engine.torque
-```
-
-> **NOTE** It's recommended that you follow this naming convention to named your CAN signals.
->
-> There is only character `*` that is forbidden in names because it's used as wildcard for subscription and unsubscription.
->
-> This described in the below chapter.
-
-### Available decoder
-
-You can use some basic decoder provided by default by the binding which are:
-
-* ***decoder_t::decode_noop*** : Default decoder if not specified, return raw value from signal's bitfield.
-* ***decoder_t::decode_boolean*** : Coerces a numerical value to a boolean.
-* ***decoder_t::decode_state*** : Find and return the corresponding string state for a CAN signal's raw integer value.
-
-### Generating JSON from Vector CANoe Database
-
-> **CAUTION** This chapter has not been tested since it haven't necessary automotive tools for that.
-
-If you use CANoe to store your `gold standard` CAN signal definitions, you may be able to use the OpenXC `xml_to_json.py` script to make your JSON for you. First, export the Canoe .dbc file as XML - you can do this with Vector CANdb++. Next, create a JSON file according to the format defined above, but only define:
-
-* CAN messages.
-* Name of CAN signals within messages and their generic_name.
-* Optionnaly name of diagnostic messages and their name.
-
-To install the OpenXC utilities and runs `xml_to_json.py` script:
-
-```bash
-sudo pip install openxc
-cd /usr/local/lib/python2.7/dist-packages/openxc/generator
-```
-
-Assuming the data exported from Vector is in `signals.xml` and your minimal mapping file is `mapping.json`, run the script:
-
-```bash
-python -m openxc.utils ./xml_to_json.py signals.xml mapping.json signals.json
-```
-
-The script scans `mapping.json` to identify the CAN messages and signals that you want to use from the XML file. It pulls the neccessary details of the messages (bit position, bit size, offset, etc) and outputs the resulting subset as JSON into the output file, `signals.json`.
-
-The resulting file together with `mapping.json` will work as input to the code generation script.
-
-### Generate your config file
-
-To generate your config file you just have to run the generator using the `-m` option to specify your JSON file.
-
-```bash
-./can-config-generator -m ../tests/basic.json -o application-generated.cpp
-```
-
-If you omit the `-o` option, then code is generated on the stdout.
-You also can specify a header and a footer file.
-These files must be valid C++ fragment as long as they will be inserted as is.
-Use the `-h` option to display help.
-
-> **CAUTION:** Each `diagnostic_message` must define the same `bus` as the binding will use only one bus.
-
-### Supported OpenXC items
-
-About now, compliance with OpenXC reference is in progress, can-config-generator and CAN\_signaling will implement them soon.
-`initializers`, `loopers`, `commands` and `handlers` nodes are ignored for now.
-
-This generator will follow OpenXC support status of the low level CAN signaling binding.
-
-> **NOTE**: The `buses` item will not be supported by this generator because the binding use another way to declare and configure buses. Please refer to the binding's documentation.
 
 ## Compile and install the binding
 
-### Build requirements
-
-* Kernel >= 4.8
-* CMake version 3.3 or later
-* G++, Clang++ or any C++11 compliant compiler.
-
-### Compile
-
-Clone the binding repository, copy the generated file and updated the git submodules.
-
-Step 1 - Execute the following commands from this repository:
-
 ```bash
-cd ${WD}/agl-service-can-low-level
-cp ${WD}/low-level-can-generator/build/application-generated.cpp ../low-can-binding/plugins
-```
-
-Step 2 - Update the CMakeLists.txt from ${WD}/low-can-binding/plugins.
-
-Add a new project's target
-
-```make
-PROJECT_TARGET_ADD(my_signals)
-	# Define targets
-	ADD_LIBRARY(${TARGET_NAME} MODULE ${TARGET_NAME}.cpp)
-
-	# Alsa Plugin properties
-	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-			LABELS "PLUGIN"
-			PREFIX ""
-			SUFFIX ".ctlso"
-			OUTPUT_NAME ${TARGET_NAME}
-	)
-
-	target_include_directories(${TARGET_NAME}
-	PRIVATE "../low-can-binding")
-
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-	low-can
-	openxc-message-format
-	uds-c
-	isotp-c
-	bitfield-c
-	afb-helpers
-	${link_libraries})
-```
-
-Step 3 - add the plugin in conf.d/project/control-agl-service-can-low-level.json
-
-```json
-"plugins": [
-    {
-        "uid": "default-signals",
-        "info": "default signals",
-        "libs": "default-signals.ctlso"
-    },
-    {
-        "uid": "application-signals",
-        "info": "application signals",
-        "libs": "application-signals.ctlso"
-    }
-]
-```
-
-### Installation
-
-```bash
-cd ${WD}/agl-service-can-low-level
+git clone https://github.com/redpesk-common/rp-can-low-level.git
+cd rp-can-low-level
 mkdir build
 cd build
 cmake ..
+make -j
+sudo make install
+```
+
+# J1939 installation
+
+#### Minimum kernel version : 4.19
+
+## Compilation of kernel j1939
+
+##### Clone linux-can-next repository on kernel.org
+
+```bash
+git clone https://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git/
+```
+
+##### Checkout on j1939 branch
+
+```bash
+git checkout j1939
+```
+
+##### Add the compilation of the j1939
+
+```bash
+make menuconfig
+	- Networking Support
+		- Can bus subsystem support
+			- <M> SAE J1939
+			- [*] 	debug SAE J1939
+```
+
+##### Compile
+
+```bash
 make
-make widget
 ```
 
-To install it manually, you need to copy the _low-can-service.wgt_ file on your target, then from it execute the following commands :
-
-On your host, to copy over the network :
+##### Install
 
 ```bash
-scp low-can-service.wgt root@<target_IP>:~
+make modules_install
+make install
 ```
 
-On the target, assuming _**wgt**_ file is in the root home directory:
+##### Update grub
+
+###### CentOS/RHEL/Oracle/Scientific and Fedora Linux
 
 ```bash
-afm-util install low-can-service.wgt
-{ "added": "low-can-service@4.0" }
+grub2-mkconfig -o /boot/grub2/grub.cfg
+grubby --set-default /boot/vmlinuz-...
+reboot
+```
+
+###### Debian/Ubuntu Linux
+
+```bash
+update-grub
+reboot
+```
+
+##### Check if the installation is correct
+
+```bash
+modprobe can-j1939
+```
+
+If no errors are generated you have successfully install a kernel with j1939 module.
+
+You can have a problem with header file, to check that go in the file /usr/include/linux/can.h
+
+```bash
+vi /usr/include/linux/can.h
+```
+
+If in the struct sockaddr_can you don't see j1939, the header are not upgrade.
+
+So you need to do this manually, go to you're linux-can-next repository and do the following command:
+
+```bash
+cp include/uapi/linux/can.h /usr/include/linux/can.h
+cp include/uapi/linux/can/j1939.h /usr/include/linux/can/
+```
+
+# ISOTP installation
+
+## Compilation and installation of module kernel isotp
+
+##### Clone repository Linux Kernel Module for ISO 15765-2:2016 CAN transport protocol
+
+```bash
+git clone https://github.com/hartkopp/can-isotp.git
+```
+
+##### Move into the new repository
+
+```bash
+cd can-isotp
+```
+
+##### Install packages to build
+
+```bash
+sudo apt-get install build-essential linux-headers-$(uname -r)
+```
+
+##### Compile
+
+```bash
+make
+```
+
+##### Install
+
+```bash
+sudo make modules_install
+```
+
+##### Load module
+
+
+```bash
+modprobe can
+modprobe vcan
+sudo insmod ./net/can/can-isotp.ko
+```
+
+
+## Include headers  files
+
+
+```bash
+sudo cp include/uapi/linux/can/isotp.h /usr/include/linux/can/
 ```

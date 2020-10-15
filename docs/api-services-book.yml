@@ -1,9 +1,9 @@
 type: books
 books:
 -
-    id: agl-service-can-low-level
-    title: AGL Service CAN Low Level
-    description: AGL Service CAN Low Level documentation
+    id: rp-service-can-low-level
+    title: RP Service CAN Low Level
+    description: RP Service CAN Low Level documentation
     keywords:
     author: "IotBzh"
     version: master
