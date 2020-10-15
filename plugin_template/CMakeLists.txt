@@ -64,7 +64,7 @@ set(TARGET_NAME generated_plugin)
 	add_custom_command( COMMAND ${ccg} -m ${dir}/${TARGET_NAME}.json -o ${TARGET_NAME}.cpp
 						OUTPUT ${TARGET_NAME}.cpp
 					)
-	add_custom_target(generate_${TARGET_NAME})
+	add_custom_target(generate_${TARGET_NAME} DEPENDS ${TARGET_NAME}.cpp)
 	target_sources(${TARGET_NAME} PRIVATE ${TARGET_NAME}.cpp)
 
 	# Alsa Plugin properties
