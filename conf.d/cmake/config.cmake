@@ -44,9 +44,19 @@ set(BUILD_TYPE "RELEASE" CACHE STRING "Default Build variant chosen. (Overwritte
 # Need module in kernel
 # --------------
 
-execute_process(COMMAND ls $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/j1939.h RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+#execute_process(COMMAND ls $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/j1939.h RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
 
-if(result OR NOT WITH_FEATURE_J1939)
+find_file(result j1939.h $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/)
+
+if("${WITH_FEATURE_J1939}" STREQUAL "ON")
+	if("${result}" STREQUAL "result-NOTFOUND")
+		message(FATAL_ERROR "ERROR: No $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/j1939.h headers found")
+	endif()
+elseif("${WITH_FEATURE_J1939}" STREQUAL "OFF")
+	set(result result-NOTFOUND)
+endif()
+
+if("${result}" STREQUAL "result-NOTFOUND")
 	message("Feature J1939 disabled")
 	set(WITH_FEATURE_J1939 OFF)
 else()
@@ -62,15 +72,26 @@ endif()
 # Need module in kernel
 # --------------
 
-execute_process(COMMAND ls $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/isotp.h RESULT_VARIABLE result2 OUTPUT_QUIET ERROR_QUIET)
+find_file(result2 isotp.h $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can)
 
-if(result2 OR NOT WITH_FEATURE_ISOTP)
-    message("Feature ISO TP disabled")
-    set(WITH_FEATURE_ISOTP OFF)
+if("${WITH_FEATURE_ISOTP}" STREQUAL "ON")
+	if("${result2}" STREQUAL "result2-NOTFOUND")
+		message(FATAL_ERROR "ERROR: No $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/isotp.h headers found")
+	endif()
+elseif("${WITH_FEATURE_ISOTP}" STREQUAL "OFF")
+	set(result2 result2-NOTFOUND)
+endif()
+
+if("${result2}" STREQUAL "result2-NOTFOUND")
+	message("Feature ISO TP disabled")
+	set(WITH_FEATURE_ISOTP OFF)
 else()
-    message("Feature ISOTP enabled")
-    set(WITH_FEATURE_ISOTP ON)
-    add_definitions(-DUSE_FEATURE_ISOTP)
+	message("Feature ISO TP enabled")
+	set(WITH_FEATURE_ISOTP ON)
+	add_definitions(-DUSE_FEATURE_ISOTP)
+	# Define name for ECU
+	set(J1939_NAME_ECU 0xC0509600227CC7AA)
+	add_definitions(-DJ1939_NAME_ECU=${J1939_NAME_ECU})
 endif()
 
 
