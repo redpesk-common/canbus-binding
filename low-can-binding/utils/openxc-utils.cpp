@@ -383,8 +383,8 @@ const openxc_DynamicField generate_openxc_DynamicField_from_message(std::shared_
 		{
 			if (dynamicField_tmp.has_type)
 			{
-				json_object_object_add(signal_json_tmp, "name", json_object_new_string(sig->get_name().c_str()));
-				jsonify_DynamicField(dynamicField_tmp, signal_json_tmp);
+				json_object_object_add(signal_json_tmp, sig->get_name().c_str(),
+							jsonify_DynamicField(dynamicField_tmp));
 				if (sig != nullptr && sig->get_unit() != "")
 					json_object_object_add(signal_json_tmp, "unit", json_object_new_string(sig->get_unit().c_str()));
 				json_object_array_add(ret.json_value, signal_json_tmp);
@@ -449,18 +449,19 @@ const openxc_SimpleMessage get_simple_message(const openxc_VehicleMessage& v_msg
 ///  a json object.
 /// @param[out] value - pointer to the object to set up.
 ///
-void jsonify_DynamicField(const openxc_DynamicField& field, json_object* value)
+json_object* jsonify_DynamicField(const openxc_DynamicField& field)
 {
 	if(field.has_numeric_value)
-		json_object_object_add(value, "value", json_object_new_double(field.numeric_value));
+		return json_object_new_double(field.numeric_value);
 	else if(field.has_boolean_value)
-		json_object_object_add(value, "value", json_object_new_boolean(field.boolean_value));
+		return json_object_new_boolean(field.boolean_value);
 	else if(field.has_string_value)
-		json_object_object_add(value, "value", json_object_new_string(field.string_value));
+		return json_object_new_string(field.string_value);
 	else if(field.has_bytes_value)
-		json_object_object_add(value, "value", json_object_new_string(converter_t::to_hex(field.bytes_value, field.length_array).c_str()));
+		return json_object_new_string(converter_t::to_hex(field.bytes_value, field.length_array).c_str());
 	else if(field.has_json_value)
-		json_object_object_add(value, "signals", json_object_get(field.json_value));
+		return json_object_get(field.json_value);
+	return nullptr;
 }
 
 ///
@@ -477,8 +478,8 @@ bool jsonify_simple(const openxc_SimpleMessage& s_msg, json_object* json)
 {
 	if(s_msg.has_name)
 	{
-		json_object_object_add(json, "name", json_object_new_string(s_msg.name));
-		jsonify_DynamicField(s_msg.value, json);
+		json_object_object_add(json, s_msg.name,
+					jsonify_DynamicField(s_msg.value));
 		return true;
 	}
 	json_object_object_add(json, "error", json_object_new_string("openxc_SimpleMessage doesn't have name'"));
