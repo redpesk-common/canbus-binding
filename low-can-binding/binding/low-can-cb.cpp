@@ -917,6 +917,7 @@ void list(afb_req_t request)
 /// Generic callback for signal's write verb
 static void write_signal_last_value(afb_req_t request)
 {
+	signal_t* signal = (signal_t*) afb_req_get_vcbdata(request);
 	json_object* args = nullptr;
 	args = afb_req_json(request);
 
@@ -926,8 +927,7 @@ static void write_signal_last_value(afb_req_t request)
 		return;
 	}
 
-	signal_t *signal = (signal_t*) afb_req_get_vcbdata(request);
-	if (signal->afb_verb_write_on_bus(args))
+	if (signal && signal->afb_verb_write_on_bus(args))
 	{
 		afb_req_fail(request, "Error: Writing on bus using argument:", json_object_get_string(args));
 		return;
@@ -939,13 +939,51 @@ static void write_signal_last_value(afb_req_t request)
 /// Generic callback for signal's get verb
 static void read_signal_last_value(afb_req_t request)
 {
-	signal_t *signal = (signal_t*) afb_req_get_vcbdata(request);
-	json_object *jobj = signal->afb_verb_get_last_value();
-
-	if (jobj)
-		afb_req_success(request, jobj, NULL);
+	signal_t* signal = (signal_t*) afb_req_get_vcbdata(request);
+	if(signal)
+	{
+		json_object *jobj = signal->afb_verb_get_last_value();
+		if (jobj)
+			afb_req_success(request, jobj, NULL);
+		else
+			afb_req_fail(request, "Error: No value retrieved. Signal might be never received.", NULL);
+	}
 	else
-		afb_req_fail(request, "Error: No value retrieved. Signal might be never received.", NULL);
+	{
+		afb_req_fail(request, "Error: No or wrong signal to be process.", NULL);
+	}
+}
+
+static void simple_subscribe_unsubscribe_signal(afb_req_t request, bool subscribe)
+{
+	signal_t* signal = (signal_t*) afb_req_get_vcbdata(request);
+	json_object *args = afb_req_json(request);
+
+	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
+	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
+	map_subscription& s = sm.get_subscribed_signals();
+
+	if(signal)
+	{
+		list_ptr_signal_t list_sig {std::make_shared<signal_t>(*signal)};
+		event_filter_t evt_filter = generate_filter(args);
+		if(subscribe_unsubscribe_signals(request, subscribe, list_sig, evt_filter, s))
+			afb_req_success_f(request, nullptr, "Signal %s subscribed.", signal->get_name().c_str());
+		else
+			afb_req_fail_f(request, "Signal %s not subscribed", signal->get_name().c_str());
+		return;
+	}
+	afb_req_fail(request, "Error: No or wrong signal to be processed.", NULL);
+}
+
+static void simple_unsubscribe_signal(afb_req_t request)
+{
+	simple_subscribe_unsubscribe_signal(request, false);
+}
+
+static void simple_subscribe_signal(afb_req_t request)
+{
+	simple_subscribe_unsubscribe_signal(request, true);
 }
 
 static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_ptr<diagnostic_message_t> diag_sig)
@@ -955,28 +993,30 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 	std::string set_info = "Write a new value for ";
 	std::string get_prefix = "r_";
 	std::string set_prefix = "w_";
+	std::string sub_prefix = "sub_";
+	std::string unsub_prefix = "unsub_";
 	std::string verbname;
 	std::string signame;
+	void * s = nullptr;
 	const struct afb_auth *auth;
-	void *s = nullptr;
 	bool writable = false;
 
 	if (sig)
 	{
 		signame = sig->get_name();
 		writable = sig->get_writable();
-		s = (void *) sig.get();
 		get_info.append("signal: ");
 		set_info.append("signal: ");
 		auth = sig->get_auth();
+		s = (void*) sig.get();
 	}
 	else if(diag_sig)
 	{
 		signame = diag_sig->get_name();
-		s = (void *) diag_sig.get();
 		get_info.append("diagnostic signal: ");
 		set_info.append("diagnostic signal: ");
 		auth = nullptr;
+		s = (void*) diag_sig.get();
 	}
 	else
 	{
@@ -986,9 +1026,17 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 	verbname = std::regex_replace(signame, forbidden_char, "_");
 	get_prefix.append(verbname);
 	set_prefix.append(verbname);
+	sub_prefix.append(verbname);
+	unsub_prefix.append(verbname);
 	get_info.append(signame);
 	set_info.append(signame);
 
+	if(afb_api_add_verb(api, sub_prefix.c_str(), "", simple_subscribe_signal,
+			(void*) s, 0, 0, 0))
+		return -1;
+	if(afb_api_add_verb(api, unsub_prefix.c_str(), "", simple_unsubscribe_signal,
+			(void*) s, 0, 0, 0))
+		return -1;
 	if(afb_api_add_verb(api, get_prefix.c_str(), get_info.c_str(),
 			read_signal_last_value,(void*) s, auth, 0,0))
 		return -1;
