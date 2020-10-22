@@ -73,6 +73,9 @@ namespace utils
 		socklen_t addrlen = sizeof(addr);
 		struct ifreq ifr;
 
+		struct timeval tv = {0,0};
+		uint64_t timestamp = 0;
+
 		ssize_t nbytes = ::recvfrom(socket(), &msg, sizeof(msg), 0, (struct sockaddr*)&addr, &addrlen);
 		if(nbytes < 0)
 		{
@@ -89,9 +92,11 @@ namespace utils
 
 		AFB_DEBUG("Data available: %li bytes read. BCM head, opcode: %i, can_id: %i, nframes: %i", frame_size, msg.msg_head.opcode, msg.msg_head.can_id, msg.msg_head.nframes);
 
-		struct timeval tv;
-		ioctl(socket(), SIOCGSTAMP, &tv);
-		uint64_t timestamp = 1000000 * tv.tv_sec + tv.tv_usec;
+		if(ioctl(socket(), SIOCGSTAMP, &tv))
+			AFB_ERROR("Error retrieving the timestamp of the message");
+		else
+			timestamp = 1000000L * tv.tv_sec + tv.tv_usec;
+
 		cm = can_message_t::convert_from_frame(msg.fd_frames[0] , frame_size, timestamp);
 		cm->set_sub_id((int)socket());
 

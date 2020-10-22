@@ -65,6 +65,9 @@ namespace utils
 		socklen_t addrlen = sizeof(addr);
 		struct ifreq ifr;
 
+		struct timeval tv = {0,0};
+		uint64_t timestamp = 0;
+
 		ssize_t nbytes = ::recvfrom(socket(), &frame, sizeof(frame), 0, (struct sockaddr*)&addr, &addrlen);
 		ifr.ifr_ifindex = addr.can_ifindex;
 		ioctl(socket(), SIOCGIFNAME, &ifr);
@@ -73,9 +76,11 @@ namespace utils
 		AFB_DEBUG("read: Found on bus %s:\n id: %X, length: %X, data %02X%02X%02X%02X%02X%02X%02X%02X", ifr.ifr_name, frame.can_id, frame.len,
 			frame.data[0], frame.data[1], frame.data[2], frame.data[3], frame.data[4], frame.data[5], frame.data[6], frame.data[7]);
 
-		struct timeval tv;
-		ioctl(socket(), SIOCGSTAMP, &tv);
-		uint64_t timestamp = 1000000 * tv.tv_sec + tv.tv_usec;
+		if(ioctl(socket(), SIOCGSTAMP, &tv))
+			AFB_ERROR("Error retrieving the timestamp of the message");
+		else
+			timestamp = 1000000L * tv.tv_sec + tv.tv_usec;
+
 		cm = ::can_message_t::convert_from_frame(frame , nbytes, timestamp);
 
 		return cm;
