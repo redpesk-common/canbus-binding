@@ -787,9 +787,6 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
  */
 int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name)
 {
-	//struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cfd.can_id);
-	//subscription.add_one_bcm_frame(cfd, bcm_msg);
-
 	if(subscription.open_socket(subscription, bus_name, J1939_PROTOCOL) < 0)
 		return -1;
 
@@ -816,9 +813,6 @@ int low_can_subscription_t::j1939_send(low_can_subscription_t &subscription, mes
  */
 int low_can_subscription_t::isotp_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name)
 {
-	//struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cfd.can_id);
-	//subscription.add_one_bcm_frame(cfd, bcm_msg);
-
 	if(subscription.open_socket(subscription, bus_name, ISOTP_PROTOCOL|ISOTP_SEND) < 0)
 		return -1;
 

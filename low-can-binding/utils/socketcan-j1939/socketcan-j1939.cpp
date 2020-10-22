@@ -249,7 +249,6 @@ namespace utils
 		for(int i=0; i<jm.get_data_vector().size(); i++)
 			data[i] = jm.get_data_vector()[i];
 
-		//sockname.can_family = 29;
 		if(socket_ < 0) {
 			AFB_ERROR("SOCKET SHOULD NOT BE CLOSED! %d", socket_);
 			return 0;
