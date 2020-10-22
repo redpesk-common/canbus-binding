@@ -26,6 +26,7 @@ namespace utils
 	socketcan_j1939_addressclaiming_t::socketcan_j1939_addressclaiming_t():
 	socketcan_j1939_t(),
 	table_j1939_address_{{std::make_pair(0, false)}},
+	current_address_{J1939_IDLE_ADDR},
 	signal_stop_{false},
 	claiming_state_{claiming_state::INITIAL}
 	{}
