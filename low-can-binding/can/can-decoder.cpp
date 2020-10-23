@@ -247,6 +247,7 @@ openxc_DynamicField decoder_t::decode_noop(signal_t& signal, std::shared_ptr<mes
 	// Don't send if they is no changes
 	*send = ((signal.get_last_value() == value && !signal.get_send_same()) || !*send) ? false : true;
 	signal.set_last_value(value);
+	signal.set_received(true);
 
 	return decoded_value;
 }
