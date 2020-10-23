@@ -10,7 +10,7 @@ devel version installed.
 
 Else install the "rp-can-low-level-devel" package using your package manager.
 
-## Install the generator <p>
+## Install the generator
 
 To generate your plugins you will need the low-level-can-generator.
 
@@ -32,7 +32,7 @@ sudo make install
 
 # Install the redpesk plugins
 
-# Write your json mapping file <p>
+# Write your json mapping file
 
 In this json file will be defined all the messages you will recieve from your
 connected device.
@@ -43,53 +43,66 @@ You can find a plugin template by installing the
 "rp-can-low-level-plugin-template" package. This package contains a json 
 mapping file, a simple plugin header file and a CMake file for easy build.
 
-## General Options <p>
+## General Options
 
-* *`name`* <p> Set plugin's name. It will be your plugin's id in the binding.
+* *`name`* \
+ Set plugin's name. It will be your plugin's id in the binding.
 It has to be unique.
 
-* *`version`* <p>Set plugin's version. It will define which version of the
+* *`version`* \
+Set plugin's version. It will define which version of the
 decoders will be used. Available versions are v1 and v2, the latest being v2.
 
-* *`extra_sources`* <p> Set sources to be added to the top of the generated
+* *`extra_sources`* \
+ Set sources to be added to the top of the generated
 plugin. It can be your own c++ signal decoders for example.
 
-## Message<p>
+## Message
 
 The *`messages`* key is a object with fields mapping from CAN message IDs 
 to signal definitions. The fields must be hex IDs of CAN messages
 as strings (e.g. 0x90).
 
-* *`name`* <p> The name of the CAN message. Can be used to easily find a 
+* *`name`* \
+ The name of the CAN message. Can be used to easily find a 
 certain message among the others.
 
-* *`bus`* <p> The name of the CAN bus where the messages can be found.
+* *`bus`* \
+ The name of the CAN bus where the messages can be found.
 
-* *`comment`* <p> To give a piece of information about the message. Useful 
+* *`comment`* \
+ To give a piece of information about the message. Useful 
 when reading the code.
 
-* *`length`* <p> Message's length in bytes.
+* *`length`* \
+ Message's length in bytes.
 
-* *`is_fd`* <p> Either True or False. Determines if your device uses CAN FD
+* *`is_fd`* \
+ Either True or False. Determines if your device uses CAN FD
 or not.
 
-* *`is_extended`* <p> Either True or False. Determines if the CAN ID is 11 bits
+* *`is_extended`* \
+ Either True or False. Determines if the CAN ID is 11 bits
 or 29 bits long.
 
-* *`is_j1939`* <p> Either True or False. Determines if you devices uses the
+* *`is_j1939`* \
+ Either True or False. Determines if you devices uses the
 j1939 protocol.
 
-* *`byte_frame_is_big_endian`* <p> Either True or False. Determines if the
+* *`byte_frame_is_big_endian`* \
+ Either True or False. Determines if the
 whole frame will be read as a big endian or not.
 
-* *`bit_position_reversed`* <p> Either True or False. Determines if index 0 of a byte starts at 0 or 0+size-1.
+* *`bit_position_reversed`*\
+ Either True or False. Determines if index 0 of a byte starts at 0 or 0+size-1.
 <img src="images/example_reversed.png" width="66%">
 
-* *`signals`* <p> A list of CAN signal objects (described in the 
+* *`signals`*\
+A list of CAN signal objects (described in the 
 [signal](#signal) section) that are in this message, with the name of the
 signal as the key.
 
-* *`max_frequency`* <p>
+* *`max_frequency`* \
 If sending raw CAN messages to the output interfaces, this controls the maximum
 frequency (in Hz) that the message will be process and let through. The default
 value (0) means that all messages will be processed, and there is no limit
@@ -97,7 +110,7 @@ imposed by the firmware. If you want to make sure you don't miss a change in
 value even when rate limiting, see the force_send_changed attribute. Defaults
 to 0 (no limit).
 
-* *`max_signal_frequency`* <p>
+* *`max_signal_frequency`* \
 Setting the max signal frequency at the message level will cascade down to all
 of the signals within the message (unless overridden). The default value (0)
 means that all signals will be processed, and there is no limit imposed by the
@@ -106,66 +119,66 @@ more information. If you want to make sure you don't miss a change in value
 even when rate limiting, see the force_send_changed_signals attribute. Defaults
 to 0 (no limit).
 
-* *`force_send_changed`* <p>
+* *`force_send_changed`* \
 Meant to be used in conjunction with max_frequency, if this is true a raw CAN
 message will be sent regardless of the given frequency if the value has changed
 (when using raw CAN passthrough). Defaults to true.
 
-* *`force_send_changed_signals`* <p>
+* *`force_send_changed_signals`* \
 Setting this value on a message will cascade down to all of the signals within
 the message (unless overridden). See the force_send_changed flag documentation
 for the signal mapping for more information. Defaults to false.
 
-## Signal <a name="#signal"></a> <p>
+## Signal
 
 The attributes of a signal object within a message are:
 
-* *`generic_name`* <p>
+* *`generic_name`* \
 The name of the associated generic signal name (from the OpenXC specification)
 that this should be translated to. Optional - if not specified, the signal is
 read and stored in memory, but not sent to the output bus. This is handy for
 combining the value of multiple signals into a composite measurement such as
 steering wheel angle with its sign.
 
-* *`bit_position`* <p>
+* *`bit_position`* \
 The starting bit position of this signal within the message.
 
-* *`bit_size`* <p>
+* *`bit_size`* \
 The width in bits of the signal.
 
-* *`factor (optional)`* <p>
+* *`factor (optional)`* \
 The signal value is multiplied by this if set.
 
-* *`offset (optional)`* <p>
+* *`offset (optional)`* \
 This is added to the signal value if set.
 
-* *`min_value (optional)`* <p>
+* *`min_value (optional)`* \
 The minimum value for the processed signal.
 
-* *`max_value (optional)`* <p>
+* *`max_value (optional)`* \
 The maximum value for the processed signal.
 
-* *`send_same (optional)`* <p>
+* *`send_same (optional)`* \
 If true, will re-send even if the value hasn't changed.
 
-* *`force_send_changed (optional)`* <p>
+* *`force_send_changed (optional)`* \
 If true, regardless of the frequency, it will send the value if it has changed.
 
-* *`sign (optional)`* <p>
+* *`sign (optional)`* \
 If the data is signed it indicates the encode.
 
-* *`bit_sign_position (optional)`* <p>
+* *`bit_sign_position (optional)`* \
 The bit that indicates the sign of the signal in its CAN message.
 
-* *`unit (optional)`* <p>
+* *`unit (optional)`* \
 The unit of the data.
 
-* *`decoder (optional)`* <p>
+* *`decoder (optional)`* \
 The name of a function that will be compiled with the firmware and should be
 applied to the signal's value after the normal translation. See the
-[Signal Decoder](#SignalDecoder) section for details.
+[Signal Decoder](#signal) section for details.
 
-* *`ignore (optional)`* <p>
+* *`ignore (optional)`* \
 Setting this to true on a signal will silence output of the signal. The VI
 will not monitor the signal nor store any of its values. This is useful if
 you are using a custom decoder for an entire message, want to silence the
@@ -173,7 +186,7 @@ normal output of the signals it handles. If you need to use the previously
 stored values of any of the signals, you can use the ignoreDecoder as the
 decoder for the signal. Defaults to false.
 
-* *`enabled (optional)`* <p>
+* *`enabled (optional)`* \
 Enable or disable all processing of a CAN signal. By default, a signal is
 enabled; if this flag is false, the signal will be left out of the generated
 source code. Defaults to true.
@@ -194,14 +207,14 @@ it in the firmware and handle it during the normal message processing pipeline,
 but just silence its output. This is useful if you need to track the last known
 value for this signal for a calculation in a custom decoder.
 
-* *`states`* <p>
+* *`states`* \
 This is a mapping between the desired descriptive states (e.g. off) and the
 corresponding numerical values from the CAN message (usually an integer). The
 raw values are specified as a list to accommodate multiple raw states being
 coalesced into a single final state (e.g. key off and key removed both mapping
 to just "off").
 
-* *`max_frequency (optional)`* <p>
+* *`max_frequency (optional)`* \
 Some CAN signals are sent at a very high frequency, likely more often than will
 ever be useful to an application. This attribute sets the maximum frequency (Hz)
 that the signal will be processed and let through. The default value (0) means
@@ -212,25 +225,25 @@ want to combine this attribute with send_same or else you risk missing a status
 change message.
 Defauls to 0 (no limit).
 
-* *`send_same (optional)`* <p>
+* *`send_same (optional)`* \
 By default, all signals are translated every time they are received from the
 CAN bus. By setting this to false, you can force a signal to be sent only if
 the value has actually changed. This works best with boolean and state based
 signals. Defaults to true.
 
-* *`force_send_changed (optional)`* <p>
+* *`force_send_changed (optional)`* \
 Meant to be used in conjunction with max_frequency, if this is true a signal
 will be sent regardless of the given frequency if the value has changed. This
 is useful for state-based and boolean states, where the state change is the
 most important thing and you don't want that message to be dropped. Defaults
 to false.
 
-* *`writable (optional)`* <p>
+* *`writable (optional)`* \
 Set this attribute to true to allow this signal to be written back to the CAN
 bus by an application. By default, the value will be interpreted as a floating
 point number. Defaults to false.
 
-* *`encoder (optional)`* <p>
+* *`encoder (optional)`* \
 You can specify a custom function here to encode the value for a CAN messages.
 
 ## Diagnostic Messages
@@ -239,24 +252,24 @@ The *`diagnostic_messages`* key is an array of objects describing a recurring di
 
 The attributes of each diagnostic message object are:
 
-* *`bus`* <p>
+* *`bus`* \
 The name of one of the previously defined CAN buses where this message should be requested.
-* *`id`* <p>
+* *`id`* \
 the arbitration ID for the request.
-* *`mode`* <p>
+* *`mode`* \
 The diagnostic request mode, e.g. Mode 1 for powertrain diagnostic requests.
-* *`frequency`* <p>
+* *`frequency`* \
 The frequency in Hz to request this diagnostic message. The maximum allowed frequency is 10Hz.
-* *`pid (optional)`* <p>
+* *`pid (optional)`* \
 If the mode uses PIDs, the pid to request.
-* *`name (optional)`* <p>
+* *`name (optional)`* \
 A human readable, string name for this request. If provided, the response will have a name field (much like a normal translated message) with this value in place of bus, id, mode and pid.
-* *`decoder (optional)`* <p>
+* *`decoder (optional)`* \
 When using a name, you can also specify a custom decoder function to parse the payload. This field is the name of a function (that matches the DiagnosticResponseDecoder function prototype). When a decoder is specified, the decoded value will be returned in the value field in place of payload.
-* *`callback (optional)`* <p>
+* *`callback (optional)`* \
 This field is the name of a function (that matches the DiagnosticResponseCallback function prototype) that should be called every time a response is received to this request.
 
-## Signal Decoder <a name="#SignalDecoder"></a><p>
+## Signal Decoder
 
 The default decoder for each signal is a simple passthrough, translating the
 signal's value from engineering units to something more usable (using the
@@ -298,7 +311,7 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 }
 ```
 
-## Json Example <p>
+## Json Example
 
 ```json
 {	"name": "NMEA2000",
@@ -360,14 +373,14 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 
 To generate your plugin you'll have to use the low-level-can-generator.
 Once you have installed the generator and wrote your json mapping file,
-simply use CMake to do it automatically (see [next section](#build))
+simply use CMake to do it automatically (see [next section](#build-and-install-your-plugin))
 or execute this command: 
 
  ```bash
 can-config-generator -m you-mapping-file.json -o your-plugin-name.cpp
  ```
 
-# Build and install your plugin <a name="#build"></a>
+# Build and install your plugin
 
 To be able to build your plugin, change ```set(TARGET_NAME generated_plugin)``` in
 the CMakeLists.txt with your plugin's name.
