@@ -100,6 +100,29 @@ namespace utils
 
 
 	/**
+	 * @brief Get the default ECU name in hexadecimal normally set in the
+	 * main binding json configuration file, default to 0x1234
+	 *
+	 * @return int
+	 */
+	name_t socketcan_j1939_t::get_j1939_name() const
+	{
+		return j1939_name_;
+	}
+
+	/**
+	 * @brief Set the default ECU name in hexadecimal normally set in the
+	 * main binding json configuration file, default to 0x1234
+	 *
+	 * @param ecu_name string with a hexadecimal prefix '0x' representing
+	 * the j1939 ecu name.
+	 */
+	void socketcan_j1939_t::set_j1939_name(name_t ecu_name)
+	{
+		j1939_name_ = ecu_name;
+	}
+
+	/**
 	 * @brief Define the tx address for the bind function
 	 *
 	 * @param device_name - The device can that you want to bind

@@ -58,6 +58,7 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	json_object *dev_mapping = nullptr;
 	json_object *preinit = nullptr;
 	json_object *postinit = nullptr;
+	const char *ecu = nullptr;
 	const char *diagnotic_bus = nullptr;
 
 	if(! ctrlConfig)
@@ -68,15 +69,22 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	if(! application)
 		return -1;
 
-	if(wrap_json_unpack(json_obj, "{si, s?s, s?o, s?o}",
+	if(wrap_json_unpack(json_obj, "{si, s?s, s?s, s?o, s?o}",
 			      "active_message_set", &active_message_set,
 			      "diagnostic_bus", &diagnotic_bus,
+			      "default_j1939_name", &ecu,
 			      "preinit", &preinit,
 			      "postinit", &postinit))
 		return -1;
 
 	AFB_DEBUG("PREINIT: %s", json_object_get_string(preinit));
 	AFB_DEBUG("POSTINIT: %s", json_object_get_string(postinit));
+
+	if(ecu)
+	{
+		application->set_default_j1939_ecu(ecu);
+		AFB_INFO("Default J1939 ECU name set to %s", ecu);
+	}
 	application->set_preinit(preinit);
 	application->set_postinit(postinit);
 

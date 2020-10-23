@@ -372,6 +372,13 @@ void low_can_subscription_t::set_message_definition(std::shared_ptr<message_defi
 int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, const std::string& bus_name,  uint32_t flags)
 {
 	int ret = -1;
+#ifdef USE_FEATURE_J1939
+	uint64_t j1939_ecu_name = application_t::instance().get_default_j1939_ecu();
+	if(subscription.get_signal() && subscription.get_signal()->get_message()->get_j1939_ecu_name())
+		j1939_ecu_name = subscription.get_signal()->get_message()->get_j1939_ecu_name();
+	if(subscription.get_message_definition() && subscription.get_message_definition()->get_j1939_ecu_name())
+		j1939_ecu_name = subscription.get_message_definition()->get_j1939_ecu_name();
+#endif
 	if(! subscription.socket_)
 	{
 		if(flags & CAN_PROTOCOL)
@@ -421,7 +428,7 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 			pgn_t pgn = J1939_NO_PGN;
 			std::shared_ptr<utils::socketcan_j1939_addressclaiming_t> socket = std::make_shared<utils::socketcan_j1939_addressclaiming_t>();
 			if(!bus_name.empty())
-				ret = socket->open(bus_name, pgn);
+				ret = socket->open(bus_name, j1939_ecu_name, pgn);
 			subscription.socket_ = socket;
 			subscription.index_ = (int)subscription.socket_->socket();
 		}
@@ -432,11 +439,11 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 			if(subscription.signal_)
 			{
 				pgn = subscription.signal_->get_message()->get_id();
-				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(), pgn);
+				ret = socket->open(subscription.signal_->get_message()->get_bus_device_name(), j1939_ecu_name, pgn);
 			}
 			else if(!bus_name.empty())
 			{
-				ret = socket->open(bus_name, pgn);
+				ret = socket->open(bus_name, j1939_ecu_name, pgn);
 			}
 
 			if(ret)

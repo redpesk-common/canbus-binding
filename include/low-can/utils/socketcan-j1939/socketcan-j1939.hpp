@@ -25,10 +25,6 @@
 #include <low-can/utils/socketcan.hpp>
 #include <low-can/can/message/j1939-message.hpp>
 
-#ifndef J1939_NAME_ECU
-#define J1939_NAME_ECU 0x1234
-#endif
-
 #define J1939_CAN_ID CAN_EFF_FLAG
 #define J1939_CAN_MASK (CAN_EFF_FLAG | CAN_RTR_FLAG)
 
@@ -67,13 +63,14 @@ namespace utils
 			virtual int write_j1939_message(pgn_t pgn, std::vector<uint8_t> &data, uint32_t len_data);
 			void define_opt(bool broadcast = true, bool promisc = false);
 
+			name_t get_j1939_name() const;
+			void set_j1939_name(name_t ecu_name);
 		protected:
+			uint64_t j1939_name_ = 0x1234; ///< Default ECU j1939 name using noted using a little endianness ie: 0xC0509600227CC7AA
 			struct ifreq ifr_;
 			static std::mutex mutex_claiming_;
 			static std::condition_variable signal_address_claiming_;
 			void define_tx_address(std::string device_name, name_t name, pgn_t pgn, uint8_t addr);
 			int add_filter(name_t name, pgn_t pgn, uint8_t addr, name_t name_mask, pgn_t pgn_mask, uint8_t addr_mask);
-
-
 	};
 }

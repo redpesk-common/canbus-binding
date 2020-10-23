@@ -25,7 +25,7 @@ namespace utils
 	{
 		public:
 			using socketcan_j1939_t::socketcan_j1939_t;
-			virtual int open(std::string device_name, pgn_t pgn);
+			virtual int open(std::string device_name, name_t ecu_name, pgn_t pgn);
 			virtual int write_message(message_t& obj);
 	};
 }
