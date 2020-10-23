@@ -21,12 +21,12 @@ dnf install rp-low-level-can-generator
 ```
 
 Generate your plugin use CMake to do it automatically 
-(see [next section](#build)) or execute:
+(see [next section](#build-and-install-your-plugin)) or execute:
 ```bash
 can-config-generator -m you_config_file.json -o generated-plugin.cpp
 ```
 
-## Build and Install your plugin <a name="#build"></a>
+## Build and Install your plugin
 
 To be able to build your plugin, change ```set(TARGET_NAME generated_plugin)``` in
 the CMakeLists.txt with your plugin's name.
