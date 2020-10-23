@@ -1,190 +1,3 @@
-# Configure the system
-
-## Virtual CAN device
-
-Connected to the target, here is how to load the virtual CAN device driver and
-set up a new vcan device :
-
-```bash
-modprobe vcan
-ip link add vcan0 type vcan
-ip link set vcan0 up
-```
-
-You can also call your linux CAN device as you like, for example if you need to name it `can0` :
-
-```bash
-modprobe vcan
-ip link add can0 type vcan
-ip link set can0 up
-```
-
-## CAN device using the USB CAN adapter
-
-Use the real connection to CAN bus of your device using an USB CAN adapter.
-
-Once connected, launch `dmesg` command and search which device to use:
-
-```bash
-$ dmesg
-[...]
-[  131.871441] usb 1-3: new full-speed USB device number 4 using ohci-pci
-[  161.860504] can: controller area network core (rev 20120528 abi 9)
-[  161.860522] NET: Registered protocol family 29
-[  177.561620] usb 1-3: USB disconnect, device number 4
-[  191.061423] usb 1-2: USB disconnect, device number 3
-[  196.095325] usb 1-2: new full-speed USB device number 5 using ohci-pci
-[  327.568882] usb 1-2: USB disconnect, device number 5
-[  428.594177] CAN device driver interface
-[ 1872.551543] usb 1-2: new full-speed USB device number 6 using ohci-pci
-[ 1872.809302] usb_8dev 1-2:1.0 can0: firmware: 1.7, hardware: 1.0
-[ 1872.809356] usbcore: registered new interface driver usb_8dev
-```
-
-Here the device is named `can0`.
-
-For this instruction, we are assuming a speed of 500000kbps for your CAN bus,
-you can try others supported bitrate like 125000,
-250000 if 500000 doesn’t work:
-
-```bash
-$ ip link set can0 type can bitrate 500000
-$ ip link set can0 up
-$ ip link show can0
-  can0: <NOARP, UP, LOWER_UP, ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
-    link/can
-    can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
-    bitrate 500000 sample-point 0.875
-    tq 125 prop-seg 6 phase-seg1 7 phase-seg2 2 sjw 1
-    sja1000: tseg1 1..16 tseg2 1..8 sjw 1..4 brp 1..64 brp-inc 1
-    clock 16000000
-```
-
-On a Rcar Gen3 board for example, you’ll have your CAN device as can1 because `can0` already
-exists as an embedded device.
-
-The instructions will be the same:
-
-```bash
-$ ip link set can1 type can bitrate 500000
-$ ip link set can1 up
-$ ip link show can1
-  can0: <NOARP, UP, LOWER_UP, ECHO> mtu 16 qdisc pfifo_fast state UNKNOWN qlen 10
-    link/can
-    can state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
-    bitrate 500000 sample-point 0.875
-    tq 125 prop-seg 6 phase-seg1 7 phase-seg2 2 sjw 1
-    sja1000: tseg1 1..16 tseg2 1..8 sjw 1..4 brp 1..64 brp-inc 1
-    clock 1600000
-```
-
-
-## Rename an existing CAN device
-
-You can rename an existing CAN device using following command and thus move
-an existing `can0` device to anything else. You will then be able to use 
-another device as `can0`. For example, using a Rcar Gen3 board,
-do the following :
-
-```bash
-sudo ip link set can0 down
-sudo ip link set can0 name bsp-can0
-sudo ip link set bsp-can0 up
-```
-
-Then connect your USB CAN device which should be named `can0` by default.
-
-# Configure the binding
-
-The binding reads system configuration file 
-_/usr/local/rp-can-low-level/etc/control-rp-can-low-level.json_ at start to
-map logical name from signals described in JSON file to linux devices name
-initialized by the system.
-
-Edit file _control-rp-can-low-level.json_ and add mapping in section `config`.
-
-Default binding configuration use a CAN bus named `hs` so you need to map it to
-the real one, here are some examples:
-
-* Using virtual CAN device as described in the previous chapter:
-
-```json
-"config": {
-  "dev-mapping": {
-			"hs": "vcan0",
-			"ls": "vcan1"
-    }
-}
-```
-
-* Using real CAN device, this example assume CAN bus traffic will be on can0.
-
-```json
-"config": {
-  "dev-mapping": {
-			"hs": "can0",
-			"ls": "can1"
-    }
-}
-```
-
-* On a Rcar Gen3 board there is an embedded CAN device so `can0` already exists. So you might want to use your USB CAN adapter plugged to the OBD2 connector, in this case use `can1`:
-
-```json
-"config": {
-  "dev-mapping": {
-			"hs": "can1"
-    }
-}
-```
-
-The _control-rp-can-low-level.json_ file should have this structure:
-
-```json
-{
-	"$schema": "",
-	"metadata": {
-		"uid": "Low Can",
-		"version": "2.0",
-		"api": "low-can",
-		"info": "Low can Configuration"
-	},
-	"config": {
-		"active_message_set": 0,
-		"dev-mapping": {
-			"hs": "can0",
-			"ls": "can0"
-		},
-		"diagnostic_bus": "hs"
-	},
-	"plugins": [
-		{
-			"uid": "generated-plugin",
-			"info": "custom generated plugin",
-			"libs": "generated-plugin.ctlso"
-		}
-	]
-}
-```
-
-> **CAUTION VERY IMPORTANT:** Make sure the CAN bus\(es\) you specify in your
-> configuration file match those specified in your generated source file with
-> the `can-config-generator`.
-
-
-
-## Change name of ECU for J1939
-
-To change the name of an ECU to J1939, you must go to the file conf.d/cmake/config.cmake and modify the value at :
-
-
-```cmake
-# Define name for ECU
-set(J1939_NAME_ECU 0x1239)
-```
-
-
-
 # Run it, test it, use it.
 
 You can run the binding using **afm-util** tool, here is the classic way to go :
@@ -239,6 +52,8 @@ Where:
 * Arguments : _**{ "event": "driver.doors.open" }**_
 
 ## Subscription and unsubscription
+
+### Using general purpose verbs
 
 You can ask to subscribe to chosen CAN event with a call to _subscribe_ API
 verb with the CAN messages name as JSON argument.
@@ -315,6 +130,31 @@ low-can unsubscribe { "event" : "doors*" }
 ON-REPLY 3:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
 ```
 
+### Using signal dedicated verbs
+
+If you only need to subscribe a signal you hav the possibility to use its
+name to interact with it. For example, to subscribe to signal
+**messages.doors.driver.open** you can simply call:
+
+```
+low-can sub_messages_doors_driver_open
+ON-EVENT-CREATE: [1:low-can/messages.doors.driver.open*]
+ON-EVENT-SUBSCRIBE 1:sub_messages_doors_driver_open: [1]
+ON-REPLY 1:sub_messages_doors_driver_open: success Signal messages.messages.doors.driver.open* subscribed.
+null
+```
+
+> **CAUTION** Note the **point** characters translated to **underscore**
+> characters.
+
+And to unsubscribe:
+
+```
+low-can unsub_messages_doors_driver_open
+ON-REPLY 1:unsub_messages_doors_driver_open: success Signal messages.messages.doors.driver.open* unsubscribed.
+null
+```
+
 ### Filtering capabilities
 
 It is possible to limits received event notifications into minimum and maximum
@@ -347,6 +187,8 @@ low-can subscribe {"id": 273, "filter": {"tx_id" : 562}}
 
 ## Get last signal value and list of configured signals
 
+### Using general purpose verbs
+
 You can also ask for a particular signal value on one shot using **get** verb, like
 this:
 
@@ -363,6 +205,17 @@ verb **list**
 ```json
 low-can list
 ON-REPLY 2:low-can/list: {"response":["messages.hvac.fan.speed","messages.hvac.temperature.left","messages.hvac.temperature.right","messages.hvac.temperature.average","messages.engine.speed","messages.fuel.level.low","messages.fuel.level","messages.vehicle.average.speed","messages.engine.oil.temp","messages.engine.oil.temp.high","messages.doors.boot.open","messages.doors.front_left.open","messages.doors.front_right.open","messages.doors.rear_left.open","messages.doors.rear_right.open","messages.windows.front_left.open","messages.windows.front_right.open","messages.windows.rear_left.open","messages.windows.rear_right.open","diagnostic_messages.engine.load","diagnostic_messages.engine.coolant.temperature","diagnostic_messages.fuel.pressure","diagnostic_messages.intake.manifold.pressure","diagnostic_messages.engine.speed","diagnostic_messages.vehicle.speed","diagnostic_messages.intake.air.temperature","diagnostic_messages.mass.airflow","diagnostic_messages.throttle.position","diagnostic_messages.running.time","diagnostic_messages.EGR.error","diagnostic_messages.fuel.level","diagnostic_messages.barometric.pressure","diagnostic_messages.ambient.air.temperature","diagnostic_messages.commanded.throttle.position","diagnostic_messages.ethanol.fuel.percentage","diagnostic_messages.accelerator.pedal.position","diagnostic_messages.hybrid.battery-pack.remaining.life","diagnostic_messages.engine.oil.temperature","diagnostic_messages.engine.fuel.rate","diagnostic_messages.engine.torque"],"jtype":"afb-reply","request":{"status":"success","uuid":"32df712a-c7fa-4d58-b70b-06a87f03566b"}}
+```
+
+### Using signal dedicated verbs
+
+The same as when you subscribe or unsubscribe for a signals you can use a
+dedicated verb to get the last value of it:
+
+```
+low-can r_messages_engine_speed
+ON-REPLY 1:low-can/get: {"response":[{"event":"messages.engine.speed","value":0}],"jtype":"afb-reply","request":{"status":"success"}}
+null
 ```
 
 ## Write on CAN buses
@@ -397,6 +250,16 @@ To be able to use write capability, you need to add the permission
 Then in order to write on bus, your app needs to call verb **auth**
 before calling **write**, to raise its **LOA**, Level Of Assurance,
 which controls usage of verb **write**.
+
+### Using signal dedicated verbs
+
+The same as when you subscribe or unsubscribe for a signals you can use a
+dedicated verb to write a new of it **if the signal has been set as writable**:
+
+```
+low-can auth
+low-can w_messages_engine_speed { "signal_name": "engine.speed", "signal_value": 1256}
+```
 
 ## Using CAN utils to monitor CAN activity
 
