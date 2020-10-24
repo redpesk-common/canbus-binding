@@ -110,7 +110,7 @@ private:
 	sign_t sign_; /* !< sign_ - if the data is signed it indicates the encode */
 	int32_t bit_sign_position_; /*!< bit_sign_position_ - The bit that indicates the sign of the signal in its CAN message*/
 	std::string unit_; /* !< unit_ - The unit of the data */
-	struct afb_auth *auth_; /* !< auth_ - An AFB authentication structure if you need to protect the signal from the API.*/
+	struct afb_auth auth_ = {afb_auth_Yes, 0, nullptr}; /* !< auth_ - An AFB authentication structure if you need to protect the signal from the API.*/
 
 public:
 	signal_t(
@@ -133,7 +133,7 @@ public:
 		sign_t sign,
 		int32_t bit_sign_position,
 		std::string unit,
-		struct afb_auth *auth);
+		struct afb_auth auth);
 
 	signal_t(
 		std::string generic_name,

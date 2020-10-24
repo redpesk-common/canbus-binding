@@ -44,6 +44,8 @@
 	#include <linux/can/j1939.h>
 #endif
 
+static struct afb_auth default_auth = {afb_auth_Yes,0,nullptr};
+
 ///*****************************************************************************
 ///
 ///		Controller Definitions and Callbacks
@@ -997,6 +999,7 @@ static void simple_subscribe_signal(afb_req_t request)
 static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_ptr<diagnostic_message_t> diag_sig)
 {
 	static std::regex forbidden_char("[^a-zA-Z_]");
+	const struct afb_auth *auth = &default_auth;
 	std::string get_info = "Get last value of ";
 	std::string set_info = "Write a new value for ";
 	std::string get_prefix = "r_";
@@ -1006,7 +1009,6 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 	std::string verbname;
 	std::string signame;
 	void * s = nullptr;
-	const struct afb_auth *auth;
 	bool writable = false;
 
 	if (sig)
@@ -1023,7 +1025,6 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 		signame = diag_sig->get_name();
 		get_info.append("diagnostic signal: ");
 		set_info.append("diagnostic signal: ");
-		auth = nullptr;
 		s = (void*) diag_sig.get();
 	}
 	else
@@ -1040,10 +1041,10 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 	set_info.append(signame);
 
 	if(afb_api_add_verb(api, sub_prefix.c_str(), "", simple_subscribe_signal,
-			(void*) s, 0, 0, 0))
+			(void*) s, auth, 0, 0))
 		return -1;
 	if(afb_api_add_verb(api, unsub_prefix.c_str(), "", simple_unsubscribe_signal,
-			(void*) s, 0, 0, 0))
+			(void*) s, auth, 0, 0))
 		return -1;
 	if(afb_api_add_verb(api, get_prefix.c_str(), get_info.c_str(),
 			read_signal_last_value,(void*) s, auth, 0,0))

@@ -51,7 +51,7 @@ signal_t::signal_t(
 	sign_t sign,
 	int32_t bit_sign_position,
 	std::string unit,
-	struct afb_auth* auth)
+	struct afb_auth auth)
 	: parent_{nullptr},
 	 generic_name_{ generic_name }
 	, bit_position_{ bit_position }
@@ -118,6 +118,7 @@ signal_t::signal_t(
 	, bit_sign_position_{bit_sign_position}
 	, unit_{unit}
 {}
+
 
 signal_t::signal_t(
 	std::string generic_name,
@@ -383,5 +384,5 @@ const std::string signal_t::get_unit() const
 
 const struct afb_auth* signal_t::get_auth() const
 {
-	return auth_;
+	return &auth_;
 }
