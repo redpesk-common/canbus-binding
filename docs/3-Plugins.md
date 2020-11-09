@@ -42,6 +42,7 @@ The generator uses OpenXC.[Here is the original documentation.](https://github.c
 You can find a plugin template by installing the 
 "rp-can-low-level-plugin-template" package. This package contains a json 
 mapping file, a simple plugin header file and a CMake file for easy build.
+After installation, these files can be found in your /usr/share/doc/ directory.
 
 ## General Options
 
