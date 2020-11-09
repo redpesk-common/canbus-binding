@@ -207,36 +207,6 @@ openxc_DynamicField decoder_t::decode_ascii(signal_t& signal, std::shared_ptr<me
 	return ret;
 }
 
-//edit
-openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
-{
-	float value = decoder_t::parse_signal_bitfield(signal, message);
-	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);
-	openxc_DynamicField decoded_value = build_DynamicField(value);
-
-	// Don't send if they is no changes
-	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
-		*send = false;
-	signal.set_last_value(value);
-
-	return decoded_value;
-}
-
-//edit
-openxc_DynamicField decoder_t::decode_time(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
-{
-	float value = decoder_t::parse_signal_bitfield(signal, message);
-	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);
-	openxc_DynamicField decoded_value = build_DynamicField(value);
-
-	// Don't send if they is no changes
-	*send = (signal.get_last_value() == value && !signal.get_send_same()) || !*send ? false : true;
-	signal.set_last_value(value);
-
-	return decoded_value;
-}
-
-
 /// @brief Wraps a raw CAN signal value in a DynamicField without modification.
 ///
 /// This is an implementation of the Signal type signature, and can be
@@ -254,28 +224,30 @@ openxc_DynamicField decoder_t::decode_time(signal_t& signal, std::shared_ptr<mes
 openxc_DynamicField decoder_t::decode_noop(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
 	float value = decoder_t::parse_signal_bitfield(signal, message);
-
 	float min_value = signal.get_min_value();
 	float max_value = signal.get_max_value();
 
-	if( min_value != std::nanf("") ||  max_value != std::nanf("")  )
+	/* If we have an exact value to match then min = max
+	 * here we compare equality of float values naively because they come
+	 * from the signal object attributes and hasn't been computed at all so
+	 * values are comparable using simple operator (it's a bit lazy ok well)
+	 */
+	if( (! isnanf(max_value) && ! isnanf(min_value) && min_value == max_value && value != min_value) ||
+	    (! isnanf(min_value) && value < min_value) ||
+	    (! isnanf(max_value) && value > max_value)
+	  )
 	{
-		if( (min_value == max_value && value != min_value) ||
-			(min_value != std::nanf("") && value < min_value) || (max_value != std::nanf("") && value > max_value))
-		{
-			AFB_DEBUG("Value doesn't match for signal %s", signal.get_generic_name().c_str());
-			return build_DynamicField_error();
-		}
-
+		AFB_DEBUG("Value doesn't match for signal %s", signal.get_generic_name().c_str());
+		return build_DynamicField_error();
 	}
 
 	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);
 	openxc_DynamicField decoded_value = build_DynamicField(value);
 
 	// Don't send if they is no changes
-	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
-		*send = false;
+	*send = ((signal.get_last_value() == value && !signal.get_send_same()) || !*send) ? false : true;
 	signal.set_last_value(value);
+	signal.set_received(true);
 
 	return decoded_value;
 }

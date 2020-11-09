@@ -13,6 +13,7 @@
 			"ls": "can0"
 		},
 		"diagnostic_bus": "hs",
+		"default_j1939_ecu": "0xC0509600227CC7AA"
 		"preinit": {
 			"uid": "preinit",
 			"action": "plugin://default-signals#preinit"

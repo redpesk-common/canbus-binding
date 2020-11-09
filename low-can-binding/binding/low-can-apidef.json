@@ -83,10 +83,10 @@
 		},
 		"x-permissions": {
 				"monitor": {
-					"permission": "urn:AGL:permission:low-can:public:monitor"
+					"permission": "urn:redpesk:permission:low-can:public:monitor"
 				},
 				"write": {
-					"permission": "urn:AGL:permission::platform:can:write"
+					"permission": "urn:redpesk:permission::platform:can:write"
 				}
 		},
 		"responses": {

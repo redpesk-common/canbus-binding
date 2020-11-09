@@ -28,9 +28,10 @@ namespace utils
 	 * @param pgn The pgn to receive only him
 	 * @return int Return the number of the socket
 	 */
-	int socketcan_j1939_data_t::open(std::string device_name, pgn_t pgn)
+	int socketcan_j1939_data_t::open(std::string device_name, name_t ecu_name, pgn_t pgn)
 	{
-		return socketcan_j1939_t::open(device_name, htole64(J1939_NAME_ECU), pgn, J1939_NO_ADDR);
+		set_j1939_name(ecu_name);
+		return socketcan_j1939_t::open(device_name, htole64(j1939_name_), pgn, J1939_NO_ADDR);
 	}
 
 	/**

@@ -1,13 +1,14 @@
 # redpesk@ CAN binding architecture proposal
 
 Meant to:
+
 * Generate CAN decoding/encoding shared libraries.
 * Load them.
 * Decode/Encode any CAN message.
 
 ![From OpenXC firmware to redpesk@ binding](images/OpenXC_to_Redpesk.png)
 
-Bringing CAN management into the redpesk@ project is more than allowing 
+Bringing CAN management into the redpesk@ project is more than allowing
 decoding and printing CAN messages, lot of tools can do that (Wireshark,
 CAN-utils, ...).
 
@@ -18,7 +19,7 @@ CAN binding will be separated in two parts:
 
 ![CAN low and high level bindings mapping](images/CAN_level_mapping.png)
 
-- High level: Binding from which others applications will connect to.
+* High level: Binding from which others applications will connect to.
 It will provides valuable access to the CAN bus by aggregating signals or
 providing new signals from several origines. For example, a signal exposing
 whether or not a door is open, no matter which one it is. Also, we can imagine
@@ -27,8 +28,7 @@ an application which supervises if there is no one in the car but moving
 will send a single event representing that behavior to the application which in
 turn will send a phone message to.
 
-- Low level: Decode messages that transit and send event through **Application Framework** to the subscribers with human readable message. It provides some basic access to the bus + some basic mathematical, statistical features (last_values, min, max, timestamps, averaging) as well as basic filters to get discerning signals only.
-
+* Low level: Decode messages that transit and send event through **Application Framework** to the subscribers with human readable message. It provides some basic access to the bus + some basic mathematical, statistical features (last_values, min, max, timestamps, averaging) as well as basic filters to get discerning signals only.
 
 ![Communication between CAN bindings and third applications](images/CAN_bindings_communication.png)
 

@@ -56,7 +56,7 @@ private:
 	afb_event_t event_; ///< event_ - application framework event used to push on client
 
 	/// Signal part
-	std::shared_ptr<message_definition_t> message_;
+	std::shared_ptr<message_definition_t> message_; ///< message_ - the CAN message subscribed
 	std::shared_ptr<signal_t> signal_; ///< signal_ - the CAN signal subscribed
 	vect_ptr_diag_msg_t diagnostic_message_; ///< diagnostic_message_ - diagnostic messages meant to receive OBD2
 										 /// responses. Normal diagnostic request and response are not tested for now.

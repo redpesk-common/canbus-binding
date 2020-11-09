@@ -227,6 +227,33 @@ std::shared_ptr<low_can_subscription_t> application_t::get_subscription_address_
 	return subscription_address_claiming_;
 }
 
+/**
+ * @brief Get the default ECU name in hexadecimal normally set in the
+ * main binding json configuration file, default to 0x1234
+ *
+ * @return int
+ */
+uint64_t application_t::get_default_j1939_ecu() const
+{
+	return default_j1939_ecu_;
+}
+
+/**
+ * @brief Set the default ECU name in hexadecimal normally set in the
+ * main binding json configuration file, default to 0x1234
+ *
+ * @param ecu_name string with a hexadecimal prefix '0x' representing
+ * the j1939 ecu name.
+ */
+void application_t::set_default_j1939_ecu(std::string ecu_name)
+{
+	if (! (ecu_name.size() <= 18) || ecu_name.rfind("0x", 0))
+	{
+		AFB_ERROR("Wrong j1939 ECU name set. It must begin with 0x plus a maximum of 16 hexadecimal character. ECU Name set to Ox1234.");
+		return;
+	}
+	default_j1939_ecu_ = stoull(ecu_name, 0, 0);
+}
 
 void application_t::set_subscription_address_claiming(std::shared_ptr<low_can_subscription_t> new_subscription)
 {

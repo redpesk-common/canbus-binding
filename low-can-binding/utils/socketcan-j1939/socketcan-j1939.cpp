@@ -100,6 +100,29 @@ namespace utils
 
 
 	/**
+	 * @brief Get the default ECU name in hexadecimal normally set in the
+	 * main binding json configuration file, default to 0x1234
+	 *
+	 * @return int
+	 */
+	name_t socketcan_j1939_t::get_j1939_name() const
+	{
+		return j1939_name_;
+	}
+
+	/**
+	 * @brief Set the default ECU name in hexadecimal normally set in the
+	 * main binding json configuration file, default to 0x1234
+	 *
+	 * @param ecu_name string with a hexadecimal prefix '0x' representing
+	 * the j1939 ecu name.
+	 */
+	void socketcan_j1939_t::set_j1939_name(name_t ecu_name)
+	{
+		j1939_name_ = ecu_name;
+	}
+
+	/**
 	 * @brief Define the tx address for the bind function
 	 *
 	 * @param device_name - The device can that you want to bind
@@ -178,6 +201,8 @@ namespace utils
 			AFB_ERROR("Bind failed. %s", strerror(errno));
 			close();
 		}
+		int enable = 1;
+		setopt(SOL_SOCKET, SO_TIMESTAMP, &enable, sizeof(enable));
 
 		return socket_;
 	}
@@ -200,21 +225,56 @@ namespace utils
 	 */
 	std::shared_ptr<message_t> socketcan_j1939_t::read_message(int flag)
 	{
-		socklen_t peernamelen;
-		std::shared_ptr<j1939_message_t> jm = std::make_shared<j1939_message_t>();
+		/* Initialize msghdr to retrieve the J1939 metadata and data
+		 * more convenient to get the timestamp saving syscalls */
 		uint8_t data[128] = {0};
+		struct iovec iov;
+		struct msghdr msg;
+		char ctrlmsg[
+			CMSG_SPACE(sizeof(struct timeval))
+			+ CMSG_SPACE(sizeof(uint8_t)) /* dest addr */
+			+ CMSG_SPACE(sizeof(uint64_t)) /* dest name */
+			+ CMSG_SPACE(sizeof(uint8_t)) /* priority */
+		];
+		iov.iov_base = &data;
+		msg.msg_name = &tx_address_;
+		msg.msg_iov = &iov;
+		msg.msg_iovlen = 1;
+		msg.msg_control = &ctrlmsg;
 
-		struct sockaddr_can peername;
-		peernamelen = sizeof(peername);
-		ssize_t nbytes = recvfrom(socket_, &data, sizeof(data), flag, (struct sockaddr *)&peername,  &peernamelen);
+		iov.iov_len = sizeof(data);
+		msg.msg_namelen = sizeof(tx_address_);
+		msg.msg_controllen = sizeof(ctrlmsg);
+		msg.msg_flags = 0;
+
+		/* Working variables to parse the recvmsg return */
+		struct cmsghdr *cmsg;
+		struct timeval tv = {0,0};
+		uint64_t timestamp = 0;
+		long recvflags = 0;
+
+		/* Final container to hold the received message */
+		std::shared_ptr<j1939_message_t> jm = std::make_shared<j1939_message_t>();
+
+		ssize_t nbytes = recvmsg(socket_, &msg, flag);
 
 		if(nbytes < 0)
 			return nullptr;
 
-		struct timeval tv;
-		ioctl(socket(), SIOCGSTAMP, &tv);
-		uint64_t timestamp = 1000000 * tv.tv_sec + tv.tv_usec;
-		jm = j1939_message_t::convert_from_addr(peername, data , nbytes, timestamp);
+		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg))
+		{
+			switch (cmsg->cmsg_level) {
+			case SOL_SOCKET:
+				if (cmsg->cmsg_type == SO_TIMESTAMP) {
+					memcpy(&tv, CMSG_DATA(cmsg), sizeof(tv));
+					recvflags |= 1 << cmsg->cmsg_type;
+				}
+				break;
+			}
+		}
+		timestamp = 1000000L * tv.tv_sec + tv.tv_usec;
+
+		jm = j1939_message_t::convert_from_addr(tx_address_, data , nbytes, timestamp);
 		jm->set_sub_id((int)socket());
 		return jm;
 	}
@@ -249,7 +309,6 @@ namespace utils
 		for(int i=0; i<jm.get_data_vector().size(); i++)
 			data[i] = jm.get_data_vector()[i];
 
-		//sockname.can_family = 29;
 		if(socket_ < 0) {
 			AFB_ERROR("SOCKET SHOULD NOT BE CLOSED! %d", socket_);
 			return 0;

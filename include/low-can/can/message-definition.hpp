@@ -55,6 +55,7 @@ private:
 										///	This is required for the forceSendChanged functionality, as the stack
 										///	needs to compare an incoming CAN message with the previous frame.*/
 	vect_ptr_signal_t signals_; ///< signals_ - Vector holding signal_t object which share the same arbitration ID */
+	uint64_t j1939_ecu_name_; ///< j1939_ecu_name_ - Hold the j1939 addr name of the message
 
 public:
 	//message_definition_t(const message_definition_t& b);
@@ -75,7 +76,15 @@ public:
 				 frequency_clock_t frequency_clock,
 				 bool force_send_changed,
 				 const vect_ptr_signal_t& signals);
-
+	message_definition_t(const std::string bus,
+				 uint32_t id,
+				 std::string name,
+				 uint32_t length,
+				 uint32_t flags,
+				 frequency_clock_t frequency_clock,
+				 bool force_send_changed,
+				 const vect_ptr_signal_t& signals,
+				 uint64_t j1939_ecu_name);
 
 	const std::string get_bus_name() const;
 	const std::string get_bus_device_name() const;
@@ -88,6 +97,7 @@ public:
 	uint32_t get_length() const;
 	uint32_t get_flags() const;
 	bool frame_layout_is_bigendian() const;
+	uint64_t get_j1939_ecu_name() const;
 
 	void set_parent(std::shared_ptr<message_set_t> parent);
 	void set_last_value(std::shared_ptr<message_t>  m);

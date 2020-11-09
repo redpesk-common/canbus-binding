@@ -22,6 +22,7 @@
 #include <map>
 #include <queue>
 #include <mutex>
+#include <regex>
 #include <vector>
 #include <thread>
 #include <algorithm>
@@ -43,6 +44,8 @@
 	#include <linux/can/j1939.h>
 #endif
 
+static struct afb_auth default_auth = {afb_auth_Yes,0,nullptr};
+
 ///*****************************************************************************
 ///
 ///		Controller Definitions and Callbacks
@@ -57,6 +60,7 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	json_object *dev_mapping = nullptr;
 	json_object *preinit = nullptr;
 	json_object *postinit = nullptr;
+	const char *ecu = nullptr;
 	const char *diagnotic_bus = nullptr;
 
 	if(! ctrlConfig)
@@ -67,15 +71,22 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	if(! application)
 		return -1;
 
-	if(wrap_json_unpack(json_obj, "{si, s?s, s?o, s?o}",
+	if(wrap_json_unpack(json_obj, "{si, s?s, s?s, s?o, s?o}",
 			      "active_message_set", &active_message_set,
 			      "diagnostic_bus", &diagnotic_bus,
+			      "default_j1939_name", &ecu,
 			      "preinit", &preinit,
 			      "postinit", &postinit))
 		return -1;
 
 	AFB_DEBUG("PREINIT: %s", json_object_get_string(preinit));
 	AFB_DEBUG("POSTINIT: %s", json_object_get_string(postinit));
+
+	if(ecu)
+	{
+		application->set_default_j1939_ecu(ecu);
+		AFB_INFO("Default J1939 ECU name set to %s", ecu);
+	}
 	application->set_preinit(preinit);
 	application->set_postinit(postinit);
 
@@ -120,7 +131,7 @@ CtlSectionT ctlSections_[] = {
 
 ///*****************************************************************************
 ///
-///		Subscription and unsubscription
+///		Api Verbs implementation
 ///
 ///****************************************************************************/
 
@@ -693,7 +704,6 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 	else
 		flags = CAN_PROTOCOL;
 
-//	cfd = encoder_t::build_frame(sig, value);
 	message_t *message = encoder_t::build_message(sig, value, false, false);
 
 	if(! send_message(message, sig->get_message()->get_bus_device_name(), flags, event_filter, sig) && send)
@@ -761,9 +771,7 @@ static struct json_object *get_signals_value(const std::string& name)
 	ans = json_object_new_array();
 	for(const auto& sig: sf.signals)
 	{
-		struct json_object *jobj = json_object_new_object();
-		json_object_object_add(jobj, "event", json_object_new_string(sig->get_name().c_str()));
-		json_object_object_add(jobj, "value", json_object_new_double(sig->get_last_value()));
+		struct json_object *jobj = sig->afb_verb_get_last_value();
 		json_object_array_add(ans, jobj);
 	}
 
@@ -793,13 +801,10 @@ static struct json_object *get_id_value(const uint32_t& id)
 		json_object_object_add(ans, "signals", jsignals);
 		for(const auto& sig: sf.signals)
 		{
-			struct json_object *jobj = json_object_new_object();
-			json_object_object_add(jobj, "name", json_object_new_string(sig->get_name().c_str()));
-			json_object_object_add(jobj, "value", json_object_new_double(sig->get_last_value()));
+			struct json_object *jobj = sig->afb_verb_get_last_value();
 			json_object_array_add(jsignals, jobj);
 		}
-
-			json_object_array_add(ret, ans);
+		json_object_array_add(ret, ans);
 	}
 
 	return ret;
@@ -816,7 +821,7 @@ void get(afb_req_t request)
 
 	// Process about Raw CAN message on CAN bus directly
 	if (args != nullptr &&
-		(json_object_object_get_ex(args, "event", &json_name) && json_object_is_type(json_name, json_type_string) ))
+		(json_object_object_get_ex(args, "event", &json_name) &&json_object_is_type(json_name, json_type_string) ))
 	{
 		ans = get_signals_value(json_object_get_string(json_name));
 		if (!ans)
@@ -919,6 +924,139 @@ void list(afb_req_t request)
 
 }
 
+/// Generic callback for signal's write verb
+static void write_signal_last_value(afb_req_t request)
+{
+	signal_t* signal = (signal_t*) afb_req_get_vcbdata(request);
+	json_object* args = nullptr;
+	args = afb_req_json(request);
+
+	if(! args)
+	{
+		afb_req_fail(request, "Error: No value to write.", NULL);
+		return;
+	}
+
+	if (signal && signal->afb_verb_write_on_bus(args))
+	{
+		afb_req_fail(request, "Error: Writing on bus using argument:", json_object_get_string(args));
+		return;
+	}
+
+	afb_req_success(request, NULL, NULL);
+}
+
+/// Generic callback for signal's get verb
+static void read_signal_last_value(afb_req_t request)
+{
+	signal_t* signal = (signal_t*) afb_req_get_vcbdata(request);
+	if(signal)
+	{
+		json_object *jobj = signal->afb_verb_get_last_value();
+		if (jobj)
+			afb_req_success(request, jobj, NULL);
+		else
+			afb_req_fail(request, "Error: No value retrieved. Signal might be never received.", NULL);
+	}
+	else
+	{
+		afb_req_fail(request, "Error: No or wrong signal to be process.", NULL);
+	}
+}
+
+static void simple_subscribe_unsubscribe_signal(afb_req_t request, bool subscribe)
+{
+	signal_t* signal = (signal_t*) afb_req_get_vcbdata(request);
+	json_object *args = afb_req_json(request);
+
+	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
+	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
+	map_subscription& s = sm.get_subscribed_signals();
+
+	if(signal)
+	{
+		list_ptr_signal_t list_sig {std::make_shared<signal_t>(*signal)};
+		event_filter_t evt_filter = generate_filter(args);
+		if(subscribe_unsubscribe_signals(request, subscribe, list_sig, evt_filter, s))
+			afb_req_success_f(request, nullptr, "Signal %s subscribed.", signal->get_name().c_str());
+		else
+			afb_req_fail_f(request, "Signal %s not subscribed", signal->get_name().c_str());
+		return;
+	}
+	afb_req_fail(request, "Error: No or wrong signal to be processed.", NULL);
+}
+
+static void simple_unsubscribe_signal(afb_req_t request)
+{
+	simple_subscribe_unsubscribe_signal(request, false);
+}
+
+static void simple_subscribe_signal(afb_req_t request)
+{
+	simple_subscribe_unsubscribe_signal(request, true);
+}
+
+static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_ptr<diagnostic_message_t> diag_sig)
+{
+	static std::regex forbidden_char("[^a-zA-Z_]");
+	const struct afb_auth *auth = &default_auth;
+	std::string get_info = "Get last value of ";
+	std::string set_info = "Write a new value for ";
+	std::string get_prefix = "r_";
+	std::string set_prefix = "w_";
+	std::string sub_prefix = "sub_";
+	std::string unsub_prefix = "unsub_";
+	std::string verbname;
+	std::string signame;
+	void * s = nullptr;
+	bool writable = false;
+
+	if (sig)
+	{
+		signame = sig->get_name();
+		writable = sig->get_writable();
+		get_info.append("signal: ");
+		set_info.append("signal: ");
+		auth = sig->get_auth();
+		s = (void*) sig.get();
+	}
+	else if(diag_sig)
+	{
+		signame = diag_sig->get_name();
+		get_info.append("diagnostic signal: ");
+		set_info.append("diagnostic signal: ");
+		s = (void*) diag_sig.get();
+	}
+	else
+	{
+		return -1;
+	}
+
+	verbname = std::regex_replace(signame, forbidden_char, "_");
+	get_prefix.append(verbname);
+	set_prefix.append(verbname);
+	sub_prefix.append(verbname);
+	unsub_prefix.append(verbname);
+	get_info.append(signame);
+	set_info.append(signame);
+
+	if(afb_api_add_verb(api, sub_prefix.c_str(), "", simple_subscribe_signal,
+			(void*) s, auth, 0, 0))
+		return -1;
+	if(afb_api_add_verb(api, unsub_prefix.c_str(), "", simple_unsubscribe_signal,
+			(void*) s, auth, 0, 0))
+		return -1;
+	if(afb_api_add_verb(api, get_prefix.c_str(), get_info.c_str(),
+			read_signal_last_value,(void*) s, auth, 0,0))
+		return -1;
+
+	if(writable)
+		if(afb_api_add_verb(api, set_prefix.c_str(), set_info.c_str(),
+				write_signal_last_value, (void*) s, auth, 0,0))
+			return -1;
+	return 0;
+}
+
 /// @brief Initialize the binding.
 ///
 /// @param[in] service Structure which represent the Application Framework Binder.
@@ -961,21 +1099,16 @@ int init_binding(afb_api_t api)
 	}
 
 #ifdef USE_FEATURE_J1939
-	std::string j1939_bus;
 	vect_ptr_msg_def_t current_messages_definition = application.get_messages_definition();
 	for(std::shared_ptr<message_definition_t> message_definition: current_messages_definition)
 	{
 		if(message_definition->is_j1939())
 		{
-			if (j1939_bus == message_definition->get_bus_device_name() )
-				continue;
-			j1939_bus = message_definition->get_bus_device_name();
-
 			std::shared_ptr<low_can_subscription_t> low_can_j1939 = std::make_shared<low_can_subscription_t>();
 			application.set_subscription_address_claiming(low_can_j1939);
 
 			ret = low_can_subscription_t::open_socket(*low_can_j1939,
-								  j1939_bus,
+								   message_definition->get_bus_device_name(),
 								  J1939_ADDR_CLAIM_PROTOCOL);
 
 			if(ret < 0)
@@ -1049,6 +1182,25 @@ int load_config(afb_api_t api)
 	{
 		AFB_API_ERROR (api, "Preinit config fail processing actions for section %s", ctlSections_[0].uid);
 		return -1;
+	}
+
+	struct utils::signals_found all_signals;
+
+	openxc_DynamicField search_key = build_DynamicField("*");
+	all_signals = utils::signals_manager_t::instance().find_signals(search_key);
+
+	for(const auto& sig: all_signals.signals)
+	{
+		ret = add_verb(api, sig, nullptr);
+		if (ret)
+			break;
+	}
+
+	for(const auto& sig: all_signals.diagnostic_messages)
+	{
+		ret = add_verb(api, nullptr, sig);
+		if (ret)
+			break;
 	}
 
 	return ret;

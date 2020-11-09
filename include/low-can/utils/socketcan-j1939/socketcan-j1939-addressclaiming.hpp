@@ -27,7 +27,7 @@ namespace utils
 		public:
 			socketcan_j1939_addressclaiming_t();
 			virtual std::shared_ptr<message_t> read_message();
-			virtual int open(std::string device_name, pgn_t pgn);
+			virtual int open(std::string device_name, name_t ecu_name, pgn_t pgn);
 			virtual claiming_state get_state();
 			TimerHandleT *timer_handle_;
 			std::pair<uint64_t, bool> table_j1939_address_[J1939_IDLE_ADDR];

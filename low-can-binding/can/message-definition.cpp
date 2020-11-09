@@ -55,6 +55,28 @@ message_definition_t::message_definition_t(const std::string bus,
 	signals_{signals}
 {}
 
+message_definition_t::message_definition_t(const std::string bus,
+	uint32_t id,
+	const std::string name,
+	uint32_t length,
+	uint32_t flags,
+	frequency_clock_t frequency_clock,
+	bool force_send_changed,
+	const vect_ptr_signal_t& signals,
+	uint64_t j1939_ecu_name)
+	: parent_{nullptr},
+	bus_{bus},
+	id_{id},
+	name_{name},
+	length_{length},
+	flags_{flags},
+	frequency_clock_{frequency_clock},
+	force_send_changed_{force_send_changed},
+	last_value_{CAN_MESSAGE_SIZE},
+	signals_{signals},
+	j1939_ecu_name_{j1939_ecu_name}
+{}
+
 const std::string message_definition_t::get_bus_device_name() const
 {
 	return application_t::instance().get_can_bus_manager()
@@ -111,6 +133,12 @@ uint32_t message_definition_t::get_flags() const
 	return flags_;
 }
 
-bool message_definition_t::frame_layout_is_bigendian() const{
+bool message_definition_t::frame_layout_is_bigendian() const
+{
 	return (flags_ & BYTE_FRAME_IS_BIG_ENDIAN);
+}
+
+uint64_t message_definition_t::get_j1939_ecu_name() const
+{
+	return j1939_ecu_name_;
 }
