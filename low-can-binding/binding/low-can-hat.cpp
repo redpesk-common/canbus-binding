@@ -27,10 +27,11 @@ static void push_n_notify(std::shared_ptr<message_t> m)
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, std::map<int, std::shared_ptr<low_can_subscription_t> >& s)
 {
 	bool is_permanent_recurring_request = false;
+	const std::shared_ptr<diagnostic_message_t> dm = can_subscription->get_diagnostic_message(pid);
 
-	if( ! can_subscription->get_diagnostic_message().empty() && can_subscription->get_diagnostic_message(pid) != nullptr)
+	if( dm != nullptr)
 	{
-		DiagnosticRequest diag_req = can_subscription->get_diagnostic_message(pid)->build_diagnostic_request();
+		DiagnosticRequest diag_req = dm->build_diagnostic_request();
 		active_diagnostic_request_t* adr = application_t::instance().get_diagnostic_manager().find_recurring_request(diag_req);
 		if( adr != nullptr)
 		{
