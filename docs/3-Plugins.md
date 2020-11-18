@@ -96,7 +96,7 @@ whole frame will be read as a big endian or not.
 
 * *`bit_position_reversed`*\
  Either True or False. Determines if index 0 of a byte starts at 0 or 0+size-1.
-<img src="images/example_reversed.png" width="66%">
+![Example reversed](images/example_reversed.png){:: style="margin:auto; display:flex; max-width:66%;"}
 
 * *`signals`*\
 A list of CAN signal objects (described in the 

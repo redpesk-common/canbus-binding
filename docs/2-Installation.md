@@ -4,19 +4,18 @@ This part is only useful if you plan to install the package from source.
 
 If you aren't planing to build it from source, add the redpesk@ repository
 to your package manager.
-Here is the url for redpesk and fedora:
+Here is the url for Redpesk and Fedora:
 `download.redpesk.bzh`
 
 ## From source
 
 We advise you to use the [local builder](http://redpesk-doc.lorient.iot/docs/en/master/getting_started/local-builder/local-builder.html) for from source installation. The
 local builder comes with everything setup to build redpesk@ projects.
-Some of the dependecies below will still be needed, like **lua** for example.
+Some of the dependecies below will still be needed, like **lua** for example. 
 
 Here is the [local builder documentation](http://redpesk-doc.lorient.iot/docs/en/master/getting_started/local-builder/local-builder.html).
 
 Else install the building tools
-
 * git
 * cmake
 * make
@@ -24,12 +23,22 @@ Else install the building tools
 
 Then the following dependencies:
 
-* json-c
+* json-c 
 * libsystemd >= 222
 * afb-daemon
 * afb-helpers
 * appcontroller
 * lua >= 5.3
+
+Fedora/OpenSuse:
+```
+dnf install git cmake make gcc-c++ rp-cmake-apps-module rp-app-framework-binder-devel json-c-devel lua-devel rp-libafb-helpers-devel rp-libappcontroller-devel 
+```
+
+Ubuntu:
+```
+apt install git cmake make g++ rp-cmake-apps-module-bin libsystemd-dev rp-app-framework-binder-dev libjson-c-dev liblua5.3-dev rp-libafb-helpers-dev rp-libappcontroller-dev
+```
 
 # Getting started
 
@@ -39,7 +48,6 @@ If you are on redpesk@ or if you have installed the required repositories
 simply install "rp-can-low-level" with you package manager.
 
 Example for redpesk@ distro:
-
 ```bash
 dnf install rp-can-low-level
 ```
@@ -58,23 +66,23 @@ sudo make install
 
 # J1939 installation
 
-## Minimum kernel version : 4.19
+#### Minimum kernel version : 4.19
 
-### Compilation of kernel j1939
+## Compilation of kernel j1939
 
-Clone linux-can-next repository on kernel.org
+##### Clone linux-can-next repository on kernel.org
 
 ```bash
 git clone https://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git/
 ```
 
-Checkout on j1939 branch
+##### Checkout on j1939 branch
 
 ```bash
 git checkout j1939
 ```
 
-Add the compilation of the j1939
+##### Add the compilation of the j1939
 
 ```bash
 make menuconfig
@@ -84,22 +92,22 @@ make menuconfig
 			- [*] 	debug SAE J1939
 ```
 
-Compile
+##### Compile
 
 ```bash
 make
 ```
 
-Install
+##### Install
 
 ```bash
 make modules_install
 make install
 ```
 
-### Update grub
+##### Update grub
 
-#### CentOS/RHEL/Oracle/Scientific and Fedora Linux
+###### CentOS/RHEL/Oracle/Scientific and Fedora Linux
 
 ```bash
 grub2-mkconfig -o /boot/grub2/grub.cfg
@@ -107,14 +115,14 @@ grubby --set-default /boot/vmlinuz-...
 reboot
 ```
 
-#### Debian/Ubuntu Linux
+###### Debian/Ubuntu Linux
 
 ```bash
 update-grub
 reboot
 ```
 
-### Check if the installation is correct
+##### Check if the installation is correct
 
 ```bash
 modprobe can-j1939
@@ -141,37 +149,38 @@ cp include/uapi/linux/can/j1939.h /usr/include/linux/can/
 
 ## Compilation and installation of module kernel isotp
 
-Clone repository Linux Kernel Module for ISO 15765-2:2016 CAN transport protocol
+##### Clone repository Linux Kernel Module for ISO 15765-2:2016 CAN transport protocol
 
 ```bash
 git clone https://github.com/hartkopp/can-isotp.git
 ```
 
-Move into the new repository
+##### Move into the new repository
 
 ```bash
 cd can-isotp
 ```
 
-Install packages to build
+##### Install packages to build
 
 ```bash
 sudo apt-get install build-essential linux-headers-$(uname -r)
 ```
 
-Compile
+##### Compile
 
 ```bash
 make
 ```
 
-Install
+##### Install
 
 ```bash
 sudo make modules_install
 ```
 
-Load module
+##### Load module
+
 
 ```bash
 modprobe can
@@ -179,7 +188,9 @@ modprobe vcan
 sudo insmod ./net/can/can-isotp.ko
 ```
 
-Include headers  files
+
+## Include headers  files
+
 
 ```bash
 sudo cp include/uapi/linux/can/isotp.h /usr/include/linux/can/
