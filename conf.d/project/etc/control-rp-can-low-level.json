@@ -14,20 +14,7 @@
 		},
 		"diagnostic_bus": "hs",
 		"default_j1939_ecu": "0xC0509600227CC7AA"
-		"preinit": {
-			"uid": "preinit",
-			"action": "plugin://default-signals#preinit"
-		},
-		"postinit": {
-			"uid": "postinit",
-			"action": "plugin://default-signals#postinit"
-		}
 	},
 	"plugins": [
-		{
-			"uid": "default-signals",
-			"info": "default signals",
-			"libs": "default-signals.ctlso"
-		}
 	]
 }
