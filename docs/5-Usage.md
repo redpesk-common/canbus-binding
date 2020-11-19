@@ -1,4 +1,4 @@
-# Run it, test it, use it.
+# Run it, test it, use it
 
 You can run the binding using **afm-util** tool, here is the classic way to go :
 
@@ -12,7 +12,7 @@ You can find instructions to use afm-util tool
  as well as documentation about Application Framework.
 
 But you can't control nor interact with it because you don't know security
-token that **Application Framework** gaves it at launch.
+token that **Application Framework** gave it at launch.
 
 So, to test it, it is better to launch the binding manually. In the following
 example, it will use port **1234** and left empty security token for testing
@@ -227,7 +227,7 @@ and its value.
 Examples:
 
 ```json
-# Authentification
+# Authentication
 low-can auth
 # Write a raw can frame to the CAN id 0x620
 low-can write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc": 8, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }

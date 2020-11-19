@@ -1,4 +1,4 @@
-# Prerequisites
+# Installation Prerequisites
 
 This part is only useful if you plan to install the package from source.
 
@@ -11,7 +11,7 @@ Here is the url for Redpesk and Fedora:
 
 We advise you to use the [local builder](http://redpesk-doc.lorient.iot/docs/en/master/getting_started/local-builder/local-builder.html) for from source installation. The
 local builder comes with everything setup to build redpesk@ projects.
-Some of the dependecies below will still be needed, like **lua** for example. 
+Some of the dependencies below will still be needed, like **lua** for example.
 
 Here is the [local builder documentation](http://redpesk-doc.lorient.iot/docs/en/master/getting_started/local-builder/local-builder.html).
 

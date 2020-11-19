@@ -21,7 +21,7 @@ CAN binding will be separated in two parts:
 
 * High level: Binding from which others applications will connect to.
 It will provides valuable access to the CAN bus by aggregating signals or
-providing new signals from several origines. For example, a signal exposing
+providing new signals from several sources. For example, a signal exposing
 whether or not a door is open, no matter which one it is. Also, we can imagine
 an application which supervises if there is no one in the car but moving
 (1m, 2m ?) to alert the owner of an unexpected behavior. The high level binding

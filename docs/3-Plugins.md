@@ -1,4 +1,4 @@
-# Prerequisites
+# Plugins Prerequisites
 
 The low-level-can-generator generates c++ plugins from json mapping files
 for the rp-can-low-level binding.
@@ -20,7 +20,7 @@ dnf install rp-low-level-can-generator
 
 or from the sources:
 
-```bash 
+```bash
 git clone https://github.com/redpesk-common/low-level-can-generator
 cd low-level-can-generator
 mkdir build
@@ -34,13 +34,13 @@ sudo make install
 
 # Write your json mapping file
 
-In this json file will be defined all the messages you will recieve from your
+In this json file will be defined all the messages you will receive from your
 connected device.
 
 The generator uses OpenXC.[Here is the original documentation.](https://github.com/openxc/vi-firmware/blob/master/docs/config/reference.rst)
 
-You can find a plugin template by installing the 
-"rp-can-low-level-plugin-template" package. This package contains a json 
+You can find a plugin template by installing the
+"rp-can-low-level-plugin-template" package. This package contains a json
 mapping file, a simple plugin header file and a CMake file for easy build.
 After installation, these files can be found in your /usr/share/doc/ directory.
 
@@ -60,19 +60,19 @@ plugin. It can be your own c++ signal decoders for example.
 
 ## Message
 
-The *`messages`* key is a object with fields mapping from CAN message IDs 
+The *`messages`* key is a object with fields mapping from CAN message IDs
 to signal definitions. The fields must be hex IDs of CAN messages
 as strings (e.g. 0x90).
 
 * *`name`* \
- The name of the CAN message. Can be used to easily find a 
+ The name of the CAN message. Can be used to easily find a
 certain message among the others.
 
 * *`bus`* \
  The name of the CAN bus where the messages can be found.
 
 * *`comment`* \
- To give a piece of information about the message. Useful 
+ To give a piece of information about the message. Useful
 when reading the code.
 
 * *`length`* \
@@ -99,7 +99,7 @@ whole frame will be read as a big endian or not.
 ![Example reversed](images/example_reversed.png){:: style="margin:auto; display:flex; max-width:66%;"}
 
 * *`signals`*\
-A list of CAN signal objects (described in the 
+A list of CAN signal objects (described in the
 [signal](#signal) section) that are in this message, with the name of the
 signal as the key.
 
@@ -278,7 +278,7 @@ defined factor and offset). Some signals require additional processing that you
 may wish to do within the binding and not on the host device. Other signals may need
 to be combined to make a composite signal that's more meaningful to developers.
 
-There is however a list of ready to use decoders provided by the low-can binding: 
+There is however a list of ready to use decoders provided by the low-can binding:
 
 * decode_state
 * decode_booleanl
@@ -293,7 +293,7 @@ There is however a list of ready to use decoders provided by the low-can binding
 
 You can also define your own decoder. To do so, create a **signal-header.cpp**
 file that will be added to the top of the generated c++ plugin file by adding
-its filename to the *`extra_sources`* field. Then write you own decoder 
+its filename to the *`extra_sources`* field. Then write you own decoder
 in this file. Here is an example:
 
 ```c++
@@ -370,12 +370,12 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 }
 ```
 
-# Generate your plugin 
+# Generate your plugin
 
 To generate your plugin you'll have to use the low-level-can-generator.
 Once you have installed the generator and wrote your json mapping file,
 simply use CMake to do it automatically (see [next section](#build-and-install-your-plugin))
-or execute this command: 
+or execute this command:
 
  ```bash
 can-config-generator -m you-mapping-file.json -o your-plugin-name.cpp
@@ -387,7 +387,7 @@ To be able to build your plugin, change ```set(TARGET_NAME generated_plugin)``` 
 the CMakeLists.txt with your plugin's name.
 
 At the root of your plugin project (replace "generated-plugin" by the name of
-your plugin). 
+your plugin).
 
 ```bash
 mkdir build && cd build
