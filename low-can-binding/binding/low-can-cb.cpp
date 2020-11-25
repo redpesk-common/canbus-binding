@@ -84,8 +84,12 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 
 	if(ecu)
 	{
+#ifdef USE_FEATURE_J1939
 		application->set_default_j1939_ecu(ecu);
 		AFB_INFO("Default J1939 ECU name set to %s", ecu);
+#else
+		AFB_INFO("J1939 feature disable, doing nothing");
+#endif
 	}
 	application->set_preinit(preinit);
 	application->set_postinit(postinit);
