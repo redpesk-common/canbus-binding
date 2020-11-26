@@ -19,17 +19,17 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 
 # Project Info
 # ------------------
-set(PROJECT_NAME can-low-level-plugin)
+set(PROJECT_NAME canbus-binding)
 set(PROJECT_LANGUAGES "C;CXX")
 
-project(${PROJECT_NAME} DESCRIPTION "Build and install custom rp-can-low-level plugins")
+project(${PROJECT_NAME} DESCRIPTION "Build and install custom canbus-binding plugins")
 
 include(FindPkgConfig)
 include(GNUInstallDirs)
 include(CTest)
 enable_testing()
 
-set(CAN_LOW_LEVEL_BINDING_NAME "rp-can-low-level" CACHE STRING "Name of the CAN low level binding. Needed to install the config and plugin at the correct place")
+set(CAN_LOW_LEVEL_BINDING_NAME "canbus-binding" CACHE STRING "Name of the CAN low level binding. Needed to install the config and plugin at the correct place")
 
 add_compile_definitions("AFB_BINDING_VERSION=3")
 
@@ -46,7 +46,7 @@ set(INSTALL_PREFIX $ENV{HOME}/opt)
 # -----------------------------
 list (APPEND link_libraries -pthread)
 
-pkg_check_modules(lowcan REQUIRED rp-can-low-level)
+pkg_check_modules(lowcan REQUIRED canbus-binding)
 
 add_link_options(-L${lowcan_LIBDIR})
 link_libraries(low-can ${lowcan_LIBRARIES})

@@ -1,14 +1,14 @@
 # Plugins Prerequisites
 
 The low-level-can-generator generates c++ plugins from json mapping files
-for the rp-can-low-level binding.
+for the canbus-binding binding.
 
 ## Install the can-low-level devel version
 
-If you have installed the rp-can-low-level from sources you already have the
+If you have installed the canbus-binding from sources you already have the
 devel version installed.
 
-Else install the "rp-can-low-level-devel" package using your package manager.
+Else install the "canbus-binding-devel" package using your package manager.
 
 ## Install the generator
 
@@ -40,7 +40,7 @@ connected device.
 The generator uses OpenXC.[Here is the original documentation.](https://github.com/openxc/vi-firmware/blob/master/docs/config/reference.rst)
 
 You can find a plugin template by installing the
-"rp-can-low-level-plugin-template" package. This package contains a json
+"canbus-binding-plugin-template" package. This package contains a json
 mapping file, a simple plugin header file and a CMake file for easy build.
 After installation, these files can be found in your /usr/share/doc/ directory.
 
@@ -400,9 +400,9 @@ The `make generated-plugin` will automatically generate you plugin's sources.
 You can also manually generate it with `make generate_generated-plugin`.
 
 Now activate the plugin in the can-low-level.
-To do so, edit the control-rp-can-low-level.json file to
+To do so, edit the control-canbus-binding.json file to
 make it look like the example down below. This file should be located in
-/usr/local/rp-can-low-level/etc/.
+/usr/local/canbus-binding/etc/.
 ```json
 {
 	"$schema": "",

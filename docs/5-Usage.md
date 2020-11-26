@@ -19,7 +19,7 @@ example, it will use port **1234** and left empty security token for testing
 purpose:
 
 ```bash
-afb-daemon --name=afbd-rp-low-can-level --workdir=/usr/local/rp-can-low-level --binding=lib/afb-low-can-binding.so --port=1234 --token=1 --tracereq=common -vvv
+afb-daemon --name=afbd-rp-low-can-level --workdir=/usr/local/canbus-binding --binding=lib/afb-low-can-binding.so --port=1234 --token=1 --tracereq=common -vvv
 ```
 
 On another terminal, connect to the binding using previously installed

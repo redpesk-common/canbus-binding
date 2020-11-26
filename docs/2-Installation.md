@@ -23,7 +23,7 @@ Else install the building tools
 
 Then the following dependencies:
 
-* json-c 
+* json-c
 * libsystemd >= 222
 * afb-daemon
 * afb-helpers
@@ -32,7 +32,7 @@ Then the following dependencies:
 
 Fedora/OpenSuse:
 ```
-dnf install git cmake make gcc-c++ rp-cmake-apps-module rp-app-framework-binder-devel json-c-devel lua-devel rp-libafb-helpers-devel rp-libappcontroller-devel 
+dnf install git cmake make gcc-c++ rp-cmake-apps-module rp-app-framework-binder-devel json-c-devel lua-devel rp-libafb-helpers-devel rp-libappcontroller-devel
 ```
 
 Ubuntu:
@@ -45,18 +45,18 @@ apt install git cmake make g++ rp-cmake-apps-module-bin libsystemd-dev rp-app-fr
 ## Easy installation
 
 If you are on redpesk@ or if you have installed the required repositories
-simply install "rp-can-low-level" with you package manager.
+simply install "canbus-binding" with you package manager.
 
 Example for redpesk@ distro:
 ```bash
-dnf install rp-can-low-level
+dnf install canbus-binding
 ```
 
 ## Compile and install the binding
 
 ```bash
-git clone https://github.com/redpesk-common/rp-can-low-level.git
-cd rp-can-low-level
+git clone https://github.com/redpesk-common/canbus-binding.git
+cd canbus-binding
 mkdir build
 cd build
 cmake ..

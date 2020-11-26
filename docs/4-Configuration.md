@@ -129,11 +129,11 @@ a point-to-point protocol. Use the following key to claim a name:
 ## The dev-mapping section
 
 The binding reads system configuration file
-_/usr/local/rp-can-low-level/etc/control-rp-can-low-level.json_ at start to
+_/usr/local/canbus-binding/etc/control-canbus-binding.json_ at start to
 map logical name from signals described in JSON file to linux devices name
 initialized by the system.
 
-Edit file _control-rp-can-low-level.json_ and add mapping in section `config`.
+Edit file _control-canbus-binding.json_ and add mapping in section `config`.
 
 Default binding configuration use a CAN bus named `hs` so you need to map it to
 the real one, here are some examples:
@@ -201,7 +201,7 @@ Here is an example:
 
 ## Example of a typical binding configuration file
 
-The _control-rp-can-low-level.json_ file should have this structure:
+The _control-canbus-binding.json_ file should have this structure:
 
 ```json
 {

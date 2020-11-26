@@ -1,6 +1,6 @@
 # Plugin Template
 
-Is this folder you will find a simple plugin example for the rp-can-low-level binding.
+Is this folder you will find a simple plugin example for the canbus-binding binding.
 
 The json file defines a few signals that may be found on the can bus.
 The cpp file implements a custom decoder, take it as an example
@@ -8,9 +8,9 @@ to understand how to make your own decoder.
 
 ## Prerequisites
 
-Install the rp-can-low-level and the devel version if you haven't yet:
+Install the canbus-binding and the devel version if you haven't yet:
 ```bash
-dnf install rp-can-low-level rp-can-low-level-devel
+dnf install canbus-binding canbus-binding-devel
 ```
 
 ## Generate your plugin
@@ -20,7 +20,7 @@ First, install the generator:
 dnf install rp-low-level-can-generator
 ```
 
-Generate your plugin use CMake to do it automatically 
+Generate your plugin use CMake to do it automatically
 (see [next section](#build-and-install-your-plugin)) or execute:
 ```bash
 can-config-generator -m you_config_file.json -o generated-plugin.cpp
@@ -45,9 +45,9 @@ The `make generated-plugin` will automatically generate you plugin's sources.
 You can also manually generate it with `make generate_generated-plugin`.
 
 Now activate the plugin in the can-low-level.
-To do so, edit the control-rp-can-low-level.json file to
+To do so, edit the control-canbus-binding.json file to
 make it look like the example down below. This file should be located in
-/usr/local/rp-can-low-level/etc/.
+/usr/local/canbus-binding/etc/.
 ```json
 {
 	"$schema": "",
