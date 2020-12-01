@@ -1,9 +1,9 @@
 # Plugins Prerequisites
 
-The low-level-can-generator generates c++ plugins from json mapping files
+The canbus-generator generates c++ plugins from json mapping files
 for the canbus-binding binding.
 
-## Install the can-low-level devel version
+## Install the canbus-binding devel version
 
 If you have installed the canbus-binding from sources you already have the
 devel version installed.
@@ -12,17 +12,17 @@ Else install the "canbus-binding-devel" package using your package manager.
 
 ## Install the generator
 
-To generate your plugins you will need the low-level-can-generator.
+To generate your plugins you will need the canbus-generator.
 
 ```bash
-dnf install rp-low-level-can-generator
+dnf install canbus-generator
 ```
 
 or from the sources:
 
 ```bash
-git clone https://github.com/redpesk-common/low-level-can-generator
-cd low-level-can-generator
+git clone https://github.com/redpesk-common/canbus-generator
+cd canbus-generator
 mkdir build
 cd build
 cmake ..
@@ -278,7 +278,7 @@ defined factor and offset). Some signals require additional processing that you
 may wish to do within the binding and not on the host device. Other signals may need
 to be combined to make a composite signal that's more meaningful to developers.
 
-There is however a list of ready to use decoders provided by the low-can binding:
+There is however a list of ready to use decoders provided by the canbus binding:
 
 * decode_state
 * decode_booleanl
@@ -372,7 +372,7 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 
 # Generate your plugin
 
-To generate your plugin you'll have to use the low-level-can-generator.
+To generate your plugin you'll have to use the canbus-generator.
 Once you have installed the generator and wrote your json mapping file,
 simply use CMake to do it automatically (see [next section](#build-and-install-your-plugin))
 or execute this command:
@@ -399,7 +399,7 @@ make install_generated-plugin
 The `make generated-plugin` will automatically generate you plugin's sources.
 You can also manually generate it with `make generate_generated-plugin`.
 
-Now activate the plugin in the can-low-level.
+Now activate the plugin in the canbus-binding.
 To do so, edit the control-canbus-binding.json file to
 make it look like the example down below. This file should be located in
 /usr/local/canbus-binding/etc/.
@@ -407,10 +407,10 @@ make it look like the example down below. This file should be located in
 {
 	"$schema": "",
 	"metadata": {
-		"uid": "Low Can",
+		"uid": "CAN bus",
 		"version": "2.0",
-		"api": "low-can",
-		"info": "Low can Configuration"
+		"api": "canbus",
+		"info": "CAN bus Configuration"
 	},
 	"config": {
 		"active_message_set": 0,

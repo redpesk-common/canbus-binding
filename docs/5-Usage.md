@@ -3,7 +3,7 @@
 You can run the binding using **afm-util** tool, here is the classic way to go :
 
 ```bash
-afm-util run low-can-service@4.0
+afm-util run canbus-service@4.0
 1
 ```
 
@@ -19,7 +19,7 @@ example, it will use port **1234** and left empty security token for testing
 purpose:
 
 ```bash
-afb-daemon --name=afbd-rp-low-can-level --workdir=/usr/local/canbus-binding --binding=lib/afb-low-can-binding.so --port=1234 --token=1 --tracereq=common -vvv
+afb-daemon --name=afbd-canbus-binding --workdir=/usr/local/canbus-binding --binding=lib/afb-canbus-binding.so --port=1234 --token=1 --tracereq=common -vvv
 ```
 
 On another terminal, connect to the binding using previously installed
@@ -47,7 +47,7 @@ following:
 
 Where:
 
-* API : _**low-can**_.
+* API : _**canbus**_.
 * Verb : _**subscribe**_ or _**unsubscribe**_
 * Arguments : _**{ "event": "driver.doors.open" }**_
 
@@ -64,8 +64,8 @@ verb with the CAN messages name as JSON argument.
 For example from a websocket session:
 
 ```json
-low-can subscribe { "event": "doors.driver.open" }
-ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"a18fd375-b6fa-4c0e-a1d4-9d3955975ae8"}}
+canbus subscribe { "event": "doors.driver.open" }
+ON-REPLY 1:canbus/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"a18fd375-b6fa-4c0e-a1d4-9d3955975ae8"}}
 ```
 
 Subscription and unsubscription can take wildcard in their _event_ value and are
@@ -74,15 +74,15 @@ Subscription and unsubscription can take wildcard in their _event_ value and are
 To receive all doors events :
 
 ```json
-low-can subscribe { "event" : "doors*" }
-ON-REPLY 1:low-can/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"511c872e-d7f3-4f3b-89c2-aa9a3e9fbbdb"}}
+canbus subscribe { "event" : "doors*" }
+ON-REPLY 1:canbus/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"511c872e-d7f3-4f3b-89c2-aa9a3e9fbbdb"}}
 ```
 
 Then you will receive an event each time a CAN message is decoded for the event
 named _doors.driver.open_ with its received timestamp if available:
 
 ```json
-ON-EVENT low-can/messages.doors.driver.open({"event":"low-can\/messages.doors.driver.open","data":{"name":"messages.doors.driver.open","value":true, "timestamp": 1505812906020023},"jtype":"afb-event"})
+ON-EVENT canbus/messages.doors.driver.open({"event":"canbus\/messages.doors.driver.open","data":{"name":"messages.doors.driver.open","value":true, "timestamp": 1505812906020023},"jtype":"afb-event"})
 ```
 
 Notice that event shows you that the CAN event is named
@@ -97,37 +97,37 @@ This will let you subscribe or unsubcribe to all signals at once, not
 recommended, and better make filter on subscribe operation based upon their type. Examples:
 
 ```json
-low-can subscribe { "event" : "*speed*" } --> will subscribe to all messages with speed in their name. Search will be make without prefix for it.
-low-can subscribe { "event" : "speed*" } --> will subscribe to all messages begin by speed in their name. Search will be make without prefix for it.
-low-can subscribe { "event" : "messages*speed*" } --> will subscribe to all CAN messages with speed in their name. Search will be on prefixed messages here.
-low-can subscribe { "event" : "messages*speed" } --> will subscribe to all CAN messages ending with speed in their name. Search will be on prefixed messages here.
-low-can subscribe { "event" : "diagnostic*speed*" } --> will subscribe to all diagnostic messages with speed in their name. Search will be on prefixed messages here.
-low-can subscribe { "event" : "diagnostic*speed" } --> will subscribe to all diagnostic messages ending with speed in their name. Search will be on prefixed messages here.
+canbus subscribe { "event" : "*speed*" } --> will subscribe to all messages with speed in their name. Search will be make without prefix for it.
+canbus subscribe { "event" : "speed*" } --> will subscribe to all messages begin by speed in their name. Search will be make without prefix for it.
+canbus subscribe { "event" : "messages*speed*" } --> will subscribe to all CAN messages with speed in their name. Search will be on prefixed messages here.
+canbus subscribe { "event" : "messages*speed" } --> will subscribe to all CAN messages ending with speed in their name. Search will be on prefixed messages here.
+canbus subscribe { "event" : "diagnostic*speed*" } --> will subscribe to all diagnostic messages with speed in their name. Search will be on prefixed messages here.
+canbus subscribe { "event" : "diagnostic*speed" } --> will subscribe to all diagnostic messages ending with speed in their name. Search will be on prefixed messages here.
 ```
 
 You can also subscribe to an event with the ID or the PGN of the message definition :
 
 
 ```json
-low-can subscribe {"id" : 1568}
-low-can subscribe {"pgn" : 61442}
+canbus subscribe {"id" : 1568}
+canbus subscribe {"pgn" : 61442}
 ```
 
 And subscribe to all ID or PGN :
 
 ```json
-low-can subscribe {"id" : "*"}
-low-can subscribe {"pgn" : "*"}
+canbus subscribe {"id" : "*"}
+canbus subscribe {"pgn" : "*"}
 ```
 
 
 You can stop receiving event from it by unsubscribe the signal the same way you did for subscribe
 
 ```json
-low-can unsubscribe { "event": "doors.driver.open" }
-ON-REPLY 2:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
-low-can unsubscribe { "event" : "doors*" }
-ON-REPLY 3:low-can/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
+canbus unsubscribe { "event": "doors.driver.open" }
+ON-REPLY 2:canbus/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
+canbus unsubscribe { "event" : "doors*" }
+ON-REPLY 3:canbus/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
 ```
 
 ### Using signal dedicated verbs
@@ -137,8 +137,8 @@ name to interact with it. For example, to subscribe to signal
 **messages.doors.driver.open** you can simply call:
 
 ```
-low-can sub_messages_doors_driver_open
-ON-EVENT-CREATE: [1:low-can/messages.doors.driver.open*]
+canbus sub_messages_doors_driver_open
+ON-EVENT-CREATE: [1:canbus/messages.doors.driver.open*]
 ON-EVENT-SUBSCRIBE 1:sub_messages_doors_driver_open: [1]
 ON-REPLY 1:sub_messages_doors_driver_open: success Signal messages.messages.doors.driver.open* subscribed.
 null
@@ -150,7 +150,7 @@ null
 And to unsubscribe:
 
 ```
-low-can unsub_messages_doors_driver_open
+canbus unsub_messages_doors_driver_open
 ON-REPLY 1:unsub_messages_doors_driver_open: success Signal messages.messages.doors.driver.open* unsubscribed.
 null
 ```
@@ -178,11 +178,11 @@ or all of them at once.
 Usage examples :
 
 ```json
-low-can subscribe {"event": "messages.engine.speed", "filter": { "frequency": 3, "min": 1250, "max": 3500}}
-low-can subscribe {"event": "messages.engine.load", "filter": { "min": 30, "max": 100}}
-low-can subscribe {"event": "messages.vehicle.speed", "filter": { "frequency": 2}}
+canbus subscribe {"event": "messages.engine.speed", "filter": { "frequency": 3, "min": 1250, "max": 3500}}
+canbus subscribe {"event": "messages.engine.load", "filter": { "min": 30, "max": 100}}
+canbus subscribe {"event": "messages.vehicle.speed", "filter": { "frequency": 2}}
 # ISOTP
-low-can subscribe {"id": 273, "filter": {"tx_id" : 562}}
+canbus subscribe {"id": 273, "filter": {"tx_id" : 562}}
 ```
 
 ## Get last signal value and list of configured signals
@@ -193,18 +193,18 @@ You can also ask for a particular signal value on one shot using **get** verb, l
 this:
 
 ```json
-low-can get {"event": "messages.engine.speed"}
-ON-REPLY 1:low-can/get: {"response":[{"event":"messages.engine.speed","value":0}],"jtype":"afb-reply","request":{"status":"success"}}
+canbus get {"event": "messages.engine.speed"}
+ON-REPLY 1:canbus/get: {"response":[{"event":"messages.engine.speed","value":0}],"jtype":"afb-reply","request":{"status":"success"}}
 ```
 
 > **CAUTION** Only one event could be requested.
 
-Also, if you want to know the supported CAN signals loaded by **low-can**, use
+Also, if you want to know the supported CAN signals loaded by **canbus**, use
 verb **list**
 
 ```json
-low-can list
-ON-REPLY 2:low-can/list: {"response":["messages.hvac.fan.speed","messages.hvac.temperature.left","messages.hvac.temperature.right","messages.hvac.temperature.average","messages.engine.speed","messages.fuel.level.low","messages.fuel.level","messages.vehicle.average.speed","messages.engine.oil.temp","messages.engine.oil.temp.high","messages.doors.boot.open","messages.doors.front_left.open","messages.doors.front_right.open","messages.doors.rear_left.open","messages.doors.rear_right.open","messages.windows.front_left.open","messages.windows.front_right.open","messages.windows.rear_left.open","messages.windows.rear_right.open","diagnostic_messages.engine.load","diagnostic_messages.engine.coolant.temperature","diagnostic_messages.fuel.pressure","diagnostic_messages.intake.manifold.pressure","diagnostic_messages.engine.speed","diagnostic_messages.vehicle.speed","diagnostic_messages.intake.air.temperature","diagnostic_messages.mass.airflow","diagnostic_messages.throttle.position","diagnostic_messages.running.time","diagnostic_messages.EGR.error","diagnostic_messages.fuel.level","diagnostic_messages.barometric.pressure","diagnostic_messages.ambient.air.temperature","diagnostic_messages.commanded.throttle.position","diagnostic_messages.ethanol.fuel.percentage","diagnostic_messages.accelerator.pedal.position","diagnostic_messages.hybrid.battery-pack.remaining.life","diagnostic_messages.engine.oil.temperature","diagnostic_messages.engine.fuel.rate","diagnostic_messages.engine.torque"],"jtype":"afb-reply","request":{"status":"success","uuid":"32df712a-c7fa-4d58-b70b-06a87f03566b"}}
+canbus list
+ON-REPLY 2:canbus/list: {"response":["messages.hvac.fan.speed","messages.hvac.temperature.left","messages.hvac.temperature.right","messages.hvac.temperature.average","messages.engine.speed","messages.fuel.level.low","messages.fuel.level","messages.vehicle.average.speed","messages.engine.oil.temp","messages.engine.oil.temp.high","messages.doors.boot.open","messages.doors.front_left.open","messages.doors.front_right.open","messages.doors.rear_left.open","messages.doors.rear_right.open","messages.windows.front_left.open","messages.windows.front_right.open","messages.windows.rear_left.open","messages.windows.rear_right.open","diagnostic_messages.engine.load","diagnostic_messages.engine.coolant.temperature","diagnostic_messages.fuel.pressure","diagnostic_messages.intake.manifold.pressure","diagnostic_messages.engine.speed","diagnostic_messages.vehicle.speed","diagnostic_messages.intake.air.temperature","diagnostic_messages.mass.airflow","diagnostic_messages.throttle.position","diagnostic_messages.running.time","diagnostic_messages.EGR.error","diagnostic_messages.fuel.level","diagnostic_messages.barometric.pressure","diagnostic_messages.ambient.air.temperature","diagnostic_messages.commanded.throttle.position","diagnostic_messages.ethanol.fuel.percentage","diagnostic_messages.accelerator.pedal.position","diagnostic_messages.hybrid.battery-pack.remaining.life","diagnostic_messages.engine.oil.temperature","diagnostic_messages.engine.fuel.rate","diagnostic_messages.engine.torque"],"jtype":"afb-reply","request":{"status":"success","uuid":"32df712a-c7fa-4d58-b70b-06a87f03566b"}}
 ```
 
 ### Using signal dedicated verbs
@@ -213,8 +213,8 @@ The same as when you subscribe or unsubscribe for a signals you can use a
 dedicated verb to get the last value of it:
 
 ```
-low-can r_messages_engine_speed
-ON-REPLY 1:low-can/get: {"response":[{"event":"messages.engine.speed","value":0}],"jtype":"afb-reply","request":{"status":"success"}}
+canbus r_messages_engine_speed
+ON-REPLY 1:canbus/get: {"response":[{"event":"messages.engine.speed","value":0}],"jtype":"afb-reply","request":{"status":"success"}}
 null
 ```
 
@@ -228,24 +228,24 @@ Examples:
 
 ```json
 # Authentication
-low-can auth
+canbus auth
 # Write a raw can frame to the CAN id 0x620
-low-can write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc": 8, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }
+canbus write { "bus_name": "hs", "frame": { "can_id": 1568, "can_dlc": 8, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }
 # Write a signal's value.
-low-can write { "signal_name": "engine.speed", "signal_value": 1256}
+canbus write { "signal_name": "engine.speed", "signal_value": 1256}
 # Write J1939 'single frame'
-low-can write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":8, "data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }
+canbus write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":8, "data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }
 # Write J1939 'multi frame'
-low-can write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":9, "data": [ 255, 255, 255, 255, 255, 255, 255, 255, 254]} }
+canbus write { "bus_name": "j1939", "frame": { "pgn": 61442, "length":9, "data": [ 255, 255, 255, 255, 255, 255, 255, 255, 254]} }
 # Write ISOTP 'single frame'
-low-can write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 8, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }
+canbus write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 8, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255]} }
 # Write ISOTP 'multi frame'
-low-can write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 9, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255, 25]} }
+canbus write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 273, "can_dlc": 9, "can_data": [ 255, 255, 255, 255, 255, 255, 255, 255, 25]} }
 ```
 
 To be able to use write capability, you need to add the permission
  ```urn:redpesk:permission::platform:can:write``` to your package configuration
- file that need to write on CAN bus through **low-can** api.
+ file that need to write on CAN bus through **canbus** api.
 
 Then in order to write on bus, your app needs to call verb **auth**
 before calling **write**, to raise its **LOA**, Level Of Assurance,
@@ -257,8 +257,8 @@ The same as when you subscribe or unsubscribe for a signals you can use a
 dedicated verb to write a new of it **if the signal has been set as writable**:
 
 ```
-low-can auth
-low-can w_messages_engine_speed { "signal_name": "engine.speed", "signal_value": 1256}
+canbus auth
+canbus w_messages_engine_speed { "signal_name": "engine.speed", "signal_value": 1256}
 ```
 
 ## Using CAN utils to monitor CAN activity

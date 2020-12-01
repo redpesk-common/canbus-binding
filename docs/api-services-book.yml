@@ -1,9 +1,9 @@
 type: books
 books:
 -
-    id: rp-service-can-low-level
-    title: RP Service CAN Low Level
-    description: RP Service CAN Low Level documentation
+    id: canbus-binding
+    title: RP canbus-binding
+    description: RP canbus-binding documentation
     keywords:
     author: "IotBzh"
     version: master

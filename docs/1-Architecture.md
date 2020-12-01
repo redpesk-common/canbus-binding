@@ -32,4 +32,4 @@ turn will send a phone message to.
 
 ![Communication between CAN bindings and third applications](images/CAN_bindings_communication.png)
 
-Last but not least, the low level binding can be shipped as binary only using OpenXC inspired [redpesk@ low level CAN binding Generator](https://github.com/redpesk-common/low-level-can-generator).
+Last but not least, the low level binding can be shipped as binary only using OpenXC inspired [redpesk@ canbus Generator](https://github.com/redpesk-common/canbus-generator).

@@ -1,6 +1,6 @@
 # Abstract
 
-This project proposes a Low Level CAN Binding for redpesk@, with the following features:
+This project proposes a CAN bus Binding for redpesk@, with the following features:
 
 * CAN messages and diagnostic messages (OBD-II) are currently supported
 * Description of CAN messages is  done using JSON definition following OpenXC 

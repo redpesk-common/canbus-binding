@@ -32,12 +32,12 @@ Then the following dependencies:
 
 Fedora/OpenSuse:
 ```
-dnf install git cmake make gcc-c++ rp-cmake-apps-module rp-app-framework-binder-devel json-c-devel lua-devel rp-libafb-helpers-devel rp-libappcontroller-devel
+dnf install git cmake make gcc-c++ afb-cmake-modules afb-binding-devel json-c-devel lua-devel afb-libhelpers-devel afb-libcontroller-devel
 ```
 
 Ubuntu:
 ```
-apt install git cmake make g++ rp-cmake-apps-module-bin libsystemd-dev rp-app-framework-binder-dev libjson-c-dev liblua5.3-dev rp-libafb-helpers-dev rp-libappcontroller-dev
+apt install git cmake make g++ afb-cmake-modules-bin libsystemd-dev afb-binding-dev libjson-c-dev liblua5.3-dev afb-libhelpers-dev afb-libcontroller-dev
 ```
 
 # Getting started
