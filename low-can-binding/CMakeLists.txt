@@ -19,7 +19,7 @@
 
 # Add target to project dependency list
 
-PROJECT_TARGET_ADD(low-can)
+PROJECT_TARGET_ADD(canbus)
 
 	if(WITH_FEATURE_ISOTP)
 	set(SOURCES_ISOTP
@@ -78,7 +78,7 @@ PROJECT_TARGET_ADD(low-can)
 		bitfield-c
 		${link_libraries})
 
-PROJECT_TARGET_ADD(low-can-binding)
+PROJECT_TARGET_ADD(canbus-binding)
 
 	# Define project Targets
 	set (SOURCES
@@ -101,7 +101,7 @@ PROJECT_TARGET_ADD(low-can-binding)
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		low-can
+		canbus
 		openxc-message-format
 		uds-c
 		isotp-c

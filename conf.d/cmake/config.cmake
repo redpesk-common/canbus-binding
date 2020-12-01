@@ -19,15 +19,15 @@
 # Project Info
 # ------------------
 set(PROJECT_NAME canbus-binding)
-set(PROJECT_PRETTY_NAME "Low level CAN bus binding")
-set(PROJECT_DESCRIPTION "Expose CAN Low Level APIs through AGL Framework")
+set(PROJECT_PRETTY_NAME "CAN bus binding")
+set(PROJECT_DESCRIPTION "Expose CAN bus  APIs through AGL Framework")
 set(PROJECT_URL "https://git.ovh.iot/redpesk-common/canbus-bindingit")
 set(PROJECT_ICON "icon.png")
 set(PROJECT_AUTHOR "Romain Forlot")
 set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
 set(PROJECT_LICENSE "APL2.0")
 set(PROJECT_LANGUAGES "C;CXX")
-set(API_NAME "low-can")
+set(API_NAME "canbus")
 
 # Where are stored the project configuration files
 # relative to the root project directory
@@ -201,7 +201,7 @@ set(WIDGET_TYPE application/vnd.agl.service)
 # This is the file that will be executed, loaded,
 # at launch time by the application framework.
 #
-set(WIDGET_ENTRY_POINT lib/afb-low-can-binding.so)
+set(WIDGET_ENTRY_POINT lib/afb-canbus-binding.so)
 
 # Optional dependencies order
 # ---------------------------

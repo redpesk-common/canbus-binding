@@ -3,10 +3,10 @@
 	"$schema": "http:iot.bzh/download/openapi/schema-3.0/default-schema.json",
 	"info": {
 		"description": "",
-		"title": "low-can",
+		"title": "canbus",
 		"version": "4.0",
 		"x-binding-c-generator": {
-			"api": "low-can",
+			"api": "canbus",
 			"version": 2,
 			"prefix": "",
 			"postfix": "",
@@ -83,7 +83,7 @@
 		},
 		"x-permissions": {
 				"monitor": {
-					"permission": "urn:redpesk:permission:low-can:public:monitor"
+					"permission": "urn:redpesk:permission:canbus:public:monitor"
 				},
 				"write": {
 					"permission": "urn:redpesk:permission::platform:can:write"

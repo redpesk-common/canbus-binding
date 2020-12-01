@@ -207,10 +207,10 @@ The _control-canbus-binding.json_ file should have this structure:
 {
 	"$schema": "",
 	"metadata": {
-		"uid": "Low Can",
+		"uid": "CAN bus",
 		"version": "2.0",
-		"api": "low-can",
-		"info": "Low can Configuration"
+		"api": "canbus",
+		"info": "CAN bus Configuration"
 	},
 	"config": {
 		"active_message_set": 0,
