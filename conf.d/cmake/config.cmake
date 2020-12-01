@@ -27,7 +27,7 @@ set(PROJECT_AUTHOR "Romain Forlot")
 set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
 set(PROJECT_LICENSE "APL2.0")
 set(PROJECT_LANGUAGES "C;CXX")
-set(API_NAME "low-can")
+set(API_NAME "canbus")
 
 # Where are stored the project configuration files
 # relative to the root project directory
