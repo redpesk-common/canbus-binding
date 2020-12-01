@@ -101,7 +101,7 @@ PROJECT_TARGET_ADD(canbus-binding)
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		low-can
+		canbus
 		openxc-message-format
 		uds-c
 		isotp-c
