@@ -19,7 +19,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 
 # Project Info
 # ------------------
-set(PROJECT_NAME canbus-binding)
+set(PROJECT_NAME canbus-plugins-template)
 set(PROJECT_LANGUAGES "C;CXX")
 
 project(${PROJECT_NAME} DESCRIPTION "Build and install custom canbus-binding plugins")
@@ -49,7 +49,7 @@ list (APPEND link_libraries -pthread)
 pkg_check_modules(lowcan REQUIRED canbus-binding)
 
 add_link_options(-L${lowcan_LIBDIR})
-link_libraries(low-can ${lowcan_LIBRARIES})
+link_libraries(canbus ${lowcan_LIBRARIES})
 
 set(TARGETS_LIST "" CACHE INTERNAL "Enumarate targets")
 
