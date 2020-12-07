@@ -114,8 +114,8 @@ set (PKG_REQUIRED_LIST
 	json-c
 	libsystemd>=222
 	afb-binding
-	afb-helpers
-	appcontroller
+	afb-libhelpers
+	afb-libcontroller
 )
 
 # Prefix path where will be installed the files

@@ -106,5 +106,4 @@ PROJECT_TARGET_ADD(canbus-binding)
 		uds-c
 		isotp-c
 		bitfield-c
-		appcontroller
 		${link_libraries})

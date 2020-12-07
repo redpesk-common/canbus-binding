@@ -26,8 +26,8 @@ Then the following dependencies:
 * json-c
 * libsystemd >= 222
 * afb-daemon
-* afb-helpers
-* appcontroller
+* afb-libhelpers
+* afb-libcontroller
 * lua >= 5.3
 
 Fedora/OpenSuse:
