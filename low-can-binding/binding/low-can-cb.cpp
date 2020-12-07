@@ -1002,7 +1002,6 @@ static void simple_subscribe_signal(afb_req_t request)
 
 static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_ptr<diagnostic_message_t> diag_sig)
 {
-	static std::regex forbidden_char("[^a-zA-Z_]");
 	const struct afb_auth *auth = &default_auth;
 	std::string get_info = "Get last value of ";
 	std::string set_info = "Write a new value for ";
@@ -1036,11 +1035,10 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 		return -1;
 	}
 
-	verbname = std::regex_replace(signame, forbidden_char, "_");
-	get_prefix.append(verbname);
-	set_prefix.append(verbname);
-	sub_prefix.append(verbname);
-	unsub_prefix.append(verbname);
+	get_prefix.append(signame);
+	set_prefix.append(signame);
+	sub_prefix.append(signame);
+	unsub_prefix.append(signame);
 	get_info.append(signame);
 	set_info.append(signame);
 
