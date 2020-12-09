@@ -69,7 +69,7 @@ enum sign_t
 		SIGN_BIT_EXTERN = 4
 };
 
-class signal_t
+class signal_t:  public std::enable_shared_from_this<signal_t>
 {
 private:
 	std::shared_ptr<message_definition_t> parent_; /*!< parent_ - pointer to the parent message definition holding this signal*/
@@ -110,7 +110,7 @@ private:
 	sign_t sign_; /* !< sign_ - if the data is signed it indicates the encode */
 	int32_t bit_sign_position_; /*!< bit_sign_position_ - The bit that indicates the sign of the signal in its CAN message*/
 	std::string unit_; /* !< unit_ - The unit of the data */
-	struct afb_auth auth_ = {afb_auth_Yes, 0, nullptr}; /* !< auth_ - An AFB authentication structure if you need to protect the signal from the API.*/
+	std::string permission_ = ""; /* !< r_auth_ - An AFB authentication structure if you need to protect the signal from the API.*/
 
 public:
 	signal_t(
@@ -133,7 +133,7 @@ public:
 		sign_t sign,
 		int32_t bit_sign_position,
 		std::string unit,
-		struct afb_auth auth);
+		std::string permission);
 
 	signal_t(
 		std::string generic_name,
@@ -174,6 +174,7 @@ public:
 		signal_encoder encoder,
 		bool received);
 
+	std::shared_ptr<signal_t> get_shared_ptr();
 	std::shared_ptr<message_definition_t> get_message() const;
 	const std::string get_generic_name() const;
 	const std::string get_name() const;
@@ -199,7 +200,7 @@ public:
 	sign_t get_sign() const;
 	int32_t get_bit_sign_position() const;
 	const std::string get_unit() const;
-	const struct afb_auth* get_auth() const;
+	const std::string get_permission() const;
 
 	void set_parent(std::shared_ptr<message_definition_t> parent);
 	void set_received(bool r);

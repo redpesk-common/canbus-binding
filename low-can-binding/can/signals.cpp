@@ -51,7 +51,7 @@ signal_t::signal_t(
 	sign_t sign,
 	int32_t bit_sign_position,
 	std::string unit,
-	struct afb_auth auth)
+	std::string permission)
 	: parent_{nullptr},
 	 generic_name_{ generic_name }
 	, bit_position_{ bit_position }
@@ -73,7 +73,7 @@ signal_t::signal_t(
 	, sign_{sign}
 	, bit_sign_position_{bit_sign_position}
 	, unit_{unit}
-	, auth_{auth}
+	, permission_{permission}
 {}
 
 signal_t::signal_t(
@@ -152,6 +152,11 @@ signal_t::signal_t(
 	, encoder_{encoder}
 	, received_{received}
 {}
+
+std::shared_ptr<signal_t> signal_t::get_shared_ptr()
+{
+	return shared_from_this();
+}
 
 std::shared_ptr<message_definition_t> signal_t::get_message() const
 {
@@ -282,7 +287,7 @@ json_object* signal_t::afb_verb_get_last_value()
 int signal_t::afb_verb_write_on_bus(json_object *json_value)
 {
 	openxc_DynamicField dynafield_value = build_DynamicField(json_value);
-	std::shared_ptr<signal_t> sig = std::make_shared<signal_t>(*this);
+	std::shared_ptr<signal_t> sig = get_shared_ptr();
 	std::string bus_name = sig->get_message()->get_bus_device_name();
 	bool send = true;
 
@@ -382,7 +387,7 @@ const std::string signal_t::get_unit() const
 	return unit_;
 }
 
-const struct afb_auth* signal_t::get_auth() const
+const std::string signal_t::get_permission() const
 {
-	return &auth_;
+	return permission_;
 }
