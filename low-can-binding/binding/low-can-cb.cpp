@@ -924,7 +924,6 @@ void list(afb_req_t request)
 		afb_req_success(request, ans, NULL);
 	else
 		afb_req_fail(request, "error", NULL);
-
 }
 
 static void simple_subscribe_unsubscribe_signal(afb_req_t request, signal_t* signal, json_object* args, bool subscribe)
@@ -1023,7 +1022,7 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 
 	if(afb_api_add_verb(api, signame.c_str(), info.c_str(), signal_verb,
 			(void*) s, auth, 0, 0))
-		return -1;
+		AFB_WARNING("You got problem adding verb for the signal %s. Ignoring!", signame.c_str());
 
 	return 0;
 }
