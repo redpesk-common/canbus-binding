@@ -10,12 +10,28 @@ devel version installed.
 
 Else install the "canbus-binding-devel" package using your package manager.
 
+For redesk, Fedora or Opensuse:
+```
+sudo dnf install canbus-binding-devel
+```
+
+or for Ubuntu:
+```
+sudo apt install canbus-binding-dev
+```
+
 ## Install the generator
 
 To generate your plugins you will need the canbus-generator.
 
+For redesk, Fedora or Opensuse:
 ```bash
 dnf install canbus-generator
+```
+
+or for Ubuntu:
+```
+sudo apt install canbus-generator-bin
 ```
 
 or from the sources:

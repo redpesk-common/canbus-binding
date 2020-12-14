@@ -8,7 +8,7 @@ afm-util run canbus-service@4.0
 ```
 
 You can find instructions to use afm-util tool
-[here](../../reference/af-main/1-afm-daemons.html#using-afm-util),
+[here](../../developer-guides/1-afm-daemons.html#using-afm-util),
  as well as documentation about Application Framework.
 
 But you can't control nor interact with it because you don't know security
@@ -19,14 +19,14 @@ example, it will use port **1234** and left empty security token for testing
 purpose:
 
 ```bash
-afb-daemon --name=afbd-canbus-binding --workdir=/usr/local/canbus-binding --binding=lib/afb-canbus-binding.so --port=1234 --token=1 --tracereq=common -vvv
+afb-binder --name=afbd-canbus-binding --workdir=/usr/local/canbus-binding --binding=lib/afb-canbus-binding.so --port=1234 --token=1 --tracereq=common -vvv
 ```
 
 On another terminal, connect to the binding using previously installed
 **AFB Websocket CLI** tool:
 
 ```bash
-afb-client-demo -H ws://localhost:1234/api?token=1
+afb-client -H ws://localhost:1234/api?token=1
 ```
 
 You will be on an interactive session where you can communicate directly with

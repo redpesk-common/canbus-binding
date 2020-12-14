@@ -4,16 +4,15 @@ This part is only useful if you plan to install the package from source.
 
 If you aren't planing to build it from source, add the redpesk@ repository
 to your package manager.
-Here is the url for Redpesk and Fedora:
-`download.redpesk.bzh`
+To set up your build host please follow [this section](../../developer-guides/host-configuration/docs/1-Setup-your-build-host.html).
 
 ## From source
 
-We advise you to use the [local builder](http://redpesk-doc.lorient.iot/docs/en/master/getting_started/local-builder/local-builder.html) for from source installation. The
+We advise you to use the [local builder](../../getting_started/local_builder/docs/0_introduction.html) for from source installation. The
 local builder comes with everything setup to build redpesk@ projects.
 Some of the dependencies below will still be needed, like **lua** for example.
 
-Here is the [local builder documentation](http://redpesk-doc.lorient.iot/docs/en/master/getting_started/local-builder/local-builder.html).
+Here is the [local builder documentation](../../getting_started/local_builder/docs/3_build.html).
 
 Else install the building tools
 * git
@@ -25,7 +24,7 @@ Then the following dependencies:
 
 * json-c
 * libsystemd >= 222
-* afb-daemon
+* afb-binding
 * afb-libhelpers
 * afb-libcontroller
 * lua >= 5.3
@@ -37,7 +36,7 @@ dnf install git cmake make gcc-c++ afb-cmake-modules afb-binding-devel json-c-de
 
 Ubuntu:
 ```
-apt install git cmake make g++ afb-cmake-modules-bin libsystemd-dev afb-binding-dev libjson-c-dev liblua5.3-dev afb-libhelpers-dev afb-libcontroller-dev
+apt install git cmake make g++ afb-cmake-modules libsystemd-dev afb-binding-dev libjson-c-dev liblua5.3-dev afb-libhelpers-dev afb-libcontroller-dev
 ```
 
 # Getting started
@@ -47,10 +46,16 @@ apt install git cmake make g++ afb-cmake-modules-bin libsystemd-dev afb-binding-
 If you are on redpesk@ or if you have installed the required repositories
 simply install "canbus-binding" with you package manager.
 
-Example for redpesk@ distro:
+Example for redpesk@ distro, Fedora or Opensuse:
 ```bash
 dnf install canbus-binding
 ```
+
+For Ubuntu:
+```bash
+sudo apt install canbus-binding-bin
+```
+
 
 ## Compile and install the binding
 

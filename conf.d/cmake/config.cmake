@@ -231,7 +231,7 @@ set(AFB_REMPORT "1234" CACHE STRING "Default binder listening port")
 
 # Print a helper message when every thing is finished
 # ----------------------------------------------------
-set(CLOSING_MESSAGE "Typical binding launch: afb-daemon --port=${AFB_REMPORT} --workdir=${CMAKE_BINARY_DIR}/package --ldpaths=lib --roothttp=htdocs  --token=\"${AFB_TOKEN}\" --tracereq=common --verbose")
+set(CLOSING_MESSAGE "Typical binding launch: afb-binder --port=${AFB_REMPORT} --workdir=${CMAKE_BINARY_DIR}/package --ldpaths=lib --roothttp=htdocs  --token=\"${AFB_TOKEN}\" --tracereq=common --verbose")
 set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
 
 # Add Controller config
