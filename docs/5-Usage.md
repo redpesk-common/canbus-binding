@@ -53,60 +53,35 @@ Where:
 
 ## Subscription and unsubscription
 
-### Using general purpose verbs
+### Signal (un)subscription
 
-You can ask to subscribe to chosen CAN event with a call to _subscribe_ API
-verb with the CAN messages name as JSON argument.
+You can ask to subscribe to chosen CAN signal calling API and a verb with the
+name of the signal as verb prefixed by the plugin name holding the signal.
 
-> **NOTE:** If no argument is provided, then you'll subscribe to all signals
-> at once.
-
-For example from a websocket session:
+For example from an opened session:
 
 ```json
-canbus subscribe { "event": "doors.driver.open" }
-ON-REPLY 1:canbus/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"a18fd375-b6fa-4c0e-a1d4-9d3955975ae8"}}
-```
-
-Subscription and unsubscription can take wildcard in their _event_ value and are
-**case-insensitive**.
-
-To receive all doors events :
-
-```json
-canbus subscribe { "event" : "doors*" }
-ON-REPLY 1:canbus/subscribe: {"jtype":"afb-reply","request":{"status":"success","uuid":"511c872e-d7f3-4f3b-89c2-aa9a3e9fbbdb"}}
+canbus vcar/doors.driver.open "subscribe"
+ON-REPLY 1:canbus/vcar/doors.driver.open: {"jtype":"afb-reply","request":{"status":"success","uuid":"a18fd375-b6fa-4c0e-a1d4-9d3955975ae8"}}
 ```
 
 Then you will receive an event each time a CAN message is decoded for the event
 named _doors.driver.open_ with its received timestamp if available:
 
 ```json
-ON-EVENT canbus/messages.doors.driver.open({"event":"canbus\/messages.doors.driver.open","data":{"name":"messages.doors.driver.open","value":true, "timestamp": 1505812906020023},"jtype":"afb-event"})
+ON-EVENT canbus/vcar/vcar\/doors.driver.open({"event":"canbus\/vcar\/doors.driver.open","data":{"vcar\/doors.driver.open":true, "timestamp": 1505812906020023},"jtype":"afb-event"})
 ```
 
-Notice that event shows you that the CAN event is named
-_messages.doors.driver.open_ but you ask for event about
-_doors.driver.open_.
-
-This is because all CAN messages or diagnostic messages are prefixed by the
-JSON parent node name, **messages** for CAN messages and
-**diagnostic\_messages** for diagnostic messages like OBD2.
-
-This will let you subscribe or unsubcribe to all signals at once, not
-recommended, and better make filter on subscribe operation based upon their type. Examples:
+You can stop receiving event from it by unsubscribe the signal the same way you did for subscribe
 
 ```json
-canbus subscribe { "event" : "*speed*" } --> will subscribe to all messages with speed in their name. Search will be make without prefix for it.
-canbus subscribe { "event" : "speed*" } --> will subscribe to all messages begin by speed in their name. Search will be make without prefix for it.
-canbus subscribe { "event" : "messages*speed*" } --> will subscribe to all CAN messages with speed in their name. Search will be on prefixed messages here.
-canbus subscribe { "event" : "messages*speed" } --> will subscribe to all CAN messages ending with speed in their name. Search will be on prefixed messages here.
-canbus subscribe { "event" : "diagnostic*speed*" } --> will subscribe to all diagnostic messages with speed in their name. Search will be on prefixed messages here.
-canbus subscribe { "event" : "diagnostic*speed" } --> will subscribe to all diagnostic messages ending with speed in their name. Search will be on prefixed messages here.
+canbus vcar/doors.driver.open "unsubscribe"
+ON-REPLY 2:canbus/vcar/doors.driver.open: {"jtype":"afb-reply","request":{"status":"success"}}
 ```
 
-You can also subscribe to an event with the ID or the PGN of the message definition :
+### Message (un)subscription
 
+You can also subscribe to an event with the ID or the PGN of the message definition :
 
 ```json
 canbus subscribe {"id" : 1568}
@@ -120,39 +95,13 @@ canbus subscribe {"id" : "*"}
 canbus subscribe {"pgn" : "*"}
 ```
 
-
 You can stop receiving event from it by unsubscribe the signal the same way you did for subscribe
 
 ```json
-canbus unsubscribe { "event": "doors.driver.open" }
-ON-REPLY 2:canbus/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
-canbus unsubscribe { "event" : "doors*" }
+canbus unsubscribe {"id" : "*"}
 ON-REPLY 3:canbus/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
-```
-
-### Using signal dedicated verbs
-
-If you only need to subscribe a signal you hav the possibility to use its
-name to interact with it. For example, to subscribe to signal
-**messages.doors.driver.open** you can simply call:
-
-```
-canbus sub_messages_doors_driver_open
-ON-EVENT-CREATE: [1:canbus/messages.doors.driver.open*]
-ON-EVENT-SUBSCRIBE 1:sub_messages_doors_driver_open: [1]
-ON-REPLY 1:sub_messages_doors_driver_open: success Signal messages.messages.doors.driver.open* subscribed.
-null
-```
-
-> **CAUTION** Note the **point** characters translated to **underscore**
-> characters.
-
-And to unsubscribe:
-
-```
-canbus unsub_messages_doors_driver_open
-ON-REPLY 1:unsub_messages_doors_driver_open: success Signal messages.messages.doors.driver.open* unsubscribed.
-null
+canbus unsubscribe {"pgn" : "*"}
+ON-REPLY 4:canbus/unsubscribe: {"jtype":"afb-reply","request":{"status":"success"}}
 ```
 
 ### Filtering capabilities
@@ -178,44 +127,33 @@ or all of them at once.
 Usage examples :
 
 ```json
-canbus subscribe {"event": "messages.engine.speed", "filter": { "frequency": 3, "min": 1250, "max": 3500}}
-canbus subscribe {"event": "messages.engine.load", "filter": { "min": 30, "max": 100}}
-canbus subscribe {"event": "messages.vehicle.speed", "filter": { "frequency": 2}}
+canbus vcar/engine.speed { "subscribe": {"filter": { "frequency": 3, "min": 1250, "max": 3500}}}
+canbus vcar/engine.load  {"subscribe": {"filter": { "min": 30, "max": 100}}}
+canbus vcar/vehicle.speed  {"subscribe": {"filter": { "frequency": 2}}}
 # ISOTP
 canbus subscribe {"id": 273, "filter": {"tx_id" : 562}}
 ```
 
-## Get last signal value and list of configured signals
-
-### Using general purpose verbs
+## Get last signal value
 
 You can also ask for a particular signal value on one shot using **get** verb, like
 this:
 
 ```json
-canbus get {"event": "messages.engine.speed"}
-ON-REPLY 1:canbus/get: {"response":[{"event":"messages.engine.speed","value":0}],"jtype":"afb-reply","request":{"status":"success"}}
+canbus vcar/engine.speed "get"
+ON-REPLY 1:canbus/vcar/engine.speed: {"response":[{"vcar\/engine.speed":0}],"jtype":"afb-reply","request":{"status":"success"}}
 ```
 
 > **CAUTION** Only one event could be requested.
+
+## List of current loaded signals
 
 Also, if you want to know the supported CAN signals loaded by **canbus**, use
 verb **list**
 
 ```json
 canbus list
-ON-REPLY 2:canbus/list: {"response":["messages.hvac.fan.speed","messages.hvac.temperature.left","messages.hvac.temperature.right","messages.hvac.temperature.average","messages.engine.speed","messages.fuel.level.low","messages.fuel.level","messages.vehicle.average.speed","messages.engine.oil.temp","messages.engine.oil.temp.high","messages.doors.boot.open","messages.doors.front_left.open","messages.doors.front_right.open","messages.doors.rear_left.open","messages.doors.rear_right.open","messages.windows.front_left.open","messages.windows.front_right.open","messages.windows.rear_left.open","messages.windows.rear_right.open","diagnostic_messages.engine.load","diagnostic_messages.engine.coolant.temperature","diagnostic_messages.fuel.pressure","diagnostic_messages.intake.manifold.pressure","diagnostic_messages.engine.speed","diagnostic_messages.vehicle.speed","diagnostic_messages.intake.air.temperature","diagnostic_messages.mass.airflow","diagnostic_messages.throttle.position","diagnostic_messages.running.time","diagnostic_messages.EGR.error","diagnostic_messages.fuel.level","diagnostic_messages.barometric.pressure","diagnostic_messages.ambient.air.temperature","diagnostic_messages.commanded.throttle.position","diagnostic_messages.ethanol.fuel.percentage","diagnostic_messages.accelerator.pedal.position","diagnostic_messages.hybrid.battery-pack.remaining.life","diagnostic_messages.engine.oil.temperature","diagnostic_messages.engine.fuel.rate","diagnostic_messages.engine.torque"],"jtype":"afb-reply","request":{"status":"success","uuid":"32df712a-c7fa-4d58-b70b-06a87f03566b"}}
-```
-
-### Using signal dedicated verbs
-
-The same as when you subscribe or unsubscribe for a signals you can use a
-dedicated verb to get the last value of it:
-
-```
-canbus r_messages_engine_speed
-ON-REPLY 1:canbus/get: {"response":[{"event":"messages.engine.speed","value":0}],"jtype":"afb-reply","request":{"status":"success"}}
-null
+ON-REPLY 2:canbus/list: {"response":["vcar\/hvac.fan.speed","vcar\/hvac.temperature.left","vcar\/hvac.temperature.right","vcar\/hvac.temperature.average","vcar\/engine.speed","vcar\/fuel.level.low","vcar\/fuel.level","vcar\/vehicle.average.speed","vcar\/engine.oil.temp","vcar\/engine.oil.temp.high","vcar\/doors.boot.open","vcar\/doors.front_left.open","vcar\/doors.front_right.open","vcar\/doors.rear_left.open","vcar\/doors.rear_right.open","vcar\/windows.front_left.open","vcar\/windows.front_right.open","vcar\/windows.rear_left.open","vcar\/windows.rear_right.open","vcar\/engine.load","vcar\/engine.coolant.temperature","vcar\/fuel.pressure","vcar\/intake.manifold.pressure","vcar\/engine.speed","vcar\/vehicle.speed","vcar\/intake.air.temperature","vcar\/mass.airflow","vcar\/throttle.position","vcar\/running.time","vcar\/EGR.error","vcar\/fuel.level","vcar\/barometric.pressure","vcar\/ambient.air.temperature","vcar\/commanded.throttle.position","vcar\/ethanol.fuel.percentage","vcar\/accelerator.pedal.position","vcar\/hybrid.battery-pack.remaining.life","vcar\/engine.oil.temperature","vcar\/engine.fuel.rate","vcar\/engine.torque"],"jtype":"afb-reply","request":{"status":"success","uuid":"32df712a-c7fa-4d58-b70b-06a87f03566b"}}
 ```
 
 ## Write on CAN buses
@@ -258,7 +196,7 @@ dedicated verb to write a new of it **if the signal has been set as writable**:
 
 ```
 canbus auth
-canbus w_messages_engine_speed { "signal_name": "engine.speed", "signal_value": 1256}
+canbus vcar/engine_speed { "write": 1256 }
 ```
 
 ## Using CAN utils to monitor CAN activity

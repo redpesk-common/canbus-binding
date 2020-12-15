@@ -95,38 +95,9 @@ Then connect your USB CAN device which should be named `can0` by default.
 
 # Configure the binding
 
-## Choose your active message set to use
+## **config** section
 
-Using several plugins you have the possibility to add several message set.
-A message set is a coherent set of message representing a usage of a CAN
-network. By example a car could run with a certain message set and could
-need to access sensitive data through another so you can separate those using
-this key **active_message_set**
-
-```json
-	"active_message_set": 0
-```
-
-## Choose the diagnostic bus
-
-The diagnostic bus use on existing bus devices to communicate to OBD2 ECUs.
-Use the following key to specify it:
-
-```json
-	"diagnostic_bus": "hs",
-```
-
-## Choose a default j1939 ECU name
-
-On a j1939 capable CAN network you can claim an address on it and then be
-able to retrieve the message addressed to this addr as the j1939 protocol is
-a point-to-point protocol. Use the following key to claim a name:
-
-```json
-	"defaut_j1939_ecu": "0xC0509600227CC7AA"
-```
-
-## The dev-mapping section
+### dev-mapping
 
 The binding reads system configuration file
 _/usr/local/canbus-binding/etc/control-canbus-binding.json_ at start to
@@ -170,7 +141,46 @@ the real one, here are some examples:
 }
 ```
 
-## The preinit/postinit sections
+> **CAUTION VERY IMPORTANT:** Make sure the CAN bus\(es\) you specify in your
+> configuration file match those specified in your generated source file with
+> the `can-config-generator`.
+
+### active_message_set
+
+Choose your active message set to use.
+
+Using several plugins you have the possibility to add several message set.
+A message set is a coherent set of message representing a usage of a CAN
+network. By example a car could run with a certain message set and could
+need to access sensitive data through another so you can separate those using
+this key **active_message_set**
+
+```json
+	"active_message_set": 0
+```
+
+### (Optionnal) diagnostic_bus
+
+Choose the diagnostic bus to use to communicate with OBD2 ECUs.
+Use the following key to specify it:
+
+```json
+	"diagnostic_bus": "hs",
+```
+
+### (Optionnal) defaut_j1939_ecu
+
+Choose a default j1939 ECU name.
+
+On a j1939 capable CAN network you can claim an address on it and then be
+able to retrieve the message addressed to this addr as the j1939 protocol is
+a point-to-point protocol. Use the following key to claim a name:
+
+```json
+	"defaut_j1939_ecu": "0xC0509600227CC7AA"
+```
+
+### (Optionnal) The preinit/postinit sections
 
 These sections define actions from plugins to be executed before and after the
 binding initialization. If you need set and executed some arbitrary code this is
@@ -199,7 +209,15 @@ Here is an example:
 },
 ```
 
-## Example of a typical binding configuration file
+## **plugins** section
+
+A plugin or an array of plugin definition with **3** keys:
+
+* **uid** mandatory key that identify the plugin uniquely.
+* **info** optionnal key to add some information about the plugin.
+* **libs** mandatory key defining plugin file name to load.
+
+### Example of a configuration file
 
 The _control-canbus-binding.json_ file should have this structure:
 
@@ -231,14 +249,10 @@ The _control-canbus-binding.json_ file should have this structure:
 	},
 	"plugins": [
 		{
-			"uid": "generated-generated",
-			"info": "custom generated plugin",
-			"libs": "generated-plugin.ctlso"
+			"uid": "j1939-signals",
+			"info": "J1939 generated plugin",
+			"libs": "j1939-plugin.ctlso"
 		}
 	]
 }
 ```
-
-> **CAUTION VERY IMPORTANT:** Make sure the CAN bus\(es\) you specify in your
-> configuration file match those specified in your generated source file with
-> the `can-config-generator`.
