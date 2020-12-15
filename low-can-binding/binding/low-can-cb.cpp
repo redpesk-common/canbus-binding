@@ -963,7 +963,8 @@ static void signal_verb(afb_req_t request)
 
 	signal_t* signal = (signal_t*) afb_req_get_vcbdata(request);
 
-	if(json_object_object_get_ex(actionJ, "write", &optionsJ))
+	if(json_object_object_get_ex(actionJ, "write", &optionsJ) &&
+	   afb_req_session_get_LOA(request) >= AFB_SESSION_LOA_1)
 	{
 		if(signal->get_writable() && signal->afb_verb_write_on_bus(optionsJ))
 			afb_req_fail_f(request, "Changing the configuration of signal '%s' failed.", signal->get_generic_name().c_str());
