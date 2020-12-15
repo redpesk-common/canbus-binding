@@ -82,7 +82,6 @@ class diagnostic_message_t
 
 		uint32_t get_pid();
 		const std::string get_generic_name() const;
-		const std::string get_name() const;
 		float get_frequency() const;
 		DiagnosticResponseDecoder get_decoder() const;
 		DiagnosticResponseCallback get_callback() const;

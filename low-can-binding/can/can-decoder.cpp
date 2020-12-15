@@ -114,7 +114,7 @@ float decoder_t::parse_signal_bitfield(signal_t& signal, std::shared_ptr<message
 	sign = handle_sign(signal, data_signal, new_end_bit, data);
 
 	if(data_signal.size() > 65535)
-		AFB_ERROR("Too long data signal %s", signal.get_name().c_str());
+		AFB_ERROR("Too long data signal %s", signal.get_generic_name().c_str());
 
 	return static_cast<float>(sign) * bitfield_parse_float(data_signal.data(), (uint16_t) data_signal.size(),
 			new_start_bit, bit_size, signal.get_factor(),

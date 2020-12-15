@@ -31,6 +31,11 @@ message_set_t::message_set_t(
 {}
 
 
+std::string message_set_t::get_name() const
+{
+	return name_;
+}
+
 int message_set_t::add_message_definition(std::shared_ptr<message_definition_t> msg_def)
 {
 	for (auto old_msg_def : messages_definition_)

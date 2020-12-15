@@ -70,11 +70,6 @@ const std::string diagnostic_message_t::get_generic_name() const
 	return generic_name_;
 }
 
-const std::string diagnostic_message_t::get_name() const
-{
-	return active_diagnostic_request_t::get_prefix() + "." + generic_name_;
-}
-
 float diagnostic_message_t::get_frequency() const
 {
 	return frequency_;

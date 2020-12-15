@@ -51,6 +51,7 @@ public:
 	int add_message_definition(std::shared_ptr<message_definition_t> msg_def);
 	int add_diagnostic_message(std::shared_ptr<diagnostic_message_t> diag_msg);
 
+	std::string get_name() const;
 	vect_ptr_msg_def_t& get_messages_definition();
 	vect_ptr_signal_t get_all_signals() const;
 	vect_ptr_diag_msg_t& get_diagnostic_messages();

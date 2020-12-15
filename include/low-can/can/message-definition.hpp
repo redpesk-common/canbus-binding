@@ -86,6 +86,7 @@ public:
 				 const vect_ptr_signal_t& signals,
 				 uint64_t j1939_ecu_name);
 
+	std::shared_ptr<message_set_t> get_parent() const;
 	const std::string get_bus_name() const;
 	const std::string get_bus_device_name() const;
 	const std::string get_name() const;

@@ -24,8 +24,6 @@
 
 #define AFB_ERROR_PID 0xFF
 
-std::string active_diagnostic_request_t::prefix_ = "diagnostic_messages";
-
 active_diagnostic_request_t::active_diagnostic_request_t(const std::string& bus, uint32_t id,
 		const std::string& name,
 		bool wait_for_multiple_responses,
@@ -74,11 +72,6 @@ DiagnosticRequestHandle* active_diagnostic_request_t::get_handle()
 const std::string active_diagnostic_request_t::get_name() const
 {
 	return name_;
-}
-
-std::string& active_diagnostic_request_t::get_prefix()
-{
-	return active_diagnostic_request_t::prefix_;
 }
 
 DiagnosticResponseDecoder& active_diagnostic_request_t::get_decoder()

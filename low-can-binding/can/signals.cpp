@@ -29,8 +29,6 @@
 
 #include "canutil/write.h"
 
-std::string signal_t::prefix_ = "messages";
-
 signal_t::signal_t(
 	std::string generic_name,
 	uint32_t bit_position,
@@ -168,11 +166,6 @@ const std::string signal_t::get_generic_name() const
 	return generic_name_;
 }
 
-const std::string signal_t::get_name() const
-{
-	return prefix_ + "." + generic_name_;
-}
-
 uint32_t signal_t::get_bit_position() const
 {
 	return bit_position_;
@@ -268,13 +261,13 @@ json_object* signal_t::afb_verb_get_last_value()
 
 	if(states_.empty())
 	{
-		json_object_object_add(jobj, get_name().c_str(),
+		json_object_object_add(jobj, get_generic_name().c_str(),
 					json_object_new_double(last_value_));
 	}
 	else
 	{
 		std::string val = states_[(uint8_t) last_value_];
-		json_object_object_add(jobj, get_name().c_str(),
+		json_object_object_add(jobj, get_generic_name().c_str(),
 					json_object_new_string(val.c_str()));
 
 	}

@@ -77,6 +77,11 @@ message_definition_t::message_definition_t(const std::string bus,
 	j1939_ecu_name_{j1939_ecu_name}
 {}
 
+std::shared_ptr<message_set_t> message_definition_t::get_parent() const
+{
+	return parent_;
+}
+
 const std::string message_definition_t::get_bus_device_name() const
 {
 	return application_t::instance().get_can_bus_manager()
