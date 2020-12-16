@@ -7,9 +7,7 @@ afm-util run canbus-service@4.0
 1
 ```
 
-You can find instructions to use afm-util tool
-[here](../../developer-guides/1-afm-daemons.html#using-afm-util),
- as well as documentation about Application Framework.
+The tool afm-util tool is automatically installed in redpesk® image. You can find documentation about [Application Framework Binder](../../developer-guides/afb-overview.html)
 
 But you can't control nor interact with it because you don't know security
 token that **Application Framework** gave it at launch.
