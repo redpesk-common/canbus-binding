@@ -1,0 +1,2 @@
+@CMAKE_INSTALL_PREFIX@/canbus-binding/lib
+@CMAKE_INSTALL_PREFIX@/canbus-binding/lib64

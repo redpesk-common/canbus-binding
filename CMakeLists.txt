@@ -30,3 +30,12 @@ INSTALL(FILES
 	DESTINATION
 	${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
+
+configure_file(${PROJECT_NAME}.conf.in ${PROJECT_NAME}.conf @ONLY)
+
+INSTALL(FILES
+	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.conf
+	DESTINATION
+	/etc/ld.so.conf.d
+)
+INSTALL(CODE "execute_process(COMMAND ldconfig)")
