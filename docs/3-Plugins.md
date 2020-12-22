@@ -46,8 +46,6 @@ make
 sudo make install
 ```
 
-# Install the redpesk plugins
-
 # Write your json mapping file
 
 In this json file will be defined all the messages you will receive from your
