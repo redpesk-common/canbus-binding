@@ -4,15 +4,15 @@ This part is only useful if you plan to install the package from source.
 
 If you aren't planing to build it from source, add the redpesk@ repository
 to your package manager.
-To set up your build host please follow [this section](../../developer-guides/host-configuration/docs/1-Setup-your-build-host.html).
+To set up your build host please follow [this section]({% chapter_link host-configuration-doc.setup-your-build-host %}).
 
 ## From source
 
-We advise you to use the [local builder](../../getting_started/local_builder/docs/0_introduction.html) for from source installation. The
+We advise you to use the [local builder]({% chapter_link local-builder-doc.introduction %}) for from source installation. The
 local builder comes with everything setup to build redpesk@ projects.
 Some of the dependencies below will still be needed, like **lua** for example.
 
-Here is the [local builder documentation](../../getting_started/local_builder/docs/3_build.html).
+Here is the [local builder documentation]({% chapter_link local-builder-doc.build %}).
 
 Else install the building tools
 * git
