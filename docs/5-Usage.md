@@ -7,7 +7,7 @@ afm-util run canbus-service@4.0
 1
 ```
 
-The tool afm-util tool is automatically installed in redpesk® image. You can find documentation about [Application Framework Binder]({% chapter_link afb_binder.overview %})
+The tool afm-util tool is automatically installed in redpesk image. You can find documentation about [Application Framework Binder]({% chapter_link afb_binder.overview %})
 
 But you can't control nor interact with it because you don't know security
 token that **Application Framework** gave it at launch.
