@@ -9,6 +9,7 @@
 
 	<feature name="urn:AGL:widget:required-permission">
 		<param name="urn:AGL:permission::partner:scope-platform" value="required" />
+		<param name="urn:AGL:permission::partner:create-can-socket" value="required" />
 		<param name="urn:AGL:permission::public:hidden" value="required" />
 		<param name="urn:AGL:permission::system:run-by-default" value="required" />
 		<param name="urn:AGL:permission::public:no-htdocs" value="required" />
