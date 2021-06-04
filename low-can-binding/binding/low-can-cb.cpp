@@ -106,13 +106,11 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	/// We pass by default the first CAN bus device to its Initialization.
 	if(! diagnotic_bus)
 		AFB_WARNING("Diagnostic Manager: no diagnostic bus specified. Service will run without the diagnostic manager.");
-	if(! application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
+	else if(! application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
 	{
 		AFB_ERROR("Diagnostic Manager: not initialized. Problem initializing the diagnostic manager with the bus: %s", diagnotic_bus);
 		return -1;
 	}
-
-
 
 	return 0;
 }
@@ -1176,11 +1174,14 @@ int load_config(afb_api_t api)
 			break;
 	}
 
-	for(const auto& sig: all_signals.diagnostic_messages)
+	if(application.get_diagnostic_manager().is_initialized())
 	{
-		ret = add_verb(api, nullptr, sig);
-		if (ret)
-			break;
+		for(const auto& sig: all_signals.diagnostic_messages)
+		{
+			ret = add_verb(api, nullptr, sig);
+			if (ret)
+				break;
+		}
 	}
 
 	return ret;
