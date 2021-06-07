@@ -230,17 +230,17 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 		if(sig->get_supported() && subscribe)
 		{
 			if (!app.is_engine_on())
-				AFB_WARNING("signal: Engine is off, %s won't received responses until it's on",  sig->get_generic_name().c_str());
+				AFB_WARNING("signal: Engine is off, %s won't received responses until it's on",  sig->get_name().c_str());
 
-			diag_m.add_recurring_request(diag_req, sig->get_generic_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency, perm_rec_diag_req);
+			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency, perm_rec_diag_req);
 			if(can_subscription->create_rx_filter(sig) < 0)
 				return -1;
-			AFB_DEBUG("Signal: %s subscribed", sig->get_generic_name().c_str());
+			AFB_DEBUG("Signal: %s subscribed", sig->get_name().c_str());
 			if(it == s.end() && add_to_event_loop(can_subscription) < 0)
 			{
 				diag_m.cleanup_request(
 					diag_m.find_recurring_request(*diag_req), true);
-				AFB_WARNING("signal: %s isn't supported. Canceling operation.",  sig->get_generic_name().c_str());
+				AFB_WARNING("signal: %s isn't supported. Canceling operation.",  sig->get_name().c_str());
 				return -1;
 			}
 		}
@@ -248,11 +248,11 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 		{
 			if(sig->get_supported())
 			{
-				AFB_DEBUG("%s cancelled due to unsubscribe", sig->get_generic_name().c_str());
+				AFB_DEBUG("%s cancelled due to unsubscribe", sig->get_name().c_str());
 			}
 			else
 			{
-				AFB_WARNING("signal: %s isn't supported. Canceling operation.", sig->get_generic_name().c_str());
+				AFB_WARNING("signal: %s isn't supported. Canceling operation.", sig->get_name().c_str());
 				return -1;
 			}
 		}
@@ -294,7 +294,7 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 			return -1;
 
 		rets++;
-		AFB_DEBUG("%s Signal: %s %ssubscribed", sig->get_message()->is_fd() ? "FD": "", sig->get_generic_name().c_str(), subscribe ? "":"un");
+		AFB_DEBUG("%s Signal: %s %ssubscribed", sig->get_message()->is_fd() ? "FD": "", sig->get_name().c_str(), subscribe ? "":"un");
 	}
 	return rets;
 }
@@ -688,7 +688,7 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 	std::shared_ptr<signal_t> sig = sf.signals.front();
 	if(! sig->get_writable())
 	{
-		afb_req_fail_f(request, "%s isn't writable. Message not sent.", sig->get_generic_name().c_str());
+		afb_req_fail_f(request, "%s isn't writable. Message not sent.", sig->get_name().c_str());
 		return;
 	}
 
@@ -889,12 +889,12 @@ static struct json_object *list_can_message(const std::string& name)
 	for(const auto& sig: sf.signals)
 	{
 		json_object_array_add(ans,
-			json_object_new_string(sig->get_generic_name().c_str()));
+			json_object_new_string(sig->get_name().c_str()));
 	}
 	for(const auto& sig: sf.diagnostic_messages)
 	{
 		json_object_array_add(ans,
-			json_object_new_string(sig->get_generic_name().c_str()));
+			json_object_new_string(sig->get_name().c_str()));
 	}
 
 	return ans;
@@ -935,9 +935,9 @@ static void simple_subscribe_unsubscribe_signal(afb_req_t request, signal_t* sig
 		list_ptr_signal_t list_sig {signal->get_shared_ptr()};
 		event_filter_t evt_filter = generate_filter(args);
 		if(subscribe_unsubscribe_signals(request, subscribe, list_sig, evt_filter, s))
-			afb_req_success_f(request, nullptr, "Signal %s subscribed.", signal->get_generic_name().c_str());
+			afb_req_success_f(request, nullptr, "Signal %s subscribed.", signal->get_name().c_str());
 		else
-			afb_req_fail_f(request, "Signal %s not subscribed", signal->get_generic_name().c_str());
+			afb_req_fail_f(request, "Signal %s not subscribed", signal->get_name().c_str());
 		return;
 	}
 	afb_req_fail(request, "Error: No or wrong signal to be processed.", NULL);
@@ -965,7 +965,7 @@ static void signal_verb(afb_req_t request)
 	   afb_req_session_get_LOA(request) >= AFB_SESSION_LOA_1)
 	{
 		if(signal->get_writable() && signal->afb_verb_write_on_bus(optionsJ))
-			afb_req_fail_f(request, "Changing the configuration of signal '%s' failed.", signal->get_generic_name().c_str());
+			afb_req_fail_f(request, "Changing the configuration of signal '%s' failed.", signal->get_name().c_str());
 		else
 			afb_req_success(request, optionsJ, "write");
 	}
@@ -1010,7 +1010,7 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 
 	if (sig)
 	{
-		signame = sig->get_message()->get_parent()->get_name() + '/' + sig->get_generic_name();
+		signame = sig->get_message()->get_parent()->get_name() + '/' + sig->get_name();
 		if(! sig->get_permission().empty())
 		{
 			auth->type = afb_auth_Permission;
@@ -1020,7 +1020,7 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 	}
 	else if(diag_sig)
 	{
-		signame = diag_sig->get_generic_name();
+		signame = diag_sig->get_name();
 		s = (void*) diag_sig.get();
 	}
 	else

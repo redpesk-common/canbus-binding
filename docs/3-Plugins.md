@@ -148,7 +148,7 @@ for the signal mapping for more information. Defaults to false.
 
 The attributes of a signal object within a message are:
 
-* *`generic_name`* \
+* *`name`* \
 The name of the associated generic signal name (from the OpenXC specification)
 that this should be translated to. Optional - if not specified, the signal is
 read and stored in memory, but not sent to the output bus. This is handy for
@@ -348,14 +348,14 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 					"bit_position": 0,
 					"bit_size": 8,
 					"sign": 0,
-					"generic_name": "Iso.Transport.Protocol.Data.Transfer.Sid"
+					"name": "Iso.Transport.Protocol.Data.Transfer.Sid"
 				},
 				"Data": {
 					"bit_position": 8,
 					"bit_size": 56,
 					"decoder": "decoder_t::decode_bytes",
 					"sign": 0,
-					"generic_name": "Iso.Transport.Protocol.Data.Transfer.Data"
+					"name": "Iso.Transport.Protocol.Data.Transfer.Data"
 				}
 			}
 		},
@@ -376,7 +376,7 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 					"comment": "One signals",
 					"decoder": "decoder_t::decode_60160",
 					"sign": 0,
-					"generic_name": "signal.60160"
+					"name": "signal.60160"
 				}
 			}
 		}

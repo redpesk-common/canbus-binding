@@ -57,7 +57,7 @@ int message_set_t::add_diagnostic_message(std::shared_ptr<diagnostic_message_t> 
 	{
 		if(old_diag_msg->get_pid() == diag_msg->get_pid())
 		{
-			AFB_ERROR("Same pid between : %s and %s", old_diag_msg->get_generic_name().c_str(), diag_msg->get_generic_name().c_str());
+			AFB_ERROR("Same pid between : %s and %s", old_diag_msg->get_name().c_str(), diag_msg->get_name().c_str());
 			return -1;
 		}
 	}

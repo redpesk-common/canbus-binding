@@ -47,7 +47,7 @@ class diagnostic_message_t
 	private:
 		std::shared_ptr<message_set_t> parent_; /*!< parent_ - Pointer to the CAN message set holding this diagnostic message */
 		uint8_t pid_; /*!< pid_ - The 1 byte PID.*/
-		std::string generic_name_; /*!< generic_name_ - A human readable name to use for this PID when published.*/
+		std::string name_; /*!< name_ - A human readable name to use for this PID when published.*/
 		int min_; /*!< min_ - Minimum value that can take this pid */
 		int max_; /*!< max_ - Maximum value that can take this pid */
 		enum UNIT unit_; /*!< unit_ : Which unit system is used by that pid. See enum UNIT above.*/
@@ -68,9 +68,9 @@ class diagnostic_message_t
 								* If 'received_' is false, this value is undefined. */
 
 	public:
-		const char* generic_name = generic_name_.c_str();
+		const char* name = name_.c_str();
 		diagnostic_message_t(uint8_t pid,
-					 const std::string& generic_name,
+					 const std::string& name,
 					 const int min,
 					 const int max,
 					 enum UNIT unit,
@@ -81,7 +81,7 @@ class diagnostic_message_t
 					 bool received);
 
 		uint32_t get_pid();
-		const std::string get_generic_name() const;
+		const std::string get_name() const;
 		float get_frequency() const;
 		DiagnosticResponseDecoder get_decoder() const;
 		DiagnosticResponseCallback get_callback() const;

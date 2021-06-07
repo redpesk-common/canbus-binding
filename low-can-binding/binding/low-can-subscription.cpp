@@ -184,7 +184,7 @@ const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnost
 const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnostic_message(const std::string& name) const
 {
 	for(const auto& diag: diagnostic_message_)
-		if(diag->get_generic_name() == name)
+		if(diag->get_name() == name)
 			return diag;
 
 	return nullptr;
@@ -195,7 +195,7 @@ const std::shared_ptr<diagnostic_message_t> low_can_subscription_t::get_diagnost
 const std::string low_can_subscription_t::get_name() const
 {
 	if (signal_ != nullptr)
-		return signal_->get_message()->get_parent()->get_name() + '/' + signal_->get_generic_name();
+		return signal_->get_message()->get_parent()->get_name() + '/' + signal_->get_name();
 	else if (!diagnostic_message_.empty())
 		return "diagnostic_messages";
 
@@ -209,7 +209,7 @@ const std::string low_can_subscription_t::get_name() const
 const std::string low_can_subscription_t::get_name(uint32_t pid) const
 {
 	if (!diagnostic_message_.empty())
-		return get_diagnostic_message(pid)->get_generic_name() ;
+		return get_diagnostic_message(pid)->get_name() ;
 
 	AFB_WARNING("No diagnostics messages nor CAN signals registered in that subscription. Name empty ! It's a bug to be reported.");
 	return "";

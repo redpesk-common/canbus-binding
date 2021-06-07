@@ -30,7 +30,7 @@
 #include "canutil/write.h"
 
 signal_t::signal_t(
-	std::string generic_name,
+	std::string name,
 	uint32_t bit_position,
 	uint32_t bit_size,
 	float factor,
@@ -51,7 +51,7 @@ signal_t::signal_t(
 	std::string unit,
 	std::string permission)
 	: parent_{nullptr},
-	 generic_name_{ generic_name }
+	 name_{ name }
 	, bit_position_{ bit_position }
 	, bit_size_{ bit_size }
 	, factor_{ factor }
@@ -75,7 +75,7 @@ signal_t::signal_t(
 {}
 
 signal_t::signal_t(
-	std::string generic_name,
+	std::string name,
 	uint32_t bit_position,
 	uint32_t bit_size,
 	float factor,
@@ -95,7 +95,7 @@ signal_t::signal_t(
 	int32_t bit_sign_position,
 	std::string unit)
 	: parent_{nullptr},
-	 generic_name_{ generic_name }
+	 name_{ name }
 	, bit_position_{ bit_position }
 	, bit_size_{ bit_size }
 	, factor_{ factor }
@@ -119,7 +119,7 @@ signal_t::signal_t(
 
 
 signal_t::signal_t(
-	std::string generic_name,
+	std::string name,
 	uint32_t bit_position,
 	uint32_t bit_size,
 	float factor,
@@ -134,7 +134,7 @@ signal_t::signal_t(
 	signal_decoder decoder,
 	signal_encoder encoder,
 	bool received)
-	: generic_name_{ generic_name }
+	: name_{ name }
 	, bit_position_{ bit_position }
 	, bit_size_{ bit_size }
 	, factor_{ factor }
@@ -161,9 +161,9 @@ std::shared_ptr<message_definition_t> signal_t::get_message() const
 	return parent_;
 }
 
-const std::string signal_t::get_generic_name() const
+const std::string signal_t::get_name() const
 {
-	return generic_name_;
+	return name_;
 }
 
 uint32_t signal_t::get_bit_position() const
@@ -261,13 +261,13 @@ json_object* signal_t::afb_verb_get_last_value()
 
 	if(states_.empty())
 	{
-		json_object_object_add(jobj, get_generic_name().c_str(),
+		json_object_object_add(jobj, get_name().c_str(),
 					json_object_new_double(last_value_));
 	}
 	else
 	{
 		std::string val = states_[(uint8_t) last_value_];
-		json_object_object_add(jobj, get_generic_name().c_str(),
+		json_object_object_add(jobj, get_name().c_str(),
 					json_object_new_string(val.c_str()));
 
 	}

@@ -66,7 +66,7 @@ namespace utils
 		{
 			for(std::shared_ptr<T> s : signals)
 			{
-				if(::fnmatch(key.c_str(), s->get_generic_name().c_str(), FNM_CASEFOLD) == 0)
+				if(::fnmatch(key.c_str(), s->get_name().c_str(), FNM_CASEFOLD) == 0)
 					found_signals.push_back(s);
 			}
 		}

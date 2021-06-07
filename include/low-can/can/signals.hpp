@@ -73,7 +73,7 @@ class signal_t:  public std::enable_shared_from_this<signal_t>
 {
 private:
 	std::shared_ptr<message_definition_t> parent_; /*!< parent_ - pointer to the parent message definition holding this signal*/
-	std::string generic_name_; /*!< generic_name_ - The name of the signal to be output.*/
+	std::string name_; /*!< name_ - The name of the signal to be output.*/
 	uint32_t bit_position_; /*!< bitPosition_ - The starting bit of the signal in its CAN message (assuming
 				*	non-inverted bit numbering, i.e. the most significant bit of
 				*	each byte is 0) */
@@ -112,7 +112,7 @@ private:
 
 public:
 	signal_t(
-		std::string generic_name,
+		std::string name,
 		uint32_t bit_position,
 		uint32_t bit_size,
 		float factor,
@@ -134,7 +134,7 @@ public:
 		std::string permission);
 
 	signal_t(
-		std::string generic_name,
+		std::string name,
 		uint32_t bit_position,
 		uint32_t bit_size,
 		float factor,
@@ -156,7 +156,7 @@ public:
 
 
 	signal_t(
-		std::string generic_name,
+		std::string name,
 		uint32_t bit_position,
 		uint32_t bit_size,
 		float factor,
@@ -174,7 +174,7 @@ public:
 
 	std::shared_ptr<signal_t> get_shared_ptr();
 	std::shared_ptr<message_definition_t> get_message() const;
-	const std::string get_generic_name() const;
+	const std::string get_name() const;
 	uint32_t get_bit_position() const;
 	uint32_t get_bit_size() const;
 	float get_factor() const;

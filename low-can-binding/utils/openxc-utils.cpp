@@ -383,7 +383,7 @@ const openxc_DynamicField generate_openxc_DynamicField_from_message(std::shared_
 		{
 			if (dynamicField_tmp.has_type)
 			{
-				json_object_object_add(signal_json_tmp, sig->get_generic_name().c_str(),
+				json_object_object_add(signal_json_tmp, sig->get_name().c_str(),
 							jsonify_DynamicField(dynamicField_tmp));
 				if (sig != nullptr && sig->get_unit() != "")
 					json_object_object_add(signal_json_tmp, "unit", json_object_new_string(sig->get_unit().c_str()));

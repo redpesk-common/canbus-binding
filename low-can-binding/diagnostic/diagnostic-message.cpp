@@ -36,7 +36,7 @@ const char *UNIT_NAMES[10] = {
 
 diagnostic_message_t::diagnostic_message_t(
 		uint8_t pid,
-		const std::string& generic_name,
+		const std::string& name,
 		const int min,
 		const int max,
 		enum UNIT unit,
@@ -47,7 +47,7 @@ diagnostic_message_t::diagnostic_message_t(
 		bool received)
 		: parent_{nullptr},
 		pid_{pid},
-		generic_name_{generic_name},
+		name_{name},
 		min_{min},
 		max_{max},
 		unit_{unit},
@@ -65,9 +65,9 @@ uint32_t diagnostic_message_t::get_pid()
 	return (uint32_t)pid_;
 }
 
-const std::string diagnostic_message_t::get_generic_name() const
+const std::string diagnostic_message_t::get_name() const
 {
-	return generic_name_;
+	return name_;
 }
 
 float diagnostic_message_t::get_frequency() const
