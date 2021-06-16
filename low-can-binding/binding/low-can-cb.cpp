@@ -1048,12 +1048,6 @@ int init_binding(afb_api_t api)
 
 	ActionExecUID(NULL, (CtlConfigT*)afb_api_get_userdata(api), "preinit", nullptr);
 
-	if(application.get_message_set().empty())
-	{
-		AFB_ERROR("No message_set defined");
-		return -1;
-	}
-
 	can_bus_manager.start_threads();
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 
@@ -1162,6 +1156,11 @@ int load_config(afb_api_t api)
 		return -1;
 	}
 
+	if(application.get_message_set().empty())
+	{
+		AFB_ERROR("No message_set defined");
+		return -1;
+	}
 	struct utils::signals_found all_signals;
 
 	openxc_DynamicField search_key = build_DynamicField("*");
