@@ -1,4 +1,4 @@
-# redpesk@ CAN binding architecture proposal
+# redpesk@ CAN binding architecture
 
 Meant to:
 
@@ -20,7 +20,7 @@ CAN binding will be separated in two parts:
 ![CAN low and high level bindings mapping](images/CAN_level_mapping.png)
 
 * High level: Binding from which others applications will connect to.
-It will provides valuable access to the CAN bus by aggregating signals or
+It will provide valuable access to the CAN bus by aggregating signals or
 providing new signals from several sources. For example, a signal exposing
 whether or not a door is open, no matter which one it is. Also, we can imagine
 an application which supervises if there is no one in the car but moving
@@ -28,8 +28,8 @@ an application which supervises if there is no one in the car but moving
 will send a single event representing that behavior to the application which in
 turn will send a phone message to.
 
-* Low level: Decode messages that transit and send event through **Application Framework** to the subscribers with human readable message. It provides some basic access to the bus + some basic mathematical, statistical features (last_values, min, max, timestamps, averaging) as well as basic filters to get discerning signals only.
+* Low level: Decode messages that transit and send events through **Application Framework** to the subscribers with human readable messages. It provides some basic access to the bus + some basic mathematical, statistical features (last_values, min, max, timestamps, averaging) as well as basic filters to get discerning signals only.
 
-![Communication between CAN bindings and third applications](images/CAN_bindings_communication.png)
+![Communication between CAN bindings and third parties applications](images/CAN_bindings_communication.png)
 
 Last but not least, the low level binding can be shipped as binary only using OpenXC inspired [redpesk@ canbus Generator](https://github.com/redpesk-common/canbus-generator).
