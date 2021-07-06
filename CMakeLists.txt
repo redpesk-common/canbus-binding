@@ -18,6 +18,8 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
 
+project(canbus-binding)
+
 include(CTest)
 enable_testing()
 include(${CMAKE_CURRENT_SOURCE_DIR}/conf.d/cmake/config.cmake)

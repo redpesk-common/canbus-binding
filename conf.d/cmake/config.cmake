@@ -18,7 +18,6 @@
 
 # Project Info
 # ------------------
-set(PROJECT_NAME canbus-binding)
 set(PROJECT_PRETTY_NAME "CAN bus binding")
 set(PROJECT_DESCRIPTION "Expose CAN bus  APIs through AGL Framework")
 set(PROJECT_URL "https://git.ovh.iot/redpesk-common/canbus-bindingit")
