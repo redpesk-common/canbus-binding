@@ -36,9 +36,19 @@ application_t& application_t::instance()
 	return config;
 }
 
+plugin_store_t application_t::get_plugins()
+{
+	return _plugins_store;
+}
+
 can_bus_t& application_t::get_can_bus_manager()
 {
 	return can_bus_manager_;
+}
+
+void application_t::set_plugins(plugin_store_t pstore)
+{
+	_plugins_store = pstore;
 }
 
 std::map<std::string, std::shared_ptr<low_can_subscription_t> >& application_t::get_can_devices()
@@ -196,24 +206,14 @@ void application_t::set_parents(std::shared_ptr<message_set_t> new_message_set)
 		dm->set_parent(new_message_set);
 }
 
-json_object* application_t::get_preinit() const
+json_object* application_t::get_config() const
 {
-	return preinit_;
+	return config_;
 }
 
-json_object* application_t::get_postinit() const
+void application_t::set_config(json_object *config)
 {
-	return postinit_;
-}
-
-void application_t::set_preinit(json_object *preinit)
-{
-	preinit_ = preinit;
-}
-
-void application_t::set_postinit(json_object *postinit)
-{
-	postinit_ = postinit;
+	config_ = config;
 }
 
 #ifdef USE_FEATURE_J1939

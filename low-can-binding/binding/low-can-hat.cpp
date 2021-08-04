@@ -53,12 +53,15 @@ void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std
 	s.erase(it);
 }
 
-int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *userdata)
+void read_message(afb_evfd_t evfd, int fd, uint32_t revents, void *userdata)
 {
+	low_can_subscription_t *can_subscription = (low_can_subscription_t*) userdata;
 
-	low_can_subscription_t* can_subscription = (low_can_subscription_t*)userdata;
-
-
+	if (can_subscription->get_socket()->socket() != fd)
+	{
+		AFB_ERROR("%s: subscription socket and callback fd do not match. Should not happens, you got a valid subscription with a wrong socket. Abort.", __FUNCTION__);
+		return;
+	}
 	if ((revents & EPOLLIN) != 0)
 	{
 		utils::signals_manager_t& sm = utils::signals_manager_t::instance();
@@ -86,9 +89,7 @@ int read_message(sd_event_source *event_source, int fd, uint32_t revents, void *
 	// check if error or hangup
 	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
 	{
-		sd_event_source_unref(event_source);
+		afb_evfd_unref(evfd);
 		can_subscription->get_socket()->close();
 	}
-
-	return 0;
 }

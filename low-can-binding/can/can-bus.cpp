@@ -17,13 +17,17 @@
 
 #include <net/if.h>
 #include <sys/socket.h>
-#include <json-c/json.h>
 #include <linux/can/raw.h>
+
 #include <map>
 #include <cerrno>
 #include <vector>
 #include <string>
 #include <algorithm>
+
+#include <json-c/json.h>
+#include <afb-helpers4/afb-data-utils.h>
+
 #include <low-can/can/can-bus.hpp>
 #include <low-can/can/signals.hpp>
 #include <low-can/can/can-decoder.hpp>
@@ -131,13 +135,13 @@ void can_bus_t::process_signals(std::shared_ptr<message_t> message, map_subscrip
 
 		// messages
 		if(subscription->get_message_definition() != nullptr)
-		{
-			decoded_message = generate_openxc_DynamicField_from_message(subscription->get_message_definition(), message, send);
-		}
+			decoded_message = generate_openxc_DynamicField_from_message(
+				subscription->get_message_definition(),
+				message,
+				send
+			);
 		else // signal
-		{
 			decoded_message = decoder_t::translate_signal(*subscription->get_signal(), message, &send);
-		}
 
 		s_message = build_SimpleMessage(subscription->get_name(), decoded_message);
 		vehicle_message = build_VehicleMessage(s_message, message->get_timestamp());
@@ -202,7 +206,6 @@ void can_bus_t::can_decode_message()
 		{
 			std::shared_ptr<message_t>  message = next_can_message();
 			can_message_lock.unlock();
-
 			{
 				std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
 				map_subscription& s = sm.get_subscribed_signals();
@@ -241,7 +244,8 @@ void can_bus_t::can_event_push()
 					jo = json_object_new_object();
 					std::shared_ptr<signal_t> signal = s[v_message.first]->get_signal();
 					jsonify_vehicle(v_message.second, signal, jo);
-					if(afb_event_push(s[v_message.first]->get_event(), jo) == 0)
+					afb::data data = afb_data_json_c_hold(jo);
+					if(s[v_message.first]->get_event().push(data) == 0)
 					{
 						if(v_message.second.has_diagnostic_response)
 							on_no_clients(s[v_message.first], v_message.second.diagnostic_response.pid, s);

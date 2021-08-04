@@ -67,7 +67,7 @@ low_can_subscription_t::operator bool() const
 {
 	return ((signal_ != nullptr || ! diagnostic_message_.empty()) && ! socket_);
 }
-afb_event_t low_can_subscription_t::get_event()
+afb::event low_can_subscription_t::get_event()
 {
 	return event_;
 }
@@ -81,8 +81,8 @@ afb_event_t low_can_subscription_t::get_event()
 int low_can_subscription_t::set_event()
 {
 	std::string event_name = get_name();
-	event_ = afb_daemon_make_event(event_name.c_str());
-	if (! afb_event_is_valid(event_))
+	if(! (event_ = afb::api(afbBindingRoot).new_event(event_name)) &&
+	   ! event_.is_valid())
 	{
 		AFB_ERROR("Can't create an event for %s, something goes wrong.", event_name.c_str());
 		return -1;
@@ -99,9 +99,9 @@ int low_can_subscription_t::set_event()
  *
  * @return int - 0 if OK, -1 if not
  */
-int low_can_subscription_t::subscribe(afb_req_t request)
+int low_can_subscription_t::subscribe(afb::req request)
 {
-	if(! afb_event_is_valid(event_))
+	if(! event_.is_valid())
 		if(set_event() < 0)
 			return -1;
 
@@ -116,7 +116,7 @@ int low_can_subscription_t::subscribe(afb_req_t request)
  *
  * @return int - 0 if OK, -1 if not
  */
-int low_can_subscription_t::unsubscribe(afb_req_t request)
+int low_can_subscription_t::unsubscribe(afb::req request)
 {
 	return afb_req_unsubscribe(request, event_);
 }

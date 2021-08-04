@@ -109,8 +109,8 @@ set (PKG_REQUIRED_LIST
 	json-c
 	libsystemd>=222
 	afb-binding
-	afb-helpers3
-	afb-libcontroller
+	afb-helpers4
+	librp-utils
 )
 
 # Prefix path where will be installed the files
@@ -134,7 +134,7 @@ set(COMPILE_OPTIONS
  -Wall
  -Werror
  -Wextra
-  -Wno-unused-parameter
+ -Wno-unused-parameter
  -Wno-sign-compare
  -Wno-sign-conversion
  -Werror=maybe-uninitialized
@@ -167,7 +167,7 @@ set(CXX_COMPILE_OPTIONS -pthread CACHE STRING "Compilation flags for C++ languag
 # -D_FORTIFY_SOURCE=2
 # CACHE STRING "Compilation flags for RELEASE build type.")
 
-add_definitions(-DAFB_BINDING_VERSION=3)
+add_definitions(-DAFB_BINDING_VERSION=4)
 
 # Optional location for config.xml.in
 # -----------------------------------
@@ -228,10 +228,6 @@ set(AFB_REMPORT "1234" CACHE STRING "Default binder listening port")
 # ----------------------------------------------------
 set(CLOSING_MESSAGE "Typical binding launch: afb-binder --port=${AFB_REMPORT} --workdir=${CMAKE_BINARY_DIR}/package --ldpaths=lib --roothttp=htdocs  --token=\"${AFB_TOKEN}\" --tracereq=common --verbose")
 set(PACKAGE_MESSAGE "Install widget file using in the target : afm-util install ${PROJECT_NAME}.wgt")
-
-# Add Controller config
-add_definitions(-DCONTROL_PLUGIN_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/lib/plugins:${CMAKE_BINARY_DIR}/package/lib/plugins:${CMAKE_BINARY_DIR}/package/var:${CMAKE_BINARY_DIR}/package-test")
-add_definitions(-DCONTROL_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}/etc:${CMAKE_BINARY_DIR}/package/etc:${CMAKE_BINARY_DIR}/package-test/")
 
 # Optional schema validator about now only XML, LUA and JSON
 # are supported

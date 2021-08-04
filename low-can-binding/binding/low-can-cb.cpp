@@ -16,20 +16,28 @@
  * limitations under the License.
  */
 
-#include <low-can/binding/low-can-hat.hpp>
-#include "low-can-apidef.h"
-
 #include <map>
 #include <queue>
 #include <mutex>
 #include <regex>
 #include <vector>
 #include <thread>
+#include <filesystem>
 #include <algorithm>
-#include <wrap-json.h>
+
+
+#include <rp-utils/rp-jsonc.h>
 #include <systemd/sd-event.h>
-#include <ctl-config.h>
+
+#include <afb-helpers4/plugin-store.h>
+#include <afb-helpers4/afb-data-utils.h>
+#include <rp-utils/rp-jsonc.h>
+
+#include <low-can/binding/low-can-hat.hpp>
+#include "low-can-apidef.h"
+
 #include "openxc.pb.h"
+
 #include <low-can/binding/application.hpp>
 #include <low-can/can/can-encoder.hpp>
 #include <low-can/can/can-bus.hpp>
@@ -44,33 +52,25 @@
 	#include <linux/can/j1939.h>
 #endif
 
-static struct afb_auth default_auth = {afb_auth_Yes,0,nullptr};
 ///*****************************************************************************
 ///
 ///		Controller Definitions and Callbacks
 ///
 ///****************************************************************************/
 
-int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_obj)
+static int process_config(afb::api api, json_object *json_obj, application_t& application)
 {
 	AFB_DEBUG("Config %s", json_object_to_json_string(json_obj));
-	CtlConfigT *ctrlConfig = (CtlConfigT *) afb_api_get_userdata(apiHandle);
 	int active_message_set = 0;
 	json_object *dev_mapping = nullptr;
+	json_object *config = nullptr;
 	json_object *preinit = nullptr;
 	json_object *postinit = nullptr;
 	const char *ecu = nullptr;
 	const char *diagnotic_bus = nullptr;
 
-	if(! ctrlConfig)
-		return -1;
-
-	application_t *application = (application_t*) getExternalData(ctrlConfig);
-
-	if(! application)
-		return -1;
-
-	if(wrap_json_unpack(json_obj, "{si, s?s, s?s, s?o, s?o}",
+	if(rp_jsonc_unpack(json_obj, "sO", "config", &config)
+	|| rp_jsonc_unpack(config,   "{si s?s s?s s?o s?o}",
 			      "active_message_set", &active_message_set,
 			      "diagnostic_bus", &diagnotic_bus,
 			      "default_j1939_name", &ecu,
@@ -78,28 +78,23 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 			      "postinit", &postinit))
 		return -1;
 
-	AFB_DEBUG("PREINIT: %s", json_object_get_string(preinit));
-	AFB_DEBUG("POSTINIT: %s", json_object_get_string(postinit));
-
 	if(ecu)
 	{
 #ifdef USE_FEATURE_J1939
-		application->set_default_j1939_ecu(ecu);
+		application.set_default_j1939_ecu(ecu);
 		AFB_INFO("Default J1939 ECU name set to %s", ecu);
 #else
 		AFB_INFO("J1939 feature disable, doing nothing");
 #endif
 	}
-	application->set_preinit(preinit);
-	application->set_postinit(postinit);
 
-	application->set_active_message_set((uint8_t)active_message_set);
+	application.set_active_message_set((uint8_t)active_message_set);
 
-	if(wrap_json_unpack(json_obj, "{so}",
+	if(rp_jsonc_unpack(json_obj, "{so}",
 			    "dev-mapping", &dev_mapping))
 		return -1;
 
-	if(application->get_can_bus_manager().set_can_devices(dev_mapping) < 0)
+	if(application.get_can_bus_manager().set_can_devices(dev_mapping) < 0)
 		return -1;
 
 	/// Initialize Diagnostic manager that will handle obd2 requests.
@@ -115,31 +110,16 @@ int config_low_can(afb_api_t apiHandle, CtlSectionT *section, json_object *json_
 	return 0;
 }
 
-CtlSectionT ctlSections_[] = {
-	[0]={.key="config" , .uid="config", .info=nullptr,
-		 .loadCB=config_low_can,
-		 .handle=nullptr,
-		 .actions=nullptr},
-	[1]={.key="plugins" , .uid="plugins", .info=nullptr,
-		.loadCB=PluginConfig,
-		.handle=nullptr,
-		.actions=nullptr},
-	[2]={.key=nullptr , .uid=nullptr, .info=nullptr,
-		.loadCB=nullptr,
-		.handle=nullptr,
-		.actions=nullptr},
-};
-
 ///*****************************************************************************
 ///
-///		Api Verbs implementation
+///		Global Api Verbs implementation
 ///
 ///****************************************************************************/
 
 /// @brief This will determine if an event handle needs to be created and checks if
 /// we got a valid afb_event to get subscribe or unsubscribe. After that launch the subscription or unsubscription
 /// against the application framework using that event handle.
-static int subscribe_unsubscribe_signal(afb_req_t request,
+static int subscribe_unsubscribe_signal(afb::req request,
 					bool subscribe,
 					std::shared_ptr<low_can_subscription_t>& can_subscription,
 					map_subscription& s)
@@ -191,16 +171,19 @@ static int subscribe_unsubscribe_signal(afb_req_t request,
 
 static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscription)
 {
-		struct sd_event_source* event_source = nullptr;
-		return ( sd_event_add_io(afb_daemon_get_event_loop(),
-			&event_source,
-			can_subscription->get_socket()->socket(),
-			EPOLLIN,
-			read_message,
-			can_subscription.get()));
+	// JOBOL: missing C++ handler class, must use C one. Don't know
+	// if it is wanted or not.
+	afb_evfd_t efd = nullptr;
+	return afb_evfd_create(&efd,
+				can_subscription->get_socket()->socket(),
+				EPOLLIN,
+				read_message,
+				can_subscription.get(),
+				true,
+				true);
 }
 
-static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
+static int subscribe_unsubscribe_diagnostic_messages(afb::req request,
 						     bool subscribe,
 						     list_ptr_diag_msg_t diagnostic_messages,
 						     struct event_filter_t& event_filter,
@@ -265,7 +248,7 @@ static int subscribe_unsubscribe_diagnostic_messages(afb_req_t request,
 	return rets;
 }
 
-static int subscribe_unsubscribe_signals(afb_req_t request,
+static int subscribe_unsubscribe_signals(afb::req request,
 					 bool subscribe,
 					 list_ptr_signal_t signals,
 					 struct event_filter_t& event_filter,
@@ -309,7 +292,7 @@ static int subscribe_unsubscribe_signals(afb_req_t request,
 ///
 /// @return Number of correctly subscribed signal
 ///
-static int subscribe_unsubscribe_signals(afb_req_t request,
+static int subscribe_unsubscribe_signals(afb::req request,
 					 bool subscribe,
 					 const struct utils::signals_found& signals,
 					 struct event_filter_t& event_filter)
@@ -357,7 +340,7 @@ static event_filter_t generate_filter(json_object* args)
 }
 
 
-static int one_subscribe_unsubscribe_events(afb_req_t request, bool subscribe, const std::string& tag, json_object* args)
+static int one_subscribe_unsubscribe_events(afb::req request, bool subscribe, const std::string& tag, json_object *args)
 {
 	int ret = 0;
 	struct utils::signals_found sf;
@@ -393,7 +376,7 @@ static int one_subscribe_unsubscribe_events(afb_req_t request, bool subscribe, c
 	return ret;
 }
 
-static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const uint32_t& id, json_object *args)
+static int one_subscribe_unsubscribe_id(afb::req request, bool subscribe, const uint32_t& id, json_object *args)
 {
 	std::vector<std::shared_ptr<message_definition_t>> messages_definition = application_t::instance().get_messages_definition(id);
 	for(auto message_definition : messages_definition)
@@ -429,8 +412,7 @@ static int one_subscribe_unsubscribe_id(afb_req_t request, bool subscribe, const
 	return 0;
 }
 
-
-static int process_one_subscribe_args(afb_req_t request, bool subscribe, json_object *args)
+static int process_one_subscribe_args(afb::req request, bool subscribe, json_object *args)
 {
 	int rc = 0, rc2=0;
 	json_object *x = nullptr, *event = nullptr, *id = nullptr;
@@ -486,12 +468,25 @@ static int process_one_subscribe_args(afb_req_t request, bool subscribe, json_ob
 	return rc;
 }
 
-static void do_subscribe_unsubscribe(afb_req_t request, bool subscribe)
+static bool get_json_param(afb::req request, json_object *&json) noexcept
+{
+	afb::data data;
+	if (!request.try_convert(0, afb::JSON_C(), data)) {
+		request.reply(AFB_ERRNO_INVALID_REQUEST);
+		return false;
+	}
+	json = reinterpret_cast<json_object*>(*data);
+	return true;
+}
+
+static void do_subscribe_unsubscribe(afb::req request, afb::received_data params, bool subscribe)
 {
 	int rc = 0;
 	struct json_object *args, *x;
 
-	args = afb_req_json(request);
+	if (!get_json_param(request, args))
+		return;
+
 	if (json_object_get_type(args) == json_type_array)
 	{
 		for(int i = 0; i < json_object_array_length(args); i++)
@@ -506,25 +501,25 @@ static void do_subscribe_unsubscribe(afb_req_t request, bool subscribe)
 	}
 
 	if (rc >= 0)
-		afb_req_success(request, NULL, NULL);
+		request.reply(0);
 	else
-		afb_req_fail(request, "error", NULL);
+		request.reply(-1);
 }
 
-void auth(afb_req_t request)
+static void auth(afb::req request, afb::received_data params) noexcept
 {
 	afb_req_session_set_LOA(request, 1);
-	afb_req_success(request, NULL, NULL);
+	request.reply(0);
 }
 
-void subscribe(afb_req_t request)
+static void subscribe(afb::req request, afb::received_data params) noexcept
 {
-	do_subscribe_unsubscribe(request, true);
+	do_subscribe_unsubscribe(request, params, true);
 }
 
-void unsubscribe(afb_req_t request)
+static void unsubscribe(afb::req request, afb::received_data params) noexcept
 {
-	do_subscribe_unsubscribe(request, false);
+	do_subscribe_unsubscribe(request, params, false);
 }
 
 static int send_message(message_t *message, const std::string& bus_name, uint32_t flags, event_filter_t &event_filter, std::shared_ptr<signal_t> signal)
@@ -553,9 +548,8 @@ static int send_message(message_t *message, const std::string& bus_name, uint32_
 		return -1;
 }
 
-
-static void write_raw_frame(afb_req_t request, const std::string& bus_name, message_t *message,
-			    struct json_object *can_data, uint32_t flags, event_filter_t &event_filter)
+static void write_raw_frame(afb::req request, const std::string& bus_name, message_t *message,
+			    json_object *can_data, uint32_t flags, event_filter_t &event_filter)
 {
 
 	struct utils::signals_found sf;
@@ -607,30 +601,46 @@ static void write_raw_frame(afb_req_t request, const std::string& bus_name, mess
 		else
 		{
 			if(flags&CAN_PROTOCOL)
-				afb_req_fail(request, "Invalid", "Frame BCM");
+			{
+				afb_data_t reply = afb_data_string("Invalid: Frame BCM");
+				request.reply(-1, 1, &reply);
+			}
 			else if(flags&J1939_PROTOCOL)
-				afb_req_fail(request, "Invalid", "Frame J1939");
+			{
+				afb_data_t reply = afb_data_string("Invalid: Frame J1939");
+				request.reply(-1, 1, &reply);
+			}
 			else if(flags&ISOTP_PROTOCOL)
-				afb_req_fail(request, "Invalid", "Frame ISOTP");
+			{
+				afb_data_t reply = afb_data_string("Invalid: Frame ISOTP");
+				request.reply(-1, 1, &reply);
+			}
 			else
-				afb_req_fail(request, "Invalid", "Frame");
+			{
+				afb_data_t reply = afb_data_string("Invalid: Frame");
+				request.reply(1, 1, &reply);
+			}
 
 			return;
 		}
 
 		if(! send_message(message, application_t::instance().get_can_bus_manager().get_can_device_name(bus_name), flags, event_filter, sf.signals.front()))
-			afb_req_success(request, nullptr, "Message correctly sent");
+			request.reply(0);
 		else
-			afb_req_fail(request, "Error", "sending the message. See the log for more details.");
+			request.reply(-2);
 	}
 	else
 	{
-		afb_req_fail(request, "Error", "no find id in signals. See the log for more details.");
+		afb_data_t reply;
+		const char msg[] = "Error: no find id in signals. See the log for more details.";
+		afb_create_data_raw(&reply, AFB_PREDEFINED_TYPE_STRINGZ, msg, sizeof msg, NULL, NULL);
+
+		request.reply(-1, 1, &reply);
 	}
 
 }
 
-static void write_frame(afb_req_t request, const std::string& bus_name, json_object *json_value, event_filter_t &event_filter)
+static void write_frame(afb::req request, const std::string& bus_name, json_object *json_value, event_filter_t &event_filter)
 {
 	message_t *message;
 	uint32_t id;
@@ -640,7 +650,7 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 
 	AFB_DEBUG("JSON content %s", json_object_get_string(json_value));
 
-	if(!wrap_json_unpack(json_value, "{si, si, so !}",
+	if(!rp_jsonc_unpack(json_value, "{si, si, so !}",
 				  "can_id", &id,
 				  "can_dlc", &length,
 				  "can_data", &can_data))
@@ -649,7 +659,7 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 		write_raw_frame(request, bus_name, message, can_data, CAN_PROTOCOL, event_filter);
 	}
 #ifdef USE_FEATURE_J1939
-	else if(!wrap_json_unpack(json_value, "{si, si, so !}",
+	else if(!rp_jsonc_unpack(json_value, "{si, si, so !}",
 				  "pgn", &id,
 				  "length", &length,
 				  "data", &can_data))
@@ -660,13 +670,14 @@ static void write_frame(afb_req_t request, const std::string& bus_name, json_obj
 #endif
 	else
 	{
-		afb_req_fail(request, "Invalid", "Frame object malformed");
+		afb_data_t reply = afb_data_string("Invalid: Frame object malformed");
+		request.reply(-1, 1, &reply);
 		return;
 	}
 	delete message;
 }
 
-static void write_signal(afb_req_t request, const std::string& name, json_object *json_value, event_filter_t &event_filter)
+static void write_signal(afb::req request, const std::string& name, json_object *json_value, event_filter_t &event_filter)
 {
 	struct canfd_frame cfd;
 	struct utils::signals_found sf;
@@ -681,14 +692,16 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 
 	if (sf.signals.empty())
 	{
-		afb_req_fail_f(request, "No signal(s) found for %s. Message not sent.", name.c_str());
+		afb_data_t data = afb_data_string(std::string("No signal(s) found for "+name+". Message not sent.").c_str());
+		request.reply(-1, 1, &data);
 		return;
 	}
 
 	std::shared_ptr<signal_t> sig = sf.signals.front();
 	if(! sig->get_writable())
 	{
-		afb_req_fail_f(request, "%s isn't writable. Message not sent.", sig->get_name().c_str());
+		afb_data_t data = afb_data_string(std::string(sig->get_name()+" isn't writable. Message not sent.").c_str());
+		request.reply(-1, 1, &data);
 		return;
 	}
 
@@ -708,24 +721,28 @@ static void write_signal(afb_req_t request, const std::string& name, json_object
 	message_t *message = encoder_t::build_message(sig, value, false, false);
 
 	if(! send_message(message, sig->get_message()->get_bus_device_name(), flags, event_filter, sig) && send)
-		afb_req_success(request, nullptr, "Message correctly sent");
+		request.reply(0);
 	else
-		afb_req_fail(request, "Error", "Sending the message. See the log for more details.");
+		request.reply(-1);
 
 	if(sig->get_message()->is_j1939())
 #ifdef USE_FEATURE_J1939
 		delete (j1939_message_t*) message;
 #else
-		afb_req_fail(request, "Warning", "J1939 not implemented in your kernel.");
+		afb_data_t reply = afb_data_string("Warning: J1939 not implemented in your kernel.");
+		request.reply(-1, 1, &reply);
 #endif
 	else
 		delete (can_message_t*) message;
 }
 
-void write(afb_req_t request)
+static void write(afb::req request, afb::received_data params) noexcept
 {
-	struct json_object* args = nullptr, *json_value = nullptr, *name = nullptr;
-	args = afb_req_json(request);
+	int rc = AFB_ERRNO_INVALID_REQUEST;
+	struct json_object* args, *json_value = nullptr, *name = nullptr;
+
+	if (!get_json_param(request, args))
+		return;
 
 	if(args != NULL)
 	{
@@ -734,26 +751,21 @@ void write(afb_req_t request)
 		if(json_object_object_get_ex(args,"bus_name",&name))
 		{
 			if(json_object_object_get_ex(args,"frame",&json_value))
+			{
 				write_frame(request, (std::string)json_object_get_string(name), json_value, event_filter);
-			else
-				afb_req_fail(request, "Error", "Request argument malformed");
+				rc = 0;
+			}
 		}
 		else if(json_object_object_get_ex(args,"signal_name",&name))
 		{
 			if(json_object_object_get_ex(args,"signal_value",&json_value))
+			{
 				write_signal(request, (std::string)json_object_get_string(name), json_value, event_filter);
-			else
-				afb_req_fail(request, "Error", "Request argument malformed");
-		}
-		else
-		{
-			afb_req_fail(request, "Error", "Request argument malformed");
+				rc = 0;
+			}
 		}
 	}
-	else
-	{
-		afb_req_fail(request, "Error", "Request argument null");
-	}
+	request.reply(rc);
 }
 
 static struct json_object *get_signals_value(const std::string& name)
@@ -811,14 +823,15 @@ static struct json_object *get_id_value(const uint32_t& id)
 	return ret;
 }
 
-void get(afb_req_t request)
+// TODO: convert "ans" json_object to a normal C/C++ struct avoiding json-c
+// serialization process.
+static void get(afb::req request, afb::received_data params) noexcept
 {
 	int rc = 0;
-	struct json_object* args = nullptr,
-		*json_name = nullptr;
-	json_object *ans = nullptr;
+	struct json_object* args = nullptr, *json_name = nullptr, *ans = nullptr;
 
-	args = afb_req_json(request);
+	if (!get_json_param(request, args))
+		return;
 
 	// Process about Raw CAN message on CAN bus directly
 	if (args != nullptr &&
@@ -865,12 +878,15 @@ void get(afb_req_t request)
 		rc = -1;
 	}
 
-	if (rc >= 0)
-		afb_req_success(request, ans, NULL);
-	else
-		afb_req_fail(request, "error", NULL);
+	if (rc >= 0) {
+		afb::data data = afb_data_json_c_hold(ans);
+		request.reply(0, data);
+	}
+	else {
+		json_object_put(ans);
+		request.reply(-1);
+	}
 }
-
 
 static struct json_object *list_can_message(const std::string& name)
 {
@@ -900,13 +916,16 @@ static struct json_object *list_can_message(const std::string& name)
 	return ans;
 }
 
-void list(afb_req_t request)
+// TODO: convert "ans" json_object to a normal C/C++ struct avoiding json-c
+// serialization process.
+static void list(afb::req request, afb::received_data params) noexcept
 {
 	int rc = 0;
-	json_object *ans = nullptr;
-	struct json_object* args = nullptr,
-		*json_name = nullptr;
-	args = afb_req_json(request);
+	struct json_object* args = nullptr, *json_name = nullptr, *ans = nullptr;
+
+	if (!get_json_param(request, args))
+		return;
+
 	const char *name;
 	if ((args != nullptr) &&
 		(json_object_object_get_ex(args, "event", &json_name) && json_object_is_type(json_name, json_type_string)))
@@ -918,13 +937,23 @@ void list(afb_req_t request)
 	if (!ans)
 		rc = -1;
 
-	if (rc >= 0)
-		afb_req_success(request, ans, NULL);
-	else
-		afb_req_fail(request, "error", NULL);
+	if (rc >= 0) {
+		afb::data data = afb_data_json_c_hold(ans);
+		request.reply(0, data);
+	}
+	else {
+		json_object_put(ans);
+		request.reply(-1);
+	}
 }
 
-static void simple_subscribe_unsubscribe_signal(afb_req_t request, signal_t* signal, json_object* args, bool subscribe)
+///*****************************************************************************
+///
+///		Specialized signal's verbs implementations
+///
+///****************************************************************************/
+
+static void simple_subscribe_unsubscribe_signal(afb::req request, signal_t* signal, json_object *args, bool subscribe)
 {
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
 	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
@@ -935,39 +964,46 @@ static void simple_subscribe_unsubscribe_signal(afb_req_t request, signal_t* sig
 		list_ptr_signal_t list_sig {signal->get_shared_ptr()};
 		event_filter_t evt_filter = generate_filter(args);
 		if(subscribe_unsubscribe_signals(request, subscribe, list_sig, evt_filter, s))
-			afb_req_success_f(request, nullptr, "Signal %s subscribed.", signal->get_name().c_str());
+		{
+			request.reply();
+		}
 		else
-			afb_req_fail_f(request, "Signal %s not subscribed", signal->get_name().c_str());
+		{
+			request.reply(AFB_ERRNO_INTERNAL_ERROR);
+		}
 		return;
 	}
-	afb_req_fail(request, "Error: No or wrong signal to be processed.", NULL);
+	request.reply(AFB_ERRNO_INVALID_REQUEST);
 }
 
-static void simple_unsubscribe_signal(afb_req_t request, signal_t* signal, json_object* args)
+static void simple_unsubscribe_signal(afb::req request, signal_t* signal, json_object *args)
 {
 	simple_subscribe_unsubscribe_signal(request, signal, args, false);
 }
 
-static void simple_subscribe_signal(afb_req_t request, signal_t* signal, json_object* args)
+static void simple_subscribe_signal(afb::req request, signal_t* signal, json_object *args)
 {
 	simple_subscribe_unsubscribe_signal(request, signal, args, true);
 }
 
-static void signal_verb(afb_req_t request)
+static void signal_verb(afb::req request, afb::received_data params) noexcept
 {
-	json_object *actionJ = afb_req_json(request),
-		    *optionsJ = nullptr;
+	struct json_object* actionJ = nullptr, *optionsJ = nullptr;
+
+	if (!get_json_param(request, actionJ))
+		return;
+
 	std::string action;
 
 	signal_t* signal = (signal_t*) afb_req_get_vcbdata(request);
 
-	if(json_object_object_get_ex(actionJ, "write", &optionsJ) &&
-	   afb_req_session_get_LOA(request) >= AFB_SESSION_LOA_1)
-	{
-		if(signal->get_writable() && signal->afb_verb_write_on_bus(optionsJ))
-			afb_req_fail_f(request, "Changing the configuration of signal '%s' failed.", signal->get_name().c_str());
+	if(json_object_object_get_ex(actionJ, "write", &optionsJ)) {
+		if (afb_req_session_get_LOA(request) < AFB_SESSION_LOA_1)
+			request.reply(AFB_ERRNO_BAD_API_STATE);
+		else if(signal->get_writable() && signal->afb_verb_write_on_bus(optionsJ))
+			request.reply(-1);
 		else
-			afb_req_success(request, optionsJ, "write");
+			request.reply();
 	}
 	else if(json_object_object_get_ex(actionJ, "subscribe", &optionsJ))
 	{
@@ -983,10 +1019,14 @@ static void signal_verb(afb_req_t request)
 		if(action == "get")
 		{
 			json_object *ret = signal->afb_verb_get_last_value();
-			if (ret)
-				afb_req_success(request, ret, "get");
+			if (ret) {
+				afb::data data = afb_data_json_c_hold(ret);
+				request.reply(0, data);
+			}
 			else
-				afb_req_fail(request, "Error", "No value retrieved. Signal might be never received.");
+			{
+				request.reply(-1);
+			}
 		}
 		else if(action == "subscribe")
 		{
@@ -998,21 +1038,27 @@ static void signal_verb(afb_req_t request)
 		}
 	}
 	else
-		afb_req_fail(request, "JSON argument is not correct", "choose between 'get', 'subscribe', 'unsubscribe'");
+	{
+		AFB_REQ_INFO(request, "invalid request %s", json_object_get_string(actionJ));
+		request.reply(AFB_ERRNO_INVALID_REQUEST);
+	}
 }
 
-static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_ptr<diagnostic_message_t> diag_sig)
+static int add_verb(afb::api &api, std::shared_ptr<signal_t> sig, std::shared_ptr<diagnostic_message_t> diag_sig)
 {
-	struct afb_auth *auth = &default_auth;
+	struct afb_auth *auth = nullptr;
 	std::string info = "Verb acting on 1 signal. Behavior depending on the json arguments provided.";
 	std::string signame;
-	void * s = nullptr;
+	void *s = nullptr;
 
 	if (sig)
 	{
 		signame = sig->get_message()->get_parent()->get_name() + '/' + sig->get_name();
 		if(! sig->get_permission().empty())
 		{
+			auth = reinterpret_cast<struct afb_auth*>(::malloc(sizeof *auth));
+			if (auth == NULL)
+				return -1;
 			auth->type = afb_auth_Permission;
 			auth->text = sig->get_permission().c_str();
 		}
@@ -1028,8 +1074,8 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 		return -1;
 	}
 
-	if(afb_api_add_verb(api, signame.c_str(), info.c_str(), signal_verb,
-			(void*) s, auth, 0, 0))
+	// JOBOL: Missing c++ verb cb handling to correctly add verbs
+	if(api.add_verb(signame, info, afb::verbcb<signal_verb>, s, auth, 0, 0))
 		AFB_WARNING("You got problem adding verb for the signal %s. Ignoring!", signame.c_str());
 
 	return 0;
@@ -1040,13 +1086,11 @@ static int add_verb(afb_api_t api, std::shared_ptr<signal_t> sig, std::shared_pt
 /// @param[in] service Structure which represent the Application Framework Binder.
 ///
 /// @return Exit code, zero if success.
-int init_binding(afb_api_t api)
+static int init_binding(afb::api &api)
 {
 	int ret = 0;
 	application_t& application = application_t::instance();
 	can_bus_t& can_bus_manager = application.get_can_bus_manager();
-
-	ActionExecUID(NULL, (CtlConfigT*)afb_api_get_userdata(api), "preinit", nullptr);
 
 	can_bus_manager.start_threads();
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
@@ -1059,11 +1103,10 @@ int init_binding(afb_api_t api)
 
 		if(sf.signals.empty() && sf.diagnostic_messages.size() == 1)
 		{
-			afb_req_t request = nullptr;
+			afb::req request = nullptr;
 
 			struct event_filter_t event_filter;
 			event_filter.frequency = sf.diagnostic_messages.front()->get_frequency();
-
 			map_subscription& s = sm.get_subscribed_signals();
 
 			subscribe_unsubscribe_diagnostic_messages(request, true, sf.diagnostic_messages, event_filter, s, true);
@@ -1093,68 +1136,58 @@ int init_binding(afb_api_t api)
 		}
 	}
 #endif
-	if (application.get_postinit())
-		ActionExecUID(NULL, (CtlConfigT*)afb_api_get_userdata(api), "postinit", nullptr);
-
 	if(ret)
 		AFB_ERROR("There was something wrong with the binding initialization.");
 
 	return ret;
 }
 
-int load_config(afb_api_t api)
+static int load_config(afb::api api, json_object *config)
 {
 	int ret = 0;
-	CtlConfigT *ctlConfig;
-	const char *dirList = getenv("CONTROL_CONFIG_PATH");
-	std::string bindingDirPath = GetBindingDirPath(api);
-	std::string filepath = bindingDirPath + "/etc";
 	application_t& application = application_t::instance();
-	json_object *preinit  = nullptr;
-	json_object *postinit = nullptr;
-
-	if (!dirList)
-		dirList=CONTROL_CONFIG_PATH;
-
-	filepath.append(":");
-	filepath.append(dirList);
-	const char *configPath = CtlConfigSearch(api, filepath.c_str(), "control");
-
-	if (!configPath)
-	{
-		AFB_ERROR("CtlPreInit: No control-%s* config found invalid JSON %s ", GetBinderName(), filepath.c_str());
-		return -1;
-	}
-
-	// create one API per file
-	ctlConfig = CtlLoadMetaData(api, configPath);
-	if (!ctlConfig)
-	{
-		AFB_ERROR("CtrlPreInit No valid control config file in:\n-- %s", configPath);
-		return -1;
-	}
 
 	// Save the config in the api userdata field
-	afb_api_set_userdata(api, ctlConfig);
+	afb_api_set_userdata(api, &application);
 
-	setExternalData(ctlConfig, (void*) &application);
-	ret= CtlLoadSections(api, ctlConfig, ctlSections_);
-
-	// Add preinit and postinit functions to the config section now that
-	// plugins are loaded
-	preinit = application.get_preinit();
-	if (preinit && AddActionsToSection(api, &ctlSections_[0], preinit, 0))
+	if(process_config(api, config, application))
 	{
-		AFB_API_ERROR (api, "Preinit config fail processing actions for section %s", ctlSections_[0].uid);
+		AFB_API_ERROR(api, "No config found or invalid JSON: %s", json_object_to_json_string(config));
 		return -1;
 	}
 
-	postinit = application.get_postinit();
-	if (postinit && AddActionsToSection(api, &ctlSections_[0], postinit, 0))
+/*
+	if(! config.contains("plugins") || config["plugins"].empty())
 	{
-		AFB_API_ERROR (api, "Preinit config fail processing actions for section %s", ctlSections_[0].uid);
+		AFB_API_ERROR(api, "No plugins section found or invalid JSON: %s", json_object_to_json_string(config));
 		return -1;
 	}
+
+	plugin_store_t pstore = nullptr;
+	if(config["plugins"].is_array())
+	{
+		for(auto elt: config["plugins"])
+			plugin_load(api,
+				    elt["uid"].get<std::string>().c_str(),
+				    elt["libs"].get<std::string>().c_str(),
+				    &pstore);
+	}
+	else
+	{
+		plugin_load(api,
+			    config["plugins"]["uid"].get<std::string>().c_str(),
+			    config["plugins"]["libs"].get<std::string>().c_str(),
+			    &pstore);
+	}
+	void **cbs = plugin_seek_cb_in_all(api, pstore, "plugin_init");
+
+	int i = 0;
+	while(cbs[i]) {
+		int (*init)(afb::api) = (int (*)(afb::api)) cbs[i];
+		init(api);
+		i++;
+	}
+*/
 
 	if(application.get_message_set().empty())
 	{
@@ -1181,6 +1214,26 @@ int load_config(afb_api_t api)
 			if (ret)
 				break;
 		}
+	}
+
+	return ret;
+}
+
+
+static int mainctl(afb::api api, afb::ctlid ctlid, afb::ctlarg ctlarg, void *userdata) noexcept
+{
+	int ret = 0;
+
+	switch (ctlid)
+	{
+	case afb_ctlid_Pre_Init:
+		ret = load_config(api, ctlarg->pre_init.config);
+		break;
+	case afb_ctlid_Init:
+		ret = init_binding(api);
+		break;
+	default:
+		break;
 	}
 
 	return ret;

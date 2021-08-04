@@ -22,6 +22,7 @@
 #include <string>
 #include <memory>
 
+#include <afb-helpers4/plugin-store.h>
 #include <low-can/can/can-bus.hpp>
 #include <low-can/can/message-set.hpp>
 #include <low-can/can/signals.hpp>
@@ -53,8 +54,10 @@ class application_t
 
 		std::map<std::string, std::shared_ptr<low_can_subscription_t> > can_devices_; ///< Map containing all independant opened CAN sockets, key is the socket int value.
 
-		json_object *preinit_ = nullptr; ///< Json object coming from config Json section holding the plugin and function name to execute as preinit
-		json_object *postinit_ = nullptr; ///< Json object coming from config Json section holding the plugin and function name to execute as postinit
+		plugin_store_t _plugins_store = nullptr; ///< Chained list holding the name and pointer to shared object opened with dlopen
+
+		json_object *config_ = nullptr; ///< Json object holding the whole binding configuration for future usage
+
 #ifdef USE_FEATURE_J1939
 		std::shared_ptr<low_can_subscription_t> subscription_address_claiming_; ///< Subscription holding the socketcan J1939 which is in charge of handling the address claiming protocol
 		uint64_t default_j1939_ecu_ = 0xC0509600227CC7AA; ///< Default ECU j1939 name using noted using a little endianness ie: 0xC0509600227CC7AA
@@ -66,6 +69,10 @@ class application_t
 		static application_t& instance();
 
 		can_bus_t& get_can_bus_manager();
+
+		plugin_store_t get_plugins();
+
+		void set_plugins(plugin_store_t pstore);
 
 		std::map<std::string, std::shared_ptr<low_can_subscription_t> >& get_can_devices();
 
@@ -95,10 +102,8 @@ class application_t
 
 		void set_active_message_set(uint8_t id);
 
-		json_object* get_preinit() const;
-		json_object* get_postinit() const;
-		void set_preinit(json_object *preinit);
-		void set_postinit(json_object *postinit);
+		json_object* get_config() const;
+		void set_config(json_object *config);
 #ifdef USE_FEATURE_J1939
 		std::shared_ptr<utils::socketcan_t> get_socket_address_claiming();
 		std::shared_ptr<low_can_subscription_t> get_subscription_address_claiming();

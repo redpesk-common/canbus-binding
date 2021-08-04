@@ -94,11 +94,11 @@ PROJECT_TARGET_ADD(canbus-binding)
 
 	add_library(${TARGET_NAME} MODULE ${SOURCES})
 
-	set(OPENAPI_DEF "binding/low-can-apidef" CACHE STRING "name and path to the JSON API definition without extension")
+#	set(OPENAPI_DEF "binding/low-can-apidef" CACHE STRING "name and path to the JSON API definition without extension")
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
 		PREFIX "afb-"
-		LABELS "BINDINGV3"
+		LABELS "BINDING"
 		INSTALL_RPATH $ORIGIN
 		OUTPUT_NAME ${TARGET_NAME}
 	)

@@ -5,6 +5,6 @@ Name: @PROJECT_NAME@
 Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
 
-Requires: afb-binding afb-libcontroller
+Requires: afb-binding afb-helpers4 librp-utils
 Cflags: -I${includedir}
 Libs: -L${libdir} -lcanbus

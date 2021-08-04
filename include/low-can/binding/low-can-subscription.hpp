@@ -53,7 +53,7 @@ class low_can_subscription_t
 private:
 	int index_; ///< index_ - index number is the socket (int) casted
 	struct event_filter_t event_filter_;
-	afb_event_t event_; ///< event_ - application framework event used to push on client
+	afb::event event_; ///< event_ - application framework event used to push on client
 
 	/// Signal part
 	std::shared_ptr<message_definition_t> message_; ///< message_ - the CAN message subscribed
@@ -74,9 +74,9 @@ public:
 	low_can_subscription_t& operator=(const low_can_subscription_t& s);
 	explicit operator bool() const;
 
-	afb_event_t get_event();
-	int subscribe(afb_req_t request);
-	int unsubscribe(afb_req_t request);
+	afb::event get_event();
+	int subscribe(afb::req request);
+	int unsubscribe(afb::req request);
 
 	int get_index() const;
 	const std::shared_ptr<signal_t> get_signal() const;

@@ -19,8 +19,9 @@
 #pragma once
 
 #include <string>
-#include <json-c/json.h>
 #include <sys/timeb.h>
+
+#include <json-c/json.h>
 #include <openxc.pb.h>
 #include <low-can/can/signals.hpp>
 #include <low-can/diagnostic/active-diagnostic-request.hpp>

@@ -4,17 +4,18 @@
 	"info": {
 		"description": "",
 		"title": "canbus",
-		"version": "4.0",
+		"version": "1.0",
 		"x-binding-c-generator": {
 			"api": "canbus",
-			"version": 2,
+			"version": 4,
 			"prefix": "",
 			"postfix": "",
+			"mainctl": "mainctl",
 			"start": null ,
 			"onevent": null,
 			"preinit": "load_config",
 			"init": "init_binding",
-			"scope": "",
+			"scope": "static",
 			"private": false
 		}
 	},

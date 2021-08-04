@@ -16,7 +16,11 @@
  */
 
 #include <unistd.h>
+
+
 #include <low-can/utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp>
+
+
 namespace utils
 {
 	/**
@@ -79,9 +83,9 @@ namespace utils
 				save_addr_name(jm->get_addr(), jm->get_name());
 
 
-				if(timer_handle_->evtSource)
+				if(timer_handle_)
 				{
-						TimerEvtStop(timer_handle_);
+						afb_timer_unref(timer_handle_);
 						timer_handle_ = nullptr;
 				}
 
@@ -211,39 +215,14 @@ namespace utils
 	 * @param timerhandle The timerhandle of the timer
 	 * @return int 1 it's all it's ok
 	 */
-	int socketcan_j1939_addressclaiming_t::no_response_claiming(TimerHandleT *timerhandle)
+	void socketcan_j1939_addressclaiming_t::no_response_claiming(afb_timer_t timerhandle, void *closure, unsigned decount)
 	{
-		socketcan_j1939_addressclaiming_t *addressclaiming_socket = (socketcan_j1939_addressclaiming_t*) timerhandle->context;
+		socketcan_j1939_addressclaiming_t *addressclaiming_socket = (socketcan_j1939_addressclaiming_t*) closure;
+
 		// If the cache is cleared :
 		addressclaiming_socket->change_state(claiming_state::OPERATIONAL);
 		addressclaiming_socket->save_addr_name(addressclaiming_socket->current_address_, htole64(addressclaiming_socket->get_j1939_name()));
 		AFB_DEBUG("Get address %d for this ecu", addressclaiming_socket->current_address_);
-		/*Else :
-
-		uint8_t data[3]= { 0, 0, 0, };
-		std::vector<uint8_t> data_v(data, data+3);
-		int res = addressclaiming_socket->write_j1939_message(J1939_PGN_REQUEST, data_v, 3);
-		if(res < 0)
-		{
-			if(res == -99)
-			{
-				addressclaiming_socket->save_addr_name(addressclaiming_socket->current_address_, htole64(1));
-				AFB_DEBUG("Address busy but no claming request from other ECU");
-				addressclaiming_socket->claim_address(false, true);
-			}
-			else
-			{
-				AFB_ERROR("ERROR");
-			}
-		}
-		else
-		{
-			addressclaiming_socket->change_state(claiming_state::OPERATIONAL);
-			addressclaiming_socket->save_addr_name(addressclaiming_socket->current_address_, htole64(j1939_name_));
-			AFB_DEBUG("Get address %d for this ecu", addressclaiming_socket->current_address_);
-		}*/
-
-		return 1;
 	}
 
 	/**
@@ -252,14 +231,8 @@ namespace utils
 	 */
 	void socketcan_j1939_addressclaiming_t::launch_timer()
 	{
-		timer_handle_ = (TimerHandleT*) malloc(sizeof(TimerHandleT));
-		timer_handle_->uid = "claiming_wait";
-		timer_handle_->delay = 250;
-		timer_handle_->count = 1;
-		timer_handle_->freeCB = free_timer_handle;
-		TimerEvtStart(afbBindingV3root, timer_handle_, no_response_claiming, (void *) this);
+		afb_timer_create(&timer_handle_, 0, 0, 250, 1, 250, 10, no_response_claiming, (void *)this, 1);
 	}
-
 
 	/**
 	 * @brief Allows to claim a new address

@@ -16,7 +16,6 @@
  */
 
 #pragma once
-#include <afb-timer.h>
 
 #include "./socketcan-j1939.hpp"
 
@@ -29,7 +28,7 @@ namespace utils
 			virtual std::shared_ptr<message_t> read_message();
 			virtual int open(std::string device_name, name_t ecu_name, pgn_t pgn);
 			virtual claiming_state get_state();
-			TimerHandleT *timer_handle_;
+			afb_timer_t timer_handle_;
 			std::pair<uint64_t, bool> table_j1939_address_[J1939_IDLE_ADDR];
 
 		private:
@@ -41,7 +40,7 @@ namespace utils
 			uint8_t get_addr_table(name_t name);
 			void change_state(claiming_state new_state);
 			void launch_timer();
-			static int no_response_claiming(TimerHandleT *timerhandle);
+			static void no_response_claiming(afb_timer_t timerhandle, void *closure, unsigned decount);
 			static int free_timer_handle(void *timer_context);
 
 			uint8_t current_address_;
