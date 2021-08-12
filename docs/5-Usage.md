@@ -7,14 +7,14 @@ afm-util run canbus-service@4.0
 1
 ```
 
-The tool afm-util tool is automatically installed in redpesk image. You can find documentation about [Application Framework Binder]({% chapter_link afb_binder.overview %})
+The tool afm-util tool is automatically installed in the redpesk image. You can find documentation about [Application Framework Binder]({% chapter_link afb_binder.overview %})
 
-But you can't control nor interact with it because you don't know security
+But you can't control nor interact with it because you don't know the security
 token that **Application Framework** gave it at launch.
 
 So, to test it, it is better to launch the binding manually. In the following
-example, it will use port **1234** and left empty security token for testing
-purpose:
+example, it will use port **1234** and leave empty the security token for testing
+purposes:
 
 ```bash
 afb-binder --name=afbd-canbus-binding --workdir=/usr/local/canbus-binding --binding=lib/afb-canbus-binding.so --port=1234 --token=1 --tracereq=common -vvv
@@ -70,7 +70,7 @@ named _doors.driver.open_ with its received timestamp if available:
 ON-EVENT canbus/vcar/vcar\/doors.driver.open({"event":"canbus\/vcar\/doors.driver.open","data":{"vcar\/doors.driver.open":true, "timestamp": 1505812906020023},"jtype":"afb-event"})
 ```
 
-You can stop receiving event from it by unsubscribe the signal the same way you did for subscribe
+You can stop receiving events from it by unsubscribing the signal the same way you did for subscribe
 
 ```json
 canbus vcar/doors.driver.open "unsubscribe"
@@ -93,7 +93,7 @@ canbus subscribe {"id" : "*"}
 canbus subscribe {"pgn" : "*"}
 ```
 
-You can stop receiving event from it by unsubscribe the signal the same way you did for subscribe
+You can stop receiving events from it by unsubscribing the signal the same way you did for subscribing
 
 ```json
 canbus unsubscribe {"id" : "*"}
@@ -104,14 +104,14 @@ ON-REPLY 4:canbus/unsubscribe: {"jtype":"afb-reply","request":{"status":"success
 
 ### Filtering capabilities
 
-It is possible to limits received event notifications into minimum and maximum
+It is possible to limit received event notifications into minimum and maximum
 boundaries as well as doing frequency thinning. This is possible using the
 argument filter with one or more of the filters available :
 
-* frequency: specify in Hertz the frequency which will be used to getting
+* frequency: specify in Hertz the frequency which will be used to get
  notified of new CAN events for the designated signal. If, during the blocked
  time, further changed CAN messages are received, the last valid one will be
- transferred after the lockout with a RX_CHANGED.
+ transferred after the lockout with an RX_CHANGED.
 * min: Minimum value that the decoded value needs to be above to get pushed to
  the subscribed client(s).
 * max: Maximum value that the decoded value needs to be below to get pushed to
@@ -142,7 +142,7 @@ canbus vcar/engine.speed "get"
 ON-REPLY 1:canbus/vcar/engine.speed: {"response":[{"vcar\/engine.speed":0}],"jtype":"afb-reply","request":{"status":"success"}}
 ```
 
-> **CAUTION** Only one event could be requested.
+> **CAUTION** Only one event can be requested.
 
 ## List of current loaded signals
 
@@ -181,7 +181,7 @@ canbus write {"bus_name": "hs", "filter": {"rx_id" : 562}, "frame": { "can_id": 
 
 To be able to use write capability, you need to add the permission
  ```urn:redpesk:permission::platform:can:write``` to your package configuration
- file that need to write on CAN bus through **canbus** api.
+ file that needs to write on CAN bus through **canbus** api.
 
 Then in order to write on bus, your app needs to call verb **auth**
 before calling **write**, to raise its **LOA**, Level Of Assurance,
@@ -189,8 +189,8 @@ which controls usage of verb **write**.
 
 ### Using signal dedicated verbs
 
-The same as when you subscribe or unsubscribe for a signals you can use a
-dedicated verb to write a new of it **if the signal has been set as writable**:
+The same as when you subscribe or unsubscribe for a signal you can use a
+dedicated verb to write on it **if the signal has been set as writable**:
 
 ```
 canbus auth
@@ -208,7 +208,7 @@ To watch watch going on a CAN bus use:
 candump can0
 ```
 
-Or for an USB CAN adapter connected to porter board:
+Or for a USB CAN adapter connected to porter board:
 
 ```bash
 candump can1
@@ -220,8 +220,8 @@ Send a custom message:
 cansend can0 ID#DDDDAAAATTTTAAAA
 ```
 
-You can also replay a previously dumped CAN logfiles. These logfiles can be
-found in _can_samples_ directory under Git repository. Following examples use
+You can also replay previously dumped CAN logfiles. These logfiles can be
+found in _can_samples_ directory under Git repository. The following examples use
 a real trip from an Auris Toyota car.
 
 Trace has been recorded from a CAN device `can0` so you have to map it to the

@@ -74,7 +74,7 @@ plugin. It can be your own c++ signal decoders for example.
 
 ## Message
 
-The *`messages`* key is a object with fields mapping from CAN message IDs
+The *`messages`* key is an object with fields mapping from CAN message IDs
 to signal definitions. The fields must be hex IDs of CAN messages
 as strings (e.g. 0x90).
 
@@ -101,7 +101,7 @@ or not.
 or 29 bits long.
 
 * *`is_j1939`* \
- Either True or False. Determines if you devices uses the
+ Either True or False. Determines if your devices use the
 j1939 protocol.
 
 * *`byte_frame_is_big_endian`* \
@@ -119,7 +119,7 @@ signal as the key.
 
 * *`max_frequency`* \
 If sending raw CAN messages to the output interfaces, this controls the maximum
-frequency (in Hz) that the message will be process and let through. The default
+frequency (in Hz) that the message will be processed and let through. The default
 value (0) means that all messages will be processed, and there is no limit
 imposed by the firmware. If you want to make sure you don't miss a change in
 value even when rate limiting, see the force_send_changed attribute. Defaults
@@ -259,7 +259,7 @@ bus by an application. By default, the value will be interpreted as a floating
 point number. Defaults to false.
 
 * *`encoder (optional)`* \
-You can specify a custom function here to encode the value for a CAN messages.
+You can specify a custom function here to encode the value for CAN messages.
 
 ## Diagnostic Messages
 
@@ -387,7 +387,7 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 # Generate your plugin
 
 To generate your plugin you'll have to use the canbus-generator.
-Once you have installed the generator and wrote your json mapping file,
+Once you have installed the generator and written your json mapping file,
 simply use CMake to do it automatically (see [next section](#build-and-install-your-plugin))
 or execute this command:
 

@@ -2,7 +2,7 @@
 
 This part is only useful if you plan to install the package from source.
 
-If you aren't planing to build it from source, add the redpesk@ repository
+If you aren't planning to build it from source, add the redpesk@ repository
 to your package manager.
 To set up your build host please follow [this section]({% chapter_link host-configuration-doc.setup-your-build-host %}).
 
@@ -133,7 +133,7 @@ reboot
 modprobe can-j1939
 ```
 
-If no errors are generated you have successfully install a kernel with j1939 module.
+If no errors are generated you have successfully installed a kernel with j1939 module.
 
 You can have a problem with header file, to check that go in the file /usr/include/linux/can.h
 
@@ -141,9 +141,9 @@ You can have a problem with header file, to check that go in the file /usr/inclu
 vi /usr/include/linux/can.h
 ```
 
-If in the struct sockaddr_can you don't see j1939, the header are not upgrade.
+If in the struct sockaddr_can you don't see j1939, the headers are not upgraded.
 
-So you need to do this manually, go to you're linux-can-next repository and do the following command:
+So you need to do this manually, go to your linux-can-next repository and do the following command:
 
 ```bash
 cp include/uapi/linux/can.h /usr/include/linux/can.h

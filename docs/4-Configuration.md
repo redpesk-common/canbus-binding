@@ -80,9 +80,9 @@ $ ip link show can1
 
 ## Rename an existing CAN device
 
-You can rename an existing CAN device using following command and thus move
+You can rename an existing CAN device using the following command and thus move
 an existing `can0` device to anything else. You will then be able to use
-another device as `can0`. For example, using a Rcar Gen3 board,
+another device such as `can0`. For example, using a Rcar Gen3 board,
 do the following :
 
 ```bash
@@ -120,7 +120,7 @@ the real one, here are some examples:
 }
 ```
 
-* Using real CAN device, this example assume CAN bus traffic will be on can0.
+* Using real CAN device, this example assumes CAN bus traffic will be on can0.
 
 ```json
 "config": {
@@ -149,9 +149,9 @@ the real one, here are some examples:
 
 Choose your active message set to use.
 
-Using several plugins you have the possibility to add several message set.
-A message set is a coherent set of message representing a usage of a CAN
-network. By example a car could run with a certain message set and could
+Using several plugins you have the possibility to add several message sets.
+A message set is a coherent set of messages representing a usage of a CAN
+network. For example a car could run with a certain message set and could
 need to access sensitive data through another so you can separate those using
 this key **active_message_set**
 
@@ -161,7 +161,7 @@ this key **active_message_set**
 
 ### (Optionnal) diagnostic_bus
 
-Choose the diagnostic bus to use to communicate with OBD2 ECUs.
+Choose the diagnostic bus to communicate with OBD2 ECUs.
 Use the following key to specify it:
 
 ```json
@@ -183,10 +183,10 @@ a point-to-point protocol. Use the following key to claim a name:
 ### (Optionnal) The preinit/postinit sections
 
 These sections define actions from plugins to be executed before and after the
-binding initialization. If you need set and executed some arbitrary code this is
+binding initialization. If you need to set and execute some arbitrary code this is
 a good place to go.
 
-The operations executed between the those functions include the following:
+The operations executed between those functions include the following:
 
 * starting 2 threads, one for decoding incoming CAN messages and another to send
 them as *afb event* to the user that has subscribed to them through the binding
@@ -211,9 +211,9 @@ Here is an example:
 
 ## **plugins** section
 
-A plugin or an array of plugin definition with **3** keys:
+A plugin or an array of plugin definitions with **3** keys:
 
-* **uid** mandatory key that identify the plugin uniquely.
+* **uid** mandatory key that identifies the plugin uniquely.
 * **info** optionnal key to add some information about the plugin.
 * **libs** mandatory key defining plugin file name to load.
 
@@ -252,7 +252,7 @@ The _control-canbus-binding.json_ file should have this structure:
 			"uid": "j1939-signals",
 			"info": "J1939 generated plugin",
 			"libs": "j1939-plugin.ctlso"
-		}
+		
 	]
 }
 ```
