@@ -66,7 +66,7 @@ namespace utils
 			name_t get_j1939_name() const;
 			void set_j1939_name(name_t ecu_name);
 		protected:
-			uint64_t j1939_name_ = 0x1234; ///< Default ECU j1939 name using noted using a little endianness ie: 0xC0509600227CC7AA
+			uint64_t j1939_name_ = 0xC0509600227CC7AA; ///< Default ECU j1939 name using noted using a little endianness ie: 0xC0509600227CC7AA
 			struct ifreq ifr_;
 			static std::mutex mutex_claiming_;
 			static std::condition_variable signal_address_claiming_;
