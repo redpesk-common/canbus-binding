@@ -109,17 +109,17 @@ public:
 	static void add_one_bcm_frame(struct canfd_frame& cfd, union bcm_msg& bcm_msg);
 	static void remove_last_bcm_frame(union bcm_msg& bcm_msg);
 
-	static int open_socket(low_can_subscription_t &subscription, const std::string& bus_name = "", uint32_t flags = INVALID_FLAG);
+	int open_socket(const std::string& bus_name = "", uint32_t flags = INVALID_FLAG);
 
 	int create_rx_filter(std::shared_ptr<signal_t> sig);
 	int create_rx_filter(std::shared_ptr<message_definition_t> msg);
 	int create_rx_filter(std::shared_ptr<diagnostic_message_t> sig);
-	static int create_rx_filter_can(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig);
-	static int create_rx_filter_j1939(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig);
-	static int create_rx_filter_isotp(low_can_subscription_t &subscription, std::shared_ptr<signal_t> sig);
-	static int create_rx_filter_bcm(low_can_subscription_t &subscription, bcm_msg& bcm_msg);
+	int create_rx_filter_can(std::shared_ptr<signal_t> sig);
+	int create_rx_filter_j1939(std::shared_ptr<signal_t> sig);
+	int create_rx_filter_isotp(std::shared_ptr<signal_t> sig);
+	int create_rx_filter_bcm(bcm_msg& bcm_msg);
 
-	static int tx_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name);
-	static int j1939_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name);
-	static int isotp_send(low_can_subscription_t &subscription, message_t *message, const std::string& bus_name);
+	int tx_send(message_t *message, const std::string& bus_name);
+	int j1939_send(message_t *message, const std::string& bus_name);
+	int isotp_send(message_t *message, const std::string& bus_name);
 };

@@ -357,21 +357,18 @@ int signal_t::afb_verb_write_on_bus(json_object *json_value)
 
 	message_t *message = encoder_t::build_message(sig, value, false, false);
 
-	std::map<std::string, std::shared_ptr<low_can_subscription_t> >& cd = application_t::instance().get_can_devices();
-
-	cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t());
-	cd[bus_name]->set_signal(sig);
-
+	std::shared_ptr<low_can_subscription_t> sub = std::make_shared<low_can_subscription_t>(low_can_subscription_t());
+	sub->set_signal(sig);
 
 	if(flags & CAN_PROTOCOL)
-		return low_can_subscription_t::tx_send(*cd[bus_name], message, bus_name);
+		return sub->tx_send(message, bus_name);
 #ifdef USE_FEATURE_ISOTP
 	else if(flags & ISOTP_PROTOCOL)
-		return low_can_subscription_t::isotp_send(*cd[bus_name], message, bus_name);
+		return sub->isotp_send(message, bus_name);
 #endif
 #ifdef USE_FEATURE_J1939
 	else if(flags & J1939_PROTOCOL)
-		return low_can_subscription_t::j1939_send(*cd[bus_name], message, bus_name);
+		return sub->j1939_send(message, bus_name);
 #endif
 	else
 		return -1;

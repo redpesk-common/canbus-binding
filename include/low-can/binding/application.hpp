@@ -52,8 +52,6 @@ class application_t
 
 		std::vector<std::shared_ptr<message_set_t> > message_set_; ///< Vector holding all message set from JSON signals description file
 
-		std::map<std::string, std::shared_ptr<low_can_subscription_t> > can_devices_; ///< Map containing all independant opened CAN sockets, key is the socket int value.
-
 		plugin_store_t _plugins_store = nullptr; ///< Chained list holding the name and pointer to shared object opened with dlopen
 
 		json_object *config_ = nullptr; ///< Json object holding the whole binding configuration for future usage
@@ -73,8 +71,6 @@ class application_t
 		plugin_store_t get_plugins();
 
 		void set_plugins(plugin_store_t pstore);
-
-		std::map<std::string, std::shared_ptr<low_can_subscription_t> >& get_can_devices();
 
 		diagnostic_manager_t& get_diagnostic_manager() ;
 

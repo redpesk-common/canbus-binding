@@ -527,22 +527,20 @@ static int send_message(message_t *message, const std::string& bus_name, uint32_
 	if(bus_name.empty())
 		return -1;
 
-	std::map<std::string, std::shared_ptr<low_can_subscription_t> >& cd = application_t::instance().get_can_devices();
+	std::shared_ptr<low_can_subscription_t> sub = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
 
-	cd[bus_name] = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
-
-	cd[bus_name]->set_signal(signal);
+	sub->set_signal(signal);
 
 
 	if(flags&CAN_PROTOCOL)
-		return low_can_subscription_t::tx_send(*cd[bus_name], message, bus_name);
+		return sub->tx_send(message, bus_name);
 #ifdef USE_FEATURE_ISOTP
 	else if(flags&ISOTP_PROTOCOL)
-		return low_can_subscription_t::isotp_send(*cd[bus_name], message, bus_name);
+		return sub->isotp_send(message, bus_name);
 #endif
 #ifdef USE_FEATURE_J1939
 	else if(flags&J1939_PROTOCOL)
-		return low_can_subscription_t::j1939_send(*cd[bus_name], message, bus_name);
+		return sub->j1939_send(message, bus_name);
 #endif
 	else
 		return -1;
@@ -1122,8 +1120,7 @@ static int init_binding(afb::api &api)
 			std::shared_ptr<low_can_subscription_t> low_can_j1939 = std::make_shared<low_can_subscription_t>();
 			application.set_subscription_address_claiming(low_can_j1939);
 
-			ret = low_can_subscription_t::open_socket(*low_can_j1939,
-								   message_definition->get_bus_device_name(),
+			ret = low_can_j1939->open_socket(message_definition->get_bus_device_name(),
 								  J1939_ADDR_CLAIM_PROTOCOL);
 
 			if(ret < 0)

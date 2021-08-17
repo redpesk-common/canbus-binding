@@ -51,11 +51,6 @@ void application_t::set_plugins(plugin_store_t pstore)
 	_plugins_store = pstore;
 }
 
-std::map<std::string, std::shared_ptr<low_can_subscription_t> >& application_t::get_can_devices()
-{
-	return can_devices_;
-}
-
 diagnostic_manager_t& application_t::get_diagnostic_manager()
 {
 	return diagnostic_manager_;
