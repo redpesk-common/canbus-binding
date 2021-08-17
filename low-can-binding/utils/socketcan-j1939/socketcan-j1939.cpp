@@ -129,18 +129,23 @@ namespace utils
 	 * @param name - The name that you want to bind
 	 * @param pgn - The pgn that you want to bind
 	 * @param addr - The addr that you want to bindthat you want to bind
+	 *
+	 * @return -1 on error 0 on success.
 	 */
-	void socketcan_j1939_t::define_tx_address(std::string device_name, name_t name, pgn_t pgn, uint8_t addr)
+	int socketcan_j1939_t::define_tx_address(std::string device_name, name_t name, pgn_t pgn, uint8_t addr)
 	{
-
 		::strcpy(ifr_.ifr_name, device_name.c_str());
 		AFB_DEBUG("ifr_name is : %s", ifr_.ifr_name);
 
+		socket_mutex_.lock();
+		int ret = ::ioctl(socket_, SIOCGIFINDEX, &ifr_);
+		socket_mutex_.unlock();
 
-		if(::ioctl(socket_, SIOCGIFINDEX, &ifr_) < 0)
+		if(ret < 0)
 		{
 			AFB_ERROR("ioctl failed. Error was : %s", strerror(errno));
 			close();
+			return -1;
 		}
 		else
 		{
@@ -163,6 +168,8 @@ namespace utils
 			tx_address_.can_addr.j1939.pgn = J1939_NO_PGN;
 		else
 			tx_address_.can_addr.j1939.pgn = pgn;
+
+		return 0;
 	}
 
 
@@ -190,11 +197,19 @@ namespace utils
 	{
 		close();
 
-		socket_ = socketcan_t::open(PF_CAN, SOCK_DGRAM, CAN_J1939);
-		if (socket_ < 0)
+		if(socketcan_t::open(PF_CAN, SOCK_DGRAM, CAN_J1939) < 0)
+		{
+			AFB_ERROR("No socket opened %d", socket_);
+			close();
 			return socket_;
+		}
 
-		define_tx_address(device_name, name, pgn, addr);
+		if(define_tx_address(device_name, name, pgn, addr) < 0)
+		{
+			AFB_ERROR("Could not define the tx address on socket: %d", socket_);
+			close();
+			return -1;
+		}
 
 		if(bind((struct sockaddr *)&tx_address_, sizeof(tx_address_)) < 0)
 		{

@@ -32,16 +32,24 @@ namespace utils
 	/// @return Upon successful completion, shall return a non-negative integer, the socket file descriptor. Otherwise, a value of -1 shall be returned and errno set to indicate the error.
 	int socketcan_bcm_t::open(std::string device_name)
 	{
-		close();
-
 		struct ifreq ifr;
-		socket_ = socketcan_t::open(PF_CAN, SOCK_DGRAM, CAN_BCM);
+		if(socketcan_t::open(PF_CAN, SOCK_DGRAM, CAN_BCM) < 0)
+		{
+			AFB_ERROR("No socket opened %d", socket_);
+			close();
+			return socket_;
+		}
 
 		// Attempts to open a socket to CAN bus
 		tx_address_.can_family = AF_CAN;
 		::strcpy(ifr.ifr_name, device_name.c_str());
 		AFB_DEBUG("BCM socket ifr_name is : %s", ifr.ifr_name);
-		if(::ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)
+
+		socket_mutex_.lock();
+		int ret = ::ioctl(socket_, SIOCGIFINDEX, &ifr);
+		socket_mutex_.unlock();
+
+		if(ret < 0)
 		{
 			AFB_ERROR("ioctl failed. Error was : %s", strerror(errno));
 			close();

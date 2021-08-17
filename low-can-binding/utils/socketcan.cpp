@@ -70,7 +70,7 @@ namespace utils
 	/// @return Upon successful completion, shall return a non-negative integer, the socket file descriptor. Otherwise, a value of -1 shall be returned and errno set to indicate the error.
 	int socketcan_t::open(int domain, int type, int protocol)
 	{
-		close();
+		const std::lock_guard<std::mutex> lock(socket_mutex_);
 		socket_ = ::socket(domain, type, protocol);
 		if (socket_ < 0)
 			AFB_ERROR("Open failed. %s", strerror(errno));
@@ -82,6 +82,7 @@ namespace utils
 	/// @return 0 if success.
 	int socketcan_t::close()
 	{
+		const std::lock_guard<std::mutex> lock(socket_mutex_);
 		return socket_ != INVALID_SOCKET ? ::close(socket_) : 0;
 	}
 
@@ -89,6 +90,7 @@ namespace utils
 	/// @return 0 if success.
 	int socketcan_t::setopt(int level, int optname, const void* optval, socklen_t optlen)
 	{
+		const std::lock_guard<std::mutex> lock(socket_mutex_);
 		return socket_ != INVALID_SOCKET ? ::setsockopt(socket_, level, optname, optval, optlen) : 0;
 	}
 
@@ -103,6 +105,7 @@ namespace utils
 	/// @return 0 if success.
 	int socketcan_t::connect(const struct sockaddr* addr, socklen_t len)
 	{
+		const std::lock_guard<std::mutex> lock(socket_mutex_);
 		return socket_ != INVALID_SOCKET ? ::connect(socket_, addr, len) : 0;
 	}
 
@@ -110,11 +113,13 @@ namespace utils
 	/// @return 0 if success.
 	int socketcan_t::bind(const struct sockaddr* addr, socklen_t len)
 	{
+		const std::lock_guard<std::mutex> lock(socket_mutex_);
 		return socket_ != INVALID_SOCKET ? ::bind(socket_, addr, len) : 0;
 	}
 
 	int socketcan_t::write_message(std::vector<message_t>& vobj)
 	{
+		const std::lock_guard<std::mutex> lock(socket_mutex_);
 		for(int i=0;i<vobj.size();i++)
 		{
 			if(write_message(vobj[i])<0)

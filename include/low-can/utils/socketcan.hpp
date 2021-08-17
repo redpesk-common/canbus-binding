@@ -18,6 +18,7 @@
  */
 
 #include <vector>
+#include <mutex>
 
 #include <sys/socket.h>
 #include <linux/can/bcm.h>
@@ -66,6 +67,7 @@ namespace utils
 
 	protected:
 		int socket_;
+		std::mutex socket_mutex_;
 		struct sockaddr_can tx_address_;
 		int open(int domain, int type, int protocol);
 		int bind(const struct sockaddr* addr, socklen_t len);
