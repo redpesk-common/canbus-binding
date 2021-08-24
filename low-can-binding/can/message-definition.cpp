@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <low-can/can/message-definition.hpp>
-#include <low-can/binding/application.hpp>
+#include <canbus-binding/can/message-definition.hpp>
+#include <canbus-binding/binding/application.hpp>
 
 message_definition_t::message_definition_t(
 	const std::string bus,

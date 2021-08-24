@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-#include <low-can/utils/socketcan-bcm.hpp>
+#include <canbus-binding/utils/socketcan-bcm.hpp>
 
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include <low-can/binding/application.hpp>
+#include <canbus-binding/binding/application.hpp>
 
 
 namespace utils

@@ -20,7 +20,7 @@
 #include <linux/can/raw.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
-#include <low-can/utils/socketcan.hpp>
+#include <canbus-binding/utils/socketcan.hpp>
 
 namespace utils
 {

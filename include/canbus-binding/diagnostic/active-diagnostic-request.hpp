@@ -20,10 +20,10 @@
 #include <string>
 #include <vector>
 
-#include <low-can/utils/socketcan-bcm.hpp>
+#include <canbus-binding/utils/socketcan-bcm.hpp>
 #include <uds/uds.h>
 #include <uds/uds_types.h>
-#include <low-can/utils/timer.hpp>
+#include <canbus-binding/utils/timer.hpp>
 
 class active_diagnostic_request_t;
 class diagnostic_manager_t;

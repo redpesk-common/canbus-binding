@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-#include <low-can/binding/application.hpp>
-#include <low-can/can/can-decoder.hpp>
-#include <low-can/utils/openxc-utils.hpp>
+#include <canbus-binding/binding/application.hpp>
+#include <canbus-binding/can/can-decoder.hpp>
+#include <canbus-binding/utils/openxc-utils.hpp>
 
 #include "converter.hpp"
 

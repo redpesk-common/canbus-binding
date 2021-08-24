@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <low-can/can/message/message.hpp>
-#include <low-can/binding/low-can-hat.hpp>
+#include <canbus-binding/can/message/message.hpp>
+#include <canbus-binding/binding/low-can-hat.hpp>
 #include <cstring>
 
 /**

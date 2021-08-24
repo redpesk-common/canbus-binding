@@ -18,10 +18,10 @@
 #include <systemd/sd-event.h>
 #include <algorithm>
 #include <string.h>
-#include <low-can/diagnostic/diagnostic-manager.hpp>
-#include <low-can/binding/application.hpp>
-#include <low-can/utils/signals.hpp>
-#include <low-can/utils/openxc-utils.hpp>
+#include <canbus-binding/diagnostic/diagnostic-manager.hpp>
+#include <canbus-binding/binding/application.hpp>
+#include <canbus-binding/utils/signals.hpp>
+#include <canbus-binding/utils/openxc-utils.hpp>
 
 #define MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 10
 #define MAX_SIMULTANEOUS_DIAG_REQUESTS 50

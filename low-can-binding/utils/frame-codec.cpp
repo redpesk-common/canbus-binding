@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <low-can/utils/frame-codec.hpp>
+#include <canbus-binding/utils/frame-codec.hpp>
 
 namespace frame_codec {
 

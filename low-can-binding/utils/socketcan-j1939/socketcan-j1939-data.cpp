@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-#include <low-can/binding/application.hpp>
-#include <low-can/utils/socketcan-j1939/socketcan-j1939-data.hpp>
-#include <low-can/utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp>
+#include <canbus-binding/binding/application.hpp>
+#include <canbus-binding/utils/socketcan-j1939/socketcan-j1939-data.hpp>
+#include <canbus-binding/utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp>
 
 namespace utils
 {

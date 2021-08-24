@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-#include <low-can/can/can-encoder.hpp>
-#include <low-can/can/message-definition.hpp>
-#include <low-can/utils/openxc-utils.hpp>
-#include <low-can/utils/frame-codec.hpp>
+#include <canbus-binding/can/can-encoder.hpp>
+#include <canbus-binding/can/message-definition.hpp>
+#include <canbus-binding/utils/openxc-utils.hpp>
+#include <canbus-binding/utils/frame-codec.hpp>
 
 #include "canutil/write.h"
 #include "../utils/converter.hpp"

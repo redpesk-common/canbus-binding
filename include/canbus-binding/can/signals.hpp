@@ -24,9 +24,9 @@
 #include <memory>
 
 #include <openxc.pb.h>
-#include <low-can/utils/timer.hpp>
-#include <low-can/can/message-definition.hpp>
-#include <low-can/diagnostic/diagnostic-message.hpp>
+#include <canbus-binding/utils/timer.hpp>
+#include <canbus-binding/can/message-definition.hpp>
+#include <canbus-binding/diagnostic/diagnostic-message.hpp>
 
 #define MESSAGE_SET_ID 0
 

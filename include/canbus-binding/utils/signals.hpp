@@ -21,10 +21,10 @@
 #include <vector>
 #include <string>
 #include <fnmatch.h>
-#include <low-can/binding/application.hpp>
-#include <low-can/can/signals.hpp>
-#include <low-can/diagnostic/diagnostic-message.hpp>
-#include <low-can/binding/low-can-subscription.hpp>
+#include <canbus-binding/binding/application.hpp>
+#include <canbus-binding/can/signals.hpp>
+#include <canbus-binding/diagnostic/diagnostic-message.hpp>
+#include <canbus-binding/binding/low-can-subscription.hpp>
 #include <openxc.pb.h>
 
 

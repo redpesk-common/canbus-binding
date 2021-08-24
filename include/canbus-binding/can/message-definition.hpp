@@ -28,10 +28,10 @@
 #include <vector>
 #include <memory>
 
-#include <low-can/can/signals.hpp>
-#include <low-can/can/message-set.hpp>
-#include <low-can/utils/timer.hpp>
-#include <low-can/can/message/message.hpp>
+#include <canbus-binding/can/signals.hpp>
+#include <canbus-binding/can/message-set.hpp>
+#include <canbus-binding/utils/timer.hpp>
+#include <canbus-binding/can/message/message.hpp>
 
 class message_set_t;
 

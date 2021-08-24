@@ -17,9 +17,7 @@
 
 #include <unistd.h>
 
-
-#include <low-can/utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp>
-
+#include <canbus-binding/utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp>
 
 namespace utils
 {

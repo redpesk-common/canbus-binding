@@ -16,8 +16,8 @@
  */
 
 #include <cstring>
-#include <low-can/can/message/can-message.hpp>
-#include <low-can/binding/low-can-hat.hpp>
+#include <canbus-binding/can/message/can-message.hpp>
+#include <canbus-binding/binding/low-can-hat.hpp>
 
 ///
 /// @brief Class constructor

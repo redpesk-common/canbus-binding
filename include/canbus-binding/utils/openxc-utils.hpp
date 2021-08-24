@@ -23,8 +23,8 @@
 
 #include <json-c/json.h>
 #include <openxc.pb.h>
-#include <low-can/can/signals.hpp>
-#include <low-can/diagnostic/active-diagnostic-request.hpp>
+#include <canbus-binding/can/signals.hpp>
+#include <canbus-binding/diagnostic/active-diagnostic-request.hpp>
 
 const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value);
 const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message, uint64_t timestamp);

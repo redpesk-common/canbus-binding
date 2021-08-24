@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include <low-can/can/message-set.hpp>
-#include <low-can/can/message-definition.hpp>
+#include <canbus-binding/can/message-set.hpp>
+#include <canbus-binding/can/message-definition.hpp>
 
 message_set_t::message_set_t(
 		uint8_t index,

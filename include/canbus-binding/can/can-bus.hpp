@@ -25,8 +25,8 @@
 #include <linux/can.h>
 #include <condition_variable>
 #include <openxc.pb.h>
-#include <low-can/can/message/can-message.hpp>
-#include <low-can/binding/low-can-subscription.hpp>
+#include <canbus-binding/can/message/can-message.hpp>
+#include <canbus-binding/binding/low-can-subscription.hpp>
 
 #define CAN_ACTIVE_TIMEOUT_S 30
 

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <low-can/can/signals.hpp>
-#include <low-can/can/message/can-message.hpp>
+#include <canbus-binding/can/signals.hpp>
+#include <canbus-binding/can/message/can-message.hpp>
 #include <openxc.pb.h>
 
 class decoder_t

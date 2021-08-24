@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <low-can/can/signals.hpp>
-#include <low-can/can/message/can-message.hpp>
+#include <canbus-binding/can/signals.hpp>
+#include <canbus-binding/can/message/can-message.hpp>
 #include <openxc.pb.h>
 #ifdef USE_FEATURE_J1939
-#include <low-can/can/message/j1939-message.hpp>
+#include <canbus-binding/can/message/j1939-message.hpp>
 #endif
 
 class encoder_t

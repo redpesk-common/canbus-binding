@@ -1,11 +1,11 @@
 #include <mutex>
 #include <systemd/sd-event.h>
 
-#include <low-can/binding/application.hpp>
-#include <low-can/binding/low-can-hat.hpp>
-#include <low-can/can/message/message.hpp>
-#include <low-can/can/can-bus.hpp>
-#include <low-can/utils/signals.hpp>
+#include <canbus-binding/binding/application.hpp>
+#include <canbus-binding/binding/low-can-hat.hpp>
+#include <canbus-binding/can/message/message.hpp>
+#include <canbus-binding/can/can-bus.hpp>
+#include <canbus-binding/utils/signals.hpp>
 
 
 ///******************************************************************************

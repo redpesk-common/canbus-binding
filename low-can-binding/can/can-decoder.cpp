@@ -17,11 +17,11 @@
 
 #include <climits>
 #include <cmath>
-#include <low-can/can/can-decoder.hpp>
-#include <low-can/utils/openxc-utils.hpp>
-#include <low-can/utils/frame-codec.hpp>
-#include <low-can/can/message-definition.hpp>
-#include <low-can/binding/low-can-hat.hpp>
+#include <canbus-binding/can/can-decoder.hpp>
+#include <canbus-binding/utils/openxc-utils.hpp>
+#include <canbus-binding/utils/frame-codec.hpp>
+#include <canbus-binding/can/message-definition.hpp>
+#include <canbus-binding/binding/low-can-hat.hpp>
 
 #include "canutil/read.h"
 #include "../utils/converter.hpp"

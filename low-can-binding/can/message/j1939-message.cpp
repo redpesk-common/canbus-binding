@@ -18,8 +18,8 @@
 #include <cstring>
 #include <iomanip>
 #include <net/if.h>
-#include <low-can/binding/low-can-hat.hpp>
-#include <low-can/can/message/j1939-message.hpp>
+#include <canbus-binding/binding/low-can-hat.hpp>
+#include <canbus-binding/can/message/j1939-message.hpp>
 
 #include "../../utils/converter.hpp"
 

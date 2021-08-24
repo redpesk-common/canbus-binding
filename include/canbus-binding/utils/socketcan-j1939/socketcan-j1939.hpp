@@ -22,8 +22,8 @@
 #include <condition_variable>
 #include <linux/can/j1939.h>
 #include <net/if.h>
-#include <low-can/utils/socketcan.hpp>
-#include <low-can/can/message/j1939-message.hpp>
+#include <canbus-binding/utils/socketcan.hpp>
+#include <canbus-binding/can/message/j1939-message.hpp>
 
 #define J1939_CAN_ID CAN_EFF_FLAG
 #define J1939_CAN_MASK (CAN_EFF_FLAG | CAN_RTR_FLAG)

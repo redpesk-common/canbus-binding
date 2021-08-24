@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <low-can/utils/socketcan.hpp>
-#include <low-can/can/message/can-message.hpp>
+#include <canbus-binding/utils/socketcan.hpp>
+#include <canbus-binding/can/message/can-message.hpp>
 
 namespace utils
 {

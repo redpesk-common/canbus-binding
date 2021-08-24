@@ -25,11 +25,11 @@
 *
 *******************************************************************************/
 
-#include <low-can/utils/signals.hpp>
-#include <low-can/utils/openxc-utils.hpp>
-#include <low-can/can/can-decoder.hpp>
+#include <canbus-binding/utils/signals.hpp>
+#include <canbus-binding/utils/openxc-utils.hpp>
+#include <canbus-binding/can/can-decoder.hpp>
 
-openxc_DynamicField decode_example(signal_t &signal, std::shared_ptr<message_t> message, bool *send) //Defining a new decoder for our signals, 
+openxc_DynamicField decode_example(signal_t &signal, std::shared_ptr<message_t> message, bool *send) //Defining a new decoder for our signals,
                                                                                                     //note that the prototype must be the same
 {
     float value = decoder_t::parse_signal_bitfield(signal, message); //Getting signal value

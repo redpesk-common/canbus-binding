@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include <low-can/utils/signals.hpp>
+#include <canbus-binding/utils/signals.hpp>
 
 namespace utils
 {

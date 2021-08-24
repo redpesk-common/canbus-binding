@@ -18,7 +18,7 @@
 #pragma once
 
 #include <linux/can/j1939.h>
-#include <low-can/can/message/message.hpp>
+#include <canbus-binding/can/message/message.hpp>
 
 
 #define J1939_MAX_MULTIPACKETS 255

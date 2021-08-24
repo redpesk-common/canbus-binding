@@ -21,9 +21,9 @@
 #include <string>
 
 #include <uds/uds.h>
-#include <low-can/can/message-set.hpp>
-#include <low-can/can/message/can-message.hpp>
-#include <low-can/diagnostic/active-diagnostic-request.hpp>
+#include <canbus-binding/can/message-set.hpp>
+#include <canbus-binding/can/message/can-message.hpp>
+#include <canbus-binding/diagnostic/active-diagnostic-request.hpp>
 
 enum UNIT {
 	POURCENT,

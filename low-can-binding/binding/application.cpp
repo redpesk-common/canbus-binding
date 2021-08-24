@@ -16,10 +16,10 @@
  */
 #include <ctime>
 
-#include <low-can/binding/application.hpp>
-#include <low-can/binding/low-can-subscription.hpp>
-#include <low-can/utils/signals.hpp>
-#include <low-can/utils/openxc-utils.hpp>
+#include <canbus-binding/binding/application.hpp>
+#include <canbus-binding/binding/low-can-subscription.hpp>
+#include <canbus-binding/utils/signals.hpp>
+#include <canbus-binding/utils/openxc-utils.hpp>
 
 #define MICROSECONDS_IN_SECOND	1000000
 #define ENGINE_VALUE_TIMEOUT	5

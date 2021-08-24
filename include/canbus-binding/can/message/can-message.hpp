@@ -16,7 +16,7 @@
  */
 
 #pragma once
-#include <low-can/can/message/message.hpp>
+#include <canbus-binding/can/message/message.hpp>
 
 union bcm_msg
 {
