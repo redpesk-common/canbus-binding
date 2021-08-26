@@ -71,7 +71,7 @@ class j1939_message_t : public message_t
 		uint64_t get_name() const;
 		uint32_t get_pgn() const;
 		uint8_t get_addr() const;
-		static std::shared_ptr<j1939_message_t> convert_from_addr(struct sockaddr_can& addr, uint8_t (&data)[128], size_t nbytes, uint64_t timestamp);
+		static std::unique_ptr<j1939_message_t> convert_from_addr(struct sockaddr_can& addr, uint8_t (&data)[128], size_t nbytes, uint64_t timestamp);
 		bool is_set();
 		std::string get_debug_message();
 		uint32_t get_id() const;

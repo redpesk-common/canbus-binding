@@ -61,7 +61,7 @@ namespace utils
 		virtual int open(std::string device_name) = 0;
 		int setopt(int level, int optname, const void* optval, socklen_t optlen);
 		virtual int close();
-		virtual std::shared_ptr<message_t> read_message() = 0;
+		virtual std::unique_ptr<message_t> read_message() = 0;
 		virtual int write_message(message_t& obj) = 0;
 		virtual int write_message(std::vector<message_t>& vobj);
 

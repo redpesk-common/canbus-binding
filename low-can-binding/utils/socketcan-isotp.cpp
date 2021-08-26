@@ -82,10 +82,10 @@ namespace utils
 	 *
 	 * @return std::shared_ptr<message_t> The message that was read
 	 */
-	std::shared_ptr<message_t> socketcan_isotp_t::read_message()
+	std::unique_ptr<message_t> socketcan_isotp_t::read_message()
 	{
 
-		std::shared_ptr<can_message_t> cm = std::make_shared<can_message_t>();
+		std::unique_ptr<can_message_t> cm = std::make_unique<can_message_t>();
 		uint8_t msg[MAX_ISOTP_FRAMES];
 		ssize_t nbytes = read(socket(), msg, MAX_ISOTP_FRAMES);
 

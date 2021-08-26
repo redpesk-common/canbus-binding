@@ -227,7 +227,7 @@ namespace utils
 	 *
 	 * @return std::shared_ptr<message_t> The j1939 message that is read
 	 */
-	std::shared_ptr<message_t> socketcan_j1939_t::read_message()
+	std::unique_ptr<message_t> socketcan_j1939_t::read_message()
 	{
 		return read_message(0);
 	}
@@ -238,7 +238,7 @@ namespace utils
 	 * @param flag The flag param for the recvfrom
 	 * @return std::shared_ptr<message_t> The j1939 message that is read
 	 */
-	std::shared_ptr<message_t> socketcan_j1939_t::read_message(int flag)
+	std::unique_ptr<message_t> socketcan_j1939_t::read_message(int flag)
 	{
 		/* Initialize msghdr to retrieve the J1939 metadata and data
 		 * more convenient to get the timestamp saving syscalls */
@@ -269,7 +269,7 @@ namespace utils
 		long recvflags = 0;
 
 		/* Final container to hold the received message */
-		std::shared_ptr<j1939_message_t> jm = std::make_shared<j1939_message_t>();
+		std::unique_ptr<j1939_message_t> jm = std::make_unique<j1939_message_t>();
 
 		ssize_t nbytes = recvmsg(socket_, &msg, flag);
 

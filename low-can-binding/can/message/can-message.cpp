@@ -89,7 +89,7 @@ bool can_message_t::is_correct_to_send()
 /// @param[in] nbytes - bytes read from socket read operation.
 ///
 /// @return A can_message_t object fully initialized with canfd_frame values.
-std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes, uint64_t timestamp)
+std::unique_ptr<can_message_t> can_message_t::convert_from_frame(const struct canfd_frame& frame, size_t nbytes, uint64_t timestamp)
 {
 	uint32_t maxdlen = 0, length = 0;
 	uint32_t flags = 0;
@@ -162,7 +162,7 @@ std::shared_ptr<can_message_t> can_message_t::convert_from_frame(const struct ca
 								id, (uint32_t)flags, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 	}
 
-	return std::make_shared<can_message_t>(can_message_t(maxdlen, id, length, rtr_flag, flags, data, timestamp));
+	return std::make_unique<can_message_t>(can_message_t(maxdlen, id, length, rtr_flag, flags, data, timestamp));
 }
 
 /// @brief Take all initialized class members and build a

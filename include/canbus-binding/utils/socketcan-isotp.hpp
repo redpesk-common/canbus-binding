@@ -32,7 +32,7 @@ namespace utils
 
 		virtual int open(std::string device_name);
 		virtual int open(std::string device_name, canid_t rx_id, canid_t tx_id);
-		virtual std::shared_ptr<message_t> read_message();
+		virtual std::unique_ptr<message_t> read_message();
 		virtual int write_message(message_t& obj);
 		int define_tx_address(std::string device_name, canid_t rx_id, canid_t tx_id);
 	};

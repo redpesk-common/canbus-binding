@@ -57,8 +57,8 @@ namespace utils
 			using socketcan_t::socketcan_t;
 			virtual int open(std::string device_name);
 			virtual int open(std::string device_name, name_t name, pgn_t pgn, uint8_t addr);
-			virtual std::shared_ptr<message_t> read_message();
-			virtual std::shared_ptr<message_t> read_message(int flag);
+			virtual std::unique_ptr<message_t> read_message();
+			virtual std::unique_ptr<message_t> read_message(int flag);
 			virtual int write_message(message_t& obj);
 			virtual int write_j1939_message(pgn_t pgn, std::vector<uint8_t> &data, uint32_t len_data);
 			void define_opt(bool broadcast = true, bool promisc = false);

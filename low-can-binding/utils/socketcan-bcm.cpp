@@ -72,10 +72,10 @@ namespace utils
 	/// Read the socket to retrieve the associated CAN message. All the hard work is do into
 	/// convert_from_frame method and if there isn't CAN message retrieve, only BCM head struct,
 	/// then CAN message will be zeroed and must be handled later.
-	std::shared_ptr<message_t> socketcan_bcm_t::read_message()
+	std::unique_ptr<message_t> socketcan_bcm_t::read_message()
 	{
 		union bcm_msg msg;
-		std::shared_ptr<can_message_t> cm = std::make_shared<can_message_t>();
+		std::unique_ptr<can_message_t> cm = std::make_unique<can_message_t>();
 
 		const struct sockaddr_can& addr = get_tx_address();
 		socklen_t addrlen = sizeof(addr);
@@ -110,7 +110,7 @@ namespace utils
 			cm = can_message_t::convert_from_frame(msg.fd_frames[0] , frame_size, timestamp);
 		}
 		else if (msg.msg_head.opcode == RX_TIMEOUT)
-			cm = std::make_shared<can_message_t>(can_message_t(msg.msg_head.can_id, timestamp, true));
+			cm = std::make_unique<can_message_t>(can_message_t(msg.msg_head.can_id, timestamp, true));
 		cm->set_sub_id((int)socket());
 		return cm;
 	}

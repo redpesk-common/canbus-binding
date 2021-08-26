@@ -38,11 +38,11 @@ namespace utils
 	 *
 	 * @return std::shared_ptr<message_t> Return an INVALID j1939 message because no need of return (only signature of the function)
 	 */
-	std::shared_ptr<message_t> socketcan_j1939_addressclaiming_t::read_message()
+	std::unique_ptr<message_t> socketcan_j1939_addressclaiming_t::read_message()
 	{
 		AFB_DEBUG("[socketcan_j1939_addressclaiming_t] read_message");
-		std::shared_ptr<message_t> invalid_message = std::make_shared<j1939_message_t>();
-		std::shared_ptr<message_t> m;
+		std::unique_ptr<message_t> invalid_message = std::make_unique<j1939_message_t>();
+		std::unique_ptr<message_t> m;
 		j1939_message_t* jm;
 
 		m = socketcan_j1939_t::read_message();

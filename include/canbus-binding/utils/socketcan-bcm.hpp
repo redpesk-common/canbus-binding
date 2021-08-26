@@ -29,7 +29,7 @@ namespace utils
 		using socketcan_t::socketcan_t;
 
 		virtual int open(std::string device_name);
-		virtual std::shared_ptr<message_t> read_message();
+		virtual std::unique_ptr<message_t> read_message();
 		virtual int write_message(message_t& obj);
 
 	};

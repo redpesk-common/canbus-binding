@@ -357,7 +357,7 @@ int signal_t::afb_verb_write_on_bus(json_object *json_value)
 
 	message_t *message = encoder_t::build_message(sig, value, false, false);
 
-	std::shared_ptr<low_can_subscription_t> sub = std::make_shared<low_can_subscription_t>(low_can_subscription_t());
+	std::unique_ptr<low_can_subscription_t> sub = std::make_unique<low_can_subscription_t>(low_can_subscription_t());
 	sub->set_signal(sig);
 
 	if(flags & CAN_PROTOCOL)
