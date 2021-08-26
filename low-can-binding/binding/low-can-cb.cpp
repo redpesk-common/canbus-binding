@@ -295,13 +295,10 @@ static int subscribe_unsubscribe_signals(afb::req request,
 static int subscribe_unsubscribe_signals(afb::req request,
 					 bool subscribe,
 					 const struct utils::signals_found& signals,
-					 struct event_filter_t& event_filter)
+					 struct event_filter_t& event_filter,
+					 map_subscription& s)
 {
 	int rets = 0;
-	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
-
-	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-	map_subscription& s = sm.get_subscribed_signals();
 
 	rets += subscribe_unsubscribe_diagnostic_messages(request, subscribe, signals.diagnostic_messages, event_filter, s, false);
 	rets += subscribe_unsubscribe_signals(request, subscribe, signals.signals, event_filter, s);
@@ -340,7 +337,7 @@ static event_filter_t generate_filter(json_object* args)
 }
 
 
-static int one_subscribe_unsubscribe_events(afb::req request, bool subscribe, const std::string& tag, json_object *args)
+static int one_subscribe_unsubscribe_events(afb::req request, bool subscribe, const std::string& tag, json_object *args, map_subscription& s)
 {
 	int ret = 0;
 	struct utils::signals_found sf;
@@ -371,12 +368,12 @@ static int one_subscribe_unsubscribe_events(afb::req request, bool subscribe, co
 	else
 	{
 		event_filter_t event_filter = generate_filter(args);
-		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter);
+		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter, s);
 	}
 	return ret;
 }
 
-static int one_subscribe_unsubscribe_id(afb::req request, bool subscribe, const uint32_t& id, json_object *args)
+static int one_subscribe_unsubscribe_id(afb::req request, bool subscribe, const uint32_t& id, json_object *args, map_subscription& s)
 {
 	std::vector<std::shared_ptr<message_definition_t>> messages_definition = application_t::instance().get_messages_definition(id);
 	for(auto message_definition : messages_definition)
@@ -396,10 +393,6 @@ static int one_subscribe_unsubscribe_id(afb::req request, bool subscribe, const 
 	std::shared_ptr<low_can_subscription_t> can_subscription = std::make_shared<low_can_subscription_t>(low_can_subscription_t(event_filter));
 	can_subscription->set_message_definition(message_definition);
 
-	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
-	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-	map_subscription& s = sm.get_subscribed_signals();
-
 	if(can_subscription->create_rx_filter(message_definition) < 0)
 		return -1;
 	if(add_to_event_loop(can_subscription) < 0)
@@ -412,7 +405,7 @@ static int one_subscribe_unsubscribe_id(afb::req request, bool subscribe, const 
 	return 0;
 }
 
-static int process_one_subscribe_args(afb::req request, bool subscribe, json_object *args)
+static int process_one_subscribe_args(afb::req request, bool subscribe, json_object *args, map_subscription& s)
 {
 	int rc = 0, rc2=0;
 	json_object *x = nullptr, *event = nullptr, *id = nullptr;
@@ -425,7 +418,7 @@ static int process_one_subscribe_args(afb::req request, bool subscribe, json_obj
 
 	if( args == NULL || (id && ((std::string)json_object_get_string(id)).compare("*") == 0))
 	{
-		rc = one_subscribe_unsubscribe_events(request, subscribe, "*", args);
+		rc = one_subscribe_unsubscribe_events(request, subscribe, "*", args, s);
 	}
 	else
 	{
@@ -433,14 +426,14 @@ static int process_one_subscribe_args(afb::req request, bool subscribe, json_obj
 		{
 			if (json_object_get_type(event) != json_type_array) // event is set before and check if it's an array
 			{
-				rc = one_subscribe_unsubscribe_events(request, subscribe, json_object_get_string(event), args);
+				rc = one_subscribe_unsubscribe_events(request, subscribe, json_object_get_string(event), args, s);
 			}
 			else // event is set and it's not an array
 			{
 				for (int i = 0 ; i < json_object_array_length(event); i++)
 				{
 					x = json_object_array_get_idx(event, i);
-					rc2 = one_subscribe_unsubscribe_events(request, subscribe, json_object_get_string(x), args);
+					rc2 = one_subscribe_unsubscribe_events(request, subscribe, json_object_get_string(x), args, s);
 					if (rc >= 0)
 						rc = rc2 >= 0 ? rc + rc2 : rc2;
 				}
@@ -451,14 +444,14 @@ static int process_one_subscribe_args(afb::req request, bool subscribe, json_obj
 		{
 			if (json_object_get_type(id) != json_type_array) // id is set before and check if it's an array
 			{
-				rc = one_subscribe_unsubscribe_id(request, subscribe, json_object_get_int(id), args);
+				rc = one_subscribe_unsubscribe_id(request, subscribe, json_object_get_int(id), args, s);
 			}
 			else // event is set and it's not an array
 			{
 				for (int i = 0 ; i < json_object_array_length(id); i++)
 				{
 					x = json_object_array_get_idx(id, i);
-					rc2 = one_subscribe_unsubscribe_id(request, subscribe, json_object_get_int(x), args);
+					rc2 = one_subscribe_unsubscribe_id(request, subscribe, json_object_get_int(x), args, s);
 					if (rc >= 0)
 						rc = rc2 >= 0 ? rc + rc2 : rc2;
 				}
@@ -481,6 +474,9 @@ static bool get_json_param(afb::req request, json_object *&json) noexcept
 
 static void do_subscribe_unsubscribe(afb::req request, afb::received_data params, bool subscribe)
 {
+	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
+	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
+	map_subscription& s = sm.get_subscribed_signals();
 	int rc = 0;
 	struct json_object *args, *x;
 
@@ -492,12 +488,12 @@ static void do_subscribe_unsubscribe(afb::req request, afb::received_data params
 		for(int i = 0; i < json_object_array_length(args); i++)
 		{
 			x = json_object_array_get_idx(args, i);
-			rc += process_one_subscribe_args(request, subscribe, x);
+			rc += process_one_subscribe_args(request, subscribe, x, s);
 		}
 	}
 	else
 	{
-		rc += process_one_subscribe_args(request, subscribe, args);
+		rc += process_one_subscribe_args(request, subscribe, args, s);
 	}
 
 	if (rc >= 0)
@@ -1092,6 +1088,7 @@ static int init_binding(afb::api &api)
 
 	can_bus_manager.start_threads();
 	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
+	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
 
 	if (application.get_diagnostic_manager().is_initialized())
 	{
