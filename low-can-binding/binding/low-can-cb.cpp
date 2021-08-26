@@ -100,7 +100,7 @@ static int process_config(afb::api api, json_object *json_obj, application_t& ap
 	/// Initialize Diagnostic manager that will handle obd2 requests.
 	/// We pass by default the first CAN bus device to its Initialization.
 	if(! diagnotic_bus)
-		AFB_WARNING("Diagnostic Manager: no diagnostic bus specified. Service will run without the diagnostic manager.");
+		AFB_NOTICE("Diagnostic Manager: no diagnostic bus specified. Service will run without the diagnostic manager.");
 	else if(! application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
 	{
 		AFB_ERROR("Diagnostic Manager: not initialized. Problem initializing the diagnostic manager with the bus: %s", diagnotic_bus);
