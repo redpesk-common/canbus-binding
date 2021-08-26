@@ -34,6 +34,9 @@ low_can_subscription_t::low_can_subscription_t()
 	: index_{-1},
 	event_filter_{},
 	event_{},
+	message_{},
+	signal_{},
+	diagnostic_message_{},
 	socket_{}
 {}
 
@@ -41,6 +44,9 @@ low_can_subscription_t::low_can_subscription_t(struct event_filter_t event_filte
 	: index_{-1},
 	  event_filter_{event_filter},
 	  event_{},
+	  message_{},
+	  signal_{},
+	  diagnostic_message_{},
 	  socket_{}
  {}
 
@@ -48,6 +54,9 @@ low_can_subscription_t::low_can_subscription_t( low_can_subscription_t&& s)
 	: index_{s.index_},
 	event_filter_{s.event_filter_},
 	event_{},
+	message_{},
+	signal_{},
+	diagnostic_message_{},
 	socket_{std::move(s.socket_)}
 {}
 

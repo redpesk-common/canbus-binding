@@ -32,7 +32,8 @@ message_definition_t::message_definition_t(
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
-	signals_{signals}
+	signals_{signals},
+	j1939_ecu_name_{}
 {}
 
 message_definition_t::message_definition_t(const std::string bus,
@@ -52,7 +53,8 @@ message_definition_t::message_definition_t(const std::string bus,
 	frequency_clock_{frequency_clock},
 	force_send_changed_{force_send_changed},
 	last_value_{CAN_MESSAGE_SIZE},
-	signals_{signals}
+	signals_{signals},
+	j1939_ecu_name_{}
 {}
 
 message_definition_t::message_definition_t(const std::string bus,
