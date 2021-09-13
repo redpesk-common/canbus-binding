@@ -224,30 +224,6 @@ static int subscribe_unsubscribe_signals(afb::req request,
 	return rets;
 }
 
-///
-/// @brief subscribe to all signals in the vector signals
-///
-/// @param[in] afb_req request : contains original request use to subscribe or unsubscribe
-/// @param[in] subscribe boolean value, which chooses between a subscription operation or an unsubscription
-/// @param[in] signals -  struct containing vectors with signal_t and diagnostic_messages to subscribe
-/// @param[in] event_filter - stuct containing filter on the signal
-///
-/// @return Number of correctly subscribed signal
-///
-static int subscribe_unsubscribe_signals(afb::req request,
-					 bool subscribe,
-					 const struct utils::signals_found& signals,
-					 struct event_filter_t& event_filter,
-					 map_subscription& s)
-{
-	int rets = 0;
-
-	rets += subscribe_unsubscribe_diagnostic_messages(request, subscribe, signals.diagnostic_messages, event_filter, s, false);
-	rets += subscribe_unsubscribe_signals(request, subscribe, signals.signals, event_filter, s);
-
-	return rets;
-}
-
 static event_filter_t generate_filter(json_object* args)
 {
 	event_filter_t event_filter = {};
@@ -288,7 +264,6 @@ static int one_subscribe_unsubscribe_events(afb::req request, bool subscribe, co
 	openxc_DynamicField search_key = build_DynamicField(tag);
 	sf = utils::signals_manager_t::instance().find_signals(search_key);
 
-
 #ifdef USE_FEATURE_ISOTP
 	if(sf.signals.size() > 1)
 	{
@@ -310,7 +285,8 @@ static int one_subscribe_unsubscribe_events(afb::req request, bool subscribe, co
 	else
 	{
 		event_filter_t event_filter = generate_filter(args);
-		ret = subscribe_unsubscribe_signals(request, subscribe, sf, event_filter, s);
+		ret += subscribe_unsubscribe_diagnostic_messages(request, subscribe, sf.diagnostic_messages, event_filter, s, false);
+		ret += subscribe_unsubscribe_signals(request, subscribe, sf.signals, event_filter, s);
 	}
 	return ret;
 }
