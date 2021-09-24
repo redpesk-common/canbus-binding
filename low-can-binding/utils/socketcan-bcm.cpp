@@ -118,7 +118,7 @@ namespace utils
 	int socketcan_bcm_t::write_message(message_t& m)
 	{
 		can_message_t&  cm = reinterpret_cast<can_message_t&>(m);
-		union bcm_msg obj = cm.get_bcm_msg();
+		union bcm_msg &obj = cm.get_bcm_msg();
 		size_t size = (obj.msg_head.flags & CAN_FD_FRAME) ?
 			(size_t)((char*)&obj.fd_frames[obj.msg_head.nframes] - (char*)&obj):
 			(size_t)((char*)&obj.frames[obj.msg_head.nframes] - (char*)&obj);

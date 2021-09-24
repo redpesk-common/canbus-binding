@@ -63,7 +63,7 @@ class can_message_t : public message_t {
 		struct canfd_frame convert_to_canfd_frame();
 		struct std::vector<canfd_frame> convert_to_canfd_frame_vector();
 		union bcm_msg& get_bcm_msg();
-		void set_bcm_msg(union bcm_msg bcm_msg);
+		void set_bcm_msg(const union bcm_msg &bcm_msg);
 
 		struct can_frame convert_to_can_frame();
 		bool is_set();
