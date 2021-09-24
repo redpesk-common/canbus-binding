@@ -480,21 +480,22 @@ int low_can_subscription_t::open_socket(const std::string& bus_name,  uint32_t f
 ///
 /// @returns a bcm_msg with the msg_head parts set and can_frame
 /// zeroed.
-union bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning)
+void low_can_subscription_t::make_bcm_head(uint32_t opcode,
+                                           union bcm_msg& bcm_msg,
+					   uint32_t can_id,
+					   uint32_t flags,
+					   const struct timeval& timeout,
+					   const struct timeval& frequency_thinning)
 {
-	union bcm_msg bcm_msg;
-	::memset(&bcm_msg, 0, sizeof(bcm_msg));
-
+	::memset(&bcm_msg.msg_head, 0, sizeof bcm_msg.msg_head);
 	bcm_msg.msg_head.opcode  = opcode;
 	bcm_msg.msg_head.can_id  = can_id;
 	bcm_msg.msg_head.flags = flags;
+	bcm_msg.msg_head.nframes = 0;
 	bcm_msg.msg_head.ival1.tv_sec = timeout.tv_sec ;
 	bcm_msg.msg_head.ival1.tv_usec = timeout.tv_usec;
 	bcm_msg.msg_head.ival2.tv_sec = frequency_thinning.tv_sec ;
 	bcm_msg.msg_head.ival2.tv_usec = frequency_thinning.tv_usec;
-
-
-	return bcm_msg;
 }
 
 /// @brief Take an existing bcm_msg struct and add a can_frame.
@@ -502,16 +503,14 @@ union bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t ca
 /// a multiplexed message with several can_frame.
 void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, union bcm_msg& bcm_msg)
 {
-	struct can_frame cf;
-
 	if (bcm_msg.msg_head.flags & CAN_FD_FRAME)
 		bcm_msg.fd_frames[bcm_msg.msg_head.nframes] = cfd;
 	else
 	{
+		struct can_frame &cf = bcm_msg.frames[bcm_msg.msg_head.nframes];
 		cf.can_id = cfd.can_id;
 		cf.can_dlc = cfd.len;
-		::memcpy(&cf.data, cfd.data, cfd.len);
-		bcm_msg.frames[bcm_msg.msg_head.nframes] = cf;
+		::memcpy(cf.data, cfd.data, cfd.len);
 	}
 	bcm_msg.msg_head.nframes++;
 }
@@ -614,9 +613,10 @@ int low_can_subscription_t::create_rx_filter_can(std::shared_ptr<signal_t> sig)
 		flags_bcm &= ~RX_NO_AUTOTIMER;
 	}
 
-	union bcm_msg bcm_msg = low_can_subscription_t::make_bcm_head(RX_SETUP, signal_->get_message()->get_id(), flags_bcm, timeout, freq);
-
 	std::vector<canfd_frame> cfd_vect = cm.convert_to_canfd_frame_vector();
+
+	union bcm_msg bcm_msg;
+	low_can_subscription_t::make_bcm_head(RX_SETUP, bcm_msg, signal_->get_message()->get_id(), flags_bcm, timeout, freq);
 
 	if(cfd_vect.size() > 1) //multi
 	{
@@ -709,7 +709,8 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 	struct timeval freq = frequency_clock_t(event_filter_.frequency).get_timeval_from_period();
 	struct timeval timeout = {0, 0};
 
-	union bcm_msg bcm_msg =  make_bcm_head(RX_SETUP, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER | RX_NO_AUTOTIMER | RX_FILTER_ID, timeout, freq);
+	union bcm_msg bcm_msg;
+	make_bcm_head(RX_SETUP, bcm_msg, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER | RX_NO_AUTOTIMER | RX_FILTER_ID, timeout, freq);
 	return create_rx_filter_bcm(bcm_msg);
 }
 
@@ -759,9 +760,6 @@ int low_can_subscription_t::create_rx_filter_bcm(union bcm_msg& bcm_msg)
 int low_can_subscription_t::tx_send(message_t *message, const std::string& bus_name)
 {
 	can_message_t *cm = static_cast<can_message_t*>(message);
-
-	union bcm_msg bcm_msg = low_can_subscription_t::make_bcm_head(TX_SEND, cm->get_id(), cm->get_flags()|TX_CP_CAN_ID); // TX_CP_CAN_ID -> copy in cfd the id of bcm
-	cm->set_bcm_msg(bcm_msg);
 
 	std::vector<canfd_frame> cfd_vect = cm->convert_to_canfd_frame_vector();
 
