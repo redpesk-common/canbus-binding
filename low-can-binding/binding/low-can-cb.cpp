@@ -285,7 +285,13 @@ static int one_subscribe_unsubscribe_events(afb::req request, bool subscribe, co
 	else
 	{
 		event_filter_t event_filter = generate_filter(args);
-		ret += subscribe_unsubscribe_diagnostic_messages(request, subscribe, sf.diagnostic_messages, event_filter, s, false);
+		if(application_t::instance().get_diagnostic_manager().is_initialized())
+			ret += subscribe_unsubscribe_diagnostic_messages(request,
+									 subscribe,
+									 sf.diagnostic_messages,
+									 event_filter,
+									 s,
+									 false);
 		ret += subscribe_unsubscribe_signals(request, subscribe, sf.signals, event_filter, s);
 	}
 	return ret;
@@ -871,21 +877,17 @@ static void simple_subscribe_unsubscribe_signal(afb::req request, signal_t* sign
 	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
 	map_subscription& s = sm.get_subscribed_signals();
 
-	if(signal)
+	if(!signal)
+		request.reply(AFB_ERRNO_INVALID_REQUEST);
+	else
 	{
 		list_ptr_signal_t list_sig {signal->get_shared_ptr()};
 		event_filter_t evt_filter = generate_filter(args);
 		if(subscribe_unsubscribe_signals(request, subscribe, list_sig, evt_filter, s))
-		{
 			request.reply();
-		}
 		else
-		{
 			request.reply(AFB_ERRNO_INTERNAL_ERROR);
-		}
-		return;
 	}
-	request.reply(AFB_ERRNO_INVALID_REQUEST);
 }
 
 static void simple_unsubscribe_signal(afb::req request, signal_t* signal, json_object *args)
