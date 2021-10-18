@@ -331,7 +331,7 @@ static int one_subscribe_unsubscribe_id(afb::req request, bool subscribe, const 
 
 static int process_one_subscribe_args(afb::req request, bool subscribe, json_object *args, map_subscription& s)
 {
-	int rc = 0, rc2=0;
+	int rc = -1, rc2 = 0;
 	json_object *x = nullptr, *event = nullptr, *id = nullptr;
 
 
