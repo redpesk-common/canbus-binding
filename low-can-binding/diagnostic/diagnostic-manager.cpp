@@ -115,6 +115,7 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 
 	struct timeval freq = current_adr->get_frequency_clock().get_timeval_from_period();
 
+	::memset(&bcm_msg.msg_head, 0, sizeof(struct bcm_msg_head));
 	bcm_msg.msg_head.opcode  = TX_SETUP;
 	bcm_msg.msg_head.can_id  = arbitration_id;
 	bcm_msg.msg_head.flags = SETTIMER|STARTTIMER|TX_CP_CAN_ID;
@@ -124,13 +125,12 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 	bcm_msg.msg_head.ival2.tv_sec = freq.tv_sec;
 	bcm_msg.msg_head.ival2.tv_usec = freq.tv_usec;
 	bcm_msg.msg_head.nframes = 1;
-	cf.can_dlc = size;
 
-	::memset(cf.data, 0, sizeof(cf.data));
+	::memset(&cf, 0, sizeof(can_frame));
+	cf.can_dlc = size;
 	::memcpy(cf.data, data, size);
 
 	bcm_msg.frames[0] = cf;
-
 
 	can_message_t msg = can_message_t();
 
