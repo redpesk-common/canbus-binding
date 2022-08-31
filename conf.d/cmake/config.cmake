@@ -113,7 +113,7 @@ set (PKG_REQUIRED_LIST
 	json-c
 	libsystemd>=222
 	afb-binding
-	afb-libhelpers
+	afb-helpers
 	afb-libcontroller
 )
 
