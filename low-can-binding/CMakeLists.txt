@@ -69,7 +69,7 @@ PROJECT_TARGET_ADD(canbus)
 	IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib${TARGET_NAME}.so
 	)
 
-	target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+	target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/include)
 
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
 		openxc-message-format
@@ -96,7 +96,7 @@ PROJECT_TARGET_ADD(canbus-binding)
 		OUTPUT_NAME ${TARGET_NAME}
 	)
 
-	target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+	target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/include)
 
 	# Library dependencies (include updates automatically)
 	TARGET_LINK_LIBRARIES(${TARGET_NAME}
