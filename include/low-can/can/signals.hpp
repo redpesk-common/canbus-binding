@@ -69,6 +69,13 @@ enum sign_t
 		SIGN_BIT_EXTERN = 4
 };
 
+enum endian_t
+{
+	UnsetEndian,
+	BigEndian,
+	LittleEndian
+};
+
 class signal_t:  public std::enable_shared_from_this<signal_t>
 {
 private:
@@ -109,8 +116,31 @@ private:
 	int32_t bit_sign_position_; /*!< bit_sign_position_ - The bit that indicates the sign of the signal in its CAN message*/
 	std::string unit_; /* !< unit_ - The unit of the data */
 	std::string permission_ = ""; /* !< r_auth_ - An AFB authentication structure if you need to protect the signal from the API.*/
-
+	endian_t endian_; /* what is the endianness */
 public:
+	signal_t(
+		std::string name,
+		uint32_t bit_position,
+		uint32_t bit_size,
+		float factor,
+		float offset,
+		float min_value,
+		float max_value,
+		frequency_clock_t frequency,
+		bool send_same,
+		bool force_send_changed,
+		std::map<uint8_t, std::string> states,
+		bool writable,
+		signal_decoder decoder,
+		signal_encoder encoder,
+		bool received,
+		std::pair<bool, int> multiplex,
+		sign_t sign,
+		int32_t bit_sign_position,
+		std::string unit,
+		std::string permission,
+		endian_t endian_);
+
 	signal_t(
 		std::string name,
 		uint32_t bit_position,
@@ -198,6 +228,7 @@ public:
 	int32_t get_bit_sign_position() const;
 	const std::string get_unit() const;
 	const std::string get_permission() const;
+	endian_t get_endian() const;
 
 	void set_parent(std::shared_ptr<message_definition_t> parent);
 	void set_received(bool r);
