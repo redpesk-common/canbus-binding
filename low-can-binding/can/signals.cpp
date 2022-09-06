@@ -68,6 +68,7 @@ signal_t::signal_t(
 	, encoder_{encoder}
 	, received_{received}
 	, last_value_{.0f}
+	, last_raw_value_{0}
 	, multiplex_{multiplex}
 	, sign_{sign}
 	, bit_sign_position_{bit_sign_position}
@@ -114,6 +115,7 @@ signal_t::signal_t(
 	, encoder_{encoder}
 	, received_{received}
 	, last_value_{.0f}
+	, last_raw_value_{0}
 	, multiplex_{multiplex}
 	, sign_{sign}
 	, bit_sign_position_{bit_sign_position}
@@ -159,6 +161,7 @@ signal_t::signal_t(
 	, encoder_{encoder}
 	, received_{received}
 	, last_value_{.0f}
+	, last_raw_value_{0}
 	, multiplex_{multiplex}
 	, sign_{sign}
 	, bit_sign_position_{bit_sign_position}
@@ -302,6 +305,11 @@ float signal_t::get_last_value() const
 	return last_value_;
 }
 
+uint64_t signal_t::get_last_raw_value() const
+{
+	return last_raw_value_;
+}
+
 json_object* signal_t::afb_verb_get_last_value()
 {
 	json_object *jobj = json_object_new_object();
@@ -398,6 +406,13 @@ void signal_t::set_received(bool r)
 void signal_t::set_last_value(float val)
 {
 	last_value_ = val;
+	last_raw_value_ = (uint64_t)((int64_t)roundf((val - offset_) / factor_));
+}
+
+void signal_t::set_last_raw_value(uint64_t val)
+{
+	last_raw_value_ = val;
+	last_value_ = (factor_ * ((int64_t)val)) + offset_;
 }
 
 void signal_t::set_timestamp(uint64_t timestamp)

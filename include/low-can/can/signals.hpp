@@ -109,6 +109,7 @@ private:
 	bool received_; /*!< received_ - True if this signal has ever been received.*/
 	float last_value_; /*!< lastValue_ - The last received value of the signal. If 'received' is false,
 				* this value is undefined. */
+	uint64_t last_raw_value_;
 	std::pair<bool, int> multiplex_; /*!< multiplex_ - If bool is false and int is 0 is not a multiplex signal
 										If bool is true, that indicate that is a multiplexor
 										If int is different of 0, that indicate the link with a multiplexor */
@@ -220,6 +221,7 @@ public:
 	signal_encoder& get_encoder();
 	bool get_received() const;
 	float get_last_value() const;
+	uint64_t get_last_raw_value() const;
 	json_object* afb_verb_get_last_value();
 	int afb_verb_write_on_bus(json_object *value);
 	std::pair<float, uint64_t> get_last_value_with_timestamp() const;
@@ -232,6 +234,7 @@ public:
 
 	void set_parent(std::shared_ptr<message_definition_t> parent);
 	void set_received(bool r);
+	void set_last_raw_value(uint64_t val);
 	void set_last_value(float val);
 	void set_timestamp(uint64_t timestamp);
 	void set_bit_position(uint32_t bit_position);
