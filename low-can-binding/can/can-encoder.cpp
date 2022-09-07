@@ -18,11 +18,10 @@
 #include <low-can/can/can-encoder.hpp>
 #include <low-can/can/message-definition.hpp>
 #include <low-can/utils/openxc-utils.hpp>
+#include <low-can/utils/frame-codec.hpp>
 
 #include "canutil/write.h"
 #include "../utils/converter.hpp"
-
-#include <bitfield/bitfield.h>
 
 /**
  * @brief Allows to encode data for a signal
@@ -35,40 +34,13 @@
  */
 void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> &data, bool filter, bool factor, bool offset)
 {
-	uint32_t bit_size = sig->get_bit_size();
-	uint32_t bit_position = sig->get_bit_position();
-
-	int new_start_byte = 0;
-	int new_end_byte = 0;
-	uint8_t new_start_bit = 0;
-	uint8_t new_end_bit = 0;
-
-	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit, new_end_bit);
-	std::vector<uint8_t> data_signal(new_end_byte - new_start_byte + 1, 0xFF);
-
-	if(filter)
-	{
-		uint8_t mask_first_v = static_cast<uint8_t>(0xFF >> new_start_bit);
-		uint8_t mask_last_v = static_cast<uint8_t>(0xFF << (7 - new_end_bit));
-
-		if(new_start_byte == new_end_byte)
-		{
-			data_signal[0] = mask_first_v & mask_last_v;
-		}
-		else
-		{
-			data_signal[0] = mask_first_v;
-			data_signal[new_end_byte - new_start_byte] = mask_last_v;
-		}
-	}
-	else
-	{
-		set_bitfield(sig->get_last_raw_value(), new_start_bit,
-	                (uint8_t)bit_size, data_signal.data(), bit_size);
-	}
-
-	for(size_t i = new_start_byte; i <= new_end_byte ; i++)
-		data[i] = data[i] | data_signal[i-new_start_byte];
+	uint64_t value = filter ? (uint64_t)(int64_t)-1 : sig->get_last_raw_value();
+	return frame_codec::encode(
+				value,
+				data.data(),
+				sig->get_bit_position(),
+				sig->get_bit_size(),
+				sig->get_endian() != LittleEndian);
 }
 
 /**

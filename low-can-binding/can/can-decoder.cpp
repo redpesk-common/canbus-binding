@@ -19,13 +19,12 @@
 #include <cmath>
 #include <low-can/can/can-decoder.hpp>
 #include <low-can/utils/openxc-utils.hpp>
+#include <low-can/utils/frame-codec.hpp>
 #include <low-can/can/message-definition.hpp>
 #include <low-can/binding/low-can-hat.hpp>
 
 #include "canutil/read.h"
 #include "../utils/converter.hpp"
-
-#include <bitfield/bitfield.h>
 
 
 /// @brief Handle sign of the signal according to several decoding methods
@@ -97,34 +96,13 @@ int decoder_t::handle_sign(const signal_t& signal, std::vector<uint8_t>& data_si
 ///
 uint64_t decoder_t::parse_signal_raw_value(signal_t& signal, std::shared_ptr<message_t> message)
 {
-	int sign;
-	std::vector<uint8_t> data;
-	std::vector<uint8_t> data_signal;
-	uint8_t bit_size = (uint8_t) signal.get_bit_size();
-	uint32_t bit_position = signal.get_bit_position();
-
-	int new_start_byte = 0;
-	int new_end_byte = 0;
-	uint8_t new_start_bit = 0;
-	uint8_t new_end_bit = 0;
-
-	data = message->get_data_vector();
-	converter_t::signal_to_bits_bytes(bit_position, bit_size, new_start_byte, new_end_byte, new_start_bit, new_end_bit);
-
-	for(int i=new_start_byte;i<=new_end_byte;i++)
-		data_signal.push_back(data[i]);
-
-	sign = handle_sign(signal, data_signal, new_end_bit, data);
-
-	if(data_signal.size() > 65535)
-		AFB_ERROR("Too long data signal %s", signal.get_name().c_str());
-
-	uint64_t value = get_bitfield(data_signal.data(), (uint16_t)data_signal.size(), new_start_bit, bit_size);
-	if (sign < 0)
-		value |= ((uint64_t)-1) << bit_size;
-	return value;
+	return frame_codec::decode(
+				message->get_data_vector().data(),
+				signal.get_bit_position(),
+				signal.get_bit_size(),
+				signal.get_endian() != LittleEndian,
+				signal.get_sign() != UNSIGNED);
 }
-
 
 /// @brief Parses the signal's bitfield from the given data and returns the value.
 ///
