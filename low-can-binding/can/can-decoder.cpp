@@ -265,32 +265,35 @@ openxc_DynamicField decoder_t::decode_ascii(signal_t& signal, std::shared_ptr<me
 ///
 openxc_DynamicField decoder_t::decode_noop(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
-	float value = decoder_t::parse_signal_bitfield(signal, message);
-	float min_value = signal.get_min_value();
-	float max_value = signal.get_max_value();
+	uint64_t value = parse_signal_raw_value(signal, message);
+	AFB_DEBUG("Decoded message from parse_signal_raw_value: %llu", (long long unsigned)value);
+
+	uint64_t prval = signal.get_last_raw_value();
+	signal.set_last_raw_value(value);
+	float val = signal.get_last_value();
 
 	/* If we have an exact value to match then min = max
 	 * here we compare equality of float values naively because they come
 	 * from the signal object attributes and hasn't been computed at all so
 	 * values are comparable using simple operator (it's a bit lazy ok well)
 	 */
-	if( (! isnanf(max_value) && ! isnanf(min_value) && min_value == max_value && value != min_value) ||
-	    (! isnanf(min_value) && value < min_value) ||
-	    (! isnanf(max_value) && value > max_value)
+	float min_value = signal.get_min_value();
+	float max_value = signal.get_max_value();
+	if( (! isnanf(min_value) && val < min_value) ||
+	    (! isnanf(max_value) && val > max_value)
 	  )
 	{
 		AFB_DEBUG("Value doesn't match for signal %s", signal.get_name().c_str());
+		signal.set_last_raw_value(prval); // restore older value
 		return build_DynamicField_error();
 	}
 
-	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);
-	openxc_DynamicField decoded_value = build_DynamicField(value);
-
 	// Don't send if they is no changes
-	*send = ((signal.get_last_value() == value && !signal.get_send_same()) || !*send) ? false : true;
-	signal.set_last_value(value);
-	signal.set_received(true);
+	if ((prval == value && !signal.get_send_same()) || !*send)
+		*send = false;
 
+	signal.set_received(true);
+	openxc_DynamicField decoded_value = build_DynamicField(val);
 	return decoded_value;
 }
 /// @brief Coerces a numerical value to a boolean.
@@ -309,17 +312,17 @@ openxc_DynamicField decoder_t::decode_noop(signal_t& signal, std::shared_ptr<mes
 ///
 openxc_DynamicField decoder_t::decode_boolean(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
-	float value = decoder_t::parse_signal_bitfield(signal, message);
-	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);
-	openxc_DynamicField decoded_value = build_DynamicField(value == 0.0 ? false : true);
+	uint64_t value = parse_signal_raw_value(signal, message);
+	AFB_DEBUG("Decoded message from parse_signal_raw_value: %llu", (long long unsigned)value);
 
 	// Don't send if they is no changes
-	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
+	if ((signal.get_last_raw_value() == value && !signal.get_send_same()) || !*send)
 		*send = false;
 
-	signal.set_last_value(value);
+	signal.set_last_raw_value(value);
+	signal.set_received(true);
 
-
+	openxc_DynamicField decoded_value = build_DynamicField(value != 0);
 	return decoded_value;
 }
 /// @brief Update the metadata for a signal and the newly received value.
@@ -338,11 +341,12 @@ openxc_DynamicField decoder_t::decode_boolean(signal_t& signal, std::shared_ptr<
 ///
 openxc_DynamicField decoder_t::decode_ignore(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
-	float value = decoder_t::parse_signal_bitfield(signal, message);
+	uint64_t value = parse_signal_raw_value(signal, message);
+
 	if(send)
 	  *send = false;
 
-	signal.set_last_value(value);
+	signal.set_last_raw_value(value);
 	openxc_DynamicField decoded_value;
 
 	return decoded_value;
@@ -365,22 +369,24 @@ openxc_DynamicField decoder_t::decode_ignore(signal_t& signal, std::shared_ptr<m
 ///
 openxc_DynamicField decoder_t::decode_state(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
-	float value = decoder_t::parse_signal_bitfield(signal, message);
-	AFB_DEBUG("Decoded message from parse_signal_bitfield: %f", value);
+	uint64_t value = parse_signal_raw_value(signal, message);
+	AFB_DEBUG("Decoded message from parse_signal_raw_value: %llu", (long long unsigned)value);
+
+	// check validity of received data
 	const std::string signal_state = signal.get_states((uint8_t)value);
-	openxc_DynamicField decoded_value = build_DynamicField(signal_state);
 	if(signal_state.size() <= 0)
 	{
-		*send = false;
 		AFB_ERROR("No state found with index: %d", (int)value);
+		return build_DynamicField_error();
 	}
 
-	// Don't send if they is no changes
-	if ((signal.get_last_value() == value && !signal.get_send_same()) || !*send )
+	if ((signal.get_last_raw_value() == value && !signal.get_send_same()) || !*send )
 		*send = false;
-	signal.set_last_value(value);
 
+	signal.set_last_raw_value(value);
+	signal.set_received(true);
 
+	openxc_DynamicField decoded_value = build_DynamicField(signal_state);
 	return decoded_value;
 }
 
