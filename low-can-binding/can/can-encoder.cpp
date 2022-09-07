@@ -22,6 +22,8 @@
 #include "canutil/write.h"
 #include "../utils/converter.hpp"
 
+#include <bitfield/bitfield.h>
+
 /**
  * @brief Allows to encode data for a signal
  *
@@ -35,8 +37,6 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 {
 	uint32_t bit_size = sig->get_bit_size();
 	uint32_t bit_position = sig->get_bit_position();
-	float factor_v = factor ? sig->get_factor() : 1;
-	float offset_v = offset ? sig->get_offset() : 0;
 
 	int new_start_byte = 0;
 	int new_end_byte = 0;
@@ -63,13 +63,8 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
 	}
 	else
 	{
-		bitfield_encode_float(sig->get_last_value(),
-				      new_start_bit,
-				      (uint8_t)bit_size,
-				      factor_v,
-				      offset_v,
-				      data_signal.data(),
-				      bit_size);
+		set_bitfield(sig->get_last_raw_value(), new_start_bit,
+	                (uint8_t)bit_size, data_signal.data(), bit_size);
 	}
 
 	for(size_t i = new_start_byte; i <= new_end_byte ; i++)
@@ -88,7 +83,7 @@ void encoder_t::encode_data(std::shared_ptr<signal_t> sig, std::vector<uint8_t> 
  */
 message_t* encoder_t::build_frame(const std::shared_ptr<signal_t>& signal, uint64_t value, message_t *message, bool factor, bool offset)
 {
-	signal->set_last_value(static_cast<float>(value));
+	signal->set_last_raw_value(value);
 	std::vector<uint8_t> data(message->get_length(), 0);
 
 	for(const auto& sig: signal->get_message()->get_signals())
