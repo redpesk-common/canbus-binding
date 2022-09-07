@@ -26,6 +26,7 @@ class decoder_t
 public:
 	static int handle_sign(const signal_t& signal, std::vector<uint8_t>& data_signal, uint8_t new_end_bit, const std::vector<uint8_t>& can_data);
 	static float parse_signal_bitfield(signal_t& signal, std::shared_ptr<message_t> message);
+	static uint64_t parse_signal_raw_value(signal_t& signal, std::shared_ptr<message_t> message);
 
 	static openxc_DynamicField decode_state(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
 	static openxc_DynamicField decode_boolean(signal_t& signal, std::shared_ptr<message_t> message, bool* send);
