@@ -59,6 +59,7 @@ PROJECT_TARGET_ADD(canbus)
 		#utils/socketcan-raw.cpp
 		utils/socketcan-bcm.cpp
 		utils/converter.cpp
+		utils/frame-codec.cpp
 	)
 
 	add_library(${TARGET_NAME} SHARED ${SOURCES_LIB} ${SOURCES_J1939} ${SOURCES_ISOTP})
