@@ -16,6 +16,7 @@
 # limitations under the License.
 ###########################################################################
 
+add_executable(test-frame-codec test-frame-codec.cpp ../low-can-binding/utils/frame-codec.cpp)
 
 # Include any directory not starting with _
 # -----------------------------------------------------

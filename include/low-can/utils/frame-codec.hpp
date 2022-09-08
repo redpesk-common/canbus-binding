@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#pragma once
+
 #include <stdint.h>
 
 namespace frame_codec {

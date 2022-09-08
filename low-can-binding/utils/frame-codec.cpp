@@ -123,7 +123,7 @@ uint64_t decode(const uint8_t data[], uint32_t bit_position, uint32_t bit_size, 
 		}
 	}
 	if (sign)
-		value |= (-(value >> (bit_size - 1)) << bit_size);
+		value |= (-(value >> (bit_size - 1)) << (bit_size - 1));
 	return value;
 }
 
