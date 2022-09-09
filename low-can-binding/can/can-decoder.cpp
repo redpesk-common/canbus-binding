@@ -387,8 +387,11 @@ openxc_DynamicField decoder_t::translate_signal(signal_t& signal, std::shared_pt
 {
 	// Must call the decoders every time, regardless of if we are going to
 	// decide to send the signal or not.
-	openxc_DynamicField decoded_value = decoder_t::decode_signal(signal,
-			message, send);
+	openxc_DynamicField decoded_value
+		// if the message is special TIMEOUT send last value
+		 = message->is_timeout() ? build_DynamicField(signal.get_last_value())
+					// otherwise decode the frame
+					: decoder_t::decode_signal(signal, message, send);
 
 	signal.set_received(true);
 	signal.set_timestamp(message->get_timestamp());
