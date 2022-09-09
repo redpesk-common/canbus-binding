@@ -42,6 +42,13 @@ can_message_t::can_message_t(uint32_t maxdlen,
 	rtr_flag_{rtr_flag}
 {}
 
+can_message_t::can_message_t(uint32_t id, uint64_t timestamp, bool timeout)
+	: message_t(timestamp, timeout),
+	id_{id},
+	rtr_flag_{0}
+{}
+
+
 ///
 /// @brief Retrieve id_ member value.
 ///

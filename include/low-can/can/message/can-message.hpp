@@ -46,6 +46,9 @@ class can_message_t : public message_t {
 				uint32_t flags,
 				std::vector<uint8_t>& data,
 				uint64_t timestamp);
+		can_message_t(  uint32_t id,
+				uint64_t timestamp,
+				bool is_timeout = true);
 
 		uint32_t get_id() const;
 		void set_id(const canid_t id);

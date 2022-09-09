@@ -97,9 +97,13 @@ namespace utils
 		else
 			timestamp = 1000000L * tv.tv_sec + tv.tv_usec;
 
-		cm = can_message_t::convert_from_frame(msg.fd_frames[0] , frame_size, timestamp);
+		if (msg.msg_head.opcode == RX_CHANGED)
+		{
+			cm = can_message_t::convert_from_frame(msg.fd_frames[0] , frame_size, timestamp);
+		}
+		else if (msg.msg_head.opcode == RX_TIMEOUT)
+			cm = std::make_shared<can_message_t>(can_message_t(msg.msg_head.can_id, timestamp, true));
 		cm->set_sub_id((int)socket());
-
 		return cm;
 	}
 
