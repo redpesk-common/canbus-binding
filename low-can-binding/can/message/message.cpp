@@ -50,7 +50,18 @@ message_t::message_t(uint32_t maxdlen,
 	flags_{flags},
 	data_{data},
 	timestamp_{timestamp},
-	sub_id_{-1}
+	sub_id_{-1},
+	is_timeout_{false}
+{}
+
+message_t::message_t(uint64_t timestamp, bool is_timeout)
+	: maxdlen_{0},
+	length_{0},
+	flags_{0},
+	data_{0},
+	timestamp_{timestamp},
+	sub_id_{-1},
+	is_timeout_{is_timeout}
 {}
 
 /**
@@ -92,6 +103,16 @@ const std::vector<uint8_t> message_t::get_data_vector() const
 uint32_t message_t::get_length() const
 {
 	return length_;
+}
+
+///
+/// @brief Retrieve is_timeout value.
+///
+/// @return is_timeout_ class member
+///
+bool message_t::is_timeout() const
+{
+	return is_timeout_;
 }
 
 /**

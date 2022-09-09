@@ -64,16 +64,19 @@ protected:
 	std::vector<uint8_t> data_; ///< data_ - The message's data field with a size of 8 which is the standard about CAN bus messages.*/
 	uint64_t timestamp_; ///< timestamp_ - timestamp of the received message*/
 	int sub_id_; ///< sub_id_ - Subscription index. */
+	bool is_timeout_; //< is_timeout_ - The message is a timeout message without data*/
 
 public:
 	message_t();
 	message_t(uint32_t maxdlen, uint32_t length, uint32_t flags, std::vector<uint8_t>& data, uint64_t timestamp);
+	message_t(uint64_t timestamp, bool is_timeout);
 	virtual ~message_t() = default;
 
 	int get_sub_id() const;
 	const uint8_t* get_data() const;
 	const std::vector<uint8_t> get_data_vector() const;
 	uint32_t get_length() const;
+	bool is_timeout() const;
 	uint64_t get_timestamp() const;
 
 	void set_data(std::vector<uint8_t> data);
