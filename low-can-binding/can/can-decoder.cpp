@@ -385,18 +385,24 @@ openxc_DynamicField decoder_t::decode_state(signal_t& signal, std::shared_ptr<me
 ///
 openxc_DynamicField decoder_t::translate_signal(signal_t& signal, std::shared_ptr<message_t> message, bool* send)
 {
-	// Must call the decoders every time, regardless of if we are going to
-	// decide to send the signal or not.
-	openxc_DynamicField decoded_value
-		// if the message is special TIMEOUT send last value
-		 = message->is_timeout() ? build_DynamicField(signal.get_last_value())
-					// otherwise decode the frame
-					: decoder_t::decode_signal(signal, message, send);
-
-	signal.set_received(true);
-	signal.set_timestamp(message->get_timestamp());
-	signal.get_message()->set_last_value(message);
-	return decoded_value;
+	// if the message is special TIMEOUT send last value
+	if (!message->is_timeout()) {
+		openxc_DynamicField decoded_value = decoder_t::decode_signal(signal, message, send);
+		signal.set_received(true);
+		signal.set_timestamp(message->get_timestamp());
+		if (signal.get_send_same())
+			*send = false; // wait the timeout
+		signal.get_message()->set_last_value(message);
+		return decoded_value;
+	}
+	if (signal.get_send_same() && signal.get_received()) {
+		openxc_DynamicField decoded_value = build_DynamicField(signal.get_last_value());
+		signal.set_timestamp(message->get_timestamp());
+		*send = true;
+		return decoded_value;
+	}
+	*send = false;
+	return openxc_DynamicField();
 }
 
 /// @brief Parse a signal from a CAN message and apply any required

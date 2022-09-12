@@ -600,8 +600,8 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 	frequency_clock_t f = subscription.event_filter_.frequency == 0 ? subscription.signal_->get_frequency() : frequency_clock_t(subscription.event_filter_.frequency);
 	freq = f.get_timeval_from_period();
 
-	if (sig->get_send_same()){
-		timeout = freq;
+	if (sig->get_send_same()) {
+		timeout = { 0, 10 };
 		flags_bcm &= ~RX_NO_AUTOTIMER;
 	}
 
