@@ -24,22 +24,17 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 include(CTest)
 enable_testing()
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/conf.d/cmake/config.cmake)
 
 include(GNUInstallDirs)
-configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
+configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 INSTALL(FILES
 	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
 	DESTINATION
 	${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
 
-configure_file(${PROJECT_NAME}.conf.in ${PROJECT_NAME}.conf @ONLY)
-
-INSTALL(FILES
-	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.conf
-	DESTINATION
-	${CMAKE_INSTALL_SYSCONFDIR}/ld.so.conf.d
-)
-INSTALL(CODE "execute_process(COMMAND ldconfig)")
+INSTALL(DIRECTORY docs DESTINATION ${CMAKE_INSTALL_DATADIR}/canbus-binding)
+INSTALL(DIRECTORY _plugin_template/ DESTINATION ${CMAKE_INSTALL_DATADIR}/canbus-binding/plugin_template)

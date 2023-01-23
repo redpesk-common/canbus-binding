@@ -51,7 +51,7 @@ pkg_check_modules(lowcan REQUIRED canbus-binding)
 add_link_options(-L${lowcan_LIBDIR})
 link_libraries(canbus ${lowcan_LIBRARIES})
 
-set(TARGETS_LIST "" CACHE INTERNAL "Enumarate targets")
+set(TARGETS_LIST "" CACHE INTERNAL "Enumerate targets")
 
 set(TARGET_NAME generated_plugin)
 
