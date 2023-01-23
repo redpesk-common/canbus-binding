@@ -20,11 +20,11 @@
 
 struct bcm_msg
 {
-	struct bcm_msg_head msg_head;
 	union {
 		struct canfd_frame fd_frames[MAX_BCM_CAN_FRAMES];
 		struct can_frame frames[MAX_BCM_CAN_FRAMES];
 	};
+	struct bcm_msg_head msg_head;
 };
 
 /// @class can_message_t
