@@ -19,14 +19,9 @@
 # Project Info
 # ------------------
 set(PROJECT_PRETTY_NAME "CAN bus binding")
-set(PROJECT_DESCRIPTION "Expose CAN bus  APIs through AGL Framework")
-set(PROJECT_URL "https://git.ovh.iot/redpesk-common/canbus-bindingit")
 set(PROJECT_ICON "icon.png")
-set(PROJECT_AUTHOR "Romain Forlot")
-set(PROJECT_AUTHOR_MAIL "romain.forlot@iot.bzh")
+set(PROJECT_AUTHOR "IoT.bzh")
 set(PROJECT_LICENSE "APL2.0")
-set(PROJECT_LANGUAGES "C;CXX")
-set(PROJECT_VERSION 1.1.1)
 set(API_NAME "canbus")
 
 # Where are stored the project configuration files
