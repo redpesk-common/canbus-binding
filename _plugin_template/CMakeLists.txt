@@ -49,7 +49,7 @@ list (APPEND link_libraries -pthread)
 pkg_check_modules(lowcan REQUIRED canbus-binding)
 
 add_link_options(-L${lowcan_LIBDIR})
-link_libraries(canbus ${lowcan_LIBRARIES})
+link_libraries(${lowcan_LIBRARIES})
 
 set(TARGETS_LIST "" CACHE INTERNAL "Enumerate targets")
 

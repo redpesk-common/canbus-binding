@@ -7,4 +7,4 @@ Version: @PROJECT_VERSION@
 
 Requires: afb-binding afb-libcontroller
 Cflags: -I${includedir}
-Libs: -L${libdir}
+Libs: -L${libdir} -lcanbus
