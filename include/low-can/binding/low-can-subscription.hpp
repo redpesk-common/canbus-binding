@@ -105,9 +105,9 @@ public:
 	void set_signal(std::shared_ptr<signal_t> signal);
 	void set_message_definition(std::shared_ptr<message_definition_t> message);
 
-	static struct bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0, 0}, const struct timeval& frequency_thinning = {0, 0});
-	static void add_one_bcm_frame(struct canfd_frame& cfd, struct bcm_msg& bcm_msg);
-	static void remove_last_bcm_frame(struct bcm_msg& bcm_msg);
+	static union bcm_msg make_bcm_head(uint32_t opcode, uint32_t can_id = 0, uint32_t flags = 0, const struct timeval& timeout = {0, 0}, const struct timeval& frequency_thinning = {0, 0});
+	static void add_one_bcm_frame(struct canfd_frame& cfd, union bcm_msg& bcm_msg);
+	static void remove_last_bcm_frame(union bcm_msg& bcm_msg);
 
 	static int open_socket(low_can_subscription_t &subscription, const std::string& bus_name = "", uint32_t flags = INVALID_FLAG);
 

@@ -471,9 +471,9 @@ int low_can_subscription_t::open_socket(low_can_subscription_t &subscription, co
 ///
 /// @returns a bcm_msg with the msg_head parts set and can_frame
 /// zeroed.
-struct bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning)
+union bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t can_id, uint32_t flags, const struct timeval& timeout, const struct timeval& frequency_thinning)
 {
-	struct bcm_msg bcm_msg;
+	union bcm_msg bcm_msg;
 	::memset(&bcm_msg, 0, sizeof(bcm_msg));
 
 	bcm_msg.msg_head.opcode  = opcode;
@@ -491,7 +491,7 @@ struct bcm_msg low_can_subscription_t::make_bcm_head(uint32_t opcode, uint32_t c
 /// @brief Take an existing bcm_msg struct and add a can_frame.
 /// Currently only 1 uniq can_frame can be added, it's not possible to build
 /// a multiplexed message with several can_frame.
-void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, struct bcm_msg& bcm_msg)
+void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, union bcm_msg& bcm_msg)
 {
 	struct can_frame cf;
 
@@ -508,7 +508,7 @@ void low_can_subscription_t::add_one_bcm_frame(struct canfd_frame& cfd, struct b
 }
 
 /// @brief Take an existing bcm_msg struct and remove the latest can_frame.
-void low_can_subscription_t::remove_last_bcm_frame(struct bcm_msg& bcm_msg)
+void low_can_subscription_t::remove_last_bcm_frame(union bcm_msg& bcm_msg)
 {
 	struct canfd_frame cf;
 	memset(&cf, 0, sizeof(cf));
@@ -605,7 +605,7 @@ int low_can_subscription_t::create_rx_filter_can(low_can_subscription_t &subscri
 		flags_bcm &= ~RX_NO_AUTOTIMER;
 	}
 
-	struct bcm_msg bcm_msg = subscription.make_bcm_head(RX_SETUP, subscription.signal_->get_message()->get_id(), flags_bcm, timeout, freq);
+	union bcm_msg bcm_msg = subscription.make_bcm_head(RX_SETUP, subscription.signal_->get_message()->get_id(), flags_bcm, timeout, freq);
 
 	std::vector<canfd_frame> cfd_vect = cm.convert_to_canfd_frame_vector();
 
@@ -700,7 +700,7 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 	struct timeval freq = frequency_clock_t(event_filter_.frequency).get_timeval_from_period();
 	struct timeval timeout = {0, 0};
 
-	struct bcm_msg bcm_msg =  make_bcm_head(RX_SETUP, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER | RX_NO_AUTOTIMER | RX_FILTER_ID, timeout, freq);
+	union bcm_msg bcm_msg =  make_bcm_head(RX_SETUP, OBD2_FUNCTIONAL_BROADCAST_ID, SETTIMER | RX_NO_AUTOTIMER | RX_FILTER_ID, timeout, freq);
 	return create_rx_filter_bcm(*this, bcm_msg);
 }
 
@@ -712,7 +712,7 @@ int low_can_subscription_t::create_rx_filter(std::shared_ptr<diagnostic_message_
 /// to the 8 classics OBD2 functional response ID
 ///
 /// @return 0 if ok else -1
-int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscription, struct bcm_msg& bcm_msg)
+int low_can_subscription_t::create_rx_filter_bcm(low_can_subscription_t &subscription, union bcm_msg& bcm_msg)
 {
 	// Make sure that socket is opened.
 	if(subscription.open_socket(subscription, "", CAN_PROTOCOL) < 0)
@@ -751,7 +751,7 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 {
 	can_message_t *cm = static_cast<can_message_t*>(message);
 
-	struct bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cm->get_id(), cm->get_flags()|TX_CP_CAN_ID); // TX_CP_CAN_ID -> copy in cfd the id of bcm
+	union bcm_msg bcm_msg = subscription.make_bcm_head(TX_SEND, cm->get_id(), cm->get_flags()|TX_CP_CAN_ID); // TX_CP_CAN_ID -> copy in cfd the id of bcm
 	cm->set_bcm_msg(bcm_msg);
 
 	std::vector<canfd_frame> cfd_vect = cm->convert_to_canfd_frame_vector();
@@ -759,7 +759,7 @@ int low_can_subscription_t::tx_send(low_can_subscription_t &subscription, messag
 	if(subscription.open_socket(subscription, bus_name, CAN_PROTOCOL) < 0)
 		return -1;
 
-	struct bcm_msg &bcm_cm = cm->get_bcm_msg();
+	union bcm_msg &bcm_cm = cm->get_bcm_msg();
 
 	if(cfd_vect.size() > 1)
 	{

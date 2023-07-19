@@ -265,12 +265,12 @@ std::string can_message_t::get_debug_message()
 	return ret;
 }
 
-struct bcm_msg& can_message_t::get_bcm_msg()
+union bcm_msg& can_message_t::get_bcm_msg()
 {
 	return bcm_msg_;
 }
 
-void can_message_t::set_bcm_msg(struct bcm_msg bcm_msg)
+void can_message_t::set_bcm_msg(union bcm_msg bcm_msg)
 {
 	bcm_msg_ = bcm_msg;
 }

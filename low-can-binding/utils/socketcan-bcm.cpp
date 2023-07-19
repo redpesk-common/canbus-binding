@@ -66,7 +66,7 @@ namespace utils
 	/// then CAN message will be zeroed and must be handled later.
 	std::shared_ptr<message_t> socketcan_bcm_t::read_message()
 	{
-		struct bcm_msg msg;
+		union bcm_msg msg;
 		std::shared_ptr<can_message_t> cm = std::make_shared<can_message_t>();
 
 		const struct sockaddr_can& addr = get_tx_address();
@@ -110,7 +110,7 @@ namespace utils
 	int socketcan_bcm_t::write_message(message_t& m)
 	{
 		can_message_t&  cm = reinterpret_cast<can_message_t&>(m);
-		struct bcm_msg obj = cm.get_bcm_msg();
+		union bcm_msg obj = cm.get_bcm_msg();
 		size_t size = (obj.msg_head.flags & CAN_FD_FRAME) ?
 			(size_t)((char*)&obj.fd_frames[obj.msg_head.nframes] - (char*)&obj):
 			(size_t)((char*)&obj.frames[obj.msg_head.nframes] - (char*)&obj);

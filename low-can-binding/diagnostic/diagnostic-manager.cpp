@@ -110,7 +110,7 @@ bool diagnostic_manager_t::shims_send(const uint32_t arbitration_id, const uint8
 	if(! tx_socket)
 		tx_socket.open(dm.get_bus_device_name());
 
-	struct bcm_msg bcm_msg;
+	union bcm_msg bcm_msg;
 	struct can_frame cf;
 
 	struct timeval freq = current_adr->get_frequency_clock().get_timeval_from_period();

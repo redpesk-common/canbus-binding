@@ -18,12 +18,17 @@
 #pragma once
 #include <low-can/can/message/message.hpp>
 
-struct bcm_msg
+union bcm_msg
 {
 	struct bcm_msg_head msg_head;
-	union {
-		struct canfd_frame fd_frames[MAX_BCM_CAN_FRAMES];
-		struct can_frame frames[MAX_BCM_CAN_FRAMES];
+	struct {
+		/// Avoids the error:
+		///   "flexible array member ‘bcm_msg_head::frames’ not at end of ‘struct bcm_msg’"
+		char _head_[sizeof(struct bcm_msg_head)];
+		union {
+			struct can_frame frames[MAX_BCM_CAN_FRAMES];
+			struct canfd_frame fd_frames[MAX_BCM_CAN_FRAMES];
+		};
 	};
 };
 
@@ -35,7 +40,7 @@ class can_message_t : public message_t {
 	private:
 		uint32_t id_; ///< id_ - The ID of the message. */
 		bool rtr_flag_; ///< rtr_flag_ - Telling if the frame has RTR flag positionned. Then frame hasn't data field*/
-		struct bcm_msg bcm_msg_;
+		union bcm_msg bcm_msg_;
 
 	public:
 		can_message_t();
@@ -57,8 +62,8 @@ class can_message_t : public message_t {
 		static std::shared_ptr<can_message_t> convert_from_frame(const canfd_frame& frame, size_t nbytes, uint64_t timestamp);
 		struct canfd_frame convert_to_canfd_frame();
 		struct std::vector<canfd_frame> convert_to_canfd_frame_vector();
-		struct bcm_msg& get_bcm_msg();
-		void set_bcm_msg(struct bcm_msg bcm_msg);
+		union bcm_msg& get_bcm_msg();
+		void set_bcm_msg(union bcm_msg bcm_msg);
 
 		struct can_frame convert_to_can_frame();
 		bool is_set();
