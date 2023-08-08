@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
+#pragma once
 
-#include <cstring>
-#include <iomanip>
+#include <string>
+#include <cstdint>
 
 class converter_t
 {

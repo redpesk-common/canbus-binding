@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-#include "converter.hpp"
-#include <sstream>
-#include <net/if.h>
-#include <afb/afb-binding>
 #include <climits>
+#include <sstream>
+#include <iomanip>
+
+#include "converter.hpp"
 
 /**
  * @brief Convert data to hex string
