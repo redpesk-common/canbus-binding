@@ -52,69 +52,11 @@
 	#include <linux/can/j1939.h>
 #endif
 
-///*****************************************************************************
-///
-///		Controller Definitions and Callbacks
-///
-///****************************************************************************/
-
-static int process_config(afb::api api, json_object *json_obj, application_t& application)
-{
-	AFB_DEBUG("Config %s", json_object_to_json_string(json_obj));
-	int active_message_set = 0;
-	json_object *dev_mapping = nullptr;
-	json_object *config = nullptr;
-	json_object *preinit = nullptr;
-	json_object *postinit = nullptr;
-	const char *ecu = nullptr;
-	const char *diagnotic_bus = nullptr;
-
-	if(rp_jsonc_unpack(json_obj, "sO", "config", &config)
-	|| rp_jsonc_unpack(config,   "{si s?s s?s s?o s?o}",
-			      "active_message_set", &active_message_set,
-			      "diagnostic_bus", &diagnotic_bus,
-			      "default_j1939_name", &ecu,
-			      "preinit", &preinit,
-			      "postinit", &postinit))
-		return -1;
-
-	if(ecu)
-	{
-#ifdef USE_FEATURE_J1939
-		application.set_default_j1939_ecu(ecu);
-		AFB_INFO("Default J1939 ECU name set to %s", ecu);
-#else
-		AFB_INFO("J1939 feature disable, doing nothing");
-#endif
-	}
-
-	application.set_active_message_set((uint8_t)active_message_set);
-
-	if(rp_jsonc_unpack(json_obj, "{so}",
-			    "dev-mapping", &dev_mapping))
-		return -1;
-
-	if(application.get_can_bus_manager().set_can_devices(dev_mapping) < 0)
-		return -1;
-
-	/// Initialize Diagnostic manager that will handle obd2 requests.
-	/// We pass by default the first CAN bus device to its Initialization.
-	if(! diagnotic_bus)
-		AFB_NOTICE("Diagnostic Manager: no diagnostic bus specified. Service will run without the diagnostic manager.");
-	else if(! application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
-	{
-		AFB_ERROR("Diagnostic Manager: not initialized. Problem initializing the diagnostic manager with the bus: %s", diagnotic_bus);
-		return -1;
-	}
-
-	return 0;
-}
-
-///*****************************************************************************
-///
-///		Global Api Verbs implementation
-///
-///****************************************************************************/
+/*******************************************************************************
+*
+*		Static Api Verbs implementation
+*
+*******************************************************************************/
 
 /// @brief This will determine if an event handle needs to be created and checks if
 /// we got a valid afb_event to get subscribe or unsubscribe. After that launch the subscription or unsubscription
@@ -941,11 +883,11 @@ static void list(afb::req request, afb::received_data params) noexcept
 	}
 }
 
-///*****************************************************************************
-///
-///		Specialized signal's verbs implementations
-///
-///****************************************************************************/
+/*******************************************************************************
+*
+*		Dynamic API's verbs implementations
+*
+*******************************************************************************/
 
 static void simple_subscribe_unsubscribe_signal(afb::req request, signal_t* signal, json_object *args, bool subscribe)
 {
@@ -1075,6 +1017,11 @@ static int add_verb(afb::api &api, std::shared_ptr<signal_t> sig, std::shared_pt
 	return 0;
 }
 
+/*******************************************************************************
+*
+*			Binding initialization parts
+*
+*******************************************************************************/
 /// @brief Initialize the binding.
 ///
 /// @param[in] service Structure which represent the Application Framework Binder.
@@ -1134,6 +1081,58 @@ static int init_binding(afb::api &api)
 		AFB_ERROR("There was something wrong with the binding initialization.");
 
 	return ret;
+}
+
+static int process_config(afb::api api, json_object *json_obj, application_t& application)
+{
+	AFB_DEBUG("Config %s", json_object_to_json_string(json_obj));
+	int active_message_set = 0;
+	json_object *dev_mapping = nullptr;
+	json_object *config = nullptr;
+	json_object *preinit = nullptr;
+	json_object *postinit = nullptr;
+	const char *ecu = nullptr;
+	const char *diagnotic_bus = nullptr;
+
+	if(rp_jsonc_unpack(json_obj, "sO", "config", &config)
+	|| rp_jsonc_unpack(config,   "{si s?s s?s s?o s?o}",
+			      "active_message_set", &active_message_set,
+			      "diagnostic_bus", &diagnotic_bus,
+			      "default_j1939_name", &ecu,
+			      "preinit", &preinit,
+			      "postinit", &postinit))
+		return -1;
+
+	if(ecu)
+	{
+#ifdef USE_FEATURE_J1939
+		application.set_default_j1939_ecu(ecu);
+		AFB_INFO("Default J1939 ECU name set to %s", ecu);
+#else
+		AFB_INFO("J1939 feature disable, doing nothing");
+#endif
+	}
+
+	application.set_active_message_set((uint8_t)active_message_set);
+
+	if(rp_jsonc_unpack(json_obj, "{so}",
+			    "dev-mapping", &dev_mapping))
+		return -1;
+
+	if(application.get_can_bus_manager().set_can_devices(dev_mapping) < 0)
+		return -1;
+
+	/// Initialize Diagnostic manager that will handle obd2 requests.
+	/// We pass by default the first CAN bus device to its Initialization.
+	if(! diagnotic_bus)
+		AFB_NOTICE("Diagnostic Manager: no diagnostic bus specified. Service will run without the diagnostic manager.");
+	else if(! application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
+	{
+		AFB_ERROR("Diagnostic Manager: not initialized. Problem initializing the diagnostic manager with the bus: %s", diagnotic_bus);
+		return -1;
+	}
+
+	return 0;
 }
 
 static int load_config(afb::api api, json_object *config)
