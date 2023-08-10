@@ -19,12 +19,19 @@
 #pragma once
 
 #include <string>
+#include <memory>
+#include <vector>
 #include <sys/timeb.h>
 
 #include <json-c/json.h>
 #include <openxc.pb.h>
-#include <canbus-binding/can/signals.hpp>
-#include <canbus-binding/diagnostic/active-diagnostic-request.hpp>
+#include <uds/uds_types.h>
+
+class active_diagnostic_request_t;
+class message_definition_t;
+class message_t;
+class signal_t;
+
 
 const openxc_VehicleMessage build_VehicleMessage(active_diagnostic_request_t* request, const DiagnosticResponse& response, float parsed_value);
 const openxc_VehicleMessage build_VehicleMessage(const openxc_SimpleMessage& message, uint64_t timestamp);

@@ -16,6 +16,7 @@
  */
 
 #include <canbus-binding/utils/signals.hpp>
+#include <canbus-binding/can/signals.hpp>
 
 namespace utils
 {

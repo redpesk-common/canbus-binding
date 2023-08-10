@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "./socketcan-j1939.hpp"
+#include "socketcan-j1939.hpp"
 
 namespace utils
 {

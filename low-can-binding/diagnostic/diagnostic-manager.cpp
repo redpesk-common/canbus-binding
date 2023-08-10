@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <string.h>
 #include <canbus-binding/diagnostic/diagnostic-manager.hpp>
+#include <canbus-binding/diagnostic/diagnostic-message.hpp>
 #include <canbus-binding/binding/application.hpp>
 #include <canbus-binding/utils/signals.hpp>
 #include <canbus-binding/utils/openxc-utils.hpp>

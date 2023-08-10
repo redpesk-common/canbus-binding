@@ -18,7 +18,6 @@
 #pragma once
 
 #include <canbus-binding/utils/socketcan.hpp>
-#include <canbus-binding/can/message/can-message.hpp>
 
 namespace utils
 {
@@ -31,8 +30,5 @@ namespace utils
 		virtual int open(std::string device_name);
 		virtual std::unique_ptr<message_t> read_message();
 		virtual int write_message(message_t& obj);
-
 	};
-
-
 }

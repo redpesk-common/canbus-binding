@@ -17,7 +17,6 @@
 #pragma once
 
 #include "socketcan.hpp"
-#include "../can/message/can-message.hpp"
 
 namespace utils
 {

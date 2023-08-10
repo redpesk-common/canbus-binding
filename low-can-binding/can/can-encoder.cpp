@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <afb/afb-binding>
+
 #include <canbus-binding/can/can-encoder.hpp>
 #include <canbus-binding/can/message-definition.hpp>
 #include <canbus-binding/utils/openxc-utils.hpp>

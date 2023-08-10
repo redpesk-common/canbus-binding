@@ -266,6 +266,15 @@ const std::string signal_t::get_states(uint8_t value)
 	return std::string();
 }
 
+inline bool caseInsCharCompareN(char a, char b) {
+	return(toupper(a) == toupper(b));
+}
+
+inline bool caseInsCompare(const std::string& s1, const std::string& s2) {
+	return((s1.size() == s2.size()) &&
+	equal(s1.begin(), s1.end(), s2.begin(), caseInsCharCompareN));
+}
+
 uint64_t signal_t::get_states(const std::string& value) const
 {
 	uint64_t ret = -1;

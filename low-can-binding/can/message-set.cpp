@@ -16,8 +16,12 @@
  * limitations under the License.
  */
 
+#include <afb/afb-binding>
+
 #include <canbus-binding/can/message-set.hpp>
 #include <canbus-binding/can/message-definition.hpp>
+#include <canbus-binding/can/message/message.hpp>
+#include <canbus-binding/diagnostic/diagnostic-message.hpp>
 
 message_set_t::message_set_t(
 		uint8_t index,

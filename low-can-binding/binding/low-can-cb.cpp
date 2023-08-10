@@ -25,6 +25,7 @@
 #include <filesystem>
 #include <algorithm>
 
+#include <afb/afb-binding>
 
 #include <rp-utils/rp-jsonc.h>
 #include <systemd/sd-event.h>
@@ -111,6 +112,28 @@ static int subscribe_unsubscribe_signal(afb::req request,
 	return ret;
 }
 
+static void on_can_event(afb_evfd_t evfd, int fd, uint32_t revents, void *userdata)
+{
+	low_can_subscription_t &can_subscription = *(low_can_subscription_t*) userdata;
+
+	if (can_subscription.get_socket()->socket() != fd)
+	{
+		AFB_ERROR("%s: subscription socket and callback fd do not match. Should not happens, you got a valid subscription with a wrong socket. Abort.", __FUNCTION__);
+		return;
+	}
+	if ((revents & EPOLLIN) != 0)
+	{
+		read_message(can_subscription);
+	}
+
+	// check if error or hangup
+	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
+	{
+		afb_evfd_unref(evfd);
+		can_subscription.get_socket()->close();
+	}
+}
+
 static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscription)
 {
 	// JOBOL: missing C++ handler class, must use C one. Don't know
@@ -119,7 +142,7 @@ static int add_to_event_loop(std::shared_ptr<low_can_subscription_t>& can_subscr
 	return afb_evfd_create(&efd,
 				can_subscription->get_socket()->socket(),
 				EPOLLIN,
-				read_message,
+				on_can_event,
 				can_subscription.get(),
 				true,
 				true);

@@ -20,6 +20,9 @@
 #include <canbus-binding/binding/low-can-subscription.hpp>
 #include <canbus-binding/utils/signals.hpp>
 #include <canbus-binding/utils/openxc-utils.hpp>
+#include <canbus-binding/can/message-definition.hpp>
+#include <canbus-binding/can/signals.hpp>
+#include <canbus-binding/diagnostic/diagnostic-message.hpp>
 
 #define MICROSECONDS_IN_SECOND	1000000
 #define ENGINE_VALUE_TIMEOUT	5

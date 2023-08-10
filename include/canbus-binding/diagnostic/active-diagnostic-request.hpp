@@ -18,12 +18,10 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
-#include <canbus-binding/utils/socketcan-bcm.hpp>
 #include <uds/uds.h>
-#include <uds/uds_types.h>
 #include <canbus-binding/utils/timer.hpp>
+#include <canbus-binding/utils/socketcan-bcm.hpp>
 
 class active_diagnostic_request_t;
 class diagnostic_manager_t;

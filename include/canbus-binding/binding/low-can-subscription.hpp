@@ -18,13 +18,19 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <cmath>
-#include <utility>
+#include <linux/can.h>
 
-#include <canbus-binding/can/signals.hpp>
-#include <canbus-binding/can/message/can-message.hpp>
-#include <canbus-binding/diagnostic/diagnostic-message.hpp>
+#include <afb/afb-binding>
+
 #include <canbus-binding/utils/socketcan.hpp>
+#include <canbus-binding/can/message/message.hpp>
+#include <canbus-binding/can/message-set.hpp>
+
+class signal_t;
+class diagnostic_message_t;
+class utils::socketcan_t;
 
 #define OBDII_MAX_SIMULTANEOUS_RESPONSES 8
 

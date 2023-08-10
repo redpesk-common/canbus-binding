@@ -16,6 +16,8 @@
  */
 
 #include <cstring>
+#include <afb/afb-binding>
+
 #include <canbus-binding/can/message/can-message.hpp>
 #include <canbus-binding/binding/low-can-hat.hpp>
 

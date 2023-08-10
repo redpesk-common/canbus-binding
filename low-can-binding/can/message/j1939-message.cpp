@@ -18,6 +18,9 @@
 #include <cstring>
 #include <iomanip>
 #include <net/if.h>
+
+#include <afb/afb-binding>
+
 #include <canbus-binding/binding/low-can-hat.hpp>
 #include <canbus-binding/can/message/j1939-message.hpp>
 

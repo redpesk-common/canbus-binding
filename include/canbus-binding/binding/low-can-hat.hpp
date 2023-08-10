@@ -18,14 +18,9 @@
 
 #pragma once
 
-#include <cstddef>
-#include <map>
-#include <string>
+#include <cstdint>
 #include <memory>
-#include <systemd/sd-event.h>
-#include <cctype>
-
-#include <afb/afb-binding>
+#include <map>
 
 class low_can_subscription_t;
 
@@ -33,13 +28,5 @@ typedef std::map<int, std::shared_ptr<low_can_subscription_t>> map_subscription;
 
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, map_subscription& s);
 void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, uint32_t pid, map_subscription& s);
-void read_message(afb_evfd_t s, int fd, uint32_t revents, void *userdata);
+void read_message(low_can_subscription_t &can_subscription);
 
-inline bool caseInsCharCompareN(char a, char b) {
-	return(toupper(a) == toupper(b));
-}
-
-inline bool caseInsCompare(const std::string& s1, const std::string& s2) {
-	return((s1.size() == s2.size()) &&
-	equal(s1.begin(), s1.end(), s2.begin(), caseInsCharCompareN));
-}

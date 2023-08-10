@@ -16,7 +16,6 @@
  */
 
 #include <time.h>
-#include <stdlib.h>
 #include <cmath>
 
 #include <canbus-binding/utils/timer.hpp>

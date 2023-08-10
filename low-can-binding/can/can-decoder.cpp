@@ -17,6 +17,11 @@
 
 #include <climits>
 #include <cmath>
+
+#include <afb/afb-binding>
+
+
+
 #include <canbus-binding/can/can-decoder.hpp>
 #include <canbus-binding/utils/openxc-utils.hpp>
 #include <canbus-binding/utils/frame-codec.hpp>

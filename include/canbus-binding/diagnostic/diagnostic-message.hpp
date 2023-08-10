@@ -20,9 +20,6 @@
 #include <vector>
 #include <string>
 
-#include <uds/uds.h>
-#include <canbus-binding/can/message-set.hpp>
-#include <canbus-binding/can/message/can-message.hpp>
 #include <canbus-binding/diagnostic/active-diagnostic-request.hpp>
 
 enum UNIT {
@@ -39,7 +36,9 @@ enum UNIT {
 	INVALID
 };
 
+class message_t;
 class message_set_t;
+class can_message_t;
 
 /// @brief - A representation of an OBD-II PID Mode 01 (Note : An OBD-II PID mode 01 contains only one information).
 class diagnostic_message_t

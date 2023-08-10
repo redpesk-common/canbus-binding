@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace frame_codec {
 	void encode(uint64_t value, uint8_t data[], uint32_t bit_position, uint32_t bit_size, int bigendian);

@@ -17,7 +17,9 @@
 
 #pragma once
 
-#include "./socketcan-j1939.hpp"
+#include <afb/afb-binding>
+
+#include "socketcan-j1939.hpp"
 
 namespace utils
 {

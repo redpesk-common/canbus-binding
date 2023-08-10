@@ -28,12 +28,10 @@
 #include <vector>
 #include <memory>
 
-#include <canbus-binding/can/signals.hpp>
-#include <canbus-binding/can/message-set.hpp>
 #include <canbus-binding/utils/timer.hpp>
-#include <canbus-binding/can/message/message.hpp>
+#include <canbus-binding/can/message-set.hpp>
 
-class message_set_t;
+class message_t;
 
 /// @brief The definition of a CAN message. This includes a lot of metadata, so
 ///  to save memory this class gets the signal_t object related to a CAN message.

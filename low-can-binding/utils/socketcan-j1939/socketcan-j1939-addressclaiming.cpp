@@ -16,8 +16,11 @@
  */
 
 #include <unistd.h>
+#include <cstring>
 
 #include <canbus-binding/utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp>
+
+#include <canbus-binding/can/message/j1939-message.hpp>
 
 namespace utils
 {

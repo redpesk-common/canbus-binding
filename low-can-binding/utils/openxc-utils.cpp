@@ -16,9 +16,14 @@
  * limitations under the License.
  */
 
+#include <canbus-binding/utils/openxc-utils.hpp>
+
+#include <canbus-binding/can/signals.hpp>
+#include <canbus-binding/diagnostic/active-diagnostic-request.hpp>
+
 #include <canbus-binding/binding/application.hpp>
 #include <canbus-binding/can/can-decoder.hpp>
-#include <canbus-binding/utils/openxc-utils.hpp>
+
 
 #include "converter.hpp"
 

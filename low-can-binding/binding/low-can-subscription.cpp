@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <openxc.pb.h>
+
 #include <canbus-binding/binding/low-can-subscription.hpp>
 #include <canbus-binding/binding/application.hpp>
 #include <canbus-binding/utils/socketcan-bcm.hpp>
@@ -28,6 +30,7 @@
 
 #ifdef USE_FEATURE_J1939
 #include <canbus-binding/utils/socketcan-j1939/socketcan-j1939-data.hpp>
+#include <canbus-binding/utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp>
 #endif
 
 low_can_subscription_t::low_can_subscription_t()

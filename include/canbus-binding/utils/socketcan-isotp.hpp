@@ -17,9 +17,7 @@
 
 #pragma once
 
-#include <linux/can/isotp.h>
 #include <canbus-binding/utils/socketcan.hpp>
-#include <canbus-binding/can/message/can-message.hpp>
 
 #define CAN_ISOTP_MAX_DLEN 4096
 

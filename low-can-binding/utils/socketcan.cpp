@@ -16,11 +16,17 @@
  */
 
 #include <unistd.h>
+#include <cstring>
 #include <string>
 #include <linux/can/raw.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
+
+#include <afb/afb-binding>
+
 #include <canbus-binding/utils/socketcan.hpp>
+#include <canbus-binding/binding/low-can-hat.hpp>
+#include <canbus-binding/can/message/can-message.hpp>
 
 namespace utils
 {

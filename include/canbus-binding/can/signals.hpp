@@ -18,19 +18,24 @@
 #pragma once
 
 #include <map>
-#include <mutex>
-#include <vector>
 #include <string>
 #include <memory>
+#include <utility>
+#include <cstdint>
+
+#include <canbus-binding/utils/timer.hpp>
 
 #include <openxc.pb.h>
-#include <canbus-binding/utils/timer.hpp>
 #include <canbus-binding/can/message-definition.hpp>
 #include <canbus-binding/diagnostic/diagnostic-message.hpp>
 
+
+
 #define MESSAGE_SET_ID 0
 
+class message_definition_t;
 class signal_t;
+
 ///
 /// @brief The type signature for a CAN signal decoder.
 ///

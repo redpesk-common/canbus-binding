@@ -17,20 +17,16 @@
 
 #pragma once
 
-#include <map>
 #include <vector>
 #include <string>
 #include <memory>
 
+#include <json-c/json.h>
+
 #include <afb-helpers4/plugin-store.h>
+
 #include <canbus-binding/can/can-bus.hpp>
-#include <canbus-binding/can/message-set.hpp>
-#include <canbus-binding/can/signals.hpp>
 #include <canbus-binding/diagnostic/diagnostic-manager.hpp>
-#ifdef USE_FEATURE_J1939
-#include <canbus-binding/utils/socketcan-j1939/socketcan-j1939-data.hpp>
-#include <canbus-binding/utils/socketcan-j1939/socketcan-j1939-addressclaiming.hpp>
-#endif
 
 ///
 /// @brief Class represents a configuration attached to the binding.

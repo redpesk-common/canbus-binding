@@ -1,12 +1,16 @@
 #include <mutex>
-#include <systemd/sd-event.h>
 
-#include <canbus-binding/binding/application.hpp>
+#include <afb/afb-binding>
+
+#include <openxc.pb.h>
+
 #include <canbus-binding/binding/low-can-hat.hpp>
-#include <canbus-binding/can/message/message.hpp>
+#include <canbus-binding/can/signals.hpp>
 #include <canbus-binding/can/can-bus.hpp>
 #include <canbus-binding/utils/signals.hpp>
-
+#include <canbus-binding/can/message-definition.hpp>
+#include <canbus-binding/binding/low-can-subscription.hpp>
+#include <canbus-binding/diagnostic/diagnostic-message.hpp>
 
 ///******************************************************************************
 ///
@@ -53,43 +57,27 @@ void on_no_clients(std::shared_ptr<low_can_subscription_t> can_subscription, std
 	s.erase(it);
 }
 
-void read_message(afb_evfd_t evfd, int fd, uint32_t revents, void *userdata)
+void read_message(low_can_subscription_t &can_subscription)
 {
-	low_can_subscription_t *can_subscription = (low_can_subscription_t*) userdata;
-
-	if (can_subscription->get_socket()->socket() != fd)
+	utils::signals_manager_t& sm = utils::signals_manager_t::instance();
+	std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
+	if(can_subscription.get_index() != -1)
 	{
-		AFB_ERROR("%s: subscription socket and callback fd do not match. Should not happens, you got a valid subscription with a wrong socket. Abort.", __FUNCTION__);
-		return;
-	}
-	if ((revents & EPOLLIN) != 0)
-	{
-		utils::signals_manager_t& sm = utils::signals_manager_t::instance();
-		std::lock_guard<std::mutex> subscribed_signals_lock(sm.get_subscribed_signals_mutex());
-		if(can_subscription->get_index() != -1)
+		std::shared_ptr<utils::socketcan_t> s = can_subscription.get_socket();
+		if(s->socket() > 0)
 		{
-			std::shared_ptr<utils::socketcan_t> s = can_subscription->get_socket();
-			if(s->socket() > 0)
-			{
-				std::shared_ptr<message_t> message = s->read_message();
+			std::shared_ptr<message_t> message = s->read_message();
 
-				// Sure we got a valid CAN message ?
-				if (message->get_id() &&
-				    (message->get_length() || message->is_timeout()) &&
-				    ! (message->get_flags() & INVALID_FLAG) )
-				{
-					if(can_subscription->get_signal() != nullptr && can_subscription->get_signal()->get_message()->get_flags() & BYTE_FRAME_IS_BIG_ENDIAN)
-						message->frame_swap();
-					push_n_notify(message);
-				}
+			// Sure we got a valid CAN message ?
+			if (message->get_id() &&
+			    (message->get_length() || message->is_timeout()) &&
+			    ! (message->get_flags() & INVALID_FLAG) )
+			{
+				if(can_subscription.get_signal() != nullptr && can_subscription.get_signal()->get_message()->get_flags() & BYTE_FRAME_IS_BIG_ENDIAN)
+					message->frame_swap();
+				push_n_notify(message);
 			}
 		}
 	}
-
-	// check if error or hangup
-	if ((revents & (EPOLLERR|EPOLLRDHUP|EPOLLHUP)) != 0)
-	{
-		afb_evfd_unref(evfd);
-		can_subscription->get_socket()->close();
-	}
 }
+

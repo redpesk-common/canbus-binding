@@ -17,16 +17,14 @@
  * limitations under the License.
  */
 
+#include <sys/socket.h>
+#include <linux/can.h>
+
 #include <vector>
 #include <mutex>
+#include <memory>
 
-#include <sys/socket.h>
-#include <linux/can/bcm.h>
-#include <linux/sockios.h>
-#include <string.h>
-
-#include <canbus-binding/binding/low-can-hat.hpp>
-#include <canbus-binding/can/message/can-message.hpp>
+class message_t;
 
 #define INVALID_SOCKET -1
 #define NO_CAN_ID 0xFFFFFFFFU
@@ -74,3 +72,4 @@ namespace utils
 		int connect(const struct sockaddr* addr, socklen_t len);
 	};
 }
+

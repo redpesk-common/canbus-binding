@@ -22,15 +22,19 @@
 #include <mutex>
 #include <queue>
 #include <thread>
-#include <linux/can.h>
+//#include <linux/can.h>
 #include <condition_variable>
+
 #include <openxc.pb.h>
 #include <canbus-binding/can/message/can-message.hpp>
 #include <canbus-binding/binding/low-can-subscription.hpp>
+#include <canbus-binding/binding/low-can-hat.hpp>
 
 #define CAN_ACTIVE_TIMEOUT_S 30
 
+class low_can_subscription_t;
 class diagnostic_manager_t;
+class message_t;
 
 /// @brief Object used to handle decoding and manage event queue to be pushed.
 ///

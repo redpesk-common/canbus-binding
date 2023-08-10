@@ -18,15 +18,24 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include <vector>
 #include <string>
+#include <mutex>
 #include <fnmatch.h>
-#include <canbus-binding/binding/application.hpp>
+
+/*
 #include <canbus-binding/can/signals.hpp>
 #include <canbus-binding/diagnostic/diagnostic-message.hpp>
 #include <canbus-binding/binding/low-can-subscription.hpp>
+*/
+
 #include <openxc.pb.h>
 
+#include <canbus-binding/binding/application.hpp>
+
+class signal_t;
+class diagnostic_message_t;
 
 typedef std::list<std::shared_ptr<signal_t>> list_ptr_signal_t;
 typedef std::list<std::shared_ptr<diagnostic_message_t>> list_ptr_diag_msg_t;

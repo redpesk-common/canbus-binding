@@ -17,14 +17,12 @@
 
 #pragma once
 
-#include <systemd/sd-event.h>
-#include <map>
 #include <vector>
+#include <string>
 
-#include <canbus-binding/utils/socketcan-bcm.hpp>
 #include <uds/uds.h>
 #include <openxc.pb.h>
-#include <canbus-binding/can/can-bus.hpp>
+
 #include <canbus-binding/diagnostic/active-diagnostic-request.hpp>
 
 ///  Each CAN bus requires its own set of shim functions, so this should

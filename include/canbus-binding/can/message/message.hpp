@@ -17,13 +17,11 @@
 
 #pragma once
 
+#include <linux/can.h>
+
 #include <vector>
 #include <string>
 #include <cstdint>
-#include <iostream>
-#include <memory>
-#include <linux/can.h>
-#include <linux/can/bcm.h>
 
 #define CAN_MESSAGE_SIZE 8
 
