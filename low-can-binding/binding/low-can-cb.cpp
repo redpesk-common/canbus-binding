@@ -16,29 +16,27 @@
  * limitations under the License.
  */
 
-#include <map>
-#include <queue>
 #include <mutex>
 #include <regex>
 #include <vector>
-#include <thread>
 #include <filesystem>
 #include <algorithm>
 
+#include <sys/epoll.h>
 #include <afb/afb-binding>
 
 #include <rp-utils/rp-jsonc.h>
-#include <systemd/sd-event.h>
+#include <rp-utils/rp-path-search.h>
 
 #include <afb-helpers4/plugin-store.h>
 #include <afb-helpers4/afb-data-utils.h>
 #include <rp-utils/rp-jsonc.h>
 
 #include <canbus-binding/binding/low-can-hat.hpp>
-#include "low-can-apidef.h"
 
 #include "openxc.pb.h"
 
+#include <canbus-binding/binding/plugin.hpp>
 #include <canbus-binding/binding/application.hpp>
 #include <canbus-binding/can/can-encoder.hpp>
 #include <canbus-binding/can/can-bus.hpp>
@@ -451,16 +449,16 @@ static void do_subscribe_unsubscribe(afb::req request, afb::received_data params
 
 static void auth(afb::req request, afb::received_data params) noexcept
 {
-	afb_req_session_set_LOA(request, 1);
+	request.session_set_LOA(1);
 	request.reply(0);
 }
 
-static void subscribe(afb::req request, afb::received_data params) noexcept
+static void subscribe(afb::req request, afb::received_data params)
 {
 	do_subscribe_unsubscribe(request, params, true);
 }
 
-static void unsubscribe(afb::req request, afb::received_data params) noexcept
+static void unsubscribe(afb::req request, afb::received_data params)
 {
 	do_subscribe_unsubscribe(request, params, false);
 }
@@ -677,7 +675,7 @@ static void write_signal(afb::req request, const std::string& name, json_object 
 		delete (can_message_t*) message;
 }
 
-static void write(afb::req request, afb::received_data params) noexcept
+static void write(afb::req request, afb::received_data params)
 {
 	int rc = AFB_ERRNO_INVALID_REQUEST;
 	struct json_object* args, *json_value = nullptr, *name = nullptr;
@@ -766,7 +764,7 @@ static struct json_object *get_id_value(const uint32_t& id)
 
 // TODO: convert "ans" json_object to a normal C/C++ struct avoiding json-c
 // serialization process.
-static void get(afb::req request, afb::received_data params) noexcept
+static void get(afb::req request, afb::received_data params)
 {
 	int rc = 0;
 	struct json_object* args = nullptr, *json_name = nullptr, *ans = nullptr;
@@ -859,7 +857,7 @@ static struct json_object *list_can_message(const std::string& name)
 
 // TODO: convert "ans" json_object to a normal C/C++ struct avoiding json-c
 // serialization process.
-static void list(afb::req request, afb::received_data params) noexcept
+static void list(afb::req request, afb::received_data params)
 {
 	int rc = 0;
 	struct json_object* args = nullptr, *json_name = nullptr, *ans = nullptr;
@@ -923,7 +921,7 @@ static void simple_subscribe_signal(afb::req request, signal_t* signal, json_obj
 	simple_subscribe_unsubscribe_signal(request, signal, args, true);
 }
 
-static void signal_verb(afb::req request, afb::received_data params) noexcept
+static void signal_verb(afb::req request, afb::received_data params)
 {
 	struct json_object* actionJ = nullptr, *optionsJ = nullptr;
 
@@ -1086,7 +1084,6 @@ static int init_binding(afb::api &api)
 
 static int process_config(afb::api api, json_object *json_obj, application_t& application)
 {
-	AFB_DEBUG("Config %s", json_object_to_json_string(json_obj));
 	int active_message_set = 0;
 	json_object *dev_mapping = nullptr;
 	json_object *config = nullptr;
@@ -1094,6 +1091,8 @@ static int process_config(afb::api api, json_object *json_obj, application_t& ap
 	json_object *postinit = nullptr;
 	const char *ecu = nullptr;
 	const char *diagnotic_bus = nullptr;
+
+	AFB_DEBUG("Config %s", json_object_to_json_string(json_obj));
 
 	if(rp_jsonc_unpack(json_obj, "sO", "config", &config)
 	|| rp_jsonc_unpack(config,   "{si s?s s?s s?o s?o}",
@@ -1213,15 +1212,14 @@ static int load_config(afb::api api, json_object *config)
 	return ret;
 }
 
-
-static int mainctl(afb::api api, afb::ctlid ctlid, afb::ctlarg ctlarg, void *userdata) noexcept
+static int mainctl(afb::api api, afb::ctlid ctlid, afb::ctlarg ctlarg, void *userdata)
 {
 	int ret = 0;
 
 	switch (ctlid)
 	{
 	case afb_ctlid_Pre_Init:
-		ret = load_config(api, ctlarg->pre_init.config);
+		ret = do_preinit(api, ctlarg->pre_init.config);
 		break;
 	case afb_ctlid_Init:
 		ret = init_binding(api);
@@ -1232,3 +1230,6 @@ static int mainctl(afb::api api, afb::ctlid ctlid, afb::ctlarg ctlarg, void *use
 
 	return ret;
 }
+
+#include "low-can-apidef.h"
+

@@ -16,7 +16,11 @@
 			"preinit": "load_config",
 			"init": "init_binding",
 			"scope": "static",
-			"private": false
+			"private": false,
+			"declare": false,
+			"noexcept": false,
+			"version": 4,
+			"c++": 2
 		}
 	},
 	"servers": [

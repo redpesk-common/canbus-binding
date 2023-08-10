@@ -27,7 +27,6 @@ PROJECT_TARGET_ADD(canbus)
 	)
 	endif()
 
-
 	if(WITH_FEATURE_J1939)
 	set(SOURCES_J1939
 		can/message/j1939-message.cpp
