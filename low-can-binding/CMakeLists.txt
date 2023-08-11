@@ -66,8 +66,8 @@ PROJECT_TARGET_ADD(canbus)
 	# Binder exposes a unique public entry point
 	SET_TARGET_PROPERTIES(
 		${TARGET_NAME} PROPERTIES
-			VERSION 1
-			SOVERSION 1.1
+			VERSION 2
+			SOVERSION 2.0
 	)
 
 	INSTALL(TARGETS ${TARGET_NAME}
