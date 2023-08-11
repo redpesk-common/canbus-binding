@@ -30,7 +30,6 @@
 
 class signal_t;
 class diagnostic_message_t;
-class utils::socketcan_t;
 
 #define OBDII_MAX_SIMULTANEOUS_RESPONSES 8
 

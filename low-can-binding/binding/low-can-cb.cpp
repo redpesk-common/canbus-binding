@@ -1135,81 +1135,123 @@ static int process_config(afb::api api, json_object *json_obj, application_t& ap
 	return 0;
 }
 
-static int load_config(afb::api api, json_object *config)
+static int found_json(void *closure, const rp_path_search_entry_t *entry)
 {
-	int ret = 0;
-	application_t& application = application_t::instance();
+	json_object *global = reinterpret_cast<json_object*>(closure);
+	json_object *obj = json_object_from_file(entry->path);
+	if (obj == NULL)
+		AFB_WARNING("Can't read JSON file %s", entry->path);
+	else {
+		AFB_DEBUG("Processing JSON file %s", entry->path);
+		rp_jsonc_object_merge(global, obj, rp_jsonc_merge_option_join_or_keep);
+		json_object_put(obj);
+	}
+	return 0; /* continue */
+}
 
-	// Save the config in the api userdata field
-	afb_api_set_userdata(api, &application);
+static int found_so(void *closure, const rp_path_search_entry_t *entry)
+{
+	application_t& application = *reinterpret_cast<application_t*>(closure);
+	plugin_store_t pstore = application.get_plugins();
+	plugin_t *plugin = plugin_store_get_load(&pstore, entry->path, entry->path, nullptr);
+	if (!plugin)
+		AFB_WARNING("Can't load SO file %s", entry->path);
+	else {
+		const void *ptr = plugin_get_object(plugin, CANBUS_PLUGIN_EXPORT);
+		const canbus_plugin_t *desc = to_canbus_plugin(ptr);
+		if (!desc)
+			AFB_WARNING("Not a plugin SO file %s", entry->path);
+		else {
+			AFB_INFO("Initialisation of plugin %s (%s)", desc->id, entry->path);
+			int rc = desc->init(application);
+			if (rc >= 0)
+				AFB_INFO("Using plugin %s (%s)", desc->id, entry->path);
+			else {
+				AFB_INFO("Failed to initialize plugin %s (%s)", desc->id, entry->path);
+				desc = nullptr;
+			}
+		}
+		if (!desc)
+			plugin_store_drop(&pstore, plugin);
+	}
+	application.set_plugins(pstore);
+	return 0; /* continue */
+}
+
+static int do_preinit(afb::api api, json_object *config)
+{
+	int rc = 0;
+	rp_path_search_t *paths = nullptr;
+	const char *str;
+	json_object *obj;
+	struct utils::signals_found all_signals;
+	openxc_DynamicField search_key;
+
+	// set api's data to be application instance (very unuseful but legacy...)
+	application_t& application = application_t::instance();
+	api.set_userdata(&application);
+
+	// default path search
+	rc = rp_path_search_make_dirs(&paths, "${AFB_ROOTDIR}/plugins:${CANBUS_PLUGINS_PATH}");
+	if (rc >= 0 && 0 == rp_jsonc_unpack(config, "{ss}", "plugins-path", &str))
+		// supplementary paths
+		rc = rp_path_search_extend_dirs(&paths, str, 1);
+	if (rc < 0) {
+		AFB_API_ERROR(api, "Got error %s", strerror(-rc));
+		goto end;
+	}
+
+	// collect json configs
+	if (json_object_object_get_ex(config, "config", &obj))
+		json_object_get(obj);
+	else
+		obj = json_object_new_object();
+	rc = rp_path_search_match(paths, RP_PATH_SEARCH_FILE|RP_PATH_SEARCH_FLEXIBLE|RP_PATH_SEARCH_RECURSIVE,
+			NULL, "json", found_json, obj);
+	application.set_config(obj);
 
 	if(process_config(api, config, application))
 	{
 		AFB_API_ERROR(api, "No config found or invalid JSON: %s", json_object_to_json_string(config));
-		return -1;
+		goto end;
 	}
 
-/*
-	if(! config.contains("plugins") || config["plugins"].empty())
-	{
-		AFB_API_ERROR(api, "No plugins section found or invalid JSON: %s", json_object_to_json_string(config));
-		return -1;
+	// collect shared object plugins
+	rc = rp_path_search_match(paths, RP_PATH_SEARCH_FILE|RP_PATH_SEARCH_FLEXIBLE|RP_PATH_SEARCH_RECURSIVE,
+			NULL, "so", found_so, &application);
+
+	// check if something exists
+	if(application.get_message_set().empty()) {
+		AFB_API_ERROR(api, "No message_set defined");
+		rc = -1;
+		goto end;
 	}
 
-	plugin_store_t pstore = nullptr;
-	if(config["plugins"].is_array())
-	{
-		for(auto elt: config["plugins"])
-			plugin_load(api,
-				    elt["uid"].get<std::string>().c_str(),
-				    elt["libs"].get<std::string>().c_str(),
-				    &pstore);
-	}
-	else
-	{
-		plugin_load(api,
-			    config["plugins"]["uid"].get<std::string>().c_str(),
-			    config["plugins"]["libs"].get<std::string>().c_str(),
-			    &pstore);
-	}
-	void **cbs = plugin_seek_cb_in_all(api, pstore, "plugin_init");
-
-	int i = 0;
-	while(cbs[i]) {
-		int (*init)(afb::api) = (int (*)(afb::api)) cbs[i];
-		init(api);
-		i++;
-	}
-*/
-
-	if(application.get_message_set().empty())
-	{
-		AFB_ERROR("No message_set defined");
-		return -1;
-	}
-	struct utils::signals_found all_signals;
-
-	openxc_DynamicField search_key = build_DynamicField("*");
+	// add verbs
+	search_key = build_DynamicField("*");
 	all_signals = utils::signals_manager_t::instance().find_signals(search_key);
-
 	for(const auto& sig: all_signals.signals)
 	{
-		ret = add_verb(api, sig, nullptr);
-		if (ret)
+		rc = add_verb(api, sig, nullptr);
+		if (rc < 0)
 			break;
 	}
+	if (rc < 0)
+		goto end;
 
+	// add verbs (diagnostic)
 	if(application.get_diagnostic_manager().is_initialized())
 	{
 		for(const auto& sig: all_signals.diagnostic_messages)
 		{
-			ret = add_verb(api, nullptr, sig);
-			if (ret)
+			rc = add_verb(api, nullptr, sig);
+			if (rc < 0)
 				break;
 		}
 	}
-
-	return ret;
+end:
+	rp_path_search_unref(paths);
+	return rc;
 }
 
 static int mainctl(afb::api api, afb::ctlid ctlid, afb::ctlarg ctlarg, void *userdata)
