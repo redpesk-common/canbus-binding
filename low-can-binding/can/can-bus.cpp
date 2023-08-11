@@ -26,7 +26,9 @@
 #include <algorithm>
 
 #include <json-c/json.h>
+extern "C" {
 #include <afb-helpers4/afb-data-utils.h>
+}
 
 #include <canbus-binding/can/can-bus.hpp>
 #include <canbus-binding/can/signals.hpp>

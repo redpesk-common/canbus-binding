@@ -25,12 +25,12 @@
 #include <sys/epoll.h>
 #include <afb/afb-binding>
 
+extern "C" {
 #include <rp-utils/rp-jsonc.h>
 #include <rp-utils/rp-path-search.h>
-
 #include <afb-helpers4/plugin-store.h>
 #include <afb-helpers4/afb-data-utils.h>
-#include <rp-utils/rp-jsonc.h>
+}
 
 #include <canbus-binding/binding/low-can-hat.hpp>
 
