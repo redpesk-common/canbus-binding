@@ -46,6 +46,7 @@ class can_message_t : public message_t {
 		union bcm_msg bcm_msg_;
 
 	public:
+		virtual ~can_message_t() = default;
 		can_message_t();
 		can_message_t(  uint32_t maxdlen,
 				uint32_t id,

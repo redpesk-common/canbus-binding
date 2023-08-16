@@ -664,15 +664,7 @@ static void write_signal(afb::req request, const std::string& name, json_object 
 	else
 		request.reply(-1);
 
-	if(sig->get_message()->is_j1939())
-#ifdef USE_FEATURE_J1939
-		delete (j1939_message_t*) message;
-#else
-		afb_data_t reply = afb_data_string("Warning: J1939 not implemented in your kernel.");
-		request.reply(-1, 1, &reply);
-#endif
-	else
-		delete (can_message_t*) message;
+	delete message;
 }
 
 static void write(afb::req request, afb::received_data params)
