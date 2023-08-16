@@ -1018,7 +1018,7 @@ static int add_verb(afb::api &api, std::shared_ptr<signal_t> sig, std::shared_pt
 /// @param[in] service Structure which represent the Application Framework Binder.
 ///
 /// @return Exit code, zero if success.
-static int init_binding(afb::api &api)
+static int init_binding(afb::api api)
 {
 	int ret = 0;
 	application_t& application = application_t::instance();
@@ -1046,6 +1046,11 @@ static int init_binding(afb::api &api)
 		}
 	}
 
+	if (!application.valid_active_message_set()) {
+		AFB_API_ERROR(api, "No valid message set");
+		return -1;
+	}
+
 #ifdef USE_FEATURE_J1939
 	vect_ptr_msg_def_t current_messages_definition = application.get_messages_definition();
 	for(std::shared_ptr<message_definition_t> message_definition: current_messages_definition)
@@ -1060,7 +1065,7 @@ static int init_binding(afb::api &api)
 
 			if(ret < 0)
 			{
-				AFB_ERROR("Error open socket address claiming for j1939 protocol");
+				AFB_API_ERROR(api, "Error open socket address claiming for j1939 protocol");
 				return -1;
 			}
 			add_to_event_loop(low_can_j1939);
@@ -1069,7 +1074,7 @@ static int init_binding(afb::api &api)
 	}
 #endif
 	if(ret)
-		AFB_ERROR("There was something wrong with the binding initialization.");
+		AFB_API_ERROR(api, "There was something wrong with the binding initialization.");
 
 	return ret;
 }
@@ -1084,30 +1089,35 @@ static int process_config(afb::api api, json_object *json_obj, application_t& ap
 	const char *ecu = nullptr;
 	const char *diagnotic_bus = nullptr;
 
-	AFB_DEBUG("Config %s", json_object_to_json_string(json_obj));
+	AFB_API_DEBUG(api, "Config %s", json_object_to_json_string(json_obj));
 
-	if(rp_jsonc_unpack(json_obj, "sO", "config", &config)
-	|| rp_jsonc_unpack(config,   "{si s?s s?s s?o s?o}",
+	if(rp_jsonc_unpack(json_obj, "{sO}", "config", &config)) {
+		AFB_API_ERROR(api, "No entry 'config' found in %s", json_object_to_json_string(json_obj));
+		return -1;
+	}
+	if (rp_jsonc_unpack(config,   "{si s?s s?s s?o s?o}",
 			      "active_message_set", &active_message_set,
 			      "diagnostic_bus", &diagnotic_bus,
 			      "default_j1939_name", &ecu,
 			      "preinit", &preinit,
-			      "postinit", &postinit))
+			      "postinit", &postinit)) {
+		AFB_API_ERROR(api, "Invalid 'config' entry %s", json_object_to_json_string(config));
 		return -1;
+	}
 
 	if(ecu)
 	{
 #ifdef USE_FEATURE_J1939
 		application.set_default_j1939_ecu(ecu);
-		AFB_INFO("Default J1939 ECU name set to %s", ecu);
+		AFB_API_INFO(api, "Default J1939 ECU name set to %s", ecu);
 #else
-		AFB_INFO("J1939 feature disable, doing nothing");
+		AFB_API_INFO(api, "J1939 feature disable, doing nothing");
 #endif
 	}
 
 	application.set_active_message_set((uint8_t)active_message_set);
 
-	if(rp_jsonc_unpack(json_obj, "{so}",
+	if(rp_jsonc_unpack(config, "{so}",
 			    "dev-mapping", &dev_mapping))
 		return -1;
 
@@ -1117,25 +1127,31 @@ static int process_config(afb::api api, json_object *json_obj, application_t& ap
 	/// Initialize Diagnostic manager that will handle obd2 requests.
 	/// We pass by default the first CAN bus device to its Initialization.
 	if(! diagnotic_bus)
-		AFB_NOTICE("Diagnostic Manager: no diagnostic bus specified. Service will run without the diagnostic manager.");
+		AFB_API_NOTICE(api, "Diagnostic Manager: no diagnostic bus specified. Service will run without the diagnostic manager.");
 	else if(! application_t::instance().get_diagnostic_manager().initialize(diagnotic_bus))
 	{
-		AFB_ERROR("Diagnostic Manager: not initialized. Problem initializing the diagnostic manager with the bus: %s", diagnotic_bus);
+		AFB_API_ERROR(api, "Diagnostic Manager: not initialized. Problem initializing the diagnostic manager with the bus: %s", diagnotic_bus);
 		return -1;
 	}
 
 	return 0;
 }
 
+struct search_json_object_t
+{
+	afb::api api;
+	json_object *global;
+};
+
 static int found_json(void *closure, const rp_path_search_entry_t *entry)
 {
-	json_object *global = reinterpret_cast<json_object*>(closure);
+	search_json_object_t *sj = reinterpret_cast<search_json_object_t*>(closure);
 	json_object *obj = json_object_from_file(entry->path);
 	if (obj == NULL)
-		AFB_WARNING("Can't read JSON file %s", entry->path);
+		AFB_API_WARNING(sj->api, "Can't read JSON file %s", entry->path);
 	else {
-		AFB_DEBUG("Processing JSON file %s", entry->path);
-		rp_jsonc_object_merge(global, obj, rp_jsonc_merge_option_join_or_keep);
+		AFB_API_DEBUG(sj->api, "Processing JSON file %s", entry->path);
+		rp_jsonc_object_merge(sj->global, obj, rp_jsonc_merge_option_join_or_keep);
 		json_object_put(obj);
 	}
 	return 0; /* continue */
@@ -1143,7 +1159,8 @@ static int found_json(void *closure, const rp_path_search_entry_t *entry)
 
 static int found_so(void *closure, const rp_path_search_entry_t *entry)
 {
-	application_t& application = *reinterpret_cast<application_t*>(closure);
+	afb::api api = reinterpret_cast<afb_api_t>(closure);
+	application_t& application = application_t::instance();
 	plugin_store_t pstore = application.get_plugins();
 	plugin_t *plugin = plugin_store_get_load(&pstore, entry->path, entry->path, nullptr);
 	if (!plugin)
@@ -1178,6 +1195,7 @@ static int do_preinit(afb::api api, json_object *config)
 	json_object *obj;
 	struct utils::signals_found all_signals;
 	openxc_DynamicField search_key;
+	search_json_object_t search_json_object;
 
 	// set api's data to be application instance (very unuseful but legacy...)
 	application_t& application = application_t::instance();
@@ -1198,11 +1216,14 @@ static int do_preinit(afb::api api, json_object *config)
 		json_object_get(obj);
 	else
 		obj = json_object_new_object();
+
+	search_json_object.api = api;
+	search_json_object.global = obj;
 	rc = rp_path_search_match(paths, RP_PATH_SEARCH_FILE|RP_PATH_SEARCH_FLEXIBLE|RP_PATH_SEARCH_RECURSIVE,
-			NULL, "json", found_json, obj);
+			NULL, "json", found_json, &search_json_object);
 	application.set_config(obj);
 
-	if(process_config(api, config, application))
+	if(process_config(api, obj, application))
 	{
 		AFB_API_ERROR(api, "No config found or invalid JSON: %s", json_object_to_json_string(config));
 		goto end;
@@ -1210,7 +1231,7 @@ static int do_preinit(afb::api api, json_object *config)
 
 	// collect shared object plugins
 	rc = rp_path_search_match(paths, RP_PATH_SEARCH_FILE|RP_PATH_SEARCH_FLEXIBLE|RP_PATH_SEARCH_RECURSIVE,
-			NULL, "so", found_so, &application);
+			NULL, "so", found_so, (afb_api_t)api);
 
 	// check if something exists
 	if(application.get_message_set().empty()) {

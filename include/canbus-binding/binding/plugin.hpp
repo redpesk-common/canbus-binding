@@ -45,9 +45,11 @@ static inline const canbus_plugin_t *to_canbus_plugin(const void *ptr)
 }
 
 #define CANBUS_PLUGIN_DECLARE(id, init)                           \
+	extern "C"                                                \
 	const canbus_plugin_t canbus_plugin_export =              \
 		{ { CANBUS_PLUGIN_MAGIC0, CANBUS_PLUGIN_MAGIC1 }, \
 		  CANBUS_PLUGIN_TAG,                              \
 		  id, init };
 
 #define CANBUS_PLUGIN_EXPORT "canbus_plugin_export"
+

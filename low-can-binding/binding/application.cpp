@@ -99,6 +99,11 @@ std::vector<std::shared_ptr<message_set_t> > application_t::get_message_set()
 	return message_set_;
 }
 
+bool application_t::valid_active_message_set() const
+{
+	return active_message_set_ < message_set_.size();
+}
+
 vect_ptr_signal_t application_t::get_all_signals()
 {
 	return message_set_[active_message_set_]->get_all_signals();
