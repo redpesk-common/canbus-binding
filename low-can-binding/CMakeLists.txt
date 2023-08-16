@@ -1,8 +1,7 @@
 ###########################################################################
-# Copyright 2015, 2016, 2017 IoT.bzh
+# Copyright 2015-2023 IoT.bzh
 #
-# author: Fulup Ar Foll <fulup@iot.bzh>
-# contrib: Romain Forlot <romain.forlot@iot.bzh>
+# author: IoT.bzh team <team@iot.bzh>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,98 +16,152 @@
 # limitations under the License.
 ###########################################################################
 
+include_directories(BEFORE SYSTEM ${CMAKE_SOURCE_DIR}/include)
+
+add_definitions(-DAFB_BINDING_VERSION=4)
+
+pkg_check_modules(LIBDEPS REQUIRED
+	json-c
+	afb-binding
+	afb-helpers4
+	librp-utils
+)
+
+###########################################################################
+# The library libcanbus
+###########################################################################
+
+# Activate J1939
+# Need module in kernel
+# --------------
+
+if(WITH_FEATURE_J1939)
+	find_file(J1939 j1939.h $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/)
+	if(J1939)
+		message("Feature J1939 enabled")
+		add_definitions(-DUSE_FEATURE_J1939)
+		set(SOURCES_J1939
+			can/message/j1939-message.cpp
+			utils/socketcan-j1939/socketcan-j1939.cpp
+			utils/socketcan-j1939/socketcan-j1939-data.cpp
+			utils/socketcan-j1939/socketcan-j1939-addressclaiming.cpp
+		)
+	else(J1939)
+		message(FATAL_ERROR "ERROR: No $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/j1939.h headers found")
+	endif(J1939)
+else(WITH_FEATURE_J1939)
+	message("Feature J1939 disabled")
+endif(WITH_FEATURE_J1939)
+
+# Activate ISO TP
+# Need module in kernel
+# --------------
+
+if(WITH_FEATURE_ISOTP)
+	find_file(ISOTP isotp.h $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can)
+	if(ISOTP)
+		message("Feature ISO TP enabled")
+		add_definitions(-DUSE_FEATURE_ISOTP)
+		set(SOURCES_ISOTP
+			utils/socketcan-isotp.cpp
+		)
+	else(ISOTP)
+		message(FATAL_ERROR "ERROR: No $ENV{PKG_CONFIG_SYSROOT_DIR}/usr/include/linux/can/isotp.h headers found")
+	endif(ISOTP)
+else(WITH_FEATURE_ISOTP)
+	message("Feature ISO TP disabled")
+endif(WITH_FEATURE_ISOTP)
+
 # Add target to project dependency list
 
-PROJECT_TARGET_ADD(canbus)
+set (SOURCES_LIB
+	binding/low-can-hat.cpp
+	binding/low-can-subscription.cpp
+	binding/application.cpp
+	can/can-bus.cpp
+	can/can-decoder.cpp
+	can/can-encoder.cpp
+	can/message-set.cpp
+	can/message-definition.cpp
+	can/message/message.cpp
+	can/message/can-message.cpp
+	can/signals.cpp
+	diagnostic/diagnostic-message.cpp
+	diagnostic/diagnostic-manager.cpp
+	diagnostic/active-diagnostic-request.cpp
+	utils/signals.cpp
+	utils/openxc-utils.cpp
+	utils/timer.cpp
+	utils/socketcan.cpp
+	#utils/socketcan-raw.cpp
+	utils/socketcan-bcm.cpp
+	utils/converter.cpp
+	utils/frame-codec.cpp
+)
 
-	if(WITH_FEATURE_ISOTP)
-	set(SOURCES_ISOTP
-		utils/socketcan-isotp.cpp
-	)
-	endif()
+add_library(canbus SHARED ${SOURCES_LIB} ${SOURCES_J1939} ${SOURCES_ISOTP})
 
-	if(WITH_FEATURE_J1939)
-	set(SOURCES_J1939
-		can/message/j1939-message.cpp
-		utils/socketcan-j1939/socketcan-j1939.cpp
-		utils/socketcan-j1939/socketcan-j1939-data.cpp
-		utils/socketcan-j1939/socketcan-j1939-addressclaiming.cpp
-	)
-	endif()
+target_compile_options(canbus PRIVATE ${LIBDEPS_CFLAGS})
 
-	set (SOURCES_LIB
-		binding/low-can-hat.cpp
-		binding/low-can-subscription.cpp
-		binding/application.cpp
-		can/can-bus.cpp
-		can/can-decoder.cpp
-		can/can-encoder.cpp
-		can/message-set.cpp
-		can/message-definition.cpp
-		can/message/message.cpp
-		can/message/can-message.cpp
-		can/signals.cpp
-		diagnostic/diagnostic-message.cpp
-		diagnostic/diagnostic-manager.cpp
-		diagnostic/active-diagnostic-request.cpp
-		utils/signals.cpp
-		utils/openxc-utils.cpp
-		utils/timer.cpp
-		utils/socketcan.cpp
-		#utils/socketcan-raw.cpp
-		utils/socketcan-bcm.cpp
-		utils/converter.cpp
-		utils/frame-codec.cpp
-	)
+#target_include_directories(canbus PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-	add_library(${TARGET_NAME} SHARED ${SOURCES_LIB} ${SOURCES_J1939} ${SOURCES_ISOTP})
+target_link_libraries(canbus
+	openxc-message-format
+	uds-c
+	isotp-c
+	bitfield-c
+	${LIBDEPS_LINK_LIBRARIES})
 
-	# Binder exposes a unique public entry point
-	SET_TARGET_PROPERTIES(
-		${TARGET_NAME} PROPERTIES
-			VERSION 2
-			SOVERSION 2.0
-	)
+set_target_properties(
+	canbus PROPERTIES
+		VERSION 2
+		SOVERSION 2.0
+)
 
-	INSTALL(TARGETS ${TARGET_NAME}
-			DESTINATION ${CMAKE_INSTALL_LIBDIR}
-		)
+install(TARGETS canbus)
 
 
-	target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/include)
+###########################################################################
+# The binding afb-canbus-binding
+###########################################################################
 
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		openxc-message-format
-		uds-c
-		isotp-c
-		bitfield-c
-		${link_libraries})
+find_program(GENSKEL afb-genskel)
+if(NOT GENSKEL)
+	message(FATAL_ERROR "can't find afb-genskel")
+endif(NOT GENSKEL)
 
-PROJECT_TARGET_ADD(canbus-binding)
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/binding/low-can-apidef.h
+	COMMAND ${GENSKEL} ${CMAKE_CURRENT_SOURCE_DIR}/binding/low-can-apidef.json > ${CMAKE_CURRENT_SOURCE_DIR}/binding/low-can-apidef.h
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/binding/low-can-apidef.json
+)
 
-	# Define project Targets
-	set (SOURCES
-		binding/low-can-cb.cpp
-		)
-
-	add_library(${TARGET_NAME} MODULE ${SOURCES})
-
-#	set(OPENAPI_DEF "binding/low-can-apidef" CACHE STRING "name and path to the JSON API definition without extension")
-	# Binder exposes a unique public entry point
-	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-		PREFIX "afb-"
-		LABELS "BINDING"
-		INSTALL_RPATH $ORIGIN
-		OUTPUT_NAME ${TARGET_NAME}
+# Define project Targets
+set (SOURCES
+	binding/low-can-cb.cpp
+	binding/low-can-apidef.h
 	)
 
-	target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/include)
+add_library(canbus-binding SHARED ${SOURCES})
 
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		canbus
-		openxc-message-format
-		uds-c
-		isotp-c
-		bitfield-c
-		${link_libraries})
+# Binder exposes a unique public entry point
+SET_TARGET_PROPERTIES(canbus-binding PROPERTIES
+	PREFIX "afb-"
+	LABELS "BINDING"
+	INSTALL_RPATH $ORIGIN
+	OUTPUT_NAME canbus-binding
+)
+
+target_include_directories(canbus-binding PRIVATE ${LIBDEPS_INCLUDE_DIRS})
+
+# Library dependencies (include updates automatically)
+TARGET_LINK_LIBRARIES(canbus-binding
+	canbus
+	${LIBDEPS_LINK_LIBRARIES})
+
+set(AFM_APP_DIR ${CMAKE_INSTALL_PREFIX}/redpesk CACHE PATH "Application directory")
+set(appdir ${AFM_APP_DIR}/canbus-binding)
+install(FILES manifest.yml DESTINATION ${appdir}/.rpconfig)
+install(FILES canbus-binding-config.json DESTINATION ${appdir}/etc)
+install(TARGETS canbus-binding DESTINATION ${appdir}/lib)
+install(CODE "file(MAKE_DIRECTORY ${appdir}/plugins)")

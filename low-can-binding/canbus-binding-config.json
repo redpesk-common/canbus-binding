@@ -1,9 +1,7 @@
 {
-	"$schema": "",
 	"metadata": {
-		"uid": "CAN bus",
+		"name": "canbus-binding",
 		"version": "2.0",
-		"api": "canbus",
 		"info": "CAN bus Configuration"
 	},
 	"config": {
@@ -14,7 +12,5 @@
 		},
 		"diagnostic_bus": "hs",
 		"default_j1939_ecu": "0xC0509600227CC7AA"
-	},
-	"plugins": [
-	]
+	}
 }

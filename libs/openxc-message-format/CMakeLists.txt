@@ -17,27 +17,22 @@
 # limitations under the License.
 ###########################################################################
 
-# Add target to project dependency list
-PROJECT_TARGET_ADD(openxc-message-format)
+# Define project Target
+add_library(openxc-message-format STATIC 
+	gen/cpp/openxc.pb.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_encode.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_decode.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_common.c)
 
-	# Define project Target
-	add_library(${TARGET_NAME} STATIC 
-		gen/cpp/openxc.pb.c
-		${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_encode.c
-		${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_decode.c
-		${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_common.c)
+target_compile_definitions(openxc-message-format PUBLIC PB_FIELD_16BIT)
+# Binder exposes a unique public entry point
+SET_TARGET_PROPERTIES(openxc-message-format PROPERTIES
+	OUTPUT_NAME openxc-message-format
+)
 
-	# Binder exposes a unique public entry point
-	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-		OUTPUT_NAME ${TARGET_NAME}
-	)
+# Define target includes
+TARGET_INCLUDE_DIRECTORIES(openxc-message-format
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/gen/cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/../nanopb
+)
 
-	# Define target includes
-	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
-		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/gen/cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/../nanopb
-	)
-
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		${link_libraries})

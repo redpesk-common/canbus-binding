@@ -17,27 +17,20 @@
 # limitations under the License.
 ###########################################################################
 
-# Add target to project dependency list
-PROJECT_TARGET_ADD(bitfield-c)
+# Define project Target
+add_library(bitfield-c STATIC
+	src/bitfield/8byte.c
+	src/bitfield/bitarray.c 
+	src/bitfield/bitfield.c
+	src/canutil/read.c
+	src/canutil/write.c)
 
-	# Define project Target
-	add_library(${TARGET_NAME} STATIC
-		src/bitfield/8byte.c
-		src/bitfield/bitarray.c 
-		src/bitfield/bitfield.c
-		src/canutil/read.c
-		src/canutil/write.c)
+# Binder exposes a unique public entry point
+SET_TARGET_PROPERTIES(bitfield-c PROPERTIES
+	OUTPUT_NAME bitfield-c
+)
 
-	# Binder exposes a unique public entry point
-	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-		OUTPUT_NAME ${TARGET_NAME}
-	)
-
-	# Define target includes
-	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
-		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-	)
-
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		${link_libraries})
+# Define target includes
+TARGET_INCLUDE_DIRECTORIES(bitfield-c
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
+)

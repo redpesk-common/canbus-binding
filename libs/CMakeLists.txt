@@ -16,5 +16,8 @@
 # limitations under the License.
 ###########################################################################
 
-# Add target to project dependency list
-project_subdirs_add()
+add_subdirectory(bitfield-c)
+add_subdirectory(isotp-c)
+add_subdirectory(uds-c)
+add_subdirectory(openxc-message-format)
+

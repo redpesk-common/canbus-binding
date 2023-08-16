@@ -1,1 +1,0 @@
-list(APPEND PKG_REQUIRED_LIST lua53-c++>=5.3)

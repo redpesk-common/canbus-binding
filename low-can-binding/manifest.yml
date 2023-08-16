@@ -1,0 +1,25 @@
+rp-manifest: 1
+id: canbus-binding
+version: @PROJECT_VERSION@
+name: canbus-binding
+description: Expose CAN bus APIs through redpesk Framework
+author: IoT.bzh team <team@iot.bzh>
+license: APL2.0
+defined-permission:
+targets:
+  - target: main
+    content:
+      src: lib/afb-canbus-binding.so
+      type: application/vnd.agl.service
+    provided-api:
+      - name: canbus
+        value: ws
+    required-binding:
+      - name: lib/afb-canbus-binding.so
+        value: local
+    required-permission:
+      - urn:AGL:permission::partner:scope-platform
+      - urn:AGL:permission::partner:create-can-socket
+      - urn:AGL:permission::public:hidden
+      - urn:AGL:permission::system:run-by-default
+      - urn:AGL:permission::public:no-htdocs

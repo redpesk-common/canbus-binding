@@ -24,15 +24,24 @@ project(canbus-binding
         HOMEPAGE_URL "https://github.com/redpesk-common/canbus-binding"
         LANGUAGES C CXX)
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
+set(PROJECT_AUTHOR "IoT.bzh")
+set(PROJECT_LICENSE "APL2.0")
 
+include(FindPkgConfig)
+include(GNUInstallDirs)
 include(CTest)
 enable_testing()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/conf.d/cmake/config.cmake)
+option(WITH_FEATURE_J1939 "Activate support of J1939" ON)
+option(WITH_FEATURE_ISOTP "Activate support of ISOTP" ON)
 
-include(GNUInstallDirs)
+# sub projects
 
+add_subdirectory(include)
+add_subdirectory(libs)
+add_subdirectory(low-can-binding)
+
+# install the pkg-config manifest
 configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 INSTALL(FILES
 	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
@@ -40,5 +49,6 @@ INSTALL(FILES
 	${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
 
+# install documentation and templates
 INSTALL(DIRECTORY docs DESTINATION ${CMAKE_INSTALL_DATADIR}/canbus-binding)
 INSTALL(DIRECTORY _plugin_template/ DESTINATION ${CMAKE_INSTALL_DATADIR}/canbus-binding/plugin_template)

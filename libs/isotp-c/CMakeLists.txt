@@ -17,26 +17,22 @@
 # limitations under the License.
 ###########################################################################
 
-# Add target to project dependency list
-PROJECT_TARGET_ADD(isotp-c)
+# Define project Target
+add_library(isotp-c STATIC 
+	src/isotp/isotp.c
+	src/isotp/receive.c
+	src/isotp/send.c)
 
-	# Define project Target
-	add_library(${TARGET_NAME} STATIC 
-		src/isotp/isotp.c
-		src/isotp/receive.c
-		src/isotp/send.c)
+# Binder exposes a unique public entry point
+SET_TARGET_PROPERTIES(isotp-c PROPERTIES
+	OUTPUT_NAME isotp-c
+)
 
-	# Binder exposes a unique public entry point
-	SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES
-		OUTPUT_NAME ${TARGET_NAME}
-	)
+# Define target includes
+TARGET_INCLUDE_DIRECTORIES(isotp-c
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 
-	# Define target includes
-	TARGET_INCLUDE_DIRECTORIES(${TARGET_NAME}
-		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
-	)
-
-	# Library dependencies (include updates automatically)
-	TARGET_LINK_LIBRARIES(${TARGET_NAME}
-		bitfield-c
-		${link_libraries})
+# Library dependencies (include updates automatically)
+TARGET_LINK_LIBRARIES(isotp-c
+	bitfield-c)
