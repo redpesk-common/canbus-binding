@@ -135,11 +135,17 @@ add_custom_command(
 	COMMAND ${GENSKEL} ${CMAKE_CURRENT_SOURCE_DIR}/binding/low-can-apidef.json > ${CMAKE_CURRENT_SOURCE_DIR}/binding/low-can-apidef.h
 	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/binding/low-can-apidef.json
 )
+add_custom_command(
+	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/.version
+	COMMAND echo ${PROJECT_VERSION} > ${CMAKE_CURRENT_BINARY_DIR}/.version
+)
+
 
 # Define project Targets
 set (SOURCES
 	binding/low-can-cb.cpp
 	binding/low-can-apidef.h
+	${CMAKE_CURRENT_BINARY_DIR}/.version
 	)
 
 add_library(canbus-binding SHARED ${SOURCES})
@@ -164,4 +170,5 @@ set(appdir ${AFM_APP_DIR}/canbus-binding)
 install(FILES manifest.yml DESTINATION ${appdir}/.rpconfig)
 install(FILES canbus-binding-config.json DESTINATION ${appdir}/etc)
 install(TARGETS canbus-binding DESTINATION ${appdir}/lib)
-install(CODE "file(MAKE_DIRECTORY ${appdir}/plugins)")
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/.version DESTINATION ${appdir}/plugins)
