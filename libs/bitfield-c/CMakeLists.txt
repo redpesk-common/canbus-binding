@@ -25,6 +25,8 @@ add_library(bitfield-c STATIC
 	src/canutil/read.c
 	src/canutil/write.c)
 
+target_compile_options(bitfield-c PUBLIC -fPIC)
+
 # Binder exposes a unique public entry point
 SET_TARGET_PROPERTIES(bitfield-c PROPERTIES
 	OUTPUT_NAME bitfield-c

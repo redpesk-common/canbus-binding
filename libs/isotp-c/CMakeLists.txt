@@ -23,6 +23,8 @@ add_library(isotp-c STATIC
 	src/isotp/receive.c
 	src/isotp/send.c)
 
+target_compile_options(isotp-c PUBLIC -fPIC)
+
 # Binder exposes a unique public entry point
 SET_TARGET_PROPERTIES(isotp-c PROPERTIES
 	OUTPUT_NAME isotp-c

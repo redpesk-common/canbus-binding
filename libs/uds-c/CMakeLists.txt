@@ -22,6 +22,8 @@ add_library(uds-c STATIC
 	src/uds/extras.c
 	src/uds/uds.c)
 
+target_compile_options(uds-c PUBLIC -fPIC)
+
 # Binder exposes a unique public entry point
 SET_TARGET_PROPERTIES(uds-c PROPERTIES
 	OUTPUT_NAME uds-c
