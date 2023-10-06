@@ -165,9 +165,14 @@ TARGET_LINK_LIBRARIES(canbus-binding
 	canbus
 	${LIBDEPS_LINK_LIBRARIES})
 
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/manifest.yml.in
+	${CMAKE_CURRENT_BINARY_DIR}/manifest.yml
+	@ONLY)
+
 set(AFM_APP_DIR ${CMAKE_INSTALL_PREFIX}/redpesk CACHE PATH "Application directory")
 set(appdir ${AFM_APP_DIR}/canbus-binding)
-install(FILES manifest.yml DESTINATION ${appdir}/.rpconfig)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/manifest.yml DESTINATION ${appdir}/.rpconfig)
 install(FILES canbus-binding-config.json DESTINATION ${appdir}/etc)
 install(TARGETS canbus-binding DESTINATION ${appdir}/lib)
 
