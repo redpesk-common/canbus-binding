@@ -631,7 +631,7 @@ static void write_signal(afb::req request, const std::string& name, json_object 
 
 	if (sf.signals.empty())
 	{
-		afb_data_t data = afb_data_string(std::string("No signal(s) found for "+name+". Message not sent.").c_str());
+		afb_data_t data = afb_data_string_copy(std::string("No signal(s) found for "+name+". Message not sent.").c_str(), 0);
 		request.reply(-1, 1, &data);
 		return;
 	}
@@ -639,7 +639,7 @@ static void write_signal(afb::req request, const std::string& name, json_object 
 	std::shared_ptr<signal_t> sig = sf.signals.front();
 	if(! sig->get_writable())
 	{
-		afb_data_t data = afb_data_string(std::string(sig->get_name()+" isn't writable. Message not sent.").c_str());
+		afb_data_t data = afb_data_string_copy(std::string(sig->get_name()+" isn't writable. Message not sent.").c_str(), 0);
 		request.reply(-1, 1, &data);
 		return;
 	}
