@@ -669,7 +669,6 @@ static void write_signal(afb::req request, const std::string& name, json_object 
 
 static void write(afb::req request, afb::received_data params)
 {
-	int rc = AFB_ERRNO_INVALID_REQUEST;
 	struct json_object* args, *json_value = nullptr, *name = nullptr;
 
 	if (!get_json_param(request, args))
@@ -684,7 +683,7 @@ static void write(afb::req request, afb::received_data params)
 			if(json_object_object_get_ex(args,"frame",&json_value))
 			{
 				write_frame(request, (std::string)json_object_get_string(name), json_value, event_filter);
-				rc = 0;
+				return;
 			}
 		}
 		else if(json_object_object_get_ex(args,"signal_name",&name))
@@ -692,11 +691,11 @@ static void write(afb::req request, afb::received_data params)
 			if(json_object_object_get_ex(args,"signal_value",&json_value))
 			{
 				write_signal(request, (std::string)json_object_get_string(name), json_value, event_filter);
-				rc = 0;
+				return;
 			}
 		}
 	}
-	request.reply(rc);
+	request.reply(AFB_ERRNO_INVALID_REQUEST);
 }
 
 static struct json_object *get_signals_value(const std::string& name)
