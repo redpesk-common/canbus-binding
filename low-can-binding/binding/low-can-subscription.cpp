@@ -494,7 +494,6 @@ void low_can_subscription_t::make_bcm_head(uint32_t opcode,
 	bcm_msg.msg_head.opcode  = opcode;
 	bcm_msg.msg_head.can_id  = can_id;
 	bcm_msg.msg_head.flags = flags;
-	bcm_msg.msg_head.nframes = 0;
 	bcm_msg.msg_head.ival1.tv_sec = timeout.tv_sec ;
 	bcm_msg.msg_head.ival1.tv_usec = timeout.tv_usec;
 	bcm_msg.msg_head.ival2.tv_sec = frequency_thinning.tv_sec ;
@@ -763,6 +762,10 @@ int low_can_subscription_t::create_rx_filter_bcm(union bcm_msg& bcm_msg)
 int low_can_subscription_t::tx_send(message_t *message, const std::string& bus_name)
 {
 	can_message_t *cm = static_cast<can_message_t*>(message);
+
+	union bcm_msg bcm_msg;
+	make_bcm_head(TX_SEND, bcm_msg, cm->get_id(), cm->get_flags()|TX_CP_CAN_ID); // TX_CP_CAN_ID -> copy in cfd the id of bcm
+	cm->set_bcm_msg(bcm_msg);
 
 	std::vector<canfd_frame> cfd_vect = cm->convert_to_canfd_frame_vector();
 
