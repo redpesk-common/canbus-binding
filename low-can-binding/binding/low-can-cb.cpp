@@ -1201,7 +1201,7 @@ static int do_preinit(afb::api api, json_object *config)
 	api.set_userdata(&application);
 
 	// default path search
-	rc = rp_path_search_make_dirs(&paths, "${AFB_ROOTDIR}/plugins:${CANBUS_PLUGINS_PATH}");
+	rc = rp_path_search_make_dirs(&paths, "${AFB_ROOTDIR}/etc:${AFB_ROOTDIR}/plugins:${CANBUS_PLUGINS_PATH}");
 	if (rc >= 0 && 0 == rp_jsonc_unpack(config, "{ss}", "plugins-path", &str))
 		// supplementary paths
 		rc = rp_path_search_extend_dirs(&paths, str, 1);
