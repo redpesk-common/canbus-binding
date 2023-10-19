@@ -46,7 +46,10 @@ int message_set_t::add_message_definition(std::shared_ptr<message_definition_t> 
 	{
 		if(old_msg_def->get_id() == msg_def->get_id())
 		{
-			AFB_ERROR("Same id between : %s and %s", old_msg_def->get_name().c_str(), msg_def->get_name().c_str());
+			AFB_ERROR("Plugin %s has a message definition with ID %#x, which was already declared by plugin %s",
+					   msg_def->get_parent()->get_name().c_str(),
+					   old_msg_def->get_id(),
+					   old_msg_def->get_parent()->get_name().c_str());
 			return -1;
 		}
 	}

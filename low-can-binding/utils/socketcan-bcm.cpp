@@ -45,7 +45,7 @@ namespace utils
 		// Attempts to open a socket to CAN bus
 		tx_address_.can_family = AF_CAN;
 		::strcpy(ifr.ifr_name, device_name.c_str());
-		AFB_DEBUG("BCM socket ifr_name is : %s", ifr.ifr_name);
+		AFB_DEBUG("BCM socket ifr_name is: %s", ifr.ifr_name);
 
 		socket_mutex_.lock();
 		int ret = ::ioctl(socket_, SIOCGIFINDEX, &ifr);
