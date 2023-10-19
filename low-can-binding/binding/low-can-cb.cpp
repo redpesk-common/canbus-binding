@@ -1177,7 +1177,7 @@ static int found_so(void *closure, const rp_path_search_entry_t *entry)
 			else {
 				AFB_ERROR("Failed to initialize plugin %s (%s)", desc->id, entry->path);
 				desc = nullptr;
-				exit(1);
+				return -1;
 			}
 		}
 		if (!desc)
@@ -1232,6 +1232,8 @@ static int do_preinit(afb::api api, json_object *config)
 	// collect shared object plugins
 	rc = rp_path_search_match(paths, RP_PATH_SEARCH_FILE|RP_PATH_SEARCH_FLEXIBLE|RP_PATH_SEARCH_RECURSIVE,
 			NULL, "so", found_so, (afb_api_t)api);
+	if (rc < 0)
+		goto end;
 
 	// check if something exists
 	if(application.get_message_set().empty()) {
@@ -1287,4 +1289,3 @@ static int mainctl(afb::api api, afb::ctlid ctlid, afb::ctlarg ctlarg, void *use
 }
 
 #include "low-can-apidef.h"
-
