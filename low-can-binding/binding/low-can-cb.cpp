@@ -1175,8 +1175,9 @@ static int found_so(void *closure, const rp_path_search_entry_t *entry)
 			if (rc >= 0)
 				AFB_INFO("Using plugin %s (%s)", desc->id, entry->path);
 			else {
-				AFB_INFO("Failed to initialize plugin %s (%s)", desc->id, entry->path);
+				AFB_ERROR("Failed to initialize plugin %s (%s)", desc->id, entry->path);
 				desc = nullptr;
+				exit(1);
 			}
 		}
 		if (!desc)
