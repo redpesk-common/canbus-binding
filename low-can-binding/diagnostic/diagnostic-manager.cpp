@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#include "afb-verbosity.h"
 #include <systemd/sd-event.h>
 #include <algorithm>
 #include <string.h>

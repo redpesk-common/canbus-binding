@@ -173,34 +173,31 @@ static int subscribe_unsubscribe_diagnostic_messages(afb::req request,
 		// If the requested diagnostic message is not supported by the car then unsubcribe it
 		// no matter what we want, worst case will be a failed unsubscription but at least we won't
 		// poll a PID for nothing.
-		if(sig->get_supported() && subscribe)
-		{
-			if (!app.is_engine_on())
-				AFB_WARNING("signal: Engine is off, %s won't received responses until it's on",  sig->get_name().c_str());
+		if (sig->get_supported()) {
+			if (subscribe) {
+				if (!app.is_engine_on())
+					AFB_WARNING("signal: Engine is off, %s won't received responses until it's on",  sig->get_name().c_str());
 
-			diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency, perm_rec_diag_req);
-			if(can_subscription->create_rx_filter(sig) < 0)
-				return -1;
-			AFB_DEBUG("Signal: %s subscribed", sig->get_name().c_str());
-			if(it == s.end() && add_to_event_loop(can_subscription) < 0)
-			{
-				diag_m.cleanup_request(
-					diag_m.find_recurring_request(*diag_req), true);
-				AFB_WARNING("signal: %s isn't supported. Canceling operation.",  sig->get_name().c_str());
-				return -1;
+				diag_m.add_recurring_request(diag_req, sig->get_name().c_str(), false, sig->get_decoder(), sig->get_callback(), event_filter.frequency, perm_rec_diag_req);
+				if(can_subscription->create_rx_filter(sig) < 0)
+					return -1;
+				AFB_DEBUG("Signal: %s subscribed", sig->get_name().c_str());
+				if(it == s.end() && add_to_event_loop(can_subscription) < 0)
+				{
+					diag_m.cleanup_request(
+						diag_m.find_recurring_request(*diag_req), true);
+					AFB_WARNING("signal: %s isn't supported. Canceling operation.",  sig->get_name().c_str());
+					return -1;
+				}
+			} else {
+				diag_m.cleanup_request(diag_m.find_recurring_request(*diag_req), true);
+				AFB_DEBUG("%s cancelled due to unsubscribe", sig->get_name().c_str());
 			}
 		}
 		else
 		{
-			if(sig->get_supported())
-			{
-				AFB_DEBUG("%s cancelled due to unsubscribe", sig->get_name().c_str());
-			}
-			else
-			{
-				AFB_WARNING("signal: %s isn't supported. Canceling operation.", sig->get_name().c_str());
-				return -1;
-			}
+			AFB_WARNING("signal: %s isn't supported. Canceling operation.", sig->get_name().c_str());
+			return -1;
 		}
 		int ret = subscribe_unsubscribe_signal(request, subscribe, can_subscription, s);
 		if(ret < 0)
