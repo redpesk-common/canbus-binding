@@ -160,7 +160,7 @@ static int subscribe_unsubscribe_diagnostic_messages(afb::req request,
 	for(const auto& sig : diagnostic_messages)
 	{
 		DiagnosticRequest* diag_req = new DiagnosticRequest(sig->build_diagnostic_request());
-		event_filter.frequency = event_filter.frequency == 0 ? sig->get_frequency() : event_filter.frequency;
+		event_filter.frequency = sig->get_frequency();
 		std::shared_ptr<low_can_subscription_t> can_subscription;
 
 		auto it = std::find_if(s.begin(), s.end(), [&sig](std::pair<int, std::shared_ptr<low_can_subscription_t> > sub)

@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include "afb-verbosity.h"
 #include <systemd/sd-event.h>
 #include <algorithm>
 #include <string.h>
@@ -24,6 +25,7 @@
 #include <canbus-binding/utils/signals.hpp>
 #include <canbus-binding/utils/openxc-utils.hpp>
 
+#define MIN_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 0.05 // 20 minutes period
 #define MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ 10
 #define MAX_SIMULTANEOUS_DIAG_REQUESTS 50
 // There are only 8 slots of in flight diagnostic requests
@@ -334,11 +336,18 @@ active_diagnostic_request_t* diagnostic_manager_t::add_request(DiagnosticRequest
 /// @param[in] frequencyHz - frequency asked for sending diagnostic requests.
 ///
 /// @return True if frequency is below the Maximum false if not.
-bool diagnostic_manager_t::validate_optional_request_attributes(float frequencyHz)
+bool diagnostic_manager_t::validate_frequency(float frequencyHz)
 {
-	if(frequencyHz > MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ) {
+	if (frequencyHz > MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ)
+	{
 		AFB_DEBUG("Requested recurring diagnostic frequency %lf is higher than maximum of %d",
 			frequencyHz, MAX_RECURRING_DIAGNOSTIC_FREQUENCY_HZ);
+		return false;
+	}
+	else if (frequencyHz < MIN_RECURRING_DIAGNOSTIC_FREQUENCY_HZ)
+	{
+		AFB_DEBUG("Requested recurring diagnostic frequency %lf is lower than minimum of %lf",
+			frequencyHz, MIN_RECURRING_DIAGNOSTIC_FREQUENCY_HZ);
 		return false;
 	}
 	return true;
@@ -376,8 +385,11 @@ active_diagnostic_request_t* diagnostic_manager_t::add_recurring_request(Diagnos
 {
 	active_diagnostic_request_t* entry = nullptr;
 
-	if(!validate_optional_request_attributes(frequencyHz))
-		return entry;
+	if(!validate_frequency(frequencyHz)) {
+		frequencyHz = MIN_RECURRING_DIAGNOSTIC_FREQUENCY_HZ;
+		AFB_WARNING("Requested recurring diagnostic frequency is not valid; using minimum frequency %lfHz instead",
+			MIN_RECURRING_DIAGNOSTIC_FREQUENCY_HZ);
+	}
 
 	cleanup_active_requests(false);
 
