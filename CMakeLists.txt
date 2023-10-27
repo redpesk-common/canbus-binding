@@ -19,7 +19,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
 
 project(canbus-binding
-        VERSION 2.0.2
+        VERSION 2.0.3
         DESCRIPTION "Expose CAN bus APIs through redpesk Framework"
         HOMEPAGE_URL "https://github.com/redpesk-common/canbus-binding"
         LANGUAGES C CXX)
