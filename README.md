@@ -6,11 +6,15 @@ Full document can be found under `docs` directory.
 
 # Fast build procedure
 
-Just use autobuild script:
+Just use run :
 
 ```bash
-./autobuild/agl/autobuild build
-./autobuild/agl/autobuild package
+mkdir -p ./build
+cd ./build
+cmake ..
+make
+make install DESTDIR=${DEST}
+
 ```
 
 This will build both projects under build directory for each of them with default configuration.
