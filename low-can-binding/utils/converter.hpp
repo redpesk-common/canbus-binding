@@ -18,6 +18,7 @@
 #pragma once
 
 #include <string>
+#include <stdint.h>
 #include <cstdint>
 
 class converter_t
