@@ -35,6 +35,9 @@ enable_testing()
 option(WITH_FEATURE_J1939 "Activate support of J1939" ON)
 option(WITH_FEATURE_ISOTP "Activate support of ISOTP" ON)
 
+include(detect-can.cmake)
+
+
 # sub projects
 
 add_subdirectory(include)
