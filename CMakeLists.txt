@@ -32,8 +32,8 @@ include(GNUInstallDirs)
 include(CTest)
 enable_testing()
 
-option(WITH_FEATURE_J1939 "Activate support of J1939" ON)
-option(WITH_FEATURE_ISOTP "Activate support of ISOTP" ON)
+option(WITH_FEATURE_J1939 "Activate support of J1939" OFF)
+option(WITH_FEATURE_ISOTP "Activate support of ISOTP" OFF)
 
 include(detect-can.cmake)
 
