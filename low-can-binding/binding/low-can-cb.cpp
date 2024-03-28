@@ -19,7 +19,6 @@
 #include <mutex>
 #include <regex>
 #include <vector>
-#include <filesystem>
 #include <algorithm>
 
 #include <sys/epoll.h>
