@@ -101,7 +101,7 @@ set (SOURCES_LIB
 
 add_library(canbus SHARED ${SOURCES_LIB} ${SOURCES_J1939} ${SOURCES_ISOTP})
 
-target_compile_options(canbus PRIVATE ${LIBDEPS_CFLAGS})
+target_compile_options(canbus PRIVATE ${LIBDEPS_CFLAGS} -pthread)
 
 #target_include_directories(canbus PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -110,6 +110,7 @@ target_link_libraries(canbus
 	uds-c
 	isotp-c
 	bitfield-c
+	pthread
 	${LIBDEPS_LINK_LIBRARIES})
 
 set_target_properties(
