@@ -12,7 +12,7 @@ We advise you to use the [local builder]({% chapter_link local-builder-doc.intro
 local builder comes with everything setup to build redpesk@ projects.
 Some of the dependencies below will still be needed, like **lua** for example.
 
-Here is the [local builder documentation]({% chapter_link local-builder-doc.build %}).
+Here is the [local builder documentation]({% chapter_link local-builder-doc.introduction %}).
 
 Else install the building tools
 * git
