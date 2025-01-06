@@ -3,7 +3,7 @@ id: canbus-binding
 version: @PROJECT_VERSION@
 name: canbus-binding
 description: Expose CAN bus APIs through redpesk Framework
-author: IoT.bzh team <team@iot.bzh>
+Author: IoT.bzh team <team@iot.bzh>
 license: APL2.0
 defined-permission:
 targets:

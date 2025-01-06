@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2019, 2020 "IoT.bzh"
- * Author "Arthur Guyader" <arthur.guyader@iot.bzh>
+ * Copyright (C) 2019-2025 IoT.bzh Company
+ * Author: "Arthur Guyader" <arthur.guyader@iot.bzh>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

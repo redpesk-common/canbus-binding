@@ -1,7 +1,7 @@
 
 --[[
-    Copyright (C) 2018 "IoT.bzh"
-    Author Romain Forlot <romain.forlot@iot.bzh>
+    Copyright (C) 2018-2025 IoT.bzh Company
+    Author: Romain Forlot <romain.forlot@iot.bzh>
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2019 IoT.bzh Company
+* Copyright (C) 2019-2025 IoT.bzh Company
 * Contact: https://www.iot.bzh/licensing
 *
 * This file is part of the rp-webserver module of the RedPesk project.
