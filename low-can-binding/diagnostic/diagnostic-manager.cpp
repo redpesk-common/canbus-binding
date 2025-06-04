@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#include <systemd/sd-event.h>
 #include <algorithm>
 #include <string.h>
 #include <canbus-binding/diagnostic/diagnostic-manager.hpp>
