@@ -154,8 +154,6 @@ add_library(canbus-binding SHARED ${SOURCES})
 # Binder exposes a unique public entry point
 SET_TARGET_PROPERTIES(canbus-binding PROPERTIES
 	PREFIX "afb-"
-	LABELS "BINDING"
-	INSTALL_RPATH $ORIGIN
 	OUTPUT_NAME canbus-binding
 )
 
