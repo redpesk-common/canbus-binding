@@ -12,9 +12,11 @@ books:
       name: Architecture presentation
     - url: 2-Installation.md
       name: Installation Guide
-    - url: 3-Plugins.md
+    - url: 3-Communication-protocol.md
+      name: Communication protocol
+    - url: 4-Plugins.md
       name: Plugins
-    - url: 4-Configuration.md
+    - url: 5-Configuration.md
       name: Configuration
-    - url: 5-Usage.md
+    - url: 6-Usage.md
       name: Usage Guide

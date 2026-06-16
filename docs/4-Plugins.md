@@ -8,30 +8,21 @@ for the canbus-binding binding.
 If you have installed the canbus-binding from sources you already have the
 devel version installed.
 
+If installed from package within the [SDK container]({% chapter_link sdk-container-doc.overview %}), run:
 Else install the "canbus-binding-devel" package using your package manager.
 
-For redesk, Fedora or Opensuse:
-```
-sudo dnf install canbus-binding-devel
-```
-
-or for Ubuntu:
-```
-sudo apt install canbus-binding-dev
+```bash
+dnf install canbus-binding-devel
 ```
 
 ## Install the generator
 
 To generate your plugins you will need the canbus-generator.
 
-For redesk, Fedora or Opensuse:
+You can run the same command on a target runing a redpesk OS or in the SDK container:
+
 ```bash
 dnf install canbus-generator
-```
-
-or for Ubuntu:
-```
-sudo apt install canbus-generator-bin
 ```
 
 or from the sources:
@@ -43,10 +34,9 @@ mkdir build
 cd build
 cmake ..
 make
-sudo make install
 ```
 
-# Write your json mapping file
+## Write your json mapping file
 
 In this json file will be defined all the messages you will receive from your
 connected device.
@@ -58,7 +48,7 @@ You can find a plugin template by installing the
 mapping file, a simple plugin header file and a CMake file for easy build.
 After installation, these files can be found in your /usr/share/doc/ directory.
 
-## General Options
+### General Options
 
 * *`name`* \
  Set plugin's name. It will be your plugin's id in the binding.
@@ -72,7 +62,7 @@ decoders will be used. Available versions are v1 and v2, the latest being v2.
  Set sources to be added to the top of the generated
 plugin. It can be your own c++ signal decoders for example.
 
-## Message
+### Message
 
 The *`messages`* key is an object with fields mapping from CAN message IDs
 to signal definitions. The fields must be hex IDs of CAN messages
@@ -144,7 +134,7 @@ Setting this value on a message will cascade down to all of the signals within
 the message (unless overridden). See the force_send_changed flag documentation
 for the signal mapping for more information. Defaults to false.
 
-## Signal
+### Signal
 
 The attributes of a signal object within a message are:
 
@@ -261,7 +251,7 @@ point number. Defaults to false.
 * *`encoder (optional)`* \
 You can specify a custom function here to encode the value for CAN messages.
 
-## Diagnostic Messages
+### Diagnostic Messages
 
 The *`diagnostic_messages`* key is an array of objects describing a recurring diagnostic message request.
 
@@ -284,7 +274,7 @@ When using a name, you can also specify a custom decoder function to parse the p
 * *`callback (optional)`* \
 This field is the name of a function (that matches the DiagnosticResponseCallback function prototype) that should be called every time a response is received to this request.
 
-## Signal Decoder
+### Signal Decoder
 
 The default decoder for each signal is a simple passthrough, translating the
 signal's value from engineering units to something more usable (using the
@@ -326,7 +316,7 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 }
 ```
 
-## Json Example
+### Json Example
 
 ```json
 {	"name": "NMEA2000",
@@ -384,7 +374,7 @@ openxc_DynamicField decoder_t::decode_date(signal_t& signal, std::shared_ptr<mes
 }
 ```
 
-# Generate your plugin
+## Generate your plugin
 
 To generate your plugin you'll have to use the canbus-generator.
 Once you have installed the generator and written your json mapping file,
@@ -395,7 +385,7 @@ or execute this command:
 can-config-generator -m you-mapping-file.json -o your-plugin-name.cpp
  ```
 
-# Build and install your plugin
+## Build and install your plugin
 
 To be able to build your plugin, change ```set(TARGET_NAME generated_plugin)``` in
 the CMakeLists.txt with your plugin's name.
